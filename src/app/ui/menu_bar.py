@@ -26,6 +26,16 @@ class MainMenuBar(QMenuBar):
         file_menu.addAction(self.exit_action)
         self.addMenu(file_menu)
 
+        # Menú Aspecto
+        aspect_menu = QMenu("Aspecto", self)
+        self.light_theme_action = QAction("Tema claro", self)
+        self.dark_theme_action = QAction("Tema oscuro", self)
+        self.light_theme_action.setCheckable(True)
+        self.dark_theme_action.setCheckable(True)
+        aspect_menu.addAction(self.light_theme_action)
+        aspect_menu.addAction(self.dark_theme_action)
+        self.addMenu(aspect_menu)
+
         # Menú Ayuda
         help_menu = QMenu("Ayuda", self)
         self.about_action = QAction("Acerca de", self)

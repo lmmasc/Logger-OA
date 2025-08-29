@@ -332,10 +332,11 @@ src/app/ui/menu_bar.py      # Clase MainMenuBar, define menús y acciones
 src/app/ui/main_window.py  # Clase MainWindow, integra y conecta el menú
 ```
 
-- **menu_bar.py**: Contiene la clase `MainMenuBar`, que hereda de `QMenuBar` y define los menús "Archivo" y "Ayuda". Las acciones importantes (`exit_action`, `about_action`) se guardan como atributos para fácil acceso y conexión.
+- **menu_bar.py**: Contiene la clase `MainMenuBar`, que hereda de `QMenuBar` y define los menús "Archivo", "Aspecto" y "Ayuda". Las acciones importantes (`exit_action`, `about_action`, `light_theme_action`, `dark_theme_action`) se guardan como atributos para fácil acceso y conexión.
 - **main_window.py**: Integra la barra de menús y conecta las acciones de forma explícita:
   - "Archivo > Salir": cierra la aplicación.
   - "Ayuda > Acerca de": muestra un cuadro de diálogo informativo.
+  - "Aspecto > Tema claro / Tema oscuro": permite seleccionar el tema visual de la app y lo recuerda entre sesiones.
 
 ### Ejemplo de integración real y recomendada
 
@@ -351,6 +352,14 @@ class MainMenuBar(QMenuBar):
     self.exit_action = QAction("Salir", self)
     file_menu.addAction(self.exit_action)
     self.addMenu(file_menu)
+    aspect_menu = QMenu("Aspecto", self)
+    self.light_theme_action = QAction("Tema claro", self)
+    self.dark_theme_action = QAction("Tema oscuro", self)
+    self.light_theme_action.setCheckable(True)
+    self.dark_theme_action.setCheckable(True)
+    aspect_menu.addAction(self.light_theme_action)
+    aspect_menu.addAction(self.dark_theme_action)
+    self.addMenu(aspect_menu)
     help_menu = QMenu("Ayuda", self)
     self.about_action = QAction("Acerca de", self)
     help_menu.addAction(self.about_action)
@@ -359,6 +368,7 @@ class MainMenuBar(QMenuBar):
 # src/app/ui/main_window.py
 from PySide6.QtWidgets import QMainWindow, QMessageBox, QApplication
 from app.ui.menu_bar import MainMenuBar
+from app.ui.themes.theme_manager import ThemeManager
 
 class MainWindow(QMainWindow):
   def __init__(self):
@@ -368,9 +378,27 @@ class MainWindow(QMainWindow):
     self.center()
     self.menu_bar = MainMenuBar(self)
     self.setMenuBar(self.menu_bar)
+    self.theme_manager = ThemeManager()
+    self.theme_manager.load_last_theme()
     # Conexión explícita de acciones
     self.menu_bar.exit_action.triggered.connect(self.close)
     self.menu_bar.about_action.triggered.connect(self.show_about_dialog)
+    self.menu_bar.light_theme_action.triggered.connect(self.set_light_theme)
+    self.menu_bar.dark_theme_action.triggered.connect(self.set_dark_theme)
+    self._update_theme_menu_checks()
+
+  def set_light_theme(self):
+    self.theme_manager.apply_theme("light")
+    self._update_theme_menu_checks()
+
+  def set_dark_theme(self):
+    self.theme_manager.apply_theme("dark")
+    self._update_theme_menu_checks()
+
+  def _update_theme_menu_checks(self):
+    theme = self.theme_manager.current_theme
+    self.menu_bar.light_theme_action.setChecked(theme == "light")
+    self.menu_bar.dark_theme_action.setChecked(theme == "dark")
 
   def show_about_dialog(self):
     QMessageBox.information(self, "Acerca de", "Logger OA v2\nAplicación de ejemplo con PySide6.")
@@ -383,6 +411,6 @@ class MainWindow(QMainWindow):
     self.move(window_geometry.topLeft())
 ```
 
-Este enfoque es claro, robusto y desacoplado: la lógica del menú está separada de la ventana principal, pero las acciones se conectan de forma explícita y mantenible.
+Este enfoque es claro, robusto y desacoplado: la lógica del menú está separada de la ventana principal, pero las acciones se conectan de forma explícita y mantenible. El usuario puede cambiar el tema desde el menú "Aspecto" y la preferencia se recuerda automáticamente.
 
 ---
