@@ -262,3 +262,36 @@ ok = execute_query('ruta/auxiliar.db', 'INSERT INTO tabla (col1, col2) VALUES (?
 Esto permite trabajar con una base principal y varias bases auxiliares de forma modular y sencilla.
 
 ---
+
+## Temas y estilos (claro/oscuro)
+
+La aplicación permite cambiar entre tema claro y oscuro, centralizando los estilos en archivos QSS. La preferencia del usuario se guarda usando SettingsManager.
+
+### Estructura
+
+```
+src/app/ui/themes/
+    base.qss         # Estilos comunes
+    light.qss        # Tema claro
+    dark.qss         # Tema oscuro
+    theme_manager.py # Lógica para aplicar y recordar el tema
+```
+
+- **base.qss**: Estilos base aplicados a todos los temas.
+- **light.qss**: Estilos para el tema claro.
+- **dark.qss**: Estilos para el tema oscuro.
+- **theme_manager.py**: Clase `ThemeManager` para cargar, aplicar y recordar el tema seleccionado por el usuario.
+
+### Ejemplo de uso
+
+```python
+from app.ui.themes.theme_manager import ThemeManager
+
+themes = ThemeManager()
+themes.apply_theme("dark")  # Cambia a tema oscuro
+themes.load_last_theme()     # Aplica el último tema usado
+```
+
+Esto permite una gestión centralizada y escalable de los estilos visuales de la app.
+
+---
