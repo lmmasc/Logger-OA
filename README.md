@@ -180,6 +180,29 @@ Así, al abrir una terminal en VS Code, se usará automáticamente el entorno ad
 
 ---
 
+## Selección automática del intérprete de Python en VS Code
+
+El archivo `.vscode/settings.json` está configurado para que VS Code seleccione automáticamente el intérprete de Python adecuado según el sistema operativo:
+
+- En Linux: usa `.venv-linux/bin/python`
+- En Windows: usa `.venv-windows/Scripts/python.exe`
+- En Mac: usa `.venv-mac/bin/python3`
+
+Configuración utilizada:
+
+```jsonc
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv-linux/bin/python",
+  "python.defaultInterpreterPath.linux": "${workspaceFolder}/.venv-linux/bin/python",
+  "python.defaultInterpreterPath.windows": "${workspaceFolder}\\.venv-windows\\Scripts\\python.exe",
+  "python.defaultInterpreterPath.osx": "${workspaceFolder}/.venv-mac/bin/python3"
+}
+```
+
+Esto permite que VS Code detecte y use automáticamente el entorno virtual correcto al abrir el proyecto, sin necesidad de configuraciones manuales.
+
+---
+
 ## Notas
 - La estructura está lista para crecer: puedes agregar más módulos en `app/` y más componentes de UI en `app/ui/`.
 - El archivo `.gitignore` evita que archivos temporales y entornos virtuales se suban al repositorio.
