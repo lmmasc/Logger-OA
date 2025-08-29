@@ -13,33 +13,43 @@ Logger OA v2/
 ├── Logger OA v2.code-workspace
 ├── README.md
 ├── requirements.txt
+├── requirements-dev.txt
 ├── assets/
 │   ├── app_icon.ico
 │   ├── app_icon.png
 │   ├── app_icon.icns
 │   └── rcp_logo.png
+├── scripts/
+│   ├── build-linux.sh
+│   ├── build-mac.sh
+│   └── build-windows.bat
 ├── src/
 │   ├── main.py
 │   └── app/
 │       ├── __init__.py
 │       └── ui/
 │           └── main_window.py
-└── .venv/
+└── .venv-linux/ (o .venv-windows)
 ```
 
 - **.gitignore**: Exclusiones para Git (entornos, cachés, etc).
 - **Logger OA v2.code-workspace**: Configuración de espacio de trabajo para VS Code.
 - **README.md**: Documentación del proyecto.
 - **requirements.txt**: Dependencias del proyecto.
+- **requirements-dev.txt**: Dependencias de desarrollo (ej: PyInstaller).
 - **assets/**: Carpeta para recursos como iconos e imágenes de la app.
   - `app_icon.ico`: Icono para ejecutable en Windows.
   - `app_icon.png`: Icono para ejecutable en Linux.
   - `app_icon.icns`: Icono para ejecutable en Mac.
   - `rcp_logo.png`: Logo usado dentro de la aplicación.
+- **scripts/**: Scripts para automatizar la generación de ejecutables.
+  - `build-linux.sh`: Genera el ejecutable en Linux.
+  - `build-mac.sh`: Genera el ejecutable en Mac.
+  - `build-windows.bat`: Genera el ejecutable en Windows.
 - **src/main.py**: Punto de entrada de la aplicación. Crea y muestra la ventana principal.
 - **src/app/__init__.py**: Marca la carpeta `app` como un paquete Python.
 - **src/app/ui/main_window.py**: Define la clase `MainWindow` (ventana principal).
-- **.venv/**: Entorno virtual de Python (no se sube a Git).
+- **.venv-linux/**, **.venv-windows/**: Entornos virtuales (no se suben a Git).
 
 ---
 
@@ -63,6 +73,25 @@ Logger OA v2/
   - Mac: `app_icon.icns`
 - Logo de la app: `rcp_logo.png` (para usar dentro de la interfaz).
 
+### scripts/
+- Scripts para automatizar la generación de ejecutables multiplataforma.
+- Uso:
+  - **Linux:**
+    ```bash
+    chmod +x scripts/build-linux.sh
+    ./scripts/build-linux.sh
+    ```
+  - **Mac:**
+    ```bash
+    chmod +x scripts/build-mac.sh
+    ./scripts/build-mac.sh
+    ```
+  - **Windows:**
+    ```cmd
+    scripts\build-windows.bat
+    ```
+- Cada script debe ejecutarse en su sistema operativo correspondiente y generará el ejecutable en la carpeta `dist/`.
+
 ---
 
 ## Crear ejecutable multiplataforma
@@ -72,24 +101,23 @@ Para generar un ejecutable autocontenible en cada sistema operativo, se recomien
 ### 1. Instalar PyInstaller
 
 ```bash
-.venv/bin/pip install pyinstaller
+.venv-linux/bin/pip install pyinstaller  # Linux
+.venv-windows\Scripts\pip install pyinstaller  # Windows
 ```
 
 ### 2. Generar el ejecutable
 
 - **En Linux:**
   ```bash
-  .venv/bin/pyinstaller src/main.py --onefile --name LoggerOA --icon=assets/app_icon.png
+  ./scripts/build-linux.sh
   ```
 - **En Windows:**
-  Ejecuta el comando equivalente en una terminal de Windows:
   ```cmd
-  .venv\Scripts\pyinstaller src\main.py --onefile --name LoggerOA --icon=assets/app_icon.ico
+  scripts\build-windows.bat
   ```
 - **En Mac:**
-  Ejecuta el comando equivalente en una terminal de Mac:
   ```bash
-  .venv/bin/pyinstaller src/main.py --onefile --name LoggerOA --icon=assets/app_icon.icns
+  ./scripts/build-mac.sh
   ```
 
 Esto generará un ejecutable único en la carpeta `dist/` para cada plataforma.
@@ -104,7 +132,8 @@ Esto generará un ejecutable único en la carpeta `dist/` para cada plataforma.
 Desde la raíz del proyecto:
 
 ```bash
-.venv/bin/python src/main.py
+.venv-linux/bin/python src/main.py  # Linux
+.venv-windows\Scripts\python src\main.py  # Windows
 ```
 
 ---
@@ -115,12 +144,12 @@ Desde la raíz del proyecto:
 
 Instala dependencias de ejecución con:
 ```bash
-.venv/bin/pip install -r requirements.txt
+.venv-linux/bin/pip install -r requirements.txt
 ```
 
 Instala dependencias de desarrollo con:
 ```bash
-.venv/bin/pip install -r requirements-dev.txt
+.venv-linux/bin/pip install -r requirements-dev.txt
 ```
 
 ---
