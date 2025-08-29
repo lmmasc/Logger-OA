@@ -7,6 +7,7 @@ Proyecto base en Python usando PySide6 para una aplicación de escritorio con un
 
 ## Estructura de Carpetas y Archivos
 
+
 ```
 Logger OA v2/
 ├── .gitignore
@@ -27,8 +28,21 @@ Logger OA v2/
 │   ├── main.py
 │   └── app/
 │       ├── __init__.py
+│       ├── config/
+│       │   ├── __init__.py
+│       │   └── settings_manager.py
+│       ├── db/
+│       │   ├── __init__.py
+│       │   ├── connection.py
+│       │   └── queries.py
 │       └── ui/
-│           └── main_window.py
+│           ├── main_window.py
+│           ├── menu_bar.py
+│           └── themes/
+│               ├── base.qss
+│               ├── light.qss
+│               ├── dark.qss
+│               └── theme_manager.py
 └── .venv-linux/ (o .venv-windows)
 ```
 
@@ -48,7 +62,16 @@ Logger OA v2/
   - `build-windows.bat`: Genera el ejecutable en Windows.
 - **src/main.py**: Punto de entrada de la aplicación. Crea y muestra la ventana principal.
 - **src/app/__init__.py**: Marca la carpeta `app` como un paquete Python.
+- **src/app/config/settings_manager.py**: Abstracción de QSettings para configuración persistente.
+- **src/app/db/connection.py**: Funciones para abrir/cerrar cualquier base SQLite.
+- **src/app/db/queries.py**: Funciones CRUD y consultas reutilizables.
 - **src/app/ui/main_window.py**: Define la clase `MainWindow` (ventana principal).
+- **src/app/ui/menu_bar.py**: Barra de menús modular.
+- **src/app/ui/themes/**: Temas y estilos centralizados (QSS y lógica de temas).
+  - `base.qss`: Estilos base comunes.
+  - `light.qss`: Tema claro.
+  - `dark.qss`: Tema oscuro.
+  - `theme_manager.py`: Lógica para aplicar y recordar el tema.
 - **.venv-linux/**, **.venv-windows/**: Entornos virtuales (no se suben a Git).
 
 ---
@@ -280,7 +303,7 @@ src/app/ui/themes/
 - **base.qss**: Estilos base aplicados a todos los temas.
 - **light.qss**: Estilos para el tema claro.
 - **dark.qss**: Estilos para el tema oscuro.
-- **theme_manager.py**: Clase `ThemeManager` para cargar, aplicar y recordar el tema seleccionado por el usuario.
+- **theme_manager.py**: Clase `ThemeManager` para cargar, aplicar y recordar el tema seleccionado por el usuario. Utiliza `SettingsManager` para guardar la preferencia.
 
 ### Ejemplo de uso
 
