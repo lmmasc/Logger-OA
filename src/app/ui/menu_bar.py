@@ -5,7 +5,8 @@ Módulo para definir y gestionar la barra de menús principal de la aplicación.
 Permite separar la lógica del menú de la ventana principal para mayor modularidad.
 """
 
-from PySide6.QtWidgets import QMenuBar, QMenu, QAction
+from PySide6.QtWidgets import QMenuBar, QMenu
+from PySide6.QtGui import QAction
 
 
 class MainMenuBar(QMenuBar):
