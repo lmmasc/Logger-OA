@@ -65,6 +65,39 @@ Instala dependencias con:
 
 ---
 
+## Crear ejecutable multiplataforma
+
+Para generar un ejecutable autocontenible en cada sistema operativo, se recomienda usar [PyInstaller](https://pyinstaller.org/):
+
+### 1. Instalar PyInstaller
+
+```bash
+.venv/bin/pip install pyinstaller
+```
+
+### 2. Generar el ejecutable
+
+- **En Linux:**
+  ```bash
+  .venv/bin/pyinstaller src/main.py --onefile --name LoggerOA
+  ```
+- **En Windows:**
+  Ejecuta el comando equivalente en una terminal de Windows:
+  ```cmd
+  .venv\Scripts\pyinstaller src\main.py --onefile --name LoggerOA
+  ```
+- **En Mac:**
+  Ejecuta el comando equivalente en una terminal de Mac:
+  ```bash
+  .venv/bin/pyinstaller src/main.py --onefile --name LoggerOA
+  ```
+
+Esto generará un ejecutable único en la carpeta `dist/` para cada plataforma.
+
+> **Nota:** Debes ejecutar PyInstaller en cada sistema operativo objetivo para obtener el ejecutable nativo correspondiente.
+
+---
+
 ## Notas
 - La estructura está lista para crecer: puedes agregar más módulos en `app/` y más componentes de UI en `app/ui/`.
 - El archivo `.gitignore` evita que archivos temporales y entornos virtuales se suban al repositorio.
