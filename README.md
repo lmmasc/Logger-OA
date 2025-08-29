@@ -230,3 +230,35 @@ pos = settings.get_value('ventana/posicion', (0, 0))
 Esto permite que la app recuerde configuraciones entre sesiones de forma sencilla y multiplataforma.
 
 ---
+
+## Gestión de base de datos (SQLite)
+
+La aplicación utiliza SQLite como motor de base de datos, aprovechando el módulo `sqlite3` incluido en la biblioteca estándar de Python (no requiere instalación adicional).
+
+### Estructura
+
+```
+src/app/db/
+    __init__.py
+    connection.py   # Funciones para abrir/cerrar cualquier base SQLite
+    queries.py      # Funciones CRUD y consultas reutilizables para base principal y auxiliares
+```
+
+- **connection.py**: Proporciona la función `get_connection(db_path)` para abrir conexiones a cualquier base de datos SQLite (principal o auxiliar).
+- **queries.py**: Incluye funciones para ejecutar consultas SELECT, INSERT, UPDATE y DELETE sobre cualquier base, recibiendo la ruta de la base como argumento.
+
+### Ejemplo de uso
+
+```python
+from app.db.queries import fetch_all, execute_query
+
+# Consultar todos los registros de una tabla en la base principal
+registros = fetch_all('ruta/base_principal.db', 'SELECT * FROM tabla')
+
+# Insertar un registro en una base auxiliar
+ok = execute_query('ruta/auxiliar.db', 'INSERT INTO tabla (col1, col2) VALUES (?, ?)', (valor1, valor2))
+```
+
+Esto permite trabajar con una base principal y varias bases auxiliares de forma modular y sencilla.
+
+---
