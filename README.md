@@ -125,6 +125,32 @@ Instala dependencias de desarrollo con:
 
 ---
 
+## Configuración automática de entornos virtuales en VS Code
+
+El archivo `Logger OA v2.code-workspace` está configurado para que la terminal integrada de VS Code active automáticamente el entorno virtual correcto según el sistema operativo:
+
+- En Linux: activa `.venv-linux`
+- En Windows: activa `.venv-windows`
+
+Esto se logra con la sección `settings`:
+
+```jsonc
+"settings": {
+  "terminal.integrated.env.linux": {
+    "VIRTUAL_ENV": "${workspaceFolder}/.venv-linux",
+    "PATH": "${workspaceFolder}/.venv-linux/bin:${env:PATH}"
+  },
+  "terminal.integrated.env.windows": {
+    "VIRTUAL_ENV": "${workspaceFolder}\\.venv-windows",
+    "PATH": "${workspaceFolder}\\.venv-windows\\Scripts;${env:PATH}"
+  }
+}
+```
+
+Así, al abrir una terminal en VS Code, se usará automáticamente el entorno adecuado para cada plataforma.
+
+---
+
 ## Notas
 - La estructura está lista para crecer: puedes agregar más módulos en `app/` y más componentes de UI en `app/ui/`.
 - El archivo `.gitignore` evita que archivos temporales y entornos virtuales se suban al repositorio.

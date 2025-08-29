@@ -4,5 +4,15 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		// Configuración para activar automáticamente el entorno virtual correcto según el sistema operativo
+		"terminal.integrated.env.linux": {
+			"VIRTUAL_ENV": "${workspaceFolder}/.venv-linux",
+			"PATH": "${workspaceFolder}/.venv-linux/bin:${env:PATH}"
+		},
+		"terminal.integrated.env.windows": {
+			"VIRTUAL_ENV": "${workspaceFolder}\\.venv-windows",
+			"PATH": "${workspaceFolder}\\.venv-windows\\Scripts;${env:PATH}"
+		}
+	}
 }
