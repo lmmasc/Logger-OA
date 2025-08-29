@@ -110,12 +110,17 @@ Desde la raíz del proyecto:
 ---
 
 ## Dependencias
-- Python 3.12+
-- PySide6
+- **requirements.txt**: Solo dependencias necesarias para ejecutar la aplicación.
+- **requirements-dev.txt**: Dependencias para desarrollo y empaquetado (ej: PyInstaller).
 
-Instala dependencias con:
+Instala dependencias de ejecución con:
 ```bash
-.venv/bin/pip install pyside6
+.venv/bin/pip install -r requirements.txt
+```
+
+Instala dependencias de desarrollo con:
+```bash
+.venv/bin/pip install -r requirements-dev.txt
 ```
 
 ---
