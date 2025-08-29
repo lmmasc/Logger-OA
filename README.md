@@ -295,3 +295,28 @@ themes.load_last_theme()     # Aplica el último tema usado
 Esto permite una gestión centralizada y escalable de los estilos visuales de la app.
 
 ---
+
+## Menú principal modular
+
+La barra de menús de la aplicación está definida en un archivo independiente para mantener la modularidad y la separación de responsabilidades.
+
+### Estructura
+
+```
+src/app/ui/menu_bar.py
+```
+
+- **menu_bar.py**: Contiene la clase `MainMenuBar`, que hereda de `QMenuBar` y define los menús y acciones principales de la aplicación.
+
+### Ejemplo de uso
+
+```python
+from app.ui.menu_bar import MainMenuBar
+
+menu_bar = MainMenuBar(parent=self)
+self.setMenuBar(menu_bar)
+```
+
+Esto permite mantener la lógica del menú separada de la ventana principal y facilita su mantenimiento y expansión.
+
+---
