@@ -25,23 +25,9 @@ class MainWindow(QMainWindow):
         self.menu_bar = MainMenuBar(self)
         self.setMenuBar(self.menu_bar)
 
-        # Conectar acciones del menú
-        self._connect_menu_actions()
-
-    def _connect_menu_actions(self):
-        # Buscar acciones por texto
-        file_menu = self.menu_bar.findChild(type(self.menu_bar.addMenu("")), "Archivo")
-        help_menu = self.menu_bar.findChild(type(self.menu_bar.addMenu("")), "Ayuda")
-
-        # Alternativamente, buscar por orden
-        file_menu = self.menu_bar.actions()[0].menu()
-        help_menu = self.menu_bar.actions()[1].menu()
-
-        exit_action = file_menu.actions()[0]
-        about_action = help_menu.actions()[0]
-
-        exit_action.triggered.connect(self.close)
-        about_action.triggered.connect(self.show_about_dialog)
+        # Conectar acciones del menú de forma explícita
+        self.menu_bar.exit_action.triggered.connect(self.close)
+        self.menu_bar.about_action.triggered.connect(self.show_about_dialog)
 
     def show_about_dialog(self):
         QMessageBox.information(

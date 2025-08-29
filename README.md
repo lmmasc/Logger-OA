@@ -323,7 +323,7 @@ src/app/ui/menu_bar.py
 
 ## Menú principal modular e integración
 
-La barra de menús de la aplicación está definida en un archivo independiente para mantener la modularidad y la separación de responsabilidades. Ahora, el menú está completamente integrado con la ventana principal y sus acciones conectadas.
+La barra de menús de la aplicación está definida en un archivo independiente para mantener la modularidad y la separación de responsabilidades. El menú está completamente integrado con la ventana principal y sus acciones conectadas de forma explícita y robusta.
 
 ### Estructura
 
@@ -332,16 +332,32 @@ src/app/ui/menu_bar.py      # Clase MainMenuBar, define menús y acciones
 src/app/ui/main_window.py  # Clase MainWindow, integra y conecta el menú
 ```
 
-- **menu_bar.py**: Contiene la clase `MainMenuBar`, que hereda de `QMenuBar` y define los menús "Archivo" y "Ayuda" con sus acciones principales.
-- **main_window.py**: Integra la barra de menús y conecta las acciones:
+- **menu_bar.py**: Contiene la clase `MainMenuBar`, que hereda de `QMenuBar` y define los menús "Archivo" y "Ayuda". Las acciones importantes (`exit_action`, `about_action`) se guardan como atributos para fácil acceso y conexión.
+- **main_window.py**: Integra la barra de menús y conecta las acciones de forma explícita:
   - "Archivo > Salir": cierra la aplicación.
   - "Ayuda > Acerca de": muestra un cuadro de diálogo informativo.
 
-### Ejemplo de integración real
+### Ejemplo de integración real y recomendada
 
 ```python
+# src/app/ui/menu_bar.py
+from PySide6.QtWidgets import QMenuBar, QMenu
+from PySide6.QtGui import QAction
+
+class MainMenuBar(QMenuBar):
+  def __init__(self, parent=None):
+    super().__init__(parent)
+    file_menu = QMenu("Archivo", self)
+    self.exit_action = QAction("Salir", self)
+    file_menu.addAction(self.exit_action)
+    self.addMenu(file_menu)
+    help_menu = QMenu("Ayuda", self)
+    self.about_action = QAction("Acerca de", self)
+    help_menu.addAction(self.about_action)
+    self.addMenu(help_menu)
+
 # src/app/ui/main_window.py
-from PySide6.QtWidgets import QMainWindow, QMessageBox
+from PySide6.QtWidgets import QMainWindow, QMessageBox, QApplication
 from app.ui.menu_bar import MainMenuBar
 
 class MainWindow(QMainWindow):
@@ -349,22 +365,24 @@ class MainWindow(QMainWindow):
     super().__init__()
     self.setWindowTitle("Ventana Principal")
     self.resize(600, 400)
+    self.center()
     self.menu_bar = MainMenuBar(self)
     self.setMenuBar(self.menu_bar)
-    self._connect_menu_actions()
-
-  def _connect_menu_actions(self):
-    file_menu = self.menu_bar.actions()[0].menu()
-    help_menu = self.menu_bar.actions()[1].menu()
-    exit_action = file_menu.actions()[0]
-    about_action = help_menu.actions()[0]
-    exit_action.triggered.connect(self.close)
-    about_action.triggered.connect(self.show_about_dialog)
+    # Conexión explícita de acciones
+    self.menu_bar.exit_action.triggered.connect(self.close)
+    self.menu_bar.about_action.triggered.connect(self.show_about_dialog)
 
   def show_about_dialog(self):
     QMessageBox.information(self, "Acerca de", "Logger OA v2\nAplicación de ejemplo con PySide6.")
+
+  def center(self):
+    screen = QApplication.primaryScreen()
+    screen_geometry = screen.availableGeometry()
+    window_geometry = self.frameGeometry()
+    window_geometry.moveCenter(screen_geometry.center())
+    self.move(window_geometry.topLeft())
 ```
 
-Esto permite mantener la lógica del menú separada de la ventana principal, facilita su mantenimiento y expansión, y asegura que las acciones del menú estén conectadas y funcionales desde el inicio.
+Este enfoque es claro, robusto y desacoplado: la lógica del menú está separada de la ventana principal, pero las acciones se conectan de forma explícita y mantenible.
 
 ---

@@ -22,16 +22,12 @@ class MainMenuBar(QMenuBar):
     def _create_menus(self):
         # Menú Archivo
         file_menu = QMenu("Archivo", self)
-        exit_action = QAction("Salir", self)
-        file_menu.addAction(exit_action)
+        self.exit_action = QAction("Salir", self)
+        file_menu.addAction(self.exit_action)
         self.addMenu(file_menu)
 
         # Menú Ayuda
         help_menu = QMenu("Ayuda", self)
-        about_action = QAction("Acerca de", self)
-        help_menu.addAction(about_action)
+        self.about_action = QAction("Acerca de", self)
+        help_menu.addAction(self.about_action)
         self.addMenu(help_menu)
-
-        # Puedes conectar las acciones aquí o desde la ventana principal
-        # exit_action.triggered.connect(...)
-        # about_action.triggered.connect(...)
