@@ -7,6 +7,7 @@ Contiene la clase MainWindow, que define la ventana principal usando PySide6.
 from PySide6.QtWidgets import QMainWindow, QApplication, QMessageBox
 from app.ui.menu_bar import MainMenuBar
 from app.ui.themes.theme_manager import ThemeManager
+from app.ui.translations import tr
 
 
 class MainWindow(QMainWindow):
@@ -18,7 +19,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Ventana Principal")  # Título de la ventana
+        self.setWindowTitle(tr("main_window_title"))  # Título de la ventana
         self.resize(600, 400)  # Solo tamaño inicial
         self.center()
 
@@ -53,9 +54,7 @@ class MainWindow(QMainWindow):
         self.menu_bar.dark_theme_action.setChecked(theme == "dark")
 
     def show_about_dialog(self):
-        QMessageBox.information(
-            self, "Acerca de", "Logger OA v2\nAplicación de ejemplo con PySide6."
-        )
+        QMessageBox.information(self, tr("about"), tr("about_message"))
 
     def center(self):
         """Centra la ventana en la pantalla principal."""

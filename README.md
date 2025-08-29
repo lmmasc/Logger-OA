@@ -1,3 +1,27 @@
+# Soporte multilenguaje (i18n) personalizado
+
+La aplicación soporta español e inglés usando un sistema de traducción propio basado en diccionarios Python. Español es el idioma por defecto.
+
+### Estructura y uso
+
+```
+src/app/ui/translations.py  # Diccionario de textos y función tr(key)
+```
+
+- **translations.py**: Contiene los textos en ambos idiomas y la función `tr(key)` para obtener el texto traducido según el idioma actual. Ejemplo:
+
+```python
+from app.ui.translations import tr
+self.setWindowTitle(tr("main_window_title"))
+file_menu = QMenu(tr("file_menu"), self)
+exit_action = QAction(tr("exit"), self)
+```
+
+Para cambiar el idioma, basta con modificar la variable `current_lang` en `translations.py` y reiniciar la app. Todos los textos de la interfaz se obtienen a través de `tr(key)`.
+
+Puedes agregar o modificar textos fácilmente editando el diccionario en `translations.py`.
+
+---
 # Logger OA v2
 
 ## Descripción
