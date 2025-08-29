@@ -203,6 +203,30 @@ Esto permite que VS Code detecte y use automáticamente el entorno virtual corre
 
 ---
 
-## Notas
-- La estructura está lista para crecer: puedes agregar más módulos en `app/` y más componentes de UI en `app/ui/`.
-- El archivo `.gitignore` evita que archivos temporales y entornos virtuales se suban al repositorio.
+## Configuración y persistencia de estado
+
+La aplicación utiliza una clase `SettingsManager` basada en QSettings para guardar y recuperar configuraciones de usuario (preferencias, estado de la ventana, etc.) de forma multiplataforma.
+
+### Estructura
+
+```
+src/app/config/
+    __init__.py
+    settings_manager.py
+```
+
+- **settings_manager.py**: Contiene la clase `SettingsManager`, que abstrae el uso de QSettings y provee métodos para guardar, obtener y eliminar valores de configuración.
+
+### Ejemplo de uso
+
+```python
+from app.config.settings_manager import SettingsManager
+
+settings = SettingsManager()
+settings.set_value('ventana/posicion', (100, 100))
+pos = settings.get_value('ventana/posicion', (0, 0))
+```
+
+Esto permite que la app recuerde configuraciones entre sesiones de forma sencilla y multiplataforma.
+
+---
