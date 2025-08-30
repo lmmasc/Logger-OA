@@ -1,0 +1,260 @@
+RADIO CLUB PERUANO
+REGLAMENTO DE LOS CONCURSOS DE
+CALENDARIO FIJO AÑO 2025
+I.- CONCURSOS
+ART. 1º
+
+El presente reglamento normará los Concursos de
+Calendario Fijo que organiza el Radio Club Peruano
+durante el año, de acuerdo con las fechas señaladas en el
+Anexo del presente Reglamento.
+
+ART. 2º
+
+Los Concursos de Calendario Fijo otorgarán los puntajes
+necesarios para designar al Campeón del Año de los
+Radioaficionados OA.
+
+II.- PARTICIPANTES
+ART. 3º
+
+Podrán participar todos los radioaficionados del Perú con
+licencia oficial, así como estaciones de radioaficionados
+residentes en el país que operen portable OA.
+Las estaciones utilizarán un máximo de 100 watts
+de potencia y un ancho de banda de 2.4 KHz.
+
+ART. 4º
+
+La Estación oficial OA4O participará otorgando puntos a
+los concursantes, para lo cual presentará la respectiva
+planilla para efectos de control.
+
+ART. 5º
+
+Cuando en un mismo QTH existan 2 o más operadores
+con indicativos diferentes y que deseen intervenir en un
+concurso, deberán seguir las siguientes consideraciones:
+a.- Deberán concursar por períodos diferentes de tiempo
+y con un mínimo de 15 minutos de operación continua por
+operador.
+b.- No serán válidos los contactos entre los operadores de
+un mismo QTH.
+
+ART. 6º
+
+Podrán intervenir en un concurso estaciones portables
+para lo cual deberán mencionar su ubicación en su
+Indicativo y en la planilla respectiva. Para poder obtener
+clasificación, estas estaciones deberán permanecer en una
+ubicación fija durante todo el concurso.
+
+ART. 7º
+
+Considerando la ética de los radioaficionados no está
+permitido concertar contactos sea cual fuere el tipo de
+enlace, los que serán anulados por la Comisión.
+
+ART. 8º El Consejo Directivo podrá designar observadores del
+Concurso. Cuando alguno de los observadores constante
+alguna irregularidad o quiebre de la ética operativa de los
+participantes,
+informará
+al
+Consejo
+Directivo,
+reservándose el derecho de descalificarlo.
+III.- MODALIDAD
+ART. 9º
+
+Los concursos del Radio Club Peruano se regirán por la
+hora oficial del Perú. Todos los participantes deberán
+controlar y adecuar sus relojes a la hora oficial para
+anotarla en la hora de cada contacto.
+
+ART 10° Los concursos de Calendario Fijo tendrán una (1) hora de
+duración, estando dividido en dos (2) bloques de 30
+minutos cada uno. Los contactos realizados en el primer
+bloque podrán ser repetidos en el segundo bloque horario.
+ART. 11º Se empleará obligatoriamente la planilla oficial en la que
+deberá figurar en el orden de izquierda a derecha, con los
+datos completos, la siguiente información:
+ Número de Orden del QSO
+ Hora OA
+ Estación corresponsal
+ Intercambio recibido
+ Intercambio transmitido
+El modelo de Planilla que debe utilizarse se puede
+descargar de la web www.oa4o.pe en el apartado
+“Descargas” sección “Concursos Nacionales OA”.
+ART. 12º El intercambio numérico en cada QSO será correlativo el
+cual constará de 5 cifras, donde las 2 primeras
+corresponden al reporte de señal RS recibido y las 3
+siguientes al número progresivo del contacto, iniciando en
+001 para la primera estación.
+ART. 13º Todos los contactos entre estaciones valen dos (2) puntos
+en el primer bloque horario y tres (3) puntos para el
+segundo bloque.
+
+La estación oficial OA4O otorgará cinco (5) puntos por
+cada contacto durante todo el concurso.
+ART. 16º Para obtener y dar puntaje en un concurso, el participante
+deberá presentar su planilla y aparecer por lo menos en
+un mínimo de cinco (5) planillas de otros participantes.
+ART. 17º Los participantes de los concursos que organice el Radio
+Club Peruano deberán utilizar EXCLUSIVAMENTE la
+plantilla provista por el RCP. En caso de no hacerlo, será
+considerado solo como Check Log y no recibirá
+puntuación.
+ART.18º Los participantes deberán enviar sus planillas vía correo
+electrónico a la dirección oa4o@oa4o.pe, identificando el
+archivo con el nombre del concurso seguido de su
+Indicativo o presentarlas en la oficina administrativa del
+RCP
+ART. 19° Una estación que haya participado en el concurso pero
+que no haya enviado su planilla puede otorgar puntos
+siempre y cuando aparezca en por lo menos 5 planillas de
+otros participantes que hayan sido recibidas y visadas en
+el RCP.
+ART. 20º Las planillas deberán remitirse al Radio Club Peruano
+dentro de los 30 días siguientes de la fecha del concurso.
+IV.- CLASIFICACION
+ART. 21° La calificación de los concursantes se realizará utilizando
+el cruce de información de todas las planillas recibidas y
+que se encuentren válidas. A cada contacto válido
+realizado se aplicarán los puntajes del Art. 13,
+obteniéndose el puntaje total por la suma simple del total
+de puntos.
+ART. 22º En caso de empate en el puntaje de dos o más
+participantes, se tendrá en cuenta el mayor número de
+estaciones contactadas, así como el menor tiempo de
+participación en el concurso, entre el primero y el último
+contacto.
+
+ART. 23º Todos los concursos de Calendario Fijo que organiza el
+Radio Club Peruano otorgarán puntos para el título de
+Campeón del Año de los Radioaficionados OA. Al fin de
+cada año se nominará al “Campeón del Año” y será aquel
+que haya acumulado la mayor cantidad de puntos por su
+participación en los concursos de Calendario Fijo.
+ART. 24º Radio Club Peruano establece la siguiente tabla de
+puntaje para los 10 primeros clasificados en cada
+concurso. Esta tabla solo es válida para determinar al
+Campeón del Año y no será utilizada para el cómputo del
+ganador de los concursos individuales.
+Para el concurso DIA MUNDIAL DE LA RADIOAFICION
+1º Puesto 10 puntos
+6º
+Puesto 5 Puntos
+2º Puesto 9 puntos
+7º
+Puesto 4 Puntos
+3º Puesto 8 puntos
+8º
+Puesto 3 Puntos
+4º Puesto 7 puntos
+9º
+Puesto 2 Puntos
+5º Puesto 6 puntos
+10º Puesto 1 Puntos
+Para el concurso INDEPENDENCIA DEL PERU
+1º Puesto 20 puntos
+6º
+Puesto 10 Puntos
+2º Puesto 18 puntos
+7º
+Puesto 8 Puntos
+3º Puesto 16 puntos
+8º
+Puesto 6 Puntos
+4º Puesto 14 puntos
+9º
+Puesto 4 Puntos
+5º Puesto 12 puntos
+10º Puesto 2 Puntos
+Para el concurso DIA DEL RADIOAFICIONADO PERUANO
+1º Puesto 30 puntos
+6º
+Puesto 15 Puntos
+2º Puesto 27 puntos
+7º
+Puesto 12 Puntos
+3º Puesto 24 puntos
+8º
+Puesto 9 Puntos
+4º Puesto 21 puntos
+9º
+Puesto 6 Puntos
+5º Puesto 18 puntos
+10º Puesto 3 Puntos
+Adicionalmente se otorgará un bono de 10 puntos a
+aquellos que hayan participado en los 3 concursos.
+V.- PREMIOS Y DIPLOMAS
+ART. 25º Los premios instituidos por Radio Club Peruano para cada
+uno de los concursos son:
+1er. Puesto: Diploma
+2do. Puesto: Diploma
+3er. Puesto: Diploma
+
+ART. 26º Se otorgará también los siguientes diplomas a los
+participantes que acumulen el mayor puntaje por la
+sumatoria de puntos por su participación en al menos dos
+concursos del Calendario Fijo se acuerdo al siguiente
+detalle:
+1- Diploma “Alfredo Granda Rey” al Campeón del Año de
+los Radioaficionados OA.
+2- Diploma “William G. Wilson” al concursante de
+categoría Novicio mejor clasificado. Para optar a este
+diploma el concursante deberá tener una antigüedad
+menor a 2 años en la categoría Novicio contados desde
+su primera licencia.
+3- Diploma “Jorge Salinas Sedó” al concursante que logre
+la mejor calificación entre las Zonas Radiales distintas
+a la Zona 4.
+ART. 27º La premiación de todos los concursos del año se realizará
+durante la Sesión solemne que el Consejo Directivo
+programe con motivo de la celebración de la fundación del
+Club, en el mes de diciembre.
+VI.- GENERALES
+ART. 28º La calificación de los Concursos estará a cargo de un
+integrante del Consejo Directivo u otra persona designada
+por este. En caso de creerlo conveniente el Consejo
+Directivo podrá conformar una Comisión para revisar los
+resultados. Los Miembros del Consejo Directivo podrán
+participar solo otorgando puntos, no califican para el
+concurso.
+ART. 29º Todos los contactos de las planillas de los concursos de
+Calendario Fijo tienen valor para solicitar Certificados y/o
+Constancias que otorga el Radio Club Peruano, así como
+para el cambio de categoría, siempre y cuando no sean
+repetidos y estén verificados y visados por el responsable
+del RCP.
+ART. 30º En caso de dudas o reclamos, la decisión de una Comisión
+Calificadora que se designe será inapelable.
+ART. 31º El presente reglamento podrá ser modificado por el
+Consejo Directivo a propuesta de más de uno de sus
+miembros o de sugerencias externas debidamente
+canalizadas. Las modificaciones deberán ser anunciadas
+con varias semanas de antelación para conocimiento de
+todos los colegas.
+
+ANEXO I
+
+CONCURSO DIA MUNDIAL DE LA RADIOAFICION
+BANDAS / MODOS: 40 metros, de 7050 a 7150 KHz; LSB
+FECHA: Tercer domingo del mes de Abril (20/04/2025).
+Horario: 20:00 a 21:00 horas OA
+Fecha límite envío planillas: 19/05/2025
+CONCURSO INDEPENDENCIA DEL PERU
+BANDAS / MODOS: 40 metros, de 7050 a 7150 KHz; LSB
+FECHA: Tercer domingo de Julio (20/07/2025).
+Horario: 20:00 a 21:00 horas OA
+Fecha límite envío planillas: 20/08/2025
+
+CONCURSO DIA DEL RADIOAFICIONADO PERUANO
+BANDAS / MODOS: 40 metros, de 7050 a 7150 KHz; LSB
+FECHA: Cuarto domingo de Setiembre (21/09/2025).
+Horario: 20:00 a 21:00 horas OA
+Fecha límite envío planillas: 21/10/2025
+
+
