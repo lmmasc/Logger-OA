@@ -1,462 +1,97 @@
-# Soporte multilenguaje (i18n) personalizado
+# Logger OA v2
 
-La aplicación soporta español e inglés usando un sistema de traducción propio basado en diccionarios Python. Español es el idioma por defecto.
+## Descripción
 
-### Estructura y uso
-
----
-## Menú principal modular e integración
-
-La barra de menús de la aplicación está definida en un archivo independiente para mantener la modularidad y la separación de responsabilidades. El menú está completamente integrado con la ventana principal y sus acciones conectadas de forma explícita y robusta.
-
-### Estructura
-
-```
-    self.about_action = QAction("Acerca de", self)
-    self.help_menu.addAction(self.about_action)
-```
-
-- **menu_bar.py**: Contiene la clase `MainMenuBar`, que hereda de `QMenuBar` y define los menús "Archivo", "Aspecto" y "Ayuda". Las acciones importantes (`exit_action`, `about_action`, `light_theme_action`, `dark_theme_action`) se guardan como atributos para fácil acceso y conexión.
-- **main_window.py**: Integra la barra de menús y conecta las acciones de forma explícita:
-  - "Archivo > Salir": cierra la aplicación.
-  - "Ayuda > Acerca de": muestra un cuadro de diálogo informativo.
-  - "Aspecto > Tema claro / Tema oscuro": permite seleccionar el tema visual de la app y lo recuerda entre sesiones.
-
-### Ejemplo de integración real y recomendada
-
-```python
-# src/app/ui/menu_bar.py
-from PySide6.QtWidgets import QMenuBar, QMenu
-from PySide6.QtGui import QAction
-
-class MainMenuBar(QMenuBar):
-  def __init__(self, parent=None):
-    super().__init__(parent)
-    file_menu = QMenu("Archivo", self)
-    self.exit_action = QAction("Salir", self)
-    file_menu.addAction(self.exit_action)
-    self.addMenu(file_menu)
-    aspect_menu = QMenu("Aspecto", self)
-    self.light_theme_action = QAction("Tema claro", self)
-    self.dark_theme_action = QAction("Tema oscuro", self)
-    self.light_theme_action.setCheckable(True)
-    self.dark_theme_action.setCheckable(True)
-    aspect_menu.addAction(self.light_theme_action)
-    aspect_menu.addAction(self.dark_theme_action)
-    self.addMenu(aspect_menu)
-    help_menu = QMenu("Ayuda", self)
-    self.about_action = QAction("Acerca de", self)
-    help_menu.addAction(self.about_action)
-    self.addMenu(help_menu)
-
-# src/app/ui/main_window.py
-from PySide6.QtWidgets import QMainWindow, QMessageBox, QApplication
-from app.ui.menu_bar import MainMenuBar
-from app.ui.themes.theme_manager import ThemeManager
-
-class MainWindow(QMainWindow):
-  def __init__(self):
-    super().__init__()
-    self.setWindowTitle("Ventana Principal")
-    self.resize(600, 400)
-    self.center()
-    self.menu_bar = MainMenuBar(self)
-    self.setMenuBar(self.menu_bar)
-    self.theme_manager = ThemeManager()
-    self.theme_manager.load_last_theme()
-    # Conexión explícita de acciones
-    self.menu_bar.exit_action.triggered.connect(self.close)
-    self.menu_bar.about_action.triggered.connect(self.show_about_dialog)
-    self.menu_bar.light_theme_action.triggered.connect(self.set_light_theme)
-    self.menu_bar.dark_theme_action.triggered.connect(self.set_dark_theme)
-    self._update_theme_menu_checks()
-
-  def set_light_theme(self):
-    self.theme_manager.apply_theme("light")
-    self._update_theme_menu_checks()
-
-  def set_dark_theme(self):
-    self.theme_manager.apply_theme("dark")
-    self._update_theme_menu_checks()
-
-  def _update_theme_menu_checks(self):
-    theme = self.theme_manager.current_theme
-    self.menu_bar.light_theme_action.setChecked(theme == "light")
-    self.menu_bar.dark_theme_action.setChecked(theme == "dark")
-
-  def show_about_dialog(self):
-    QMessageBox.information(self, "Acerca de", "Logger OA v2\nAplicación de ejemplo con PySide6.")
-
-  def center(self):
-    screen = QApplication.primaryScreen()
-    screen_geometry = screen.availableGeometry()
-    window_geometry = self.frameGeometry()
-    window_geometry.moveCenter(screen_geometry.center())
-    self.move(window_geometry.topLeft())
-```
-
-Este enfoque es claro, robusto y desacoplado: la lógica del menú está separada de la ventana principal, pero las acciones se conectan de forma explícita y mantenible. El usuario puede cambiar el tema desde el menú "Aspecto" y la preferencia se recuerda automáticamente.
-
-
-# src/app/ui/main_window.py
-from PySide6.QtWidgets import QMainWindow, QMessageBox, QApplication
-from app.ui.menu_bar import MainMenuBar
-from app.ui.themes.theme_manager import ThemeManager
-
-class MainWindow(QMainWindow):
-  def __init__(self):
-    super().__init__()
-    self.setWindowTitle("Ventana Principal")
-    self.resize(600, 400)
-    self.center()
-    self.menu_bar = MainMenuBar(self)
-    self.setMenuBar(self.menu_bar)
-    self.theme_manager = ThemeManager()
-    self.theme_manager.load_last_theme()
-    # Conexión explícita de acciones
-    self.menu_bar.exit_action.triggered.connect(self.close)
-    self.menu_bar.about_action.triggered.connect(self.show_about_dialog)
-    self.menu_bar.light_theme_action.triggered.connect(self.set_light_theme)
-    self.menu_bar.dark_theme_action.triggered.connect(self.set_dark_theme)
-    self.menu_bar.lang_es_action.triggered.connect(lambda: self.set_language("es"))
-    self.menu_bar.lang_en_action.triggered.connect(lambda: self.set_language("en"))
-    self._update_theme_menu_checks()
-
-  def set_light_theme(self):
-    self.theme_manager.apply_theme("light")
-    self._update_theme_menu_checks()
-
-  def set_dark_theme(self):
-    self.theme_manager.apply_theme("dark")
-    self._update_theme_menu_checks()
-
-  def _update_theme_menu_checks(self):
-    theme = self.theme_manager.current_theme
-    self.menu_bar.light_theme_action.setChecked(theme == "light")
-    self.menu_bar.dark_theme_action.setChecked(theme == "dark")
-
-  def show_about_dialog(self):
-    QMessageBox.information(self, "Acerca de", "Logger OA v2\nAplicación de ejemplo con PySide6.")
-
-  def center(self):
-    screen = QApplication.primaryScreen()
-    screen_geometry = screen.availableGeometry()
-    window_geometry = self.frameGeometry()
-    window_geometry.moveCenter(screen_geometry.center())
-    self.move(window_geometry.topLeft())
-```
-
-Este enfoque es claro, robusto y desacoplado: la lógica del menú está separada de la ventana principal, pero las acciones y textos se gestionan por nombre de atributo, permitiendo reordenar o modificar los menús sin romper la lógica de la interfaz.
-
-- **En Linux:**
-  ```bash
-  ./scripts/build-linux.sh
-  ```
-- **En Windows:**
-  ```cmd
-  scripts\build-windows.bat
-  ```
-- **En Mac:**
-  ```bash
-  ./scripts/build-mac.sh
-  ```
-
-Esto generará un ejecutable único en la carpeta `dist/` para cada plataforma.
-
-> **Nota:** Debes ejecutar PyInstaller en cada sistema operativo objetivo para obtener el ejecutable nativo correspondiente.
-> El icono debe estar en la carpeta `assets/` y en el formato adecuado para cada sistema.
+**Logger OA v2** es una aplicación de escritorio multiplataforma para el registro y gestión de concursos y operaciones de radioaficionados OA (Perú). Permite llevar un control detallado de contactos, concursos y actividades, con soporte para temas claro/oscuro, persistencia de datos en SQLite y una interfaz moderna basada en PySide6 (Qt).
 
 ---
 
-## Ejecución
+## Requisitos del sistema
 
-Desde la raíz del proyecto:
+- **Sistema operativo:** Linux, Windows o macOS
+- **Python:** 3.8 o superior (recomendado 3.12+)
+- **Dependencias principales:**
+	- PySide6
+	- PySide6_Addons
+	- PySide6_Essentials
+	- shiboken6
+
+---
+
+## Instalación
+
+1. **Clona el repositorio y accede a la carpeta del proyecto:**
+	 ```bash
+	 git clone <URL_DEL_REPOSITORIO>
+	 cd "Logger OA v2"
+	 ```
+
+2. **Crea y activa un entorno virtual:**
+	 ```bash
+	 python3 -m venv .venv
+	 source .venv/bin/activate
+	 ```
+
+3. **Instala las dependencias:**
+	 ```bash
+	 pip install -r requirements.txt
+	 ```
+
+---
+
+## Ejemplo de ejecución
+
+Para ejecutar la aplicación en modo desarrollo:
 
 ```bash
-.venv-linux/bin/python src/main.py  # Linux
-.venv-windows\Scripts\python src\main.py  # Windows
+python src/main.py
 ```
 
----
+Para generar un ejecutable (ejemplo en Linux):
 
-## Dependencias
-- **requirements.txt**: Solo dependencias necesarias para ejecutar la aplicación.
-- **requirements-dev.txt**: Dependencias para desarrollo y empaquetado (ej: PyInstaller).
-
-Instala dependencias de ejecución con:
 ```bash
-.venv-linux/bin/pip install -r requirements.txt
+bash scripts/build-linux.sh
 ```
+El ejecutable se generará en la carpeta `dist/`.
 
-Instala dependencias de desarrollo con:
-```bash
-.venv-linux/bin/pip install -r requirements-dev.txt
+---
+
+## Estructura de carpetas
+
+```
+assets/           # Iconos e imágenes de la aplicación
+build/            # Archivos generados por PyInstaller
+dist/             # Ejecutables generados
+scripts/          # Scripts de build para cada SO
+src/
+	app/
+		config/       # Gestión de configuración (QSettings)
+		db/           # Conexión y consultas a SQLite
+		ui/           # Interfaz gráfica (ventanas, menús, temas, traducciones)
+			themes/     # Archivos QSS para temas claro/oscuro
+		utils/        # Utilidades generales (gestión de archivos, rutas)
+	main.py         # Punto de entrada de la aplicación
+requirements.txt  # Dependencias principales
+requirements-dev.txt # Dependencias de desarrollo (ej: pyinstaller)
+LoggerOA.spec     # Configuración de PyInstaller
 ```
 
 ---
 
-## Configuración automática de entornos virtuales en VS Code
+## Notas sobre la base de datos SQLite
 
-El archivo `Logger OA v2.code-workspace` está configurado para que la terminal integrada de VS Code active automáticamente el entorno virtual correcto según el sistema operativo:
-
-- En Linux: activa `.venv-linux`
-- En Windows: activa `.venv-windows`
-
-Esto se logra con la sección `settings`:
-
-```jsonc
-"settings": {
-  "terminal.integrated.env.linux": {
-    "VIRTUAL_ENV": "${workspaceFolder}/.venv-linux",
-    "PATH": "${workspaceFolder}/.venv-linux/bin:${env:PATH}"
-  },
-  "terminal.integrated.env.windows": {
-    "VIRTUAL_ENV": "${workspaceFolder}\\.venv-windows",
-    "PATH": "${workspaceFolder}\\.venv-windows\\Scripts;${env:PATH}"
-  }
-}
-```
-
-Así, al abrir una terminal en VS Code, se usará automáticamente el entorno adecuado para cada plataforma.
+- La aplicación utiliza una base de datos SQLite local para almacenar los registros.
+- Por defecto, la base de datos se crea en la ruta: `~/LoggerOA/loggeroa.db` (puede cambiarse en la configuración).
+- El acceso y las operaciones CRUD se gestionan desde `src/app/db/connection.py` y `src/app/db/queries.py`.
+- No requiere instalación ni configuración adicional de servidores de base de datos.
 
 ---
 
-## Selección automática del intérprete de Python en VS Code
-
-El archivo `.vscode/settings.json` está configurado para que VS Code seleccione automáticamente el intérprete de Python adecuado según el sistema operativo:
-
-- En Linux: usa `.venv-linux/bin/python`
-- En Windows: usa `.venv-windows/Scripts/python.exe`
-- En Mac: usa `.venv-mac/bin/python3`
-
-Configuración utilizada:
-
-```jsonc
-{
-  "python.defaultInterpreterPath": "${workspaceFolder}/.venv-linux/bin/python",
-  "python.defaultInterpreterPath.linux": "${workspaceFolder}/.venv-linux/bin/python",
-  "python.defaultInterpreterPath.windows": "${workspaceFolder}\\.venv-windows\\Scripts\\python.exe",
-  "python.defaultInterpreterPath.osx": "${workspaceFolder}/.venv-mac/bin/python3"
-}
-```
-
-Esto permite que VS Code detecte y use automáticamente el entorno virtual correcto al abrir el proyecto, sin necesidad de configuraciones manuales.
-
----
-
-## Configuración y persistencia de estado
-
-La aplicación utiliza una clase `SettingsManager` basada en QSettings para guardar y recuperar configuraciones de usuario (preferencias, estado de la ventana, etc.) de forma multiplataforma.
-
-### Estructura
-
-```
-src/app/config/
-    __init__.py
-    settings_manager.py
-```
-
-- **settings_manager.py**: Contiene la clase `SettingsManager`, que abstrae el uso de QSettings y provee métodos para guardar, obtener y eliminar valores de configuración.
-
-### Ejemplo de uso
-
-```python
-from app.config.settings_manager import SettingsManager
-
-settings = SettingsManager()
-settings.set_value('ventana/posicion', (100, 100))
-pos = settings.get_value('ventana/posicion', (0, 0))
-```
-
-Esto permite que la app recuerde configuraciones entre sesiones de forma sencilla y multiplataforma.
-
----
-
-
-## Utilidades de manejo de archivos y rutas
-
-La aplicación cuenta con un módulo centralizado para la gestión de rutas y archivos, facilitando la obtención de paths multiplataforma y operaciones comunes como verificar existencia o crear carpetas.
-
-### Estructura
-
-```
-src/app/utils/
-  file_manager.py   # Funciones utilitarias para manejo de archivos y rutas
-```
-
-- **file_manager.py**: Incluye funciones como `get_db_path()` para obtener la ruta recomendada de la base de datos (por defecto en la carpeta del usuario, compatible con Linux, Windows y Mac), `ensure_dir_exists()` para crear carpetas si no existen, y `file_exists()` para verificar la existencia de archivos.
-
-### Ejemplo de uso
-
-```python
-from app.utils.file_manager import get_db_path, ensure_dir_exists, file_exists
-
-db_path = get_db_path()  # Obtiene la ruta multiplataforma para la base de datos
-ensure_dir_exists('/ruta/a/crear')  # Crea la carpeta si no existe
-if file_exists(db_path):
-  print("La base de datos existe")
-```
-
-Esto permite centralizar y profesionalizar el manejo de archivos y rutas en toda la aplicación.
-
----
-## Gestión de base de datos (SQLite)
-
-La aplicación utiliza SQLite como motor de base de datos, aprovechando el módulo `sqlite3` incluido en la biblioteca estándar de Python (no requiere instalación adicional).
-
-### Estructura
-
-```
-src/app/db/
-    __init__.py
-    connection.py   # Funciones para abrir/cerrar cualquier base SQLite
-    queries.py      # Funciones CRUD y consultas reutilizables para base principal y auxiliares
-```
-
-- **connection.py**: Proporciona la función `get_connection(db_path)` para abrir conexiones a cualquier base de datos SQLite (principal o auxiliar).
-- **queries.py**: Incluye funciones para ejecutar consultas SELECT, INSERT, UPDATE y DELETE sobre cualquier base, recibiendo la ruta de la base como argumento.
-
-### Ejemplo de uso
-
-```python
-from app.db.queries import fetch_all, execute_query
-
-# Consultar todos los registros de una tabla en la base principal
-registros = fetch_all('ruta/base_principal.db', 'SELECT * FROM tabla')
-
-# Insertar un registro en una base auxiliar
-ok = execute_query('ruta/auxiliar.db', 'INSERT INTO tabla (col1, col2) VALUES (?, ?)', (valor1, valor2))
-```
-
-Esto permite trabajar con una base principal y varias bases auxiliares de forma modular y sencilla.
-
----
-
-## Temas y estilos (claro/oscuro)
-
-La aplicación permite cambiar entre tema claro y oscuro, centralizando los estilos en archivos QSS. La preferencia del usuario se guarda usando SettingsManager.
-
-### Estructura
-
-```
-src/app/ui/themes/
-    base.qss         # Estilos comunes
-    light.qss        # Tema claro
-    dark.qss         # Tema oscuro
-    theme_manager.py # Lógica para aplicar y recordar el tema
-```
-
-- **base.qss**: Estilos base aplicados a todos los temas.
-- **light.qss**: Estilos para el tema claro.
-- **dark.qss**: Estilos para el tema oscuro.
-- **theme_manager.py**: Clase `ThemeManager` para cargar, aplicar y recordar el tema seleccionado por el usuario. Utiliza `SettingsManager` para guardar la preferencia.
-
-### Ejemplo de uso
-
-```python
-from app.ui.themes.theme_manager import ThemeManager
-
-themes = ThemeManager()
-themes.apply_theme("dark")  # Cambia a tema oscuro
-themes.load_last_theme()     # Aplica el último tema usado
-```
-
-Esto permite una gestión centralizada y escalable de los estilos visuales de la app.
-
----
-
-src/app/ui/menu_bar.py
-
-## Menú principal modular e integración
-
-La barra de menús de la aplicación está definida en un archivo independiente para mantener la modularidad y la separación de responsabilidades. El menú está completamente integrado con la ventana principal y sus acciones conectadas de forma explícita y robusta.
-
-### Estructura
-
-```
-src/app/ui/menu_bar.py      # Clase MainMenuBar, define menús y acciones
-src/app/ui/main_window.py  # Clase MainWindow, integra y conecta el menú
-```
-
-- **menu_bar.py**: Contiene la clase `MainMenuBar`, que hereda de `QMenuBar` y define los menús "Archivo", "Aspecto" y "Ayuda". Las acciones importantes (`exit_action`, `about_action`, `light_theme_action`, `dark_theme_action`) se guardan como atributos para fácil acceso y conexión.
-- **main_window.py**: Integra la barra de menús y conecta las acciones de forma explícita:
-  - "Archivo > Salir": cierra la aplicación.
-  - "Ayuda > Acerca de": muestra un cuadro de diálogo informativo.
-  - "Aspecto > Tema claro / Tema oscuro": permite seleccionar el tema visual de la app y lo recuerda entre sesiones.
-
-### Ejemplo de integración real y recomendada
-
-```python
-# src/app/ui/menu_bar.py
-from PySide6.QtWidgets import QMenuBar, QMenu
-from PySide6.QtGui import QAction
-
-class MainMenuBar(QMenuBar):
-  def __init__(self, parent=None):
-    super().__init__(parent)
-    file_menu = QMenu("Archivo", self)
-    self.exit_action = QAction("Salir", self)
-    file_menu.addAction(self.exit_action)
-    self.addMenu(file_menu)
-    aspect_menu = QMenu("Aspecto", self)
-    self.light_theme_action = QAction("Tema claro", self)
-    self.dark_theme_action = QAction("Tema oscuro", self)
-    self.light_theme_action.setCheckable(True)
-    self.dark_theme_action.setCheckable(True)
-    aspect_menu.addAction(self.light_theme_action)
-    aspect_menu.addAction(self.dark_theme_action)
-    self.addMenu(aspect_menu)
-    help_menu = QMenu("Ayuda", self)
-    self.about_action = QAction("Acerca de", self)
-    help_menu.addAction(self.about_action)
-    self.addMenu(help_menu)
-
-# src/app/ui/main_window.py
-from PySide6.QtWidgets import QMainWindow, QMessageBox, QApplication
-from app.ui.menu_bar import MainMenuBar
-from app.ui.themes.theme_manager import ThemeManager
-
-class MainWindow(QMainWindow):
-  def __init__(self):
-    super().__init__()
-    self.setWindowTitle("Ventana Principal")
-    self.resize(600, 400)
-    self.center()
-    self.menu_bar = MainMenuBar(self)
-    self.setMenuBar(self.menu_bar)
-    self.theme_manager = ThemeManager()
-    self.theme_manager.load_last_theme()
-    # Conexión explícita de acciones
-    self.menu_bar.exit_action.triggered.connect(self.close)
-    self.menu_bar.about_action.triggered.connect(self.show_about_dialog)
-    self.menu_bar.light_theme_action.triggered.connect(self.set_light_theme)
-    self.menu_bar.dark_theme_action.triggered.connect(self.set_dark_theme)
-    self._update_theme_menu_checks()
-
-  def set_light_theme(self):
-    self.theme_manager.apply_theme("light")
-    self._update_theme_menu_checks()
-
-  def set_dark_theme(self):
-    self.theme_manager.apply_theme("dark")
-    self._update_theme_menu_checks()
-
-  def _update_theme_menu_checks(self):
-    theme = self.theme_manager.current_theme
-    self.menu_bar.light_theme_action.setChecked(theme == "light")
-    self.menu_bar.dark_theme_action.setChecked(theme == "dark")
-
-  def show_about_dialog(self):
-    QMessageBox.information(self, "Acerca de", "Logger OA v2\nAplicación de ejemplo con PySide6.")
-
-  def center(self):
-    screen = QApplication.primaryScreen()
-    screen_geometry = screen.availableGeometry()
-    window_geometry = self.frameGeometry()
-    window_geometry.moveCenter(screen_geometry.center())
-    self.move(window_geometry.topLeft())
-```
-
-Este enfoque es claro, robusto y desacoplado: la lógica del menú está separada de la ventana principal, pero las acciones se conectan de forma explícita y mantenible. El usuario puede cambiar el tema desde el menú "Aspecto" y la preferencia se recuerda automáticamente.
+## Manejo de temas claros/oscuros con QSS
+
+- Los temas visuales se gestionan mediante archivos QSS ubicados en `src/app/ui/themes/`.
+- El usuario puede alternar entre tema claro (`light.qss`) y oscuro (`dark.qss`) desde el menú de la aplicación.
+- La preferencia de tema se guarda automáticamente y se restaura al iniciar la aplicación.
+- El archivo `theme_manager.py` se encarga de aplicar el tema seleccionado usando PySide6.
 
 ---
