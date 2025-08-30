@@ -3,12 +3,8 @@ Funciones para integrar los datos normalizados a la base de datos.
 """
 
 import sqlite3
-import os
 from datetime import datetime
-
-DB_PATH = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "db.sqlite3"
-)
+from app.utils.file_manager import get_db_path
 
 
 def integrate_operators_to_db(operators):
@@ -16,7 +12,8 @@ def integrate_operators_to_db(operators):
     Inserta o actualiza los operadores en la base de datos SQLite local.
     Usa UPSERT para evitar duplicados y mantener actualizados los datos.
     """
-    conn = sqlite3.connect(DB_PATH)
+    db_path = get_db_path()
+    conn = sqlite3.connect(db_path)
     cur = conn.cursor()
     # Crear tabla si no existe
     cur.execute(
