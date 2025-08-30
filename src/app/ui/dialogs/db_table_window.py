@@ -18,17 +18,16 @@ class DBTableWindow(QWidget):
 
     def load_data(self):
         db_path = get_db_path()
-        # Ejemplo: obtener todas las filas de una tabla llamada 'datos'
-        query = "SELECT * FROM datos"  # Cambia 'datos' por el nombre real de tu tabla
+        query = "SELECT id, callsign, name, country FROM radioamateurs"
         data = fetch_all(db_path, query)
         if not data:
             self.table.setRowCount(0)
             self.table.setColumnCount(0)
+            self.table.setHorizontalHeaderLabels([])
             return
         self.table.setRowCount(len(data))
-        self.table.setColumnCount(len(data[0]))
-        # Opcional: establecer encabezados si los tienes
-        # self.table.setHorizontalHeaderLabels([...])
+        self.table.setColumnCount(4)
+        self.table.setHorizontalHeaderLabels(["ID", "Callsign", "Name", "Country"])
         for row_idx, row in enumerate(data):
             for col_idx, value in enumerate(row):
                 self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(value)))
