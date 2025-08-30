@@ -23,6 +23,8 @@ class MainMenuBar(QMenuBar):
     def _create_menus(self):
         # Menú Archivo
         self.file_menu = QMenu(tr("file_menu"), self)
+        self.open_folder_action = QAction(tr("open_folder"), self)
+        self.file_menu.addAction(self.open_folder_action)
         self.exit_action = QAction(tr("exit"), self)
         self.file_menu.addAction(self.exit_action)
         self.addMenu(self.file_menu)

@@ -6,6 +6,7 @@ translations = {
     "es": {
         "main_window_title": "Ventana Principal",
         "file_menu": "Archivo",
+        "open_folder": "Abrir carpeta de Archivos",
         "exit": "Salir",
         "help_menu": "Ayuda",
         "about": "Acerca de",
@@ -20,6 +21,7 @@ translations = {
     "en": {
         "main_window_title": "Main Window",
         "file_menu": "File",
+        "open_folder": "Open Data Folder",
         "exit": "Exit",
         "help_menu": "Help",
         "about": "About",

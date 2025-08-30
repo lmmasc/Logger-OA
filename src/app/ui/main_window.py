@@ -39,8 +39,22 @@ class MainWindow(QMainWindow):
         self.theme_manager.load_last_theme()
 
         # Conectar acciones del menú de forma explícita
+        from PySide6.QtCore import QUrl
+        from PySide6.QtGui import QDesktopServices
+        import os
+        from app.utils.file_manager import get_db_path
+
         self.menu_bar.exit_action.triggered.connect(self.close)
         self.menu_bar.about_action.triggered.connect(self.show_about_dialog)
+
+        # Acción para abrir carpeta de archivos
+        def open_data_folder():
+            # Carpeta donde se guarda la base de datos
+            db_path = get_db_path()
+            folder = os.path.dirname(db_path)
+            QDesktopServices.openUrl(QUrl.fromLocalFile(folder))
+
+        self.menu_bar.open_folder_action.triggered.connect(open_data_folder)
 
         # Acciones de tema
         self.menu_bar.light_theme_action.triggered.connect(self.set_light_theme)
@@ -122,6 +136,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(tr("main_window_title"))
         # Menús y acciones
         self.menu_bar.file_menu.setTitle(tr("file_menu"))
+        self.menu_bar.open_folder_action.setText(tr("open_folder"))
         self.menu_bar.exit_action.setText(tr("exit"))
         self.menu_bar.aspect_menu.setTitle(tr("aspect_menu"))
         self.menu_bar.light_theme_action.setText(tr("light_theme"))
