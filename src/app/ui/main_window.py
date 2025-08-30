@@ -121,13 +121,13 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle(tr("main_window_title"))
         # Menús y acciones
-        self.menu_bar.actions()[0].menu().setTitle(tr("file_menu"))
+        self.menu_bar.file_menu.setTitle(tr("file_menu"))
         self.menu_bar.exit_action.setText(tr("exit"))
-        self.menu_bar.actions()[1].menu().setTitle(tr("aspect_menu"))
+        self.menu_bar.aspect_menu.setTitle(tr("aspect_menu"))
         self.menu_bar.light_theme_action.setText(tr("light_theme"))
         self.menu_bar.dark_theme_action.setText(tr("dark_theme"))
-        self.menu_bar.actions()[2].menu().setTitle(tr("help_menu"))
-        self.menu_bar.about_action.setText(tr("about"))
-        self.menu_bar.actions()[3].menu().setTitle(tr("language_menu"))
+        self.menu_bar.language_menu.setTitle(tr("language_menu"))
         self.menu_bar.lang_es_action.setText(tr("spanish"))
         self.menu_bar.lang_en_action.setText(tr("english"))
+        self.menu_bar.help_menu.setTitle(tr("help_menu"))
+        self.menu_bar.about_action.setText(tr("about"))

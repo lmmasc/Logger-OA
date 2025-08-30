@@ -4,156 +4,149 @@ La aplicación soporta español e inglés usando un sistema de traducción propi
 
 ### Estructura y uso
 
+---
+## Menú principal modular e integración
+
+La barra de menús de la aplicación está definida en un archivo independiente para mantener la modularidad y la separación de responsabilidades. El menú está completamente integrado con la ventana principal y sus acciones conectadas de forma explícita y robusta.
+
+### Estructura
+
 ```
-src/app/ui/translations.py  # Diccionario de textos y función tr(key)
+    self.about_action = QAction("Acerca de", self)
+    self.help_menu.addAction(self.about_action)
 ```
 
-- **translations.py**: Contiene los textos en ambos idiomas y la función `tr(key)` para obtener el texto traducido según el idioma actual. Ejemplo:
+- **menu_bar.py**: Contiene la clase `MainMenuBar`, que hereda de `QMenuBar` y define los menús "Archivo", "Aspecto" y "Ayuda". Las acciones importantes (`exit_action`, `about_action`, `light_theme_action`, `dark_theme_action`) se guardan como atributos para fácil acceso y conexión.
+- **main_window.py**: Integra la barra de menús y conecta las acciones de forma explícita:
+  - "Archivo > Salir": cierra la aplicación.
+  - "Ayuda > Acerca de": muestra un cuadro de diálogo informativo.
+  - "Aspecto > Tema claro / Tema oscuro": permite seleccionar el tema visual de la app y lo recuerda entre sesiones.
+
+### Ejemplo de integración real y recomendada
 
 ```python
-from app.ui.translations import tr
-self.setWindowTitle(tr("main_window_title"))
-file_menu = QMenu(tr("file_menu"), self)
-exit_action = QAction(tr("exit"), self)
+# src/app/ui/menu_bar.py
+from PySide6.QtWidgets import QMenuBar, QMenu
+from PySide6.QtGui import QAction
+
+class MainMenuBar(QMenuBar):
+  def __init__(self, parent=None):
+    super().__init__(parent)
+    file_menu = QMenu("Archivo", self)
+    self.exit_action = QAction("Salir", self)
+    file_menu.addAction(self.exit_action)
+    self.addMenu(file_menu)
+    aspect_menu = QMenu("Aspecto", self)
+    self.light_theme_action = QAction("Tema claro", self)
+    self.dark_theme_action = QAction("Tema oscuro", self)
+    self.light_theme_action.setCheckable(True)
+    self.dark_theme_action.setCheckable(True)
+    aspect_menu.addAction(self.light_theme_action)
+    aspect_menu.addAction(self.dark_theme_action)
+    self.addMenu(aspect_menu)
+    help_menu = QMenu("Ayuda", self)
+    self.about_action = QAction("Acerca de", self)
+    help_menu.addAction(self.about_action)
+    self.addMenu(help_menu)
+
+# src/app/ui/main_window.py
+from PySide6.QtWidgets import QMainWindow, QMessageBox, QApplication
+from app.ui.menu_bar import MainMenuBar
+from app.ui.themes.theme_manager import ThemeManager
+
+class MainWindow(QMainWindow):
+  def __init__(self):
+    super().__init__()
+    self.setWindowTitle("Ventana Principal")
+    self.resize(600, 400)
+    self.center()
+    self.menu_bar = MainMenuBar(self)
+    self.setMenuBar(self.menu_bar)
+    self.theme_manager = ThemeManager()
+    self.theme_manager.load_last_theme()
+    # Conexión explícita de acciones
+    self.menu_bar.exit_action.triggered.connect(self.close)
+    self.menu_bar.about_action.triggered.connect(self.show_about_dialog)
+    self.menu_bar.light_theme_action.triggered.connect(self.set_light_theme)
+    self.menu_bar.dark_theme_action.triggered.connect(self.set_dark_theme)
+    self._update_theme_menu_checks()
+
+  def set_light_theme(self):
+    self.theme_manager.apply_theme("light")
+    self._update_theme_menu_checks()
+
+  def set_dark_theme(self):
+    self.theme_manager.apply_theme("dark")
+    self._update_theme_menu_checks()
+
+  def _update_theme_menu_checks(self):
+    theme = self.theme_manager.current_theme
+    self.menu_bar.light_theme_action.setChecked(theme == "light")
+    self.menu_bar.dark_theme_action.setChecked(theme == "dark")
+
+  def show_about_dialog(self):
+    QMessageBox.information(self, "Acerca de", "Logger OA v2\nAplicación de ejemplo con PySide6.")
+
+  def center(self):
+    screen = QApplication.primaryScreen()
+    screen_geometry = screen.availableGeometry()
+    window_geometry = self.frameGeometry()
+    window_geometry.moveCenter(screen_geometry.center())
+    self.move(window_geometry.topLeft())
 ```
 
-
-El usuario puede cambiar el idioma desde el menú "Idioma" en tiempo real. La preferencia de idioma se guarda automáticamente usando `SettingsManager` y se recuerda entre sesiones.
-
-Puedes agregar o modificar textos fácilmente editando el diccionario en `translations.py`.
-
----
-# Logger OA v2
-
-## Descripción
-Proyecto base en Python usando PySide6 para una aplicación de escritorio con una ventana principal. Estructura limpia y lista para escalar.
-
----
-
-## Estructura de Carpetas y Archivos
+Este enfoque es claro, robusto y desacoplado: la lógica del menú está separada de la ventana principal, pero las acciones se conectan de forma explícita y mantenible. El usuario puede cambiar el tema desde el menú "Aspecto" y la preferencia se recuerda automáticamente.
 
 
-```
-Logger OA v2/
-├── .gitignore
-├── Logger OA v2.code-workspace
-├── README.md
-├── requirements.txt
-├── requirements-dev.txt
-├── assets/
-│   ├── app_icon.ico
-│   ├── app_icon.png
-│   ├── app_icon.icns
-│   └── rcp_logo.png
-├── scripts/
-│   ├── build-linux.sh
-│   ├── build-mac.sh
-│   └── build-windows.bat
-├── src/
-│   ├── main.py
-│   └── app/
-│       ├── __init__.py
-│       ├── config/
-│       │   ├── __init__.py
-│       │   └── settings_manager.py
-│       ├── db/
-│       │   ├── __init__.py
-│       │   ├── connection.py
-│       │   └── queries.py
-│       └── ui/
-│           ├── main_window.py
-│           ├── menu_bar.py
-│           └── themes/
-│               ├── base.qss
-│               ├── light.qss
-│               ├── dark.qss
-│               └── theme_manager.py
-└── .venv-linux/ (o .venv-windows)
+# src/app/ui/main_window.py
+from PySide6.QtWidgets import QMainWindow, QMessageBox, QApplication
+from app.ui.menu_bar import MainMenuBar
+from app.ui.themes.theme_manager import ThemeManager
+
+class MainWindow(QMainWindow):
+  def __init__(self):
+    super().__init__()
+    self.setWindowTitle("Ventana Principal")
+    self.resize(600, 400)
+    self.center()
+    self.menu_bar = MainMenuBar(self)
+    self.setMenuBar(self.menu_bar)
+    self.theme_manager = ThemeManager()
+    self.theme_manager.load_last_theme()
+    # Conexión explícita de acciones
+    self.menu_bar.exit_action.triggered.connect(self.close)
+    self.menu_bar.about_action.triggered.connect(self.show_about_dialog)
+    self.menu_bar.light_theme_action.triggered.connect(self.set_light_theme)
+    self.menu_bar.dark_theme_action.triggered.connect(self.set_dark_theme)
+    self.menu_bar.lang_es_action.triggered.connect(lambda: self.set_language("es"))
+    self.menu_bar.lang_en_action.triggered.connect(lambda: self.set_language("en"))
+    self._update_theme_menu_checks()
+
+  def set_light_theme(self):
+    self.theme_manager.apply_theme("light")
+    self._update_theme_menu_checks()
+
+  def set_dark_theme(self):
+    self.theme_manager.apply_theme("dark")
+    self._update_theme_menu_checks()
+
+  def _update_theme_menu_checks(self):
+    theme = self.theme_manager.current_theme
+    self.menu_bar.light_theme_action.setChecked(theme == "light")
+    self.menu_bar.dark_theme_action.setChecked(theme == "dark")
+
+  def show_about_dialog(self):
+    QMessageBox.information(self, "Acerca de", "Logger OA v2\nAplicación de ejemplo con PySide6.")
+
+  def center(self):
+    screen = QApplication.primaryScreen()
+    screen_geometry = screen.availableGeometry()
+    window_geometry = self.frameGeometry()
+    window_geometry.moveCenter(screen_geometry.center())
+    self.move(window_geometry.topLeft())
 ```
 
-- **.gitignore**: Exclusiones para Git (entornos, cachés, etc).
-- **Logger OA v2.code-workspace**: Configuración de espacio de trabajo para VS Code.
-- **README.md**: Documentación del proyecto.
-- **requirements.txt**: Dependencias del proyecto.
-- **requirements-dev.txt**: Dependencias de desarrollo (ej: PyInstaller).
-- **assets/**: Carpeta para recursos como iconos e imágenes de la app.
-  - `app_icon.ico`: Icono para ejecutable en Windows.
-  - `app_icon.png`: Icono para ejecutable en Linux.
-  - `app_icon.icns`: Icono para ejecutable en Mac.
-  - `rcp_logo.png`: Logo usado dentro de la aplicación.
-- **scripts/**: Scripts para automatizar la generación de ejecutables.
-  - `build-linux.sh`: Genera el ejecutable en Linux.
-  - `build-mac.sh`: Genera el ejecutable en Mac.
-  - `build-windows.bat`: Genera el ejecutable en Windows.
-- **src/main.py**: Punto de entrada de la aplicación. Crea y muestra la ventana principal.
-- **src/app/__init__.py**: Marca la carpeta `app` como un paquete Python.
-- **src/app/config/settings_manager.py**: Abstracción de QSettings para configuración persistente.
-- **src/app/db/connection.py**: Funciones para abrir/cerrar cualquier base SQLite.
-- **src/app/db/queries.py**: Funciones CRUD y consultas reutilizables.
-- **src/app/ui/main_window.py**: Define la clase `MainWindow` (ventana principal).
-- **src/app/ui/menu_bar.py**: Barra de menús modular.
-- **src/app/ui/themes/**: Temas y estilos centralizados (QSS y lógica de temas).
-  - `base.qss`: Estilos base comunes.
-  - `light.qss`: Tema claro.
-  - `dark.qss`: Tema oscuro.
-  - `theme_manager.py`: Lógica para aplicar y recordar el tema.
-- **.venv-linux/**, **.venv-windows/**: Entornos virtuales (no se suben a Git).
-
----
-
-## Módulos y Funcionalidades
-
-### src/main.py
-- Importa y ejecuta la clase `MainWindow`.
-- Inicializa la aplicación Qt.
-- Documentado y estructurado para fácil mantenimiento.
-
-### src/app/ui/main_window.py
-- Contiene la clase `MainWindow`.
-- Hereda de `QMainWindow`.
-- Configura el título, tamaño y centra la ventana al iniciar.
-
-### assets/
-- Guarda aquí los recursos gráficos de la aplicación.
-- Iconos para ejecutables:
-  - Windows: `app_icon.ico`
-  - Linux: `app_icon.png`
-  - Mac: `app_icon.icns`
-- Logo de la app: `rcp_logo.png` (para usar dentro de la interfaz).
-
-### scripts/
-- Scripts para automatizar la generación de ejecutables multiplataforma.
-- Uso:
-  - **Linux:**
-    ```bash
-    chmod +x scripts/build-linux.sh
-    ./scripts/build-linux.sh
-    ```
-  - **Mac:**
-    ```bash
-    chmod +x scripts/build-mac.sh
-    ./scripts/build-mac.sh
-    ```
-  - **Windows:**
-    ```cmd
-    scripts\build-windows.bat
-    ```
-- Cada script debe ejecutarse en su sistema operativo correspondiente y generará el ejecutable en la carpeta `dist/`.
-
----
-
-## Crear ejecutable multiplataforma
-
-Para generar un ejecutable autocontenible en cada sistema operativo, se recomienda usar [PyInstaller](https://pyinstaller.org/):
-
-### 1. Instalar PyInstaller
-
-```bash
-.venv-linux/bin/pip install pyinstaller  # Linux
-.venv-windows\Scripts\pip install pyinstaller  # Windows
-```
-
-### 2. Generar el ejecutable
+Este enfoque es claro, robusto y desacoplado: la lógica del menú está separada de la ventana principal, pero las acciones y textos se gestionan por nombre de atributo, permitiendo reordenar o modificar los menús sin romper la lógica de la interfaz.
 
 - **En Linux:**
   ```bash
