@@ -7,6 +7,7 @@ Permite trabajar tanto con la base principal como con bases auxiliares.
 
 from typing import Any, List, Tuple, Optional
 from .connection import get_connection
+from app.utils.file_manager import get_db_path
 
 
 def fetch_all(db_path: str, query: str, params: Tuple = ()) -> List[Tuple]:
@@ -54,3 +55,56 @@ def execute_query(db_path: str, query: str, params: Tuple = ()) -> bool:
         return False
     finally:
         conn.close()
+
+
+def add_radioamateur(callsign, name, country):
+    """
+    Inserta un nuevo radioaficionado.
+    """
+    db_path = get_db_path()
+    conn = get_connection(db_path)
+    sql = "INSERT INTO radioamateurs (callsign, name, country) VALUES (?, ?, ?)"
+    cursor = conn.cursor()
+    cursor.execute(sql, (callsign, name, country))
+    conn.commit()
+    conn.close()
+
+
+def get_radioamateurs():
+    """
+    Devuelve todos los radioaficionados.
+    """
+    db_path = get_db_path()
+    conn = get_connection(db_path)
+    sql = "SELECT id, callsign, name, country FROM radioamateurs"
+    cursor = conn.cursor()
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    conn.close()
+    return results
+
+
+def update_radioamateur(id, callsign, name, country):
+    """
+    Actualiza un radioaficionado por id.
+    """
+    db_path = get_db_path()
+    conn = get_connection(db_path)
+    sql = "UPDATE radioamateurs SET callsign=?, name=?, country=? WHERE id=?"
+    cursor = conn.cursor()
+    cursor.execute(sql, (callsign, name, country, id))
+    conn.commit()
+    conn.close()
+
+
+def delete_radioamateur(id):
+    """
+    Elimina un radioaficionado por id.
+    """
+    db_path = get_db_path()
+    conn = get_connection(db_path)
+    sql = "DELETE FROM radioamateurs WHERE id=?"
+    cursor = conn.cursor()
+    cursor.execute(sql, (id,))
+    conn.commit()
+    conn.close()
