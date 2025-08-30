@@ -37,12 +37,6 @@ class MainMenuBar(QMenuBar):
         aspect_menu.addAction(self.dark_theme_action)
         self.addMenu(aspect_menu)
 
-        # Menú Ayuda
-        help_menu = QMenu(tr("help_menu"), self)
-        self.about_action = QAction(tr("about"), self)
-        help_menu.addAction(self.about_action)
-        self.addMenu(help_menu)
-
         # Menú Idioma
         language_menu = QMenu(tr("language_menu"), self)
         self.lang_es_action = QAction(tr("spanish"), self)
@@ -52,3 +46,9 @@ class MainMenuBar(QMenuBar):
         language_menu.addAction(self.lang_es_action)
         language_menu.addAction(self.lang_en_action)
         self.addMenu(language_menu)
+
+        # Menú Ayuda
+        help_menu = QMenu(tr("help_menu"), self)
+        self.about_action = QAction(tr("about"), self)
+        help_menu.addAction(self.about_action)
+        self.addMenu(help_menu)

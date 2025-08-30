@@ -5,6 +5,8 @@ Contiene la clase MainWindow, que define la ventana principal usando PySide6.
 """
 
 from PySide6.QtWidgets import QMainWindow, QApplication, QMessageBox
+
+# Importaciones locales
 from app.ui.menu_bar import MainMenuBar
 from app.ui.themes.theme_manager import ThemeManager
 from app.ui.translations import tr
@@ -13,11 +15,16 @@ from app.ui.translations import tr
 class MainWindow(QMainWindow):
     """
     Ventana principal de la aplicación.
-    Hereda de QMainWindow y configura el título y tamaño inicial.
-    La ventana aparece centrada en la pantalla.
+
+    Hereda de QMainWindow y configura el título, tamaño inicial y la barra de menús.
+    Permite cambiar el tema y el idioma, y muestra un diálogo de información.
     """
 
     def __init__(self):
+        """
+        Inicializa la ventana principal, configura el título, tamaño, barra de menús,
+        gestor de temas y conecta las acciones del menú.
+        """
         super().__init__()
         self.setWindowTitle(tr("main_window_title"))  # Título de la ventana
         self.resize(600, 400)  # Solo tamaño inicial
@@ -42,35 +49,55 @@ class MainWindow(QMainWindow):
         # Acciones de idioma
         self.menu_bar.lang_es_action.triggered.connect(lambda: self.set_language("es"))
         self.menu_bar.lang_en_action.triggered.connect(lambda: self.set_language("en"))
+
         self._update_language_menu_checks()
-
         self._update_theme_menu_checks()
-
-    def set_light_theme(self):
-        self.theme_manager.apply_theme("light")
-        self._update_theme_menu_checks()
-
-    def set_dark_theme(self):
-        self.theme_manager.apply_theme("dark")
-        self._update_theme_menu_checks()
-
-    def _update_theme_menu_checks(self):
-        theme = self.theme_manager.current_theme
-        self.menu_bar.light_theme_action.setChecked(theme == "light")
-        self.menu_bar.dark_theme_action.setChecked(theme == "dark")
-
-    def show_about_dialog(self):
-        QMessageBox.information(self, tr("about"), tr("about_message"))
 
     def center(self):
-        """Centra la ventana en la pantalla principal."""
+        """
+        Centra la ventana en la pantalla principal.
+        """
         screen = QApplication.primaryScreen()
         screen_geometry = screen.availableGeometry()
         window_geometry = self.frameGeometry()
         window_geometry.moveCenter(screen_geometry.center())
         self.move(window_geometry.topLeft())
 
+    def set_light_theme(self):
+        """
+        Aplica el tema claro a la aplicación y actualiza el estado del menú de temas.
+        """
+        self.theme_manager.apply_theme("light")
+        self._update_theme_menu_checks()
+
+    def set_dark_theme(self):
+        """
+        Aplica el tema oscuro a la aplicación y actualiza el estado del menú de temas.
+        """
+        self.theme_manager.apply_theme("dark")
+        self._update_theme_menu_checks()
+
+    def _update_theme_menu_checks(self):
+        """
+        Actualiza el estado (checked) de las acciones del menú de temas según el tema actual.
+        """
+        theme = self.theme_manager.current_theme
+        self.menu_bar.light_theme_action.setChecked(theme == "light")
+        self.menu_bar.dark_theme_action.setChecked(theme == "dark")
+
+    def show_about_dialog(self):
+        """
+        Muestra un cuadro de diálogo con información sobre la aplicación.
+        """
+        QMessageBox.information(self, tr("about"), tr("about_message"))
+
     def set_language(self, lang):
+        """
+        Cambia el idioma de la aplicación y actualiza los textos de la interfaz.
+
+        Args:
+            lang (str): Código del idioma a establecer ("es" o "en").
+        """
         from app.ui.translations import set_language, tr
 
         set_language(lang)
@@ -78,12 +105,18 @@ class MainWindow(QMainWindow):
         self._update_language_menu_checks()
 
     def _update_language_menu_checks(self):
+        """
+        Actualiza el estado (checked) de las acciones del menú de idioma según el idioma actual.
+        """
         from app.ui.translations import current_lang
 
         self.menu_bar.lang_es_action.setChecked(current_lang == "es")
         self.menu_bar.lang_en_action.setChecked(current_lang == "en")
 
     def _retranslate_ui(self):
+        """
+        Actualiza los textos de la interfaz según el idioma seleccionado.
+        """
         from app.ui.translations import tr
 
         self.setWindowTitle(tr("main_window_title"))
