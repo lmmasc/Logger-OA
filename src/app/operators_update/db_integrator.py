@@ -20,8 +20,7 @@ def integrate_operators_to_db(operators):
     cur = conn.cursor()
     # Crear tabla si no existe
     cur.execute(
-        """
-        CREATE TABLE IF NOT EXISTS radio_operators (
+        """CREATE TABLE IF NOT EXISTS radio_operators (
             callsign TEXT PRIMARY KEY,
             name TEXT,
             category TEXT,
@@ -33,28 +32,31 @@ def integrate_operators_to_db(operators):
             resolution TEXT,
             expiration_date TEXT,
             cutoff_date TEXT,
+            enabled INTEGER DEFAULT 1,
+            country TEXT DEFAULT '',
             updated_at TEXT
-        )
-    """
+        )"""
     )
     upsert_sql = """
-        INSERT INTO radio_operators (
-            callsign, name, category, type, district, province, department,
-            license, resolution, expiration_date, cutoff_date, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ON CONFLICT(callsign) DO UPDATE SET
-            name=excluded.name,
-            category=excluded.category,
-            type=excluded.type,
-            district=excluded.district,
-            province=excluded.province,
-            department=excluded.department,
-            license=excluded.license,
-            resolution=excluded.resolution,
-            expiration_date=excluded.expiration_date,
-            cutoff_date=excluded.cutoff_date,
-            updated_at=excluded.updated_at
-    """
+            INSERT INTO radio_operators (
+                callsign, name, category, type, district, province, department,
+                license, resolution, expiration_date, cutoff_date, enabled, country, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(callsign) DO UPDATE SET
+                name=excluded.name,
+                category=excluded.category,
+                type=excluded.type,
+                district=excluded.district,
+                province=excluded.province,
+                department=excluded.department,
+                license=excluded.license,
+                resolution=excluded.resolution,
+                expiration_date=excluded.expiration_date,
+                cutoff_date=excluded.cutoff_date,
+                enabled=excluded.enabled,
+                country=excluded.country,
+                updated_at=excluded.updated_at
+        """
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     for op in operators:
         cur.execute(
@@ -70,7 +72,9 @@ def integrate_operators_to_db(operators):
                 op["license"],
                 op["resolution"],
                 op["expiration_date"],
-                op["cutoff_date"],
+                op.get("cutoff_date", ""),
+                op.get("enabled", 1),
+                op.get("country", ""),
                 now,
             ),
         )
