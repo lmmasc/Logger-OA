@@ -5,6 +5,7 @@ Contiene la clase MainWindow, que define la ventana principal usando PySide6.
 """
 
 from PySide6.QtWidgets import QMainWindow, QApplication, QMessageBox, QStackedWidget
+from PySide6.QtCore import Qt
 
 # Importaciones locales
 from app.ui.menu_bar import MainMenuBar
@@ -34,6 +35,9 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(tr("main_window_title"))  # Título de la ventana
         self.resize(600, 400)  # Solo tamaño inicial
         self.center()
+
+        # Instancia única de la ventana de tabla de base de datos
+        self.db_table_window = None
 
         # Crear y asignar la barra de menús
         self.menu_bar = MainMenuBar(self)
@@ -214,11 +218,26 @@ class MainWindow(QMainWindow):
             QMessageBox.information(self, tr("main_window_title"), f"{action}: {e}")
 
     def _show_db_window(self):
-        """Muestra la ventana de tabla de base de datos (placeholder)."""
+        """Muestra la ventana de tabla de base de datos como instancia única."""
         try:
             from app.ui.dialogs.db_table_window import DBTableWindow
 
-            dlg = DBTableWindow(self)
-            dlg.exec()
+            if self.db_table_window is not None and self.db_table_window.isVisible():
+                self.db_table_window.raise_()
+                self.db_table_window.activateWindow()
+                return
+            self.db_table_window = DBTableWindow(self)
+            self.db_table_window.setAttribute(Qt.WA_DeleteOnClose)
+            self.db_table_window.destroyed.connect(self._on_db_table_window_closed)
+            self.db_table_window.show()
         except Exception as e:
             QMessageBox.warning(self, tr("main_window_title"), str(e))
+
+    def _on_db_table_window_closed(self, *args):
+        self.db_table_window = None
+
+    def closeEvent(self, event):
+        # Cerrar la ventana de tabla de base de datos si está abierta
+        if self.db_table_window is not None:
+            self.db_table_window.close()
+        super().closeEvent(event)
