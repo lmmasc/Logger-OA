@@ -9,7 +9,7 @@ from PySide6.QtWidgets import QMainWindow, QApplication, QMessageBox
 # Importaciones locales
 from app.ui.menu_bar import MainMenuBar
 from app.ui.themes.theme_manager import ThemeManager
-from app.ui.translations import tr
+from app.translation import tr, set_language, get_language
 
 
 class MainWindow(QMainWindow):
@@ -149,8 +149,6 @@ class MainWindow(QMainWindow):
         Args:
             lang (str): Código del idioma a establecer ("es" o "en").
         """
-        from app.ui.translations import set_language, tr
-
         set_language(lang)
         self._retranslate_ui()
         self._update_language_menu_checks()
@@ -159,8 +157,7 @@ class MainWindow(QMainWindow):
         """
         Actualiza el estado (checked) de las acciones del menú de idioma según el idioma actual.
         """
-        from app.ui.translations import current_lang
-
+        current_lang = get_language()
         self.menu_bar.lang_es_action.setChecked(current_lang == "es")
         self.menu_bar.lang_en_action.setChecked(current_lang == "en")
 
@@ -168,43 +165,10 @@ class MainWindow(QMainWindow):
         """
         Actualiza los textos de la interfaz según el idioma seleccionado.
         """
-        from app.ui.translations import tr
-
         self.setWindowTitle(tr("main_window_title"))
-        # Menús y acciones
-        self.menu_bar.file_menu.setTitle(tr("file_menu"))
-        self.menu_bar.open_folder_action.setText(tr("open_folder"))
-        self.menu_bar.exit_action.setText(tr("exit"))
+        from app.translation import retranslate_menu_bar
 
-        # Operativo
-        self.menu_bar.operativo_menu.setTitle(tr("ops_menu"))
-        self.menu_bar.ops_new_action.setText(tr("new"))
-        self.menu_bar.ops_open_action.setText(tr("open"))
-        self.menu_bar.ops_export_action.setText(tr("export"))
-        self.menu_bar.ops_close_action.setText(tr("close"))
-
-        # Concurso
-        self.menu_bar.concurso_menu.setTitle(tr("contest_menu"))
-        self.menu_bar.contest_new_action.setText(tr("new"))
-        self.menu_bar.contest_open_action.setText(tr("open"))
-        self.menu_bar.contest_export_action.setText(tr("export"))
-        self.menu_bar.contest_close_action.setText(tr("close"))
-
-        # Base de datos
-        self.menu_bar.database_menu.setTitle(tr("database_menu"))
-        self.menu_bar.db_import_pdf_action.setText(tr("import_from_pdf"))
-        self.menu_bar.db_export_action.setText(tr("export"))
-        self.menu_bar.db_show_action.setText(tr("show_database"))
-
-        # Resto
-        self.menu_bar.aspect_menu.setTitle(tr("aspect_menu"))
-        self.menu_bar.light_theme_action.setText(tr("light_theme"))
-        self.menu_bar.dark_theme_action.setText(tr("dark_theme"))
-        self.menu_bar.language_menu.setTitle(tr("language_menu"))
-        self.menu_bar.lang_es_action.setText(tr("spanish"))
-        self.menu_bar.lang_en_action.setText(tr("english"))
-        self.menu_bar.help_menu.setTitle(tr("help_menu"))
-        self.menu_bar.about_action.setText(tr("about"))
+        retranslate_menu_bar(self.menu_bar)
 
     # Handlers básicos de acciones de menú (placeholders con mensajes)
     def _on_menu_action(self, action: str):

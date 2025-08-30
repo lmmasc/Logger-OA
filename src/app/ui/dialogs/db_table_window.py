@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QTableWidget
 from app.db.queries import get_table_data
-from app.ui.translations import tr
+from app.translation import tr
 
 
 class DBTableWindow(QDialog):

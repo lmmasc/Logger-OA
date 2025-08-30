@@ -1,8 +1,6 @@
-# translations.py
+# Diccionarios de traducción para la aplicación
 
-from app.config.settings_manager import SettingsManager
-
-translations = {
+TRANSLATIONS = {
     "es": {
         "main_window_title": "Ventana Principal",
         "file_menu": "Archivo",
@@ -26,6 +24,10 @@ translations = {
         "close": "Cerrar",
         "import_from_pdf": "Importar desde PDF",
         "show_database": "Mostrar base de datos",
+        "welcome_message": "Bienvenido a Logger OA v2",
+        "log_contest": "Vista Concurso",
+        "log_ops": "Vista Operativo",
+        "db_table": "Tabla de Base de Datos",
     },
     "en": {
         "main_window_title": "Main Window",
@@ -50,19 +52,9 @@ translations = {
         "close": "Close",
         "import_from_pdf": "Import from PDF",
         "show_database": "Show database",
+        "welcome_message": "Welcome to Logger OA v2",
+        "log_contest": "Contest View",
+        "log_ops": "Operations View",
+        "db_table": "Database Table",
     },
 }
-
-settings_mgr = SettingsManager()
-current_lang = settings_mgr.get_value("language", "es")
-
-
-def tr(key):
-    return translations.get(current_lang, translations["es"]).get(key, key)
-
-
-def set_language(lang):
-    global current_lang
-    if lang in translations:
-        current_lang = lang
-        settings_mgr.set_value("language", lang)

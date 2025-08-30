@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel
-from app.ui.translations import tr
+from app.translation import tr
 
 
 class LogOpsView(QWidget):
