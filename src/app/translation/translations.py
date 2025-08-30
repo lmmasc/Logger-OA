@@ -2,7 +2,7 @@
 
 TRANSLATIONS = {
     "es": {
-        "main_window_title": "Ventana Principal",
+        "main_window_title": "Logger OA",
         "file_menu": "Archivo",
         "ops_menu": "Operativo",
         "contest_menu": "Concurso",
@@ -14,7 +14,7 @@ TRANSLATIONS = {
         "aspect_menu": "Aspecto",
         "light_theme": "Tema claro",
         "dark_theme": "Tema oscuro",
-        "about_message": "Logger OA v2\nAplicación de ejemplo con PySide6.",
+        "about_message": "Logger OA\nHerramienta de registro de radioaficionados para concursos y operaciones especiales.\nDesarrollado por Miguel OA4BAU y Raquel OA4EHN.",
         "language_menu": "Idioma",
         "spanish": "Español",
         "english": "Inglés",
@@ -31,7 +31,7 @@ TRANSLATIONS = {
         "credits_message": "Desarrollado por Miguel OA4BAU y Raquel OA4EHN",
     },
     "en": {
-        "main_window_title": "Main Window",
+        "main_window_title": "Logger OA",
         "file_menu": "File",
         "ops_menu": "Operations",
         "contest_menu": "Contest",
@@ -43,7 +43,7 @@ TRANSLATIONS = {
         "aspect_menu": "Appearance",
         "light_theme": "Light Theme",
         "dark_theme": "Dark Theme",
-        "about_message": "Logger OA v2\nSample app with PySide6.",
+        "about_message": "Logger OA\nLogging tool for amateur radio contests and special operations.\nDeveloped by Miguel OA4BAU and Raquel OA4EHN.",
         "language_menu": "Language",
         "spanish": "Spanish",
         "english": "English",
