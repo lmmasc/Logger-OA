@@ -279,6 +279,34 @@ Esto permite que la app recuerde configuraciones entre sesiones de forma sencill
 
 ---
 
+
+## Utilidades de manejo de archivos y rutas
+
+La aplicación cuenta con un módulo centralizado para la gestión de rutas y archivos, facilitando la obtención de paths multiplataforma y operaciones comunes como verificar existencia o crear carpetas.
+
+### Estructura
+
+```
+src/app/utils/
+  file_manager.py   # Funciones utilitarias para manejo de archivos y rutas
+```
+
+- **file_manager.py**: Incluye funciones como `get_db_path()` para obtener la ruta recomendada de la base de datos (por defecto en la carpeta del usuario, compatible con Linux, Windows y Mac), `ensure_dir_exists()` para crear carpetas si no existen, y `file_exists()` para verificar la existencia de archivos.
+
+### Ejemplo de uso
+
+```python
+from app.utils.file_manager import get_db_path, ensure_dir_exists, file_exists
+
+db_path = get_db_path()  # Obtiene la ruta multiplataforma para la base de datos
+ensure_dir_exists('/ruta/a/crear')  # Crea la carpeta si no existe
+if file_exists(db_path):
+  print("La base de datos existe")
+```
+
+Esto permite centralizar y profesionalizar el manejo de archivos y rutas en toda la aplicación.
+
+---
 ## Gestión de base de datos (SQLite)
 
 La aplicación utiliza SQLite como motor de base de datos, aprovechando el módulo `sqlite3` incluido en la biblioteca estándar de Python (no requiere instalación adicional).
