@@ -19,16 +19,36 @@ class DBTableWindow(QWidget):
 
     def load_data(self):
         db_path = get_db_path()
-        query = "SELECT id, callsign, name, country FROM radioamateurs"
+        query = (
+            "SELECT callsign, name, category, type, district, province, department, "
+            "license, resolution, expiration_date, cutoff_date, enabled, country, updated_at "
+            "FROM radio_operators"
+        )
         data = fetch_all(db_path, query)
+        headers = [
+            "Callsign",
+            "Name",
+            "Category",
+            "Type",
+            "District",
+            "Province",
+            "Department",
+            "License",
+            "Resolution",
+            "Expiration Date",
+            "Cutoff Date",
+            "Enabled",
+            "Country",
+            "Updated At",
+        ]
         if not data:
             self.table.setRowCount(0)
             self.table.setColumnCount(0)
             self.table.setHorizontalHeaderLabels([])
             return
         self.table.setRowCount(len(data))
-        self.table.setColumnCount(4)
-        self.table.setHorizontalHeaderLabels(["ID", "Callsign", "Name", "Country"])
+        self.table.setColumnCount(len(headers))
+        self.table.setHorizontalHeaderLabels(headers)
         for row_idx, row in enumerate(data):
             for col_idx, value in enumerate(row):
                 self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(value)))
