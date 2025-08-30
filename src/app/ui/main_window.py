@@ -33,7 +33,7 @@ class MainWindow(QMainWindow):
         """
         super().__init__()
         self.setWindowTitle(tr("main_window_title"))  # Título de la ventana
-        self.resize(600, 400)  # Solo tamaño inicial
+        self.resize(1200, 700)  # Solo tamaño inicial
         self.center()
 
         # Instancia única de la ventana de tabla de base de datos
