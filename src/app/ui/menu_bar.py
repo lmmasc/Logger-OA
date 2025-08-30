@@ -42,3 +42,13 @@ class MainMenuBar(QMenuBar):
         self.about_action = QAction(tr("about"), self)
         help_menu.addAction(self.about_action)
         self.addMenu(help_menu)
+
+        # Menú Idioma
+        language_menu = QMenu(tr("language_menu"), self)
+        self.lang_es_action = QAction(tr("spanish"), self)
+        self.lang_en_action = QAction(tr("english"), self)
+        self.lang_es_action.setCheckable(True)
+        self.lang_en_action.setCheckable(True)
+        language_menu.addAction(self.lang_es_action)
+        language_menu.addAction(self.lang_en_action)
+        self.addMenu(language_menu)

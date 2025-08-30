@@ -17,7 +17,8 @@ file_menu = QMenu(tr("file_menu"), self)
 exit_action = QAction(tr("exit"), self)
 ```
 
-Para cambiar el idioma, basta con modificar la variable `current_lang` en `translations.py` y reiniciar la app. Todos los textos de la interfaz se obtienen a través de `tr(key)`.
+
+El usuario puede cambiar el idioma desde el menú "Idioma" en tiempo real. La preferencia de idioma se guarda automáticamente usando `SettingsManager` y se recuerda entre sesiones.
 
 Puedes agregar o modificar textos fácilmente editando el diccionario en `translations.py`.
 
