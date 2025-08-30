@@ -8,6 +8,7 @@ from app.translation import tr
 class DBTableWindow(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.resize(1200, 700)  # Tamaño inicial, no fijo
         self.setWindowTitle(tr("db_table"))
         self.setWindowFlag(Qt.Window)
         layout = QVBoxLayout()
