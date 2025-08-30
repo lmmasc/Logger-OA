@@ -194,6 +194,10 @@ class MainWindow(QMainWindow):
         from app.translation import retranslate_menu_bar
 
         retranslate_menu_bar(self.menu_bar)
+        # Actualizar todas las vistas que tengan retranslate_ui
+        for view in self.views.values():
+            if hasattr(view, "retranslate_ui"):
+                view.retranslate_ui()
 
     # Handlers básicos de acciones de menú (placeholders con mensajes)
     def _on_menu_action(self, action: str):

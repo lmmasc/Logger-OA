@@ -4,6 +4,7 @@ Servicio centralizado para traducción y manejo de idioma en la aplicación.
 
 from app.config.settings_manager import SettingsManager
 from app.translation.translations import TRANSLATIONS
+from app.translation.translation_events import translation_signal
 
 # Estado global de idioma
 _settings_mgr = SettingsManager()
@@ -16,11 +17,12 @@ def tr(key: str) -> str:
 
 
 def set_language(lang: str):
-    """Cambia el idioma global de la app y lo guarda en settings."""
+    """Cambia el idioma global de la app y lo guarda en settings. Emite señal de cambio de idioma."""
     global _current_lang
     if lang in TRANSLATIONS:
         _current_lang = lang
         _settings_mgr.set_value("language", lang)
+        translation_signal.language_changed.emit()
 
 
 def get_language() -> str:
@@ -68,32 +70,3 @@ def retranslate_menu_bar(menu_bar, tr_func=None):
     menu_bar.lang_en_action.setText(tr_func("english"))
     menu_bar.help_menu.setTitle(tr_func("help_menu"))
     menu_bar.about_action.setText(tr_func("about"))
-
-
-# translation_service.py
-"""
-Servicio centralizado para traducción y manejo de idioma en la aplicación.
-"""
-from app.config.settings_manager import SettingsManager
-from app.translation.translations import TRANSLATIONS
-
-_settings_mgr = SettingsManager()
-_current_lang = _settings_mgr.get_value("language", "es")
-
-
-def tr(key: str) -> str:
-    """Traduce una clave según el idioma actual."""
-    return TRANSLATIONS.get(_current_lang, TRANSLATIONS["es"]).get(key, key)
-
-
-def set_language(lang: str):
-    """Cambia el idioma global de la app y lo guarda en settings."""
-    global _current_lang
-    if lang in TRANSLATIONS:
-        _current_lang = lang
-        _settings_mgr.set_value("language", lang)
-
-
-def get_language() -> str:
-    """Devuelve el idioma actual."""
-    return _current_lang
