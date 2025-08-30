@@ -206,14 +206,35 @@ class MainWindow(QMainWindow):
     # Handlers básicos de acciones de menú (placeholders con mensajes)
     def _on_menu_action(self, action: str):
         """
-        Cambia la vista central según el menú seleccionado. Preparado para integración futura.
+        Maneja acciones de menú, incluyendo importación de operadores desde PDF.
         """
         try:
             if action.startswith("ops_"):
                 self.show_view("log_ops")
             elif action.startswith("contest_"):
                 self.show_view("log_contest")
-            # Aquí puedes agregar más lógica según el tipo de acción
+            elif action == "db_import_pdf":
+                from PySide6.QtWidgets import QFileDialog
+                from app.operators_update.updater import update_operators_from_pdf
+
+                file_path, _ = QFileDialog.getOpenFileName(
+                    self, tr("import_from_pdf"), "", "PDF Files (*.pdf)"
+                )
+                if file_path:
+                    try:
+                        result = update_operators_from_pdf(file_path)
+                        if result:
+                            QMessageBox.information(
+                                self, tr("main_window_title"), tr("import_success")
+                            )
+                        else:
+                            QMessageBox.warning(
+                                self, tr("main_window_title"), tr("import_failed")
+                            )
+                    except Exception as e:
+                        QMessageBox.critical(
+                            self, tr("main_window_title"), f"{tr('import_failed')}: {e}"
+                        )
         except Exception as e:
             QMessageBox.information(self, tr("main_window_title"), f"{action}: {e}")
 

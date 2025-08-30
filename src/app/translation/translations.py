@@ -29,6 +29,8 @@ TRANSLATIONS = {
         "log_ops": "Vista Operativo",
         "db_table": "Tabla de Base de Datos",
         "credits_message": "Desarrollado por Miguel OA4BAU y Raquel OA4EHN",
+        "import_success": "Importación completada: {count} operadores actualizados.",
+        "import_failed": "Error al importar operadores desde PDF. Por favor, revise el archivo y vuelva a intentarlo.",
     },
     "en": {
         "main_window_title": "Logger OA",
@@ -58,5 +60,7 @@ TRANSLATIONS = {
         "log_ops": "Operations View",
         "db_table": "Database Table",
         "credits_message": "Developed by Miguel OA4BAU and Raquel OA4EHN",
+        "import_success": "Import completed: {count} operators updated.",
+        "import_failed": "Failed to import operators from PDF. Please check the file and try again.",
     },
 }
