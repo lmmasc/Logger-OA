@@ -6,11 +6,21 @@ def init_radioamateur_table(conn):
     Crea la tabla de radioaficionados si no existe.
     """
     sql = """
-    CREATE TABLE IF NOT EXISTS radioamateurs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        callsign TEXT UNIQUE NOT NULL,
-        name TEXT NOT NULL,
-        country TEXT NOT NULL
+    CREATE TABLE IF NOT EXISTS radio_operators (
+        callsign TEXT PRIMARY KEY,
+        name TEXT,
+        category TEXT,
+        type TEXT,
+        district TEXT,
+        province TEXT,
+        department TEXT,
+        license TEXT,
+        resolution TEXT,
+        expiration_date TEXT,
+        cutoff_date TEXT,
+        enabled INTEGER DEFAULT 1,
+        country TEXT DEFAULT '',
+        updated_at TEXT
     );
     """
     cursor = conn.cursor()

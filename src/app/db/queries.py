@@ -57,26 +57,67 @@ def execute_query(db_path: str, query: str, params: Tuple = ()) -> bool:
         conn.close()
 
 
-def add_radioamateur(callsign, name, country):
+def add_radio_operator(
+    callsign,
+    name,
+    category,
+    type_,
+    district,
+    province,
+    department,
+    license_,
+    resolution,
+    expiration_date,
+    cutoff_date,
+    enabled,
+    country,
+    updated_at,
+):
     """
-    Inserta un nuevo radioaficionado.
+    Inserta un nuevo operador de radio.
     """
     db_path = get_db_path()
     conn = get_connection(db_path)
-    sql = "INSERT INTO radioamateurs (callsign, name, country) VALUES (?, ?, ?)"
+    sql = (
+        "INSERT INTO radio_operators (callsign, name, category, type, district, province, department, "
+        "license, resolution, expiration_date, cutoff_date, enabled, country, updated_at) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    )
     cursor = conn.cursor()
-    cursor.execute(sql, (callsign, name, country))
+    cursor.execute(
+        sql,
+        (
+            callsign,
+            name,
+            category,
+            type_,
+            district,
+            province,
+            department,
+            license_,
+            resolution,
+            expiration_date,
+            cutoff_date,
+            enabled,
+            country,
+            updated_at,
+        ),
+    )
     conn.commit()
     conn.close()
 
 
-def get_radioamateurs():
+def get_radio_operators():
     """
-    Devuelve todos los radioaficionados.
+    Devuelve todos los operadores de radio.
     """
     db_path = get_db_path()
     conn = get_connection(db_path)
-    sql = "SELECT id, callsign, name, country FROM radioamateurs"
+    sql = (
+        "SELECT callsign, name, category, type, district, province, department, "
+        "license, resolution, expiration_date, cutoff_date, enabled, country, updated_at "
+        "FROM radio_operators"
+    )
     cursor = conn.cursor()
     cursor.execute(sql)
     results = cursor.fetchall()
@@ -84,27 +125,64 @@ def get_radioamateurs():
     return results
 
 
-def update_radioamateur(id, callsign, name, country):
+def update_radio_operator(
+    callsign,
+    name,
+    category,
+    type_,
+    district,
+    province,
+    department,
+    license_,
+    resolution,
+    expiration_date,
+    cutoff_date,
+    enabled,
+    country,
+    updated_at,
+):
     """
-    Actualiza un radioaficionado por id.
+    Actualiza un operador de radio por callsign.
     """
     db_path = get_db_path()
     conn = get_connection(db_path)
-    sql = "UPDATE radioamateurs SET callsign=?, name=?, country=? WHERE id=?"
+    sql = (
+        "UPDATE radio_operators SET name=?, category=?, type=?, district=?, province=?, department=?, "
+        "license=?, resolution=?, expiration_date=?, cutoff_date=?, enabled=?, country=?, updated_at=? "
+        "WHERE callsign=?"
+    )
     cursor = conn.cursor()
-    cursor.execute(sql, (callsign, name, country, id))
+    cursor.execute(
+        sql,
+        (
+            name,
+            category,
+            type_,
+            district,
+            province,
+            department,
+            license_,
+            resolution,
+            expiration_date,
+            cutoff_date,
+            enabled,
+            country,
+            updated_at,
+            callsign,
+        ),
+    )
     conn.commit()
     conn.close()
 
 
-def delete_radioamateur(id):
+def delete_radio_operator(callsign):
     """
-    Elimina un radioaficionado por id.
+    Elimina un operador de radio por callsign.
     """
     db_path = get_db_path()
     conn = get_connection(db_path)
-    sql = "DELETE FROM radioamateurs WHERE id=?"
+    sql = "DELETE FROM radio_operators WHERE callsign=?"
     cursor = conn.cursor()
-    cursor.execute(sql, (id,))
+    cursor.execute(sql, (callsign,))
     conn.commit()
     conn.close()
