@@ -4,12 +4,17 @@ Módulo de la ventana principal de la aplicación.
 Contiene la clase MainWindow, que define la ventana principal usando PySide6.
 """
 
-from PySide6.QtWidgets import QMainWindow, QApplication, QMessageBox
+from PySide6.QtWidgets import QMainWindow, QApplication, QMessageBox, QStackedWidget
 
 # Importaciones locales
 from app.ui.menu_bar import MainMenuBar
 from app.ui.themes.theme_manager import ThemeManager
 from app.translation import tr, set_language, get_language
+
+
+from app.ui.views.welcome_view import WelcomeView
+from app.ui.views.log_ops_view import LogOpsView
+from app.ui.views.log_contest_view import LogContestView
 
 
 class MainWindow(QMainWindow):
@@ -37,6 +42,26 @@ class MainWindow(QMainWindow):
         # Gestor de temas
         self.theme_manager = ThemeManager()
         self.theme_manager.load_last_theme()
+
+        # --- Vistas dinámicas ---
+        self.stacked_widget = QStackedWidget()
+        self.views = {
+            "welcome": WelcomeView(self),
+            "log_ops": LogOpsView(self),
+            "log_contest": LogContestView(self),
+        }
+        for view in self.views.values():
+            self.stacked_widget.addWidget(view)
+        self.setCentralWidget(self.stacked_widget)
+        self.show_view("welcome")
+
+    def show_view(self, view_name):
+        """
+        Cambia la vista central según el nombre dado.
+        """
+        view = self.views.get(view_name)
+        if view:
+            self.stacked_widget.setCurrentWidget(view)
 
         # Conectar acciones del menú de forma explícita
         from PySide6.QtCore import QUrl
@@ -172,20 +197,16 @@ class MainWindow(QMainWindow):
 
     # Handlers básicos de acciones de menú (placeholders con mensajes)
     def _on_menu_action(self, action: str):
-        """Muestra un mensaje informativo por ahora. Integra aquí la lógica real."""
-        # Se puede integrar con vistas LogOpsView y LogContestView según corresponda.
-        # Cambiar de vista según el contexto del menú
+        """
+        Cambia la vista central según el menú seleccionado. Preparado para integración futura.
+        """
         try:
             if action.startswith("ops_"):
-                from app.ui.views.log_ops_view import LogOpsView
-
-                self.setCentralWidget(LogOpsView(self))
+                self.show_view("log_ops")
             elif action.startswith("contest_"):
-                from app.ui.views.log_contest_view import LogContestView
-
-                self.setCentralWidget(LogContestView(self))
+                self.show_view("log_contest")
+            # Aquí puedes agregar más lógica según el tipo de acción
         except Exception as e:
-            # Fallback informativo si algo falla al crear la vista
             QMessageBox.information(self, tr("main_window_title"), f"{action}: {e}")
 
     def _show_db_window(self):
