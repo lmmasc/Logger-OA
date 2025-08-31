@@ -19,6 +19,7 @@ class MainMenuBar(QMenuBar):
     def __init__(self, parent=None):
         super().__init__(parent)
         self._create_menus()
+        translation_service.signal.language_changed.connect(self.retranslate_ui)
 
     def _create_menus(self):
         # Menú Archivo
@@ -90,3 +91,39 @@ class MainMenuBar(QMenuBar):
         self.about_action = QAction(translation_service.tr("about"), self)
         self.help_menu.addAction(self.about_action)
         self.addMenu(self.help_menu)
+
+    def retranslate_ui(self):
+        """
+        Actualiza los textos de todos los menús y acciones según el idioma actual.
+        """
+        self.file_menu.setTitle(translation_service.tr("file_menu"))
+        self.open_folder_action.setText(translation_service.tr("open_folder"))
+        self.exit_action.setText(translation_service.tr("exit"))
+
+        self.operativo_menu.setTitle(translation_service.tr("ops_menu"))
+        self.ops_new_action.setText(translation_service.tr("new"))
+        self.ops_open_action.setText(translation_service.tr("open"))
+        self.ops_export_action.setText(translation_service.tr("export"))
+        self.ops_close_action.setText(translation_service.tr("close"))
+
+        self.concurso_menu.setTitle(translation_service.tr("contest_menu"))
+        self.contest_new_action.setText(translation_service.tr("new"))
+        self.contest_open_action.setText(translation_service.tr("open"))
+        self.contest_export_action.setText(translation_service.tr("export"))
+        self.contest_close_action.setText(translation_service.tr("close"))
+
+        self.database_menu.setTitle(translation_service.tr("database_menu"))
+        self.db_import_pdf_action.setText(translation_service.tr("import_from_pdf"))
+        self.db_export_action.setText(translation_service.tr("export"))
+        self.db_show_action.setText(translation_service.tr("show_database"))
+
+        self.aspect_menu.setTitle(translation_service.tr("aspect_menu"))
+        self.light_theme_action.setText(translation_service.tr("light_theme"))
+        self.dark_theme_action.setText(translation_service.tr("dark_theme"))
+
+        self.language_menu.setTitle(translation_service.tr("language_menu"))
+        self.lang_es_action.setText(translation_service.tr("spanish"))
+        self.lang_en_action.setText(translation_service.tr("english"))
+
+        self.help_menu.setTitle(translation_service.tr("help_menu"))
+        self.about_action.setText(translation_service.tr("about"))
