@@ -24,6 +24,12 @@ def normalize_operator_data(raw_data):
         resolution = normalize_ascii(row.get("resolution", ""))
         expiration_date = row.get("expiration_date", "")
         cutoff_date = row.get("cutoff_date", "")
+        # Normalizar país: PERU por defecto, sin acentos ni minúsculas
+        country = row.get("country", None)
+        if not country or not country.strip():
+            country = "PERU"
+        else:
+            country = normalize_ascii(country).upper()
         # Validar formato de fecha dd/mm/yyyy
         if expiration_date and not re.match(r"\d{2}/\d{2}/\d{4}", expiration_date):
             expiration_date = ""
@@ -40,6 +46,7 @@ def normalize_operator_data(raw_data):
                 "resolution": resolution,
                 "expiration_date": expiration_date,
                 "cutoff_date": cutoff_date,
+                "country": country,
             }
         )
     return normalized
