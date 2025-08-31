@@ -2,12 +2,12 @@
 theme_manager.py
 
 Módulo para gestionar y aplicar temas (claro/oscuro) usando archivos QSS.
-Utiliza SettingsManager para guardar y recuperar la preferencia del usuario.
+Utiliza settings_service para guardar y recuperar la preferencia del usuario.
 """
 
 import os
 from PySide6.QtWidgets import QApplication
-from app.config.settings_manager import SettingsManager
+from app.core.config.settings_service import settings_service
 
 
 class ThemeManager:
@@ -17,7 +17,7 @@ class ThemeManager:
     """
 
     def __init__(self):
-        self.settings = SettingsManager()
+        self.settings = settings_service
         self.theme_dir = os.path.dirname(__file__)
         self.current_theme = self.settings.get_value("theme", "light")
 

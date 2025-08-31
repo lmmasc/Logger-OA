@@ -1,15 +1,15 @@
 """
-settings_manager.py
+settings_service.py
 
-Módulo encargado de la gestión de configuraciones de la aplicación usando QSettings.
+Servicio centralizado para la gestión de configuraciones de la aplicación usando QSettings.
 """
 
 from PySide6.QtCore import QSettings
 
 
-class SettingsManager:
+class SettingsService:
     """
-    Clase para gestionar la configuración persistente de la aplicación.
+    Servicio para gestionar la configuración persistente de la aplicación.
     Utiliza QSettings para guardar y recuperar valores.
     """
 
@@ -28,3 +28,7 @@ class SettingsManager:
     def remove(self, key):
         """Elimina una clave de la configuración."""
         self.settings.remove(key)
+
+
+# Instancia global para acceso centralizado
+settings_service = SettingsService()
