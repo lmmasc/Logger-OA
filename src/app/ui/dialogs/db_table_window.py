@@ -1,7 +1,9 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem
 from PySide6.QtCore import Qt
-from app.db.queries import fetch_all
-from app.utils.file_manager import get_db_path
+from app.repositories.sqlite_radio_operator_repository import (
+    SqliteRadioOperatorRepository,
+)
+from app.services.radio_operator_service import RadioOperatorService
 from app.translation import tr
 
 
@@ -18,13 +20,9 @@ class DBTableWindow(QWidget):
         self.load_data()
 
     def load_data(self):
-        db_path = get_db_path()
-        query = (
-            "SELECT callsign, name, category, type, district, province, department, "
-            "license, resolution, expiration_date, cutoff_date, enabled, country, updated_at "
-            "FROM radio_operators"
-        )
-        data = fetch_all(db_path, query)
+        repo = SqliteRadioOperatorRepository()
+        service = RadioOperatorService(repo)
+        operators = service.list_operators()
         headers = [
             "Callsign",
             "Name",
@@ -41,16 +39,33 @@ class DBTableWindow(QWidget):
             "Country",
             "Updated At",
         ]
-        if not data:
+        if not operators:
             self.table.setRowCount(0)
             self.table.setColumnCount(0)
             self.table.setHorizontalHeaderLabels([])
             return
-        self.table.setRowCount(len(data))
+        self.table.setRowCount(len(operators))
         self.table.setColumnCount(len(headers))
         self.table.setHorizontalHeaderLabels(headers)
-        for row_idx, row in enumerate(data):
-            for col_idx, value in enumerate(row):
+        for row_idx, op in enumerate(operators):
+            for col_idx, value in enumerate(
+                [
+                    op.callsign,
+                    op.name,
+                    op.category,
+                    op.type_,
+                    op.district,
+                    op.province,
+                    op.department,
+                    op.license_,
+                    op.resolution,
+                    op.expiration_date,
+                    op.cutoff_date,
+                    op.enabled,
+                    op.country,
+                    op.updated_at,
+                ]
+            ):
                 self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(value)))
 
     # ...existing code...
