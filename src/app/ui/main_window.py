@@ -10,7 +10,7 @@ from PySide6.QtCore import Qt
 # Importaciones locales
 from app.ui.menu_bar import MainMenuBar
 from app.ui.themes.theme_manager import ThemeManager
-from app.translation import tr, set_language, get_language
+from app.core.translation.translation_service import translation_service
 
 
 from app.ui.views.welcome_view import WelcomeView
@@ -32,7 +32,9 @@ class MainWindow(QMainWindow):
         gestor de temas y conecta las acciones del menú.
         """
         super().__init__()
-        self.setWindowTitle(tr("main_window_title"))  # Título de la ventana
+        self.setWindowTitle(
+            translation_service.tr("main_window_title")
+        )  # Título de la ventana
         self.resize(1200, 700)  # Solo tamaño inicial
         self.center()
 
@@ -169,7 +171,12 @@ class MainWindow(QMainWindow):
         """
         Muestra un cuadro de diálogo con información sobre la aplicación.
         """
-        QMessageBox.information(self, tr("about"), tr("about_message"))
+
+        QMessageBox.information(
+            self,
+            translation_service.tr("about"),
+            translation_service.tr("about_message"),
+        )
 
     def set_language(self, lang):
         """
@@ -178,7 +185,7 @@ class MainWindow(QMainWindow):
         Args:
             lang (str): Código del idioma a establecer ("es" o "en").
         """
-        set_language(lang)
+        translation_service.set_language(lang)
         self._retranslate_ui()
         self._update_language_menu_checks()
 
@@ -186,7 +193,7 @@ class MainWindow(QMainWindow):
         """
         Actualiza el estado (checked) de las acciones del menú de idioma según el idioma actual.
         """
-        current_lang = get_language()
+        current_lang = translation_service.get_language()
         self.menu_bar.lang_es_action.setChecked(current_lang == "es")
         self.menu_bar.lang_en_action.setChecked(current_lang == "en")
 
@@ -194,10 +201,9 @@ class MainWindow(QMainWindow):
         """
         Actualiza los textos de la interfaz según el idioma seleccionado.
         """
-        self.setWindowTitle(tr("main_window_title"))
-        from app.translation import retranslate_menu_bar
-
-        retranslate_menu_bar(self.menu_bar)
+        self.setWindowTitle(translation_service.tr("main_window_title"))
+        if hasattr(self.menu_bar, "retranslate_ui"):
+            self.menu_bar.retranslate_ui()
         # Actualizar todas las vistas que tengan retranslate_ui
         for view in self.views.values():
             if hasattr(view, "retranslate_ui"):
@@ -218,25 +224,36 @@ class MainWindow(QMainWindow):
                 from app.operators_update.updater import update_operators_from_pdf
 
                 file_path, _ = QFileDialog.getOpenFileName(
-                    self, tr("import_from_pdf"), "", "PDF Files (*.pdf)"
+                    self,
+                    translation_service.tr("import_from_pdf"),
+                    "",
+                    "PDF Files (*.pdf)",
                 )
                 if file_path:
                     try:
                         result = update_operators_from_pdf(file_path)
                         if result:
                             QMessageBox.information(
-                                self, tr("main_window_title"), tr("import_success")
+                                self,
+                                translation_service.tr("main_window_title"),
+                                translation_service.tr("import_success"),
                             )
                         else:
                             QMessageBox.warning(
-                                self, tr("main_window_title"), tr("import_failed")
+                                self,
+                                translation_service.tr("main_window_title"),
+                                translation_service.tr("import_failed"),
                             )
                     except Exception as e:
                         QMessageBox.critical(
-                            self, tr("main_window_title"), f"{tr('import_failed')}: {e}"
+                            self,
+                            translation_service.tr("main_window_title"),
+                            f"{translation_service.tr('import_failed')}: {e}",
                         )
         except Exception as e:
-            QMessageBox.information(self, tr("main_window_title"), f"{action}: {e}")
+            QMessageBox.information(
+                self, translation_service.tr("main_window_title"), f"{action}: {e}"
+            )
 
     def _show_db_window(self):
         """Muestra la ventana de tabla de base de datos como instancia única."""
@@ -252,7 +269,9 @@ class MainWindow(QMainWindow):
             self.db_table_window.destroyed.connect(self._on_db_table_window_closed)
             self.db_table_window.show()
         except Exception as e:
-            QMessageBox.warning(self, tr("main_window_title"), str(e))
+            QMessageBox.warning(
+                self, translation_service.tr("main_window_title"), str(e)
+            )
 
     def _on_db_table_window_closed(self, *args):
         self.db_table_window = None

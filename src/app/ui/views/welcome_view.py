@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QSpacerItem, QSizePolicy
 from PySide6.QtGui import QPixmap, Qt
-from app.translation import tr
-from app.translation.translation_events import translation_signal
+from app.core.translation.translation_service import translation_service
+from app.core.translation.translation_events import translation_signal
 
 
 class WelcomeView(QWidget):
@@ -10,7 +10,7 @@ class WelcomeView(QWidget):
         super().__init__(parent)
         layout = QVBoxLayout()
         # Mensaje de bienvenida arriba
-        self.label = QLabel(tr("welcome_message"))
+        self.label = QLabel(translation_service.tr("welcome_message"))
         self.label.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
         font = self.label.font()
         font.setPointSize(28)  # Mucho más grande
@@ -38,7 +38,7 @@ class WelcomeView(QWidget):
         )
 
         # Mensaje de créditos abajo
-        self.credits_label = QLabel(tr("credits_message"))
+        self.credits_label = QLabel(translation_service.tr("credits_message"))
         self.credits_label.setAlignment(Qt.AlignHCenter | Qt.AlignBottom)
         credits_font = self.credits_label.font()
         credits_font.setPointSize(14)  # Más grande
@@ -49,5 +49,5 @@ class WelcomeView(QWidget):
         translation_signal.language_changed.connect(self.retranslate_ui)
 
     def retranslate_ui(self):
-        self.label.setText(tr("welcome_message"))
-        self.credits_label.setText(tr("credits_message"))
+        self.label.setText(translation_service.tr("welcome_message"))
+        self.credits_label.setText(translation_service.tr("credits_message"))

@@ -1,16 +1,16 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel
-from app.translation import tr
-from app.translation.translation_events import translation_signal
+from app.core.translation.translation_service import translation_service
+from app.core.translation.translation_events import translation_signal
 
 
 class LogContestView(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         layout = QVBoxLayout()
-        self.label = QLabel(tr("log_contest"))
+        self.label = QLabel(translation_service.tr("log_contest"))
         layout.addWidget(self.label)
         self.setLayout(layout)
         translation_signal.language_changed.connect(self.retranslate_ui)
 
     def retranslate_ui(self):
-        self.label.setText(tr("log_contest"))
+        self.label.setText(translation_service.tr("log_contest"))

@@ -4,14 +4,14 @@ from app.repositories.sqlite_radio_operator_repository import (
     SqliteRadioOperatorRepository,
 )
 from app.services.radio_operator_service import RadioOperatorService
-from app.translation import tr
+from app.core.translation.translation_service import translation_service
 
 
 class DBTableWindow(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.resize(1200, 700)  # Tamaño inicial, no fijo
-        self.setWindowTitle(tr("db_table"))
+        self.setWindowTitle(translation_service.tr("db_table"))
         self.setWindowFlag(Qt.Window)
         layout = QVBoxLayout()
         self.table = QTableWidget()
