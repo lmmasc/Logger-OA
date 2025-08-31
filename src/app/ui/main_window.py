@@ -1,3 +1,5 @@
+from app.core.config.settings_service import settings_service
+
 """
 Módulo de la ventana principal de la aplicación.
 
@@ -32,6 +34,9 @@ class MainWindow(QMainWindow):
         gestor de temas y conecta las acciones del menú.
         """
         super().__init__()
+        # Leer idioma guardado o usar por defecto
+        lang = settings_service.get_value("language", "es")
+        translation_service.set_language(lang)
         self.setWindowTitle(
             translation_service.tr("main_window_title")
         )  # Título de la ventana
@@ -180,12 +185,13 @@ class MainWindow(QMainWindow):
 
     def set_language(self, lang):
         """
-        Cambia el idioma de la aplicación y actualiza los textos de la interfaz.
+        Cambia el idioma de la aplicación, lo guarda en la configuración y actualiza los textos de la interfaz.
 
         Args:
             lang (str): Código del idioma a establecer ("es" o "en").
         """
         translation_service.set_language(lang)
+        settings_service.set_value("language", lang)
         self._retranslate_ui()
         self._update_language_menu_checks()
 
