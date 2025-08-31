@@ -12,7 +12,7 @@ from PySide6.QtWidgets import QApplication
 from app.ui.main_window import MainWindow
 from app.db.connection import get_connection
 from app.db.schema import init_radioamateur_table
-from app.utils.file_manager import get_db_path
+from app.core.config.paths import get_db_path
 
 
 def main():

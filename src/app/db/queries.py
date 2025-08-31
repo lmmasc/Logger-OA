@@ -7,7 +7,7 @@ Permite trabajar tanto con la base principal como con bases auxiliares.
 
 from typing import Any, List, Tuple, Optional
 from .connection import get_connection
-from app.utils.file_manager import get_db_path
+from app.core.config.paths import get_db_path
 
 
 def fetch_all(db_path: str, query: str, params: Tuple = ()) -> List[Tuple]:

@@ -78,7 +78,7 @@ class MainWindow(QMainWindow):
         from PySide6.QtCore import QUrl
         from PySide6.QtGui import QDesktopServices
         import os
-        from app.utils.file_manager import get_db_path
+        from app.core.config.paths import get_db_path
 
         self.menu_bar.exit_action.triggered.connect(self.close)
         self.menu_bar.about_action.triggered.connect(self.show_about_dialog)
