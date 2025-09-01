@@ -161,19 +161,44 @@ class MainWindow(QMainWindow):
         window_geometry.moveCenter(screen_geometry.center())
         self.move(window_geometry.topLeft())
 
+    def refresh_ui(self):
+        """
+        Refresca todos los textos y checks de la interfaz gráfica según el idioma y tema actual.
+        Llama a este método tras cambiar idioma o tema para garantizar consistencia visual.
+        """
+        self.setWindowTitle(translation_service.tr("main_window_title"))
+        if hasattr(self.menu_bar, "retranslate_ui"):
+            self.menu_bar.retranslate_ui()
+        for view in self.view_manager.views.values():
+            if hasattr(view, "retranslate_ui"):
+                view.retranslate_ui()
+        self._update_language_menu_checks()
+        self._update_theme_menu_checks()
+
+    def set_language(self, lang):
+        """
+        Cambia el idioma de la aplicación, lo guarda en la configuración y actualiza los textos de la interfaz.
+
+        Args:
+            lang (str): Código del idioma a establecer ("es" o "en").
+        """
+        translation_service.set_language(lang)
+        settings_service.set_value("language", lang)
+        self.refresh_ui()
+
     def set_light_theme(self):
         """
-        Aplica el tema claro a la aplicación y actualiza el estado del menú de temas.
+        Aplica el tema claro a la aplicación y actualiza la interfaz.
         """
         self.theme_manager.apply_theme("light")
-        self._update_theme_menu_checks()
+        self.refresh_ui()
 
     def set_dark_theme(self):
         """
-        Aplica el tema oscuro a la aplicación y actualiza el estado del menú de temas.
+        Aplica el tema oscuro a la aplicación y actualiza la interfaz.
         """
         self.theme_manager.apply_theme("dark")
-        self._update_theme_menu_checks()
+        self.refresh_ui()
 
     def _update_theme_menu_checks(self):
         """
@@ -193,18 +218,6 @@ class MainWindow(QMainWindow):
             translation_service.tr("about"),
             translation_service.tr("about_message"),
         )
-
-    def set_language(self, lang):
-        """
-        Cambia el idioma de la aplicación, lo guarda en la configuración y actualiza los textos de la interfaz.
-
-        Args:
-            lang (str): Código del idioma a establecer ("es" o "en").
-        """
-        translation_service.set_language(lang)
-        settings_service.set_value("language", lang)
-        self._retranslate_ui()
-        self._update_language_menu_checks()
 
     def _update_language_menu_checks(self):
         """
