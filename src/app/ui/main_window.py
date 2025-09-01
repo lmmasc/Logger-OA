@@ -90,6 +90,102 @@ class MainWindow(QMainWindow):
         # Llama este método al final del __init__
         self._set_initial_theme_and_language()
 
+    # =====================
+    # Métodos públicos principales
+    # =====================
+
+    def show_view(self, view_name):
+        """
+        Cambia la vista central según el nombre dado usando el gestor de vistas.
+        """
+        self.view_manager.show_view(view_name)
+
+    def refresh_ui(self):
+        """
+        Refresca todos los textos y checks de la interfaz gráfica según el idioma y tema actual.
+        Llama a este método tras cambiar idioma o tema para garantizar consistencia visual.
+        """
+        self.setWindowTitle(translation_service.tr("main_window_title"))
+        if hasattr(self.menu_bar, "retranslate_ui"):
+            self.menu_bar.retranslate_ui()
+        for view in self.view_manager.views.values():
+            if hasattr(view, "retranslate_ui"):
+                view.retranslate_ui()
+        self._update_language_menu_checks()
+        self._update_theme_menu_checks()
+
+    # =====================
+    # Métodos de configuración y actualización de UI
+    # =====================
+
+    def set_language(self, lang):
+        """
+        Cambia el idioma de la aplicación, lo guarda en la configuración y actualiza los textos de la interfaz.
+
+        Args:
+            lang (str): Código del idioma a establecer ("es" o "en").
+        """
+        translation_service.set_language(lang)
+        settings_service.set_value("language", lang)
+        self.refresh_ui()
+
+    def set_light_theme(self):
+        """
+        Aplica el tema claro a la aplicación y actualiza la interfaz.
+        """
+        self.theme_manager.apply_theme("light")
+        self.refresh_ui()
+
+    def set_dark_theme(self):
+        """
+        Aplica el tema oscuro a la aplicación y actualiza la interfaz.
+        """
+        self.theme_manager.apply_theme("dark")
+        self.refresh_ui()
+
+    def _update_theme_menu_checks(self):
+        """
+        Actualiza el estado (checked) de las acciones del menú de temas según el tema actual.
+        """
+        theme = self.theme_manager.current_theme
+        self.menu_bar.light_theme_action.setChecked(theme == "light")
+        self.menu_bar.dark_theme_action.setChecked(theme == "dark")
+
+    def _update_language_menu_checks(self):
+        """
+        Actualiza el estado (checked) de las acciones del menú de idioma según el idioma actual.
+        """
+        current_lang = translation_service.get_language()
+        self.menu_bar.lang_es_action.setChecked(current_lang == "es")
+        self.menu_bar.lang_en_action.setChecked(current_lang == "en")
+
+    def _retranslate_ui(self):
+        """
+        Actualiza los textos de la interfaz según el idioma seleccionado.
+        """
+        self.setWindowTitle(translation_service.tr("main_window_title"))
+        if hasattr(self.menu_bar, "retranslate_ui"):
+            self.menu_bar.retranslate_ui()
+        for view in self.view_manager.views.values():
+            if hasattr(view, "retranslate_ui"):
+                view.retranslate_ui()
+
+    def _set_initial_theme_and_language(self):
+        """
+        Aplica el tema y el idioma guardados al iniciar la aplicación.
+        """
+        theme = self.theme_manager.current_theme
+        if theme == "dark":
+            self.set_dark_theme()
+        else:
+            self.set_light_theme()
+        lang = settings_service.get_value("language", "es")
+        self.set_language(lang)
+
+    # =====================
+    # Métodos de conexión de menús y handlers de acciones
+    # =====================
+
     def _connect_menu_actions(self):
         self.menu_bar.exit_action.triggered.connect(self.close)
         self.menu_bar.about_action.triggered.connect(self.show_about_dialog)
@@ -161,53 +257,6 @@ class MainWindow(QMainWindow):
         window_geometry.moveCenter(screen_geometry.center())
         self.move(window_geometry.topLeft())
 
-    def refresh_ui(self):
-        """
-        Refresca todos los textos y checks de la interfaz gráfica según el idioma y tema actual.
-        Llama a este método tras cambiar idioma o tema para garantizar consistencia visual.
-        """
-        self.setWindowTitle(translation_service.tr("main_window_title"))
-        if hasattr(self.menu_bar, "retranslate_ui"):
-            self.menu_bar.retranslate_ui()
-        for view in self.view_manager.views.values():
-            if hasattr(view, "retranslate_ui"):
-                view.retranslate_ui()
-        self._update_language_menu_checks()
-        self._update_theme_menu_checks()
-
-    def set_language(self, lang):
-        """
-        Cambia el idioma de la aplicación, lo guarda en la configuración y actualiza los textos de la interfaz.
-
-        Args:
-            lang (str): Código del idioma a establecer ("es" o "en").
-        """
-        translation_service.set_language(lang)
-        settings_service.set_value("language", lang)
-        self.refresh_ui()
-
-    def set_light_theme(self):
-        """
-        Aplica el tema claro a la aplicación y actualiza la interfaz.
-        """
-        self.theme_manager.apply_theme("light")
-        self.refresh_ui()
-
-    def set_dark_theme(self):
-        """
-        Aplica el tema oscuro a la aplicación y actualiza la interfaz.
-        """
-        self.theme_manager.apply_theme("dark")
-        self.refresh_ui()
-
-    def _update_theme_menu_checks(self):
-        """
-        Actualiza el estado (checked) de las acciones del menú de temas según el tema actual.
-        """
-        theme = self.theme_manager.current_theme
-        self.menu_bar.light_theme_action.setChecked(theme == "light")
-        self.menu_bar.dark_theme_action.setChecked(theme == "dark")
-
     def show_about_dialog(self):
         """
         Muestra un cuadro de diálogo con información sobre la aplicación.
@@ -219,26 +268,6 @@ class MainWindow(QMainWindow):
             translation_service.tr("about_message"),
         )
 
-    def _update_language_menu_checks(self):
-        """
-        Actualiza el estado (checked) de las acciones del menú de idioma según el idioma actual.
-        """
-        current_lang = translation_service.get_language()
-        self.menu_bar.lang_es_action.setChecked(current_lang == "es")
-        self.menu_bar.lang_en_action.setChecked(current_lang == "en")
-
-    def _retranslate_ui(self):
-        """
-        Actualiza los textos de la interfaz según el idioma seleccionado.
-        """
-        self.setWindowTitle(translation_service.tr("main_window_title"))
-        if hasattr(self.menu_bar, "retranslate_ui"):
-            self.menu_bar.retranslate_ui()
-        # Actualizar todas las vistas que tengan retranslate_ui
-        for view in self.view_manager.views.values():
-            if hasattr(view, "retranslate_ui"):
-                view.retranslate_ui()
-
     def _on_menu_action(self, action: str):
         handler = self._menu_action_map.get(action)
         if handler:
@@ -248,7 +277,7 @@ class MainWindow(QMainWindow):
                 self, "Acción no implementada", f"No handler for {action}"
             )
 
-    # Ejemplo de handlers básicos (puedes expandirlos según la lógica actual)
+    # Handlers de acciones de menú
     def _action_ops_new(self):
         self.show_view("log_ops")
 
@@ -308,6 +337,10 @@ class MainWindow(QMainWindow):
         # Lógica de exportar base de datos
         pass
 
+    # =====================
+    # Métodos de gestión de ventanas secundarias
+    # =====================
+
     def _show_db_window(self):
         """Muestra la ventana de tabla de base de datos como instancia única."""
         try:
@@ -334,20 +367,3 @@ class MainWindow(QMainWindow):
         if self.db_table_window is not None:
             self.db_table_window.close()
         super().closeEvent(event)
-
-    def _set_initial_theme_and_language(self):
-        # Aplica el tema guardado
-        theme = self.theme_manager.current_theme
-        if theme == "dark":
-            self.set_dark_theme()
-        else:
-            self.set_light_theme()
-        # Aplica el idioma guardado
-        lang = settings_service.get_value("language", "es")
-        self.set_language(lang)
-
-    def show_view(self, view_name):
-        """
-        Cambia la vista central según el nombre dado usando el gestor de vistas.
-        """
-        self.view_manager.show_view(view_name)
