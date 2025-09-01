@@ -49,9 +49,9 @@ src/
 
 ## 3. Plan de Migración Paso a Paso
 
-### Paso 1: Preparación
-- Documentar la arquitectura objetivo en el README.
-- Crear la estructura de carpetas objetivo.
+### Paso 1: Preparación ✅
+- Documentar la arquitectura objetivo en el README. (Hecho)
+- Crear la estructura de carpetas objetivo. (Hecho)
 
 ### Paso 2: Dominio
 - Mover todas las entidades, modelos y lógica de negocio pura a `domain/`.
