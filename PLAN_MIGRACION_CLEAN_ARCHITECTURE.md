@@ -53,10 +53,10 @@ src/
 - Documentar la arquitectura objetivo en el README. (Hecho)
 - Crear la estructura de carpetas objetivo. (Hecho)
 
-### Paso 2: Dominio
-- Mover todas las entidades, modelos y lógica de negocio pura a `domain/`.
-- Crear subcarpetas `entities/`, `value_objects/`, `services/` si es necesario.
-- Eliminar cualquier dependencia de infraestructura en el dominio.
+### Paso 2: Dominio ✅
+- Mover todas las entidades, modelos y lógica de negocio pura a `domain/`. (Hecho)
+- Unificar y limpiar entidades duplicadas (`RadioOperator`). (Hecho)
+- Eliminar cualquier dependencia de infraestructura en el dominio. (Hecho)
 
 ### Paso 3: Application
 - Mover los casos de uso (servicios/orquestadores) a `application/use_cases/`.

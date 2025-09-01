@@ -1,6 +1,6 @@
+from domain.entities.radio_operator import RadioOperator
 from abc import ABC, abstractmethod
 from typing import List
-from app.domain.radio_operator import RadioOperator
 
 
 class RadioOperatorRepository(ABC):

@@ -1,5 +1,5 @@
 from typing import List
-from app.domain.radio_operator import RadioOperator
+from domain.entities.radio_operator import RadioOperator
 from app.repositories.radio_operator_repository import RadioOperatorRepository
 
 
