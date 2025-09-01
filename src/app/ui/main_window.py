@@ -1,23 +1,28 @@
 from app.core.config.settings_service import settings_service
+from PySide6.QtWidgets import (
+    QMainWindow,
+    QApplication,
+    QMessageBox,
+    QStackedWidget,
+    QFileDialog,
+)
+from PySide6.QtCore import Qt, QUrl
+from PySide6.QtGui import QDesktopServices
+import os
+from app.core.config.paths import get_db_path
+from app.ui.menu_bar import MainMenuBar
+from app.ui.themes.theme_manager import ThemeManager
+from app.core.translation.translation_service import translation_service
+from app.ui.views.welcome_view import WelcomeView
+from app.ui.views.log_ops_view import LogOpsView
+from app.ui.views.log_contest_view import LogContestView
+
 
 """
 Módulo de la ventana principal de la aplicación.
 
 Contiene la clase MainWindow, que define la ventana principal usando PySide6.
 """
-
-from PySide6.QtWidgets import QMainWindow, QApplication, QMessageBox, QStackedWidget
-from PySide6.QtCore import Qt
-
-# Importaciones locales
-from app.ui.menu_bar import MainMenuBar
-from app.ui.themes.theme_manager import ThemeManager
-from app.core.translation.translation_service import translation_service
-
-
-from app.ui.views.welcome_view import WelcomeView
-from app.ui.views.log_ops_view import LogOpsView
-from app.ui.views.log_contest_view import LogContestView
 
 
 class MainWindow(QMainWindow):
@@ -75,11 +80,6 @@ class MainWindow(QMainWindow):
             self.stacked_widget.setCurrentWidget(view)
 
         # Conectar acciones del menú de forma explícita
-        from PySide6.QtCore import QUrl
-        from PySide6.QtGui import QDesktopServices
-        import os
-        from app.core.config.paths import get_db_path
-
         self.menu_bar.exit_action.triggered.connect(self.close)
         self.menu_bar.about_action.triggered.connect(self.show_about_dialog)
 
@@ -226,7 +226,6 @@ class MainWindow(QMainWindow):
             elif action.startswith("contest_"):
                 self.show_view("log_contest")
             elif action == "db_import_pdf":
-                from PySide6.QtWidgets import QFileDialog
                 from app.operators_update.updater import update_operators_from_pdf
 
                 file_path, _ = QFileDialog.getOpenFileName(
