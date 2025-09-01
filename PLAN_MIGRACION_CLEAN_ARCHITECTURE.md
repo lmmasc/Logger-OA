@@ -58,10 +58,11 @@ src/
 - Unificar y limpiar entidades duplicadas (`RadioOperator`). (Hecho)
 - Eliminar cualquier dependencia de infraestructura en el dominio. (Hecho)
 
-### Paso 3: Application
-- Mover los casos de uso (servicios/orquestadores) a `application/use_cases/`.
-- Definir todas las interfaces de repositorios y servicios en `application/interfaces/`.
-- Asegurarse de que los casos de uso dependan solo de interfaces y modelos de dominio.
+
+### Paso 3: Application ✅
+- Mover los casos de uso (servicios/orquestadores) a `application/use_cases/`. (Hecho)
+- Definir todas las interfaces de repositorios y servicios en `application/interfaces/`. (Hecho)
+- Asegurarse de que los casos de uso dependan solo de interfaces y modelos de dominio. (Hecho)
 
 ### Paso 4: Infrastructure
 - Mover implementaciones concretas de repositorios, servicios de archivos, PDF, etc. a `infrastructure/`.
