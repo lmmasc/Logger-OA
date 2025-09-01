@@ -192,67 +192,52 @@ class MainWindow(QMainWindow):
 
     def _connect_menu_actions(self) -> None:
         """
-        Conecta todas las acciones del menú a sus respectivos handlers.
+        Conecta las señales personalizadas de la barra de menús a los handlers de MainWindow.
         """
-        self.menu_bar.exit_action.triggered.connect(self.close)
-        self.menu_bar.about_action.triggered.connect(self.show_about_dialog)
-
-        # Acción para abrir carpeta de archivos
-        def open_data_folder():
-            # Carpeta donde se guarda la base de datos
-            db_path = get_db_path()
-            folder = os.path.dirname(db_path)
-            QDesktopServices.openUrl(QUrl.fromLocalFile(folder))
-
-        self.menu_bar.open_folder_action.triggered.connect(open_data_folder)
-
-        # Acciones de tema
-        self.menu_bar.light_theme_action.triggered.connect(self.set_light_theme)
-        self.menu_bar.dark_theme_action.triggered.connect(self.set_dark_theme)
-
-        # Acciones de idioma
-        self.menu_bar.lang_es_action.triggered.connect(lambda: self.set_language("es"))
-        self.menu_bar.lang_en_action.triggered.connect(lambda: self.set_language("en"))
-
-        # Conectar menús Operativo y Concurso
-        # Nota: las funciones concretas pueden integrarse con vistas específicas más adelante.
-        self.menu_bar.ops_new_action.triggered.connect(
-            lambda: self._on_menu_action("ops_new")
-        )
-        self.menu_bar.ops_open_action.triggered.connect(
+        self.menu_bar.exit_requested.connect(self.close)
+        self.menu_bar.about_requested.connect(self.show_about_dialog)
+        self.menu_bar.open_folder_requested.connect(self._open_data_folder)
+        self.menu_bar.light_theme_requested.connect(self.set_light_theme)
+        self.menu_bar.dark_theme_requested.connect(self.set_dark_theme)
+        self.menu_bar.lang_es_requested.connect(lambda: self.set_language("es"))
+        self.menu_bar.lang_en_requested.connect(lambda: self.set_language("en"))
+        self.menu_bar.ops_new_requested.connect(lambda: self._on_menu_action("ops_new"))
+        self.menu_bar.ops_open_requested.connect(
             lambda: self._on_menu_action("ops_open")
         )
-        self.menu_bar.ops_export_action.triggered.connect(
+        self.menu_bar.ops_export_requested.connect(
             lambda: self._on_menu_action("ops_export")
         )
-        self.menu_bar.ops_close_action.triggered.connect(
+        self.menu_bar.ops_close_requested.connect(
             lambda: self._on_menu_action("ops_close")
         )
-
-        self.menu_bar.contest_new_action.triggered.connect(
+        self.menu_bar.contest_new_requested.connect(
             lambda: self._on_menu_action("contest_new")
         )
-        self.menu_bar.contest_open_action.triggered.connect(
+        self.menu_bar.contest_open_requested.connect(
             lambda: self._on_menu_action("contest_open")
         )
-        self.menu_bar.contest_export_action.triggered.connect(
+        self.menu_bar.contest_export_requested.connect(
             lambda: self._on_menu_action("contest_export")
         )
-        self.menu_bar.contest_close_action.triggered.connect(
+        self.menu_bar.contest_close_requested.connect(
             lambda: self._on_menu_action("contest_close")
         )
-
-        # Conectar menú Base de datos
-        self.menu_bar.db_import_pdf_action.triggered.connect(
+        self.menu_bar.db_import_pdf_requested.connect(
             lambda: self._on_menu_action("db_import_pdf")
         )
-        self.menu_bar.db_export_action.triggered.connect(
+        self.menu_bar.db_export_requested.connect(
             lambda: self._on_menu_action("db_export")
         )
-        self.menu_bar.db_show_action.triggered.connect(self._show_db_window)
+        self.menu_bar.db_show_requested.connect(self._show_db_window)
 
-        # Acciones de prueba
-        # self.menu_bar.test_action.triggered.connect(self._test_action)
+    def _open_data_folder(self) -> None:
+        """
+        Abre la carpeta donde se guarda la base de datos.
+        """
+        db_path = get_db_path()
+        folder = os.path.dirname(db_path)
+        QDesktopServices.openUrl(QUrl.fromLocalFile(folder))
 
     def center(self):
         """

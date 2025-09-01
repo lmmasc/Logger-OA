@@ -7,6 +7,7 @@ Permite separar la lógica del menú de la ventana principal para mayor modulari
 
 from PySide6.QtWidgets import QMenuBar, QMenu
 from PySide6.QtGui import QAction
+from PySide6.QtCore import Signal
 from app.core.translation.translation_service import translation_service
 
 
@@ -14,12 +15,34 @@ class MainMenuBar(QMenuBar):
     """
     Barra de menús principal de la aplicación.
     Define los menús y acciones principales.
+    Expone señales personalizadas para desacoplar la lógica de UI.
     """
+
+    # Señales personalizadas para cada acción relevante
+    ops_new_requested = Signal()
+    ops_open_requested = Signal()
+    ops_export_requested = Signal()
+    ops_close_requested = Signal()
+    contest_new_requested = Signal()
+    contest_open_requested = Signal()
+    contest_export_requested = Signal()
+    contest_close_requested = Signal()
+    db_import_pdf_requested = Signal()
+    db_export_requested = Signal()
+    db_show_requested = Signal()
+    open_folder_requested = Signal()
+    about_requested = Signal()
+    exit_requested = Signal()
+    light_theme_requested = Signal()
+    dark_theme_requested = Signal()
+    lang_es_requested = Signal()
+    lang_en_requested = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._create_menus()
         translation_service.signal.language_changed.connect(self.retranslate_ui)
+        self._connect_signals()
 
     def _create_menus(self):
         # Menú Archivo
@@ -91,6 +114,29 @@ class MainMenuBar(QMenuBar):
         self.about_action = QAction(translation_service.tr("about"), self)
         self.help_menu.addAction(self.about_action)
         self.addMenu(self.help_menu)
+
+    def _connect_signals(self):
+        """
+        Conecta las acciones del menú a las señales personalizadas.
+        """
+        self.ops_new_action.triggered.connect(self.ops_new_requested.emit)
+        self.ops_open_action.triggered.connect(self.ops_open_requested.emit)
+        self.ops_export_action.triggered.connect(self.ops_export_requested.emit)
+        self.ops_close_action.triggered.connect(self.ops_close_requested.emit)
+        self.contest_new_action.triggered.connect(self.contest_new_requested.emit)
+        self.contest_open_action.triggered.connect(self.contest_open_requested.emit)
+        self.contest_export_action.triggered.connect(self.contest_export_requested.emit)
+        self.contest_close_action.triggered.connect(self.contest_close_requested.emit)
+        self.db_import_pdf_action.triggered.connect(self.db_import_pdf_requested.emit)
+        self.db_export_action.triggered.connect(self.db_export_requested.emit)
+        self.db_show_action.triggered.connect(self.db_show_requested.emit)
+        self.open_folder_action.triggered.connect(self.open_folder_requested.emit)
+        self.about_action.triggered.connect(self.about_requested.emit)
+        self.exit_action.triggered.connect(self.exit_requested.emit)
+        self.light_theme_action.triggered.connect(self.light_theme_requested.emit)
+        self.dark_theme_action.triggered.connect(self.dark_theme_requested.emit)
+        self.lang_es_action.triggered.connect(self.lang_es_requested.emit)
+        self.lang_en_action.triggered.connect(self.lang_en_requested.emit)
 
     def retranslate_ui(self):
         """
