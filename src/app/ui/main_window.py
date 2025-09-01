@@ -16,6 +16,7 @@ from app.core.translation.translation_service import translation_service
 from app.ui.views.welcome_view import WelcomeView
 from app.ui.views.log_ops_view import LogOpsView
 from app.ui.views.log_contest_view import LogContestView
+from app.ui.view_manager import ViewManager
 
 
 """
@@ -59,25 +60,13 @@ class MainWindow(QMainWindow):
         self.theme_manager = ThemeManager()
         self.theme_manager.load_last_theme()
 
-        # --- Vistas dinámicas ---
-        self.stacked_widget = QStackedWidget()
-        self.views = {
-            "welcome": WelcomeView(self),
-            "log_ops": LogOpsView(self),
-            "log_contest": LogContestView(self),
-        }
-        for view in self.views.values():
-            self.stacked_widget.addWidget(view)
-        self.setCentralWidget(self.stacked_widget)
-        self.show_view("welcome")
-
-    def show_view(self, view_name):
-        """
-        Cambia la vista central según el nombre dado.
-        """
-        view = self.views.get(view_name)
-        if view:
-            self.stacked_widget.setCurrentWidget(view)
+        # --- Gestor de vistas ---
+        self.view_manager = ViewManager(self)
+        self.view_manager.register_view("welcome", WelcomeView(self))
+        self.view_manager.register_view("log_ops", LogOpsView(self))
+        self.view_manager.register_view("log_contest", LogContestView(self))
+        self.setCentralWidget(self.view_manager.get_widget())
+        self.view_manager.show_view("welcome")
 
         # Conectar acciones del menú de forma explícita
         self.menu_bar.exit_action.triggered.connect(self.close)
@@ -211,7 +200,7 @@ class MainWindow(QMainWindow):
         if hasattr(self.menu_bar, "retranslate_ui"):
             self.menu_bar.retranslate_ui()
         # Actualizar todas las vistas que tengan retranslate_ui
-        for view in self.views.values():
+        for view in self.view_manager.views.values():
             if hasattr(view, "retranslate_ui"):
                 view.retranslate_ui()
 
