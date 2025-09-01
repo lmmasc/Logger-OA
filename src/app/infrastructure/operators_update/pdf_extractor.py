@@ -4,7 +4,7 @@ Funciones para extraer datos de operadores desde archivos PDF.
 
 import pdfplumber
 import re
-from ..utils.text import normalize_ascii, normalize_callsign, extract_cutoff_date
+from app.utils.text import normalize_ascii, normalize_callsign, extract_cutoff_date
 
 
 def extract_operators_from_pdf(pdf_path):

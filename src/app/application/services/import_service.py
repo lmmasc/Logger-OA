@@ -3,7 +3,7 @@ Servicio para importar operadores desde un archivo PDF.
 Extrae la lógica de negocio fuera de la UI principal.
 """
 
-from app.operators_update.updater import update_operators_from_pdf
+from app.infrastructure.operators_update.updater import update_operators_from_pdf
 
 
 def import_operators_from_pdf(file_path: str) -> bool:
