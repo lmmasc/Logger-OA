@@ -69,6 +69,28 @@ class MainWindow(QMainWindow):
         self.view_manager.show_view("welcome")
 
         # Conectar acciones del menú de forma explícita
+        self._connect_menu_actions()
+
+        self._menu_action_map = {
+            "ops_new": self._action_ops_new,
+            "ops_open": self._action_ops_open,
+            "ops_export": self._action_ops_export,
+            "ops_close": self._action_ops_close,
+            "contest_new": self._action_contest_new,
+            "contest_open": self._action_contest_open,
+            "contest_export": self._action_contest_export,
+            "contest_close": self._action_contest_close,
+            "db_import_pdf": self._action_db_import_pdf,
+            "db_export": self._action_db_export,
+        }
+
+        # --- CORRECCIONES Y MEJORAS ---
+        # 1. show_view debe ser método de instancia (faltaba tras refactor)
+        # 2. Al iniciar, actualizar checks de tema e idioma según configuración guardada
+        # Llama este método al final del __init__
+        self._set_initial_theme_and_language()
+
+    def _connect_menu_actions(self):
         self.menu_bar.exit_action.triggered.connect(self.close)
         self.menu_bar.about_action.triggered.connect(self.show_about_dialog)
 
@@ -88,9 +110,6 @@ class MainWindow(QMainWindow):
         # Acciones de idioma
         self.menu_bar.lang_es_action.triggered.connect(lambda: self.set_language("es"))
         self.menu_bar.lang_en_action.triggered.connect(lambda: self.set_language("en"))
-
-        self._update_language_menu_checks()
-        self._update_theme_menu_checks()
 
         # Conectar menús Operativo y Concurso
         # Nota: las funciones concretas pueden integrarse con vistas específicas más adelante.
@@ -128,6 +147,9 @@ class MainWindow(QMainWindow):
             lambda: self._on_menu_action("db_export")
         )
         self.menu_bar.db_show_action.triggered.connect(self._show_db_window)
+
+        # Acciones de prueba
+        # self.menu_bar.test_action.triggered.connect(self._test_action)
 
     def center(self):
         """
@@ -204,50 +226,74 @@ class MainWindow(QMainWindow):
             if hasattr(view, "retranslate_ui"):
                 view.retranslate_ui()
 
-    # Handlers básicos de acciones de menú (placeholders con mensajes)
     def _on_menu_action(self, action: str):
-        """
-        Maneja acciones de menú, incluyendo importación de operadores desde PDF.
-        """
-        try:
-            if action.startswith("ops_"):
-                self.show_view("log_ops")
-            elif action.startswith("contest_"):
-                self.show_view("log_contest")
-            elif action == "db_import_pdf":
-                from app.operators_update.updater import update_operators_from_pdf
-
-                file_path, _ = QFileDialog.getOpenFileName(
-                    self,
-                    translation_service.tr("import_from_pdf"),
-                    "",
-                    "PDF Files (*.pdf)",
-                )
-                if file_path:
-                    try:
-                        result = update_operators_from_pdf(file_path)
-                        if result:
-                            QMessageBox.information(
-                                self,
-                                translation_service.tr("main_window_title"),
-                                translation_service.tr("import_success"),
-                            )
-                        else:
-                            QMessageBox.warning(
-                                self,
-                                translation_service.tr("main_window_title"),
-                                translation_service.tr("import_failed"),
-                            )
-                    except Exception as e:
-                        QMessageBox.critical(
-                            self,
-                            translation_service.tr("main_window_title"),
-                            f"{translation_service.tr('import_failed')}: {e}",
-                        )
-        except Exception as e:
-            QMessageBox.information(
-                self, translation_service.tr("main_window_title"), f"{action}: {e}"
+        handler = self._menu_action_map.get(action)
+        if handler:
+            handler()
+        else:
+            QMessageBox.warning(
+                self, "Acción no implementada", f"No handler for {action}"
             )
+
+    # Ejemplo de handlers básicos (puedes expandirlos según la lógica actual)
+    def _action_ops_new(self):
+        self.show_view("log_ops")
+
+    def _action_ops_open(self):
+        self.show_view("log_ops")
+
+    def _action_ops_export(self):
+        self.show_view("log_ops")
+
+    def _action_ops_close(self):
+        self.show_view("log_ops")
+
+    def _action_contest_new(self):
+        self.show_view("log_contest")
+
+    def _action_contest_open(self):
+        self.show_view("log_contest")
+
+    def _action_contest_export(self):
+        self.show_view("log_contest")
+
+    def _action_contest_close(self):
+        self.show_view("log_contest")
+
+    def _action_db_import_pdf(self):
+        from app.operators_update.updater import update_operators_from_pdf
+
+        file_path, _ = QFileDialog.getOpenFileName(
+            self,
+            translation_service.tr("import_from_pdf"),
+            "",
+            "PDF Files (*.pdf)",
+        )
+        if file_path:
+            try:
+                result = update_operators_from_pdf(file_path)
+                if result:
+                    QMessageBox.information(
+                        self,
+                        translation_service.tr("main_window_title"),
+                        translation_service.tr("import_success"),
+                    )
+                else:
+                    QMessageBox.warning(
+                        self,
+                        translation_service.tr("main_window_title"),
+                        translation_service.tr("import_failed"),
+                    )
+            except Exception as e:
+                QMessageBox.critical(
+                    self,
+                    translation_service.tr("main_window_title"),
+                    f"{translation_service.tr('import_failed')}: {e}",
+                )
+
+    def _action_db_export(self):
+        # Lógica de exportar base de datos
+        pass
 
     def _show_db_window(self):
         """Muestra la ventana de tabla de base de datos como instancia única."""
@@ -275,3 +321,20 @@ class MainWindow(QMainWindow):
         if self.db_table_window is not None:
             self.db_table_window.close()
         super().closeEvent(event)
+
+    def _set_initial_theme_and_language(self):
+        # Aplica el tema guardado
+        theme = self.theme_manager.current_theme
+        if theme == "dark":
+            self.set_dark_theme()
+        else:
+            self.set_light_theme()
+        # Aplica el idioma guardado
+        lang = settings_service.get_value("language", "es")
+        self.set_language(lang)
+
+    def show_view(self, view_name):
+        """
+        Cambia la vista central según el nombre dado usando el gestor de vistas.
+        """
+        self.view_manager.show_view(view_name)
