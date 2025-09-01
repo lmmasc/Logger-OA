@@ -17,6 +17,7 @@ from app.ui.views.welcome_view import WelcomeView
 from app.ui.views.log_ops_view import LogOpsView
 from app.ui.views.log_contest_view import LogContestView
 from app.ui.view_manager import ViewManager
+from app.application.services.import_service import import_operators_from_pdf
 
 
 """
@@ -308,9 +309,10 @@ class MainWindow(QMainWindow):
     def _action_contest_close(self):
         self.show_view("log_contest")
 
-    def _action_db_import_pdf(self):
-        from app.operators_update.updater import update_operators_from_pdf
-
+    def _action_db_import_pdf(self) -> None:
+        """
+        Handler para importar operadores desde PDF. Lógica delegada a un servicio externo.
+        """
         file_path, _ = QFileDialog.getOpenFileName(
             self,
             translation_service.tr("import_from_pdf"),
@@ -319,7 +321,7 @@ class MainWindow(QMainWindow):
         )
         if file_path:
             try:
-                result = update_operators_from_pdf(file_path)
+                result = import_operators_from_pdf(file_path)
                 if result:
                     QMessageBox.information(
                         self,
