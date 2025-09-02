@@ -1,9 +1,10 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QEvent
 from interface_adapters.controllers.radio_operator_controller import (
     RadioOperatorController,
 )
 from translation.translation_service import translation_service
+from config.settings_service import settings_service
 
 
 class DBTableWindow(QWidget):
@@ -105,3 +106,33 @@ class DBTableWindow(QWidget):
                         item.setText(translation_service.tr("yes"))
                     else:
                         item.setText(translation_service.tr("no"))
+
+    def showEvent(self, event):
+        """
+        Restaura el ancho de las columnas al mostrar la ventana.
+        """
+        super().showEvent(event)
+        widths = settings_service.get_value("db_table_column_widths", None)
+        if widths:
+            for i, w in enumerate(widths):
+                self.table.setColumnWidth(i, int(w))
+        # Conectar señal solo una vez
+        if not hasattr(self, "_resize_connected"):
+            self.table.horizontalHeader().sectionResized.connect(
+                self.save_column_widths
+            )
+            self._resize_connected = True
+
+    def save_column_widths(self, *args):
+        """
+        Guarda el ancho de las columnas en la configuración al ser redimensionadas.
+        """
+        widths = [self.table.columnWidth(i) for i in range(self.table.columnCount())]
+        settings_service.set_value("db_table_column_widths", widths)
+
+    def closeEvent(self, event):
+        """
+        Guarda el ancho de las columnas al cerrar la ventana.
+        """
+        self.save_column_widths()
+        super().closeEvent(event)
