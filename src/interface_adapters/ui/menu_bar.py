@@ -30,6 +30,7 @@ class MainMenuBar(QMenuBar):
     db_import_pdf_requested = Signal()
     db_export_requested = Signal()
     db_show_requested = Signal()
+    db_delete_requested = Signal()
     open_folder_requested = Signal()
     about_requested = Signal()
     exit_requested = Signal()
@@ -84,9 +85,14 @@ class MainMenuBar(QMenuBar):
         )
         self.db_export_action = QAction(translation_service.tr("export"), self)
         self.db_show_action = QAction(translation_service.tr("show_database"), self)
+        self.db_delete_action = QAction(translation_service.tr("delete_database"), self)
         self.database_menu.addAction(self.db_import_pdf_action)
         self.database_menu.addAction(self.db_export_action)
         self.database_menu.addAction(self.db_show_action)
+        # Espacio en blanco antes del separador y la opción de borrar
+        self.database_menu.addAction(QAction(" ", self))
+        self.database_menu.addSeparator()
+        self.database_menu.addAction(self.db_delete_action)
         self.addMenu(self.database_menu)
 
         # Menú Aspecto
@@ -130,6 +136,7 @@ class MainMenuBar(QMenuBar):
         self.db_import_pdf_action.triggered.connect(self.db_import_pdf_requested.emit)
         self.db_export_action.triggered.connect(self.db_export_requested.emit)
         self.db_show_action.triggered.connect(self.db_show_requested.emit)
+        self.db_delete_action.triggered.connect(self.db_delete_requested.emit)
         self.open_folder_action.triggered.connect(self.open_folder_requested.emit)
         self.about_action.triggered.connect(self.about_requested.emit)
         self.exit_action.triggered.connect(self.exit_requested.emit)
@@ -162,6 +169,7 @@ class MainMenuBar(QMenuBar):
         self.db_import_pdf_action.setText(translation_service.tr("import_from_pdf"))
         self.db_export_action.setText(translation_service.tr("export"))
         self.db_show_action.setText(translation_service.tr("show_database"))
+        self.db_delete_action.setText(translation_service.tr("delete_database"))
 
         self.aspect_menu.setTitle(translation_service.tr("aspect_menu"))
         self.light_theme_action.setText(translation_service.tr("light_theme"))

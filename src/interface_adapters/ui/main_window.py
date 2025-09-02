@@ -82,6 +82,7 @@ class MainWindow(QMainWindow):
             "contest_close": self._action_contest_close,
             "db_import_pdf": self._action_db_import_pdf,
             "db_export": self._action_db_export,
+            "db_delete": self._action_db_delete,
         }
 
         # --- CORRECCIONES Y MEJORAS ---
@@ -228,6 +229,7 @@ class MainWindow(QMainWindow):
         self.menu_bar.db_export_requested.connect(
             lambda: self._on_menu_action("db_export")
         )
+        self.menu_bar.db_delete_requested.connect(self._action_db_delete)
         self.menu_bar.db_show_requested.connect(self._show_db_window)
 
     def _open_data_folder(self) -> None:
@@ -328,6 +330,41 @@ class MainWindow(QMainWindow):
     def _action_db_export(self):
         # Lógica de exportar base de datos
         pass
+
+    def _action_db_delete(self):
+        """
+        Handler para borrar y recrear la base de datos, mostrando advertencia y confirmación.
+        """
+        from translation.translation_service import translation_service
+        from infrastructure.db.reset import reset_database
+
+        reply = QMessageBox.warning(
+            self,
+            translation_service.tr("delete_db_confirm"),
+            translation_service.tr("delete_db_warning"),
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+        if reply == QMessageBox.Yes:
+            try:
+                reset_database()
+                QMessageBox.information(
+                    self,
+                    translation_service.tr("main_window_title"),
+                    translation_service.tr("delete_db_success"),
+                )
+            except Exception as e:
+                QMessageBox.critical(
+                    self,
+                    translation_service.tr("main_window_title"),
+                    f"{translation_service.tr('import_failed')}: {e}",
+                )
+        else:
+            QMessageBox.information(
+                self,
+                translation_service.tr("main_window_title"),
+                translation_service.tr("delete_db_cancel"),
+            )
 
     # =====================
     # Métodos de gestión de ventanas secundarias

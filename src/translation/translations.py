@@ -31,6 +31,11 @@ TRANSLATIONS = {
         "credits_message": "Desarrollado por Miguel OA4BAU y Raquel OA4EHN",
         "import_success": "Importación completada: {count} operadores actualizados.",
         "import_failed": "Error al importar operadores desde PDF. Por favor, revise el archivo y vuelva a intentarlo.",
+        "delete_database": "Borrar base de datos",
+        "delete_db_warning": "¿Está seguro que desea borrar la base de datos? Esta acción no se puede deshacer.",
+        "delete_db_confirm": "Confirmar borrado",
+        "delete_db_success": "La base de datos ha sido borrada y recreada vacía.",
+        "delete_db_cancel": "Operación cancelada. La base de datos no fue modificada.",
     },
     "en": {
         "main_window_title": "Logger OA",
@@ -62,5 +67,10 @@ TRANSLATIONS = {
         "credits_message": "Developed by Miguel OA4BAU and Raquel OA4EHN",
         "import_success": "Import completed: {count} operators updated.",
         "import_failed": "Failed to import operators from PDF. Please check the file and try again.",
+        "delete_database": "Delete database",
+        "delete_db_warning": "Are you sure you want to delete the database? This action cannot be undone.",
+        "delete_db_confirm": "Confirm deletion",
+        "delete_db_success": "The database has been deleted and recreated empty.",
+        "delete_db_cancel": "Operation cancelled. The database was not modified.",
     },
 }
