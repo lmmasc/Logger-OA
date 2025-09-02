@@ -7,7 +7,7 @@ Utiliza settings_service para guardar y recuperar la preferencia del usuario.
 
 import os
 from PySide6.QtWidgets import QApplication
-from app.core.config.settings_service import settings_service
+from interface_adapters.core.config.settings_service import settings_service
 
 
 class ThemeManager:

@@ -1,7 +1,0 @@
-/* base.qss
-   Estilos comunes para todos los temas. */
-
-QWidget {
-    font-family: 'Segoe UI', 'Arial', sans-serif;
-    font-size: 12pt;
-}

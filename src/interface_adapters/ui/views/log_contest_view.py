@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel
-from app.core.translation.translation_service import translation_service
+from interface_adapters.core.translation.translation_service import translation_service
 
 
 class LogContestView(QWidget):

@@ -71,9 +71,9 @@ src/
 - Eliminar cualquier lógica de negocio de esta capa. (Hecho)
 
 ### Paso 5: Interface Adapters
-- Mover la lógica de presentación y controladores a `interface_adapters/ui/` y `interface_adapters/controllers/`.
-- Los controladores deben interactuar solo con los casos de uso de `application/`.
-- La UI nunca debe acceder directamente a infraestructura o dominio.
+- Mover la lógica de presentación y controladores a `interface_adapters/ui/` y `interface_adapters/controllers/`. (Hecho)
+- Los controladores deben interactuar solo con los casos de uso de `application/`. (Hecho)
+- La UI nunca debe acceder directamente a infraestructura o dominio. (Hecho)
 
 ### Paso 6: Utils
 - Mantener solo utilidades puras en `utils/`.

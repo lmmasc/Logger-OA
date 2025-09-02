@@ -1,1 +1,0 @@
-# Dominio de la aplicación
