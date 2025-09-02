@@ -52,7 +52,11 @@ class DBTableWindow(QWidget):
                     op.resolution,
                     op.expiration_date,
                     op.cutoff_date,
-                    op.enabled,
+                    (
+                        translation_service.tr("yes")
+                        if op.enabled == 1
+                        else translation_service.tr("no")
+                    ),
                     op.country,
                     op.updated_at,
                 ]
@@ -82,7 +86,22 @@ class DBTableWindow(QWidget):
 
     def retranslate_ui(self):
         """
-        Actualiza el título y los encabezados de la tabla según el idioma actual.
+        Actualiza el título y los encabezados de la tabla según el idioma actual, y traduce los valores de la columna 'habilitado'.
         """
         self.setWindowTitle(translation_service.tr("db_table"))
-        self.table.setHorizontalHeaderLabels(self.get_translated_headers())
+        headers = self.get_translated_headers()
+        self.table.setHorizontalHeaderLabels(headers)
+        # Buscar el índice de la columna 'habilitado' de forma robusta
+        try:
+            enabled_col = headers.index(translation_service.tr("enabled"))
+        except ValueError:
+            enabled_col = None
+        if enabled_col is not None:
+            for row in range(self.table.rowCount()):
+                item = self.table.item(row, enabled_col)
+                if item:
+                    val = item.text().strip().upper()
+                    if val in ("1", "SI", "YES"):  # Puede venir de distintas formas
+                        item.setText(translation_service.tr("yes"))
+                    else:
+                        item.setText(translation_service.tr("no"))

@@ -50,6 +50,8 @@ TRANSLATIONS = {
         "enabled": "Habilitado",
         "country": "País",
         "updated_at": "Actualizado",
+        "yes": "SI",
+        "no": "NO",
     },
     "en": {
         "main_window_title": "Logger OA",
@@ -100,5 +102,7 @@ TRANSLATIONS = {
         "enabled": "Enabled",
         "country": "Country",
         "updated_at": "Updated At",
+        "yes": "YES",
+        "no": "NO",
     },
 }
