@@ -64,10 +64,11 @@ src/
 - Definir todas las interfaces de repositorios y servicios en `application/interfaces/`. (Hecho)
 - Asegurarse de que los casos de uso dependan solo de interfaces y modelos de dominio. (Hecho)
 
-### Paso 4: Infrastructure
-- Mover implementaciones concretas de repositorios, servicios de archivos, PDF, etc. a `infrastructure/`.
-- Cada implementación debe depender solo de interfaces de `application/` y modelos de `domain/`.
-- Eliminar cualquier lógica de negocio de esta capa.
+
+### Paso 4: Infrastructure ✅
+- Mover implementaciones concretas de repositorios, servicios de archivos, PDF, etc. a `infrastructure/`. (Hecho)
+- Cada implementación debe depender solo de interfaces de `application/` y modelos de `domain/`. (Hecho)
+- Eliminar cualquier lógica de negocio de esta capa. (Hecho)
 
 ### Paso 5: Interface Adapters
 - Mover la lógica de presentación y controladores a `interface_adapters/ui/` y `interface_adapters/controllers/`.
