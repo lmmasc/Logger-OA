@@ -10,8 +10,8 @@ Este script crea y muestra la ventana principal usando PySide6.
 import sys  # Para acceder a los argumentos de línea de comandos
 from PySide6.QtWidgets import QApplication
 from app.ui.main_window import MainWindow
-from app.db.connection import get_connection
-from app.db.schema import init_radioamateur_table
+from infrastructure.db.connection import get_connection
+from infrastructure.db.schema import init_radioamateur_table
 from app.core.config.paths import get_db_path
 
 
