@@ -1,84 +1,83 @@
+
 # Logger OA v2
 
+Aplicación de escritorio multiplataforma para la gestión de concursos y operaciones de radioaficionados OA (Perú), con arquitectura desacoplada, interfaz moderna y soporte para importación de datos desde PDF.
+
+---
+
+## Tabla de Contenidos
+- [Descripción General](#descripción-general)
+- [Características Principales](#características-principales)
+- [Arquitectura y Estructura](#arquitectura-y-estructura)
+- [Dependencias](#dependencias)
+- [Instalación y Ejecución](#instalación-y-ejecución)
+- [Guía de Uso](#guía-de-uso)
+- [Licencia](#licencia)
+
+---
+
 ## Descripción General
-Logger OA v2 es una aplicación de escritorio multiplataforma para el registro y gestión de concursos y operaciones de radioaficionados OA (Perú). Permite llevar un control detallado de contactos, concursos y actividades, con soporte para temas claro/oscuro, persistencia de datos en SQLite y una interfaz moderna basada en PySide6 (Qt).
+Logger OA v2 es una aplicación de escritorio para registrar, consultar y gestionar concursos y operaciones de radioaficionados OA (Perú). Permite llevar un control detallado de contactos, concursos, operadores y actividades, con soporte para temas claro/oscuro, persistencia en SQLite, importación de operadores desde PDF y una interfaz moderna basada en PySide6 (Qt).
 
 ---
 
-## Motivación de la Reestructuración
-El proyecto está en proceso de migración hacia Clean Architecture para mejorar la mantenibilidad, escalabilidad y claridad de responsabilidades. Este README documenta tanto el estado actual como la estructura objetivo.
+## Características Principales
+- **Gestión de concursos y operaciones**: Registro, consulta y exportación de logs.
+- **Base de datos local**: Persistencia en SQLite, sin dependencias externas.
+- **Importación desde PDF**: Extracción automática de operadores OA desde listados oficiales en PDF.
+- **Interfaz moderna**: UI con PySide6, soporte para temas claro/oscuro y cambio de idioma (internacionalización).
+- **Arquitectura desacoplada**: Basada en Clean Architecture para facilitar mantenimiento y escalabilidad.
+- **Soporte multiplataforma**: Funciona en Linux, Windows y macOS.
 
 ---
 
-## Estado Actual del Proyecto
-- Estructura modular, pero con duplicidad de responsabilidades en algunas carpetas.
-- Separación parcial entre dominio, aplicación, infraestructura y presentación.
-- Utilidades y pruebas presentes, pero no organizadas por capa.
+## Arquitectura y Estructura
+El proyecto sigue los principios de Clean Architecture, separando responsabilidades en capas bien definidas:
 
-### Estructura actual (resumida)
 ```
 src/
-  main.py
-  application/
-  domain/
-  infrastructure/
-  repositories/
-  services/
-  ui/
-  utils/
-  ...
+  main.py                  # Punto de entrada de la aplicación
+  domain/                  # Entidades y lógica de negocio pura
+    entities/              # Modelos de dominio (Operador, Concurso, Contacto, etc.)
+    repositories/          # Interfaces de repositorios
+    use_cases/             # Casos de uso del dominio
+  application/             # Casos de uso y lógica de aplicación
+    use_cases/             # Casos de uso específicos (gestión, actualización, etc.)
+  infrastructure/          # Implementaciones técnicas
+    db/                    # Acceso y gestión de base de datos SQLite
+    pdf/                   # Extracción y procesamiento de PDF
+    repositories/          # Repositorios concretos
+  interface_adapters/      # Adaptadores de interfaz
+    ui/                    # Interfaz gráfica (PySide6)
+      views/               # Vistas principales (Welcome, LogOps, LogContest, etc.)
+      dialogs/             # Diálogos y ventanas auxiliares
+      themes/              # Temas visuales (claro/oscuro)
+    controllers/           # Controladores de UI
+  config/                  # Configuración, rutas y settings
+  translation/             # Internacionalización y traducciones
+  utils/                   # Utilidades puras
+tests/                     # Pruebas unitarias y de integración
+```
+
+### Diagrama de Capas (Clean Architecture)
+
+```
+[ UI / Interface Adapters ] <--> [ Application ] <--> [ Domain ] <--> [ Infrastructure ]
 ```
 
 ---
 
-## Objetivo: Clean Architecture
-El objetivo es reorganizar el proyecto siguiendo Clean Architecture, asegurando que cada módulo y archivo esté en la capa correspondiente:
+## Dependencias
 
-### Estructura objetivo
-```
-src/
-  main.py
-  domain/
-    entities/
-    value_objects/
-    services/
-  application/
-    use_cases/
-    interfaces/
-  infrastructure/
-    db/
-    files/
-    pdf/
-  interface_adapters/
-    ui/
-    controllers/
-  utils/
-  tests/
-    domain/
-    application/
-    infrastructure/
-    interface_adapters/
-```
+**Principales:**
+- [PySide6](https://doc.qt.io/qtforpython/) (>=6.9.2): Interfaz gráfica Qt para Python.
+- [pdfplumber](https://github.com/jsvine/pdfplumber): Extracción de datos desde PDF.
+- [sqlite3](https://docs.python.org/3/library/sqlite3.html): Base de datos embebida (incluida en Python).
 
-#### Descripción de carpetas
-- **domain/**: Entidades, modelos y lógica de negocio pura.
-- **application/**: Casos de uso y definición de interfaces (repositorios, servicios, gateways).
-- **infrastructure/**: Implementaciones técnicas (DB, archivos, PDF, etc.).
-- **interface_adapters/**: Adaptadores de interfaz (UI, controladores, API, CLI).
-- **utils/**: Utilidades puras, sin dependencias de otras capas.
-- **tests/**: Pruebas organizadas por capa.
+**Desarrollo:**
+- pyinstaller: Generación de ejecutables standalone.
 
----
-
-## Plan de Migración
-1. Documentar la arquitectura objetivo y crear la estructura de carpetas.
-2. Mover entidades y lógica de negocio a `domain/`.
-3. Mover casos de uso e interfaces a `application/`.
-4. Mover implementaciones concretas a `infrastructure/`.
-5. Adaptar la UI y controladores a `interface_adapters/`.
-6. Reorganizar utilidades y pruebas.
-7. Eliminar duplicidades y actualizar imports.
-8. Verificar funcionalidad y documentar la arquitectura final.
+Instalación automática desde `requirements.txt` y `requirements-dev.txt`.
 
 ---
 
@@ -97,6 +96,8 @@ src/
 3. Instala las dependencias:
    ```bash
    pip install -r requirements.txt
+   # Para desarrollo:
+   pip install -r requirements-dev.txt
    ```
 4. Ejecuta la aplicación:
    ```bash
@@ -105,10 +106,16 @@ src/
 
 ---
 
-## Estado de la Migración
-- Consulta el archivo `PLAN_MIGRACION_CLEAN_ARCHITECTURE.md` para ver el plan detallado y el progreso.
+## Guía de Uso
+
+1. **Inicio**: Al abrir la aplicación, se muestra la pantalla de bienvenida.
+2. **Gestión de Operadores**: Importa operadores OA desde PDF oficiales (menú: Importar PDF), consulta y edita la base de datos local.
+3. **Gestión de Concursos y Operaciones**: Crea, edita y exporta logs de concursos y operaciones.
+4. **Temas e Idioma**: Cambia entre tema claro/oscuro y selecciona idioma desde el menú principal.
+5. **Persistencia**: Todos los datos se guardan automáticamente en la base SQLite local.
 
 ---
 
 ## Licencia
+
 MIT
