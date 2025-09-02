@@ -80,8 +80,8 @@ src/
 - Si alguna utilidad es específica de una capa, moverla a esa capa. (Hecho)
 
 ### Paso 7: Tests
-- Reorganizar los tests en subcarpetas por capa.
-- Asegurarse de que los tests de cada capa solo dependan de esa capa y sus dependencias directas.
+- Reorganizar los tests en subcarpetas por capa. (Hecho)
+- Asegurarse de que los tests de cada capa solo dependan de esa capa y sus dependencias directas. (Hecho)
 
 ### Paso 8: Limpieza y Eliminación
 - Revisar y eliminar carpetas/archivos obsoletos o duplicados (`core/`, `db/`, `app/`, etc.).
