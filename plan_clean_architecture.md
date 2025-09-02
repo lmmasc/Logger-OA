@@ -90,6 +90,8 @@ src/
 # ✅ PASO 5 COMPLETADO: Adaptadores de interfaz limpios. Configuración y traducción migradas a carpetas raíz. Imports y lógica verificados. Sin residuos.
 
 # ✅ PASO 6 COMPLETADO: Entidades y contratos de dominio correctamente ubicados en domain/. Estructura y lógica alineadas a Clean Architecture.
+
 # ✅ PASO 7 COMPLETADO: Utilidades generales centralizadas en utils/. Duplicados eliminados y imports actualizados. Cumple Clean Architecture.
+# ✅ PASO 8 COMPLETADO: Punto de entrada único en main.py, sin lógica de negocio. Proyecto alineado 100% a Clean Architecture.
 
 **Este plan debe ser seguido paso a paso para garantizar una migración segura y ordenada.**
