@@ -65,3 +65,9 @@ class DBTableWindow(QWidget):
                 ]
             ):
                 self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(value)))
+
+    def retranslate_ui(self):
+        """
+        Actualiza el título de la ventana según el idioma actual.
+        """
+        self.setWindowTitle(translation_service.tr("db_table"))

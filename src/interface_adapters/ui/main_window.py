@@ -115,6 +115,10 @@ class MainWindow(QMainWindow):
         for view in self.view_manager.views.values():
             if hasattr(view, "retranslate_ui"):
                 view.retranslate_ui()
+        if self.db_table_window is not None and hasattr(
+            self.db_table_window, "retranslate_ui"
+        ):
+            self.db_table_window.retranslate_ui()
         self._update_language_menu_checks()
         self._update_theme_menu_checks()
 
