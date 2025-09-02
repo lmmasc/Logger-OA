@@ -2,7 +2,7 @@
 Funciones para limpiar y normalizar los datos extraídos del PDF.
 """
 
-from app.utils.text import normalize_ascii, normalize_callsign
+from utils.text import normalize_ascii, normalize_callsign
 import re
 
 
