@@ -8,6 +8,9 @@ from translation.translation_service import translation_service
 
 class DBTableWindow(QWidget):
     def __init__(self, parent=None):
+        """
+        Inicializa la ventana de tabla de operadores, configura el layout y carga los datos.
+        """
         super().__init__(parent)
         self.resize(1200, 700)  # Tamaño inicial, no fijo
         self.setWindowTitle(translation_service.tr("db_table"))
@@ -20,23 +23,11 @@ class DBTableWindow(QWidget):
         self.setLayout(layout)
 
     def load_data(self):
+        """
+        Carga los operadores desde el controlador y actualiza la tabla con los datos y headers traducidos.
+        """
         operators = self.controller.list_operators()
-        headers = [
-            "Callsign",
-            "Name",
-            "Category",
-            "Type",
-            "District",
-            "Province",
-            "Department",
-            "License",
-            "Resolution",
-            "Expiration Date",
-            "Cutoff Date",
-            "Enabled",
-            "Country",
-            "Updated At",
-        ]
+        headers = self.get_translated_headers()
         if not operators:
             self.table.setRowCount(0)
             self.table.setColumnCount(0)
@@ -66,8 +57,30 @@ class DBTableWindow(QWidget):
             ):
                 self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(value)))
 
+    def get_translated_headers(self):
+        """
+        Devuelve la lista de encabezados traducidos para la tabla de operadores.
+        """
+        return [
+            translation_service.tr("callsign"),
+            translation_service.tr("name"),
+            translation_service.tr("category"),
+            translation_service.tr("type"),
+            translation_service.tr("district"),
+            translation_service.tr("province"),
+            translation_service.tr("department"),
+            translation_service.tr("license"),
+            translation_service.tr("resolution"),
+            translation_service.tr("expiration_date"),
+            translation_service.tr("cutoff_date"),
+            translation_service.tr("enabled"),
+            translation_service.tr("country"),
+            translation_service.tr("updated_at"),
+        ]
+
     def retranslate_ui(self):
         """
-        Actualiza el título de la ventana según el idioma actual.
+        Actualiza el título y los encabezados de la tabla según el idioma actual.
         """
         self.setWindowTitle(translation_service.tr("db_table"))
+        self.table.setHorizontalHeaderLabels(self.get_translated_headers())
