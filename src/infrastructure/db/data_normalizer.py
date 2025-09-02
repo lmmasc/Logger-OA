@@ -14,12 +14,12 @@ def normalize_operator_data(raw_data):
     normalized = []
     for row in raw_data:
         callsign = normalize_callsign(row.get("callsign", ""))
-        name = normalize_ascii(row.get("name", "")).title()
+        name = normalize_ascii(row.get("name", "")).upper()
         category = normalize_ascii(row.get("category", "")).upper()
         type_ = normalize_ascii(row.get("type", "")).upper()
-        district = normalize_ascii(row.get("district", "")).title()
-        province = normalize_ascii(row.get("province", "")).title()
-        department = normalize_ascii(row.get("department", "")).title()
+        district = normalize_ascii(row.get("district", "")).upper()
+        province = normalize_ascii(row.get("province", "")).upper()
+        department = normalize_ascii(row.get("department", "")).upper()
         license_ = normalize_ascii(row.get("license", ""))
         resolution = normalize_ascii(row.get("resolution", ""))
         expiration_date = row.get("expiration_date", "")
