@@ -12,7 +12,7 @@ def update_operators_from_pdf(pdf_path):
     Ejecuta el flujo completo de extracción, normalización e integración.
     """
     from infrastructure.db.queries import get_radio_operators, update_radio_operator
-    from infrastructure.db.utils import get_db_path
+    from config.paths import get_db_path
     from datetime import datetime
 
     raw_data = extract_operators_from_pdf(pdf_path)

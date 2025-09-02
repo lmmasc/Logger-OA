@@ -4,7 +4,7 @@ Funciones para integrar los datos normalizados a la base de datos.
 
 import sqlite3
 from datetime import datetime
-from infrastructure.db.utils import get_db_path
+from config.paths import get_db_path
 
 
 def integrate_operators_to_db(operators):

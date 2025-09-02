@@ -88,6 +88,8 @@ src/
 # ✅ PASO 4 COMPLETADO: Infraestructura limpia y agrupada por tipo (db, pdf, repositories). Sin archivos ni carpetas residuales. Cumple Clean Architecture.
 
 # ✅ PASO 5 COMPLETADO: Adaptadores de interfaz limpios. Configuración y traducción migradas a carpetas raíz. Imports y lógica verificados. Sin residuos.
+
 # ✅ PASO 6 COMPLETADO: Entidades y contratos de dominio correctamente ubicados en domain/. Estructura y lógica alineadas a Clean Architecture.
+# ✅ PASO 7 COMPLETADO: Utilidades generales centralizadas en utils/. Duplicados eliminados y imports actualizados. Cumple Clean Architecture.
 
 **Este plan debe ser seguido paso a paso para garantizar una migración segura y ordenada.**
