@@ -76,8 +76,8 @@ src/
 - La UI nunca debe acceder directamente a infraestructura o dominio. (Hecho)
 
 ### Paso 6: Utils
-- Mantener solo utilidades puras en `utils/`.
-- Si alguna utilidad es específica de una capa, moverla a esa capa.
+- Mantener solo utilidades puras en `utils/`. (Hecho)
+- Si alguna utilidad es específica de una capa, moverla a esa capa. (Hecho)
 
 ### Paso 7: Tests
 - Reorganizar los tests en subcarpetas por capa.
