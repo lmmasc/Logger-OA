@@ -17,7 +17,7 @@ from .views.welcome_view import WelcomeView
 from .views.log_ops_view import LogOpsView
 from .views.log_contest_view import LogContestView
 from .view_manager import ViewManager
-from ..application.services.import_service import import_operators_from_pdf
+from application.use_cases.update_operators_from_pdf import update_operators_from_pdf
 
 """
 Módulo de la ventana principal de la aplicación.
@@ -305,7 +305,7 @@ class MainWindow(QMainWindow):
         )
         if file_path:
             try:
-                result = import_operators_from_pdf(file_path)
+                result = update_operators_from_pdf(file_path)
                 if result:
                     QMessageBox.information(
                         self,

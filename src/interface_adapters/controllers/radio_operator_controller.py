@@ -3,7 +3,7 @@ Controlador para la gestión de operadores de radio.
 Actúa como intermediario entre la UI y los servicios/casos de uso.
 """
 
-from application.services.radio_operator_service import RadioOperatorService
+from application.use_cases.radio_operator_management import RadioOperatorManagement
 from infrastructure.repositories.sqlite_radio_operator_repository import (
     SqliteRadioOperatorRepository,
 )
@@ -12,7 +12,7 @@ from infrastructure.repositories.sqlite_radio_operator_repository import (
 class RadioOperatorController:
     def __init__(self):
         repo = SqliteRadioOperatorRepository()
-        self.service = RadioOperatorService(repo)
+        self.service = RadioOperatorManagement(repo)
 
     def list_operators(self):
         return self.service.list_operators()
