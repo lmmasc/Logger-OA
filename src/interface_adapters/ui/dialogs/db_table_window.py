@@ -3,7 +3,7 @@ from PySide6.QtCore import Qt
 from interface_adapters.controllers.radio_operator_controller import (
     RadioOperatorController,
 )
-from interface_adapters.core.translation.translation_service import translation_service
+from translation.translation_service import translation_service
 
 
 class DBTableWindow(QWidget):

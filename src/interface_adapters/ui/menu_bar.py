@@ -8,7 +8,7 @@ Permite separar la lógica del menú de la ventana principal para mayor modulari
 from PySide6.QtWidgets import QMenuBar, QMenu
 from PySide6.QtGui import QAction
 from PySide6.QtCore import Signal
-from ..core.translation.translation_service import translation_service
+from translation.translation_service import translation_service
 
 
 class MainMenuBar(QMenuBar):

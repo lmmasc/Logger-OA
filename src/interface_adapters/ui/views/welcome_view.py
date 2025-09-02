@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QSpacerItem, QSizePolicy
 from PySide6.QtGui import QPixmap, Qt
-from interface_adapters.core.translation.translation_service import translation_service
+from translation.translation_service import translation_service
 
 
 class WelcomeView(QWidget):

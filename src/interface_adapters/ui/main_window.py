@@ -1,4 +1,4 @@
-from ..core.config.settings_service import settings_service
+from config.settings_service import settings_service
 from PySide6.QtWidgets import (
     QMainWindow,
     QApplication,
@@ -9,10 +9,10 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QUrl
 from PySide6.QtGui import QDesktopServices
 import os
-from ..core.config.paths import get_db_path
+from config.paths import get_db_path
 from .menu_bar import MainMenuBar
 from .themes.theme_manager import ThemeManager
-from ..core.translation.translation_service import translation_service
+from translation.translation_service import translation_service
 from .views.welcome_view import WelcomeView
 from .views.log_ops_view import LogOpsView
 from .views.log_contest_view import LogContestView
