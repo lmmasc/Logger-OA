@@ -84,8 +84,8 @@ src/
 - Asegurarse de que los tests de cada capa solo dependan de esa capa y sus dependencias directas. (Hecho)
 
 ### Paso 8: Limpieza y Eliminación
-- Revisar y eliminar carpetas/archivos obsoletos o duplicados (`core/`, `db/`, `app/`, etc.).
-- Actualizar todos los imports para reflejar la nueva estructura.
+- Revisar y eliminar carpetas/archivos obsoletos o duplicados (`core/`, `db/`, `app/`, etc.). (Hecho)
+- Actualizar todos los imports para reflejar la nueva estructura. (Hecho)
 
 ### Paso 9: Verificación
 - Ejecutar todos los tests y la aplicación para asegurar que todo sigue funcionando.
