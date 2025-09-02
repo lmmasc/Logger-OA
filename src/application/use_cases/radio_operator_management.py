@@ -5,7 +5,7 @@ Incluye listar, agregar, actualizar y deshabilitar operadores.
 
 from typing import List
 from domain.entities.radio_operator import RadioOperator
-from application.interfaces.radio_operator_repository import RadioOperatorRepository
+from domain.repositories.radio_operator_repository import RadioOperatorRepository
 
 
 class RadioOperatorManagement:

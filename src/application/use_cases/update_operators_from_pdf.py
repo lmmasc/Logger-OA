@@ -2,9 +2,9 @@
 Orquestador del proceso de actualización de operadores desde PDF.
 """
 
-from .pdf_extractor import extract_operators_from_pdf
-from .data_normalizer import normalize_operator_data
-from .db_integrator import integrate_operators_to_db
+from infrastructure.pdf.pdf_extractor import extract_operators_from_pdf
+from infrastructure.db.data_normalizer import normalize_operator_data
+from infrastructure.db.db_integrator import integrate_operators_to_db
 
 
 def update_operators_from_pdf(pdf_path):
@@ -26,7 +26,6 @@ def update_operators_from_pdf(pdf_path):
     existing_rows = get_radio_operators()
     existing = {}
     for row in existing_rows:
-        # El orden debe coincidir con get_radio_operators()
         (
             callsign,
             name,
@@ -94,7 +93,3 @@ def update_operators_from_pdf(pdf_path):
 
     result = integrate_operators_to_db(to_upsert)
     return result
-
-
-# Archivo movido desde src/app/infrastructure/operators_update/updater.py
-# ...el contenido original será insertado aquí...

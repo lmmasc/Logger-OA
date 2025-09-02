@@ -1,1 +1,0 @@
-from application.interfaces.radio_operator_repository import RadioOperatorRepository
