@@ -1,0 +1,16 @@
+/* dark.qss
+   Tema oscuro para la aplicación. */
+
+@import "base.qss";
+
+QWidget {
+    background-color: #232629;
+    color: #f5f5f5;
+}
+
+QMainWindow {
+    background-color: #181a1b;
+}
+
+
+

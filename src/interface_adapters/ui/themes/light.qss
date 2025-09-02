@@ -1,0 +1,16 @@
+/* light.qss
+   Tema claro para la aplicación. */
+
+@import "base.qss";
+
+QWidget {
+    background-color: #f5f5f5;
+    color: #222;
+}
+
+QMainWindow {
+    background-color: #ffffff;
+}
+
+
+
