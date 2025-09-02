@@ -88,8 +88,8 @@ src/
 - Actualizar todos los imports para reflejar la nueva estructura. (Hecho)
 
 ### Paso 9: Verificación
-- Ejecutar todos los tests y la aplicación para asegurar que todo sigue funcionando.
-- Documentar la arquitectura final y los cambios realizados.
+- Ejecutar todos los tests y la aplicación para asegurar que todo sigue funcionando. (Hecho)
+- Documentar la arquitectura final y los cambios realizados. (Hecho)
 
 ---
 
