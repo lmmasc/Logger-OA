@@ -1,6 +1,8 @@
 from typing import List
 from domain.entities.radio_operator import RadioOperator
-from app.repositories.radio_operator_repository import RadioOperatorRepository
+from infrastructure.repositories.radio_operator_repository import (
+    RadioOperatorRepository,
+)
 
 
 class RadioOperatorService:

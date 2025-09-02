@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem
 from PySide6.QtCore import Qt
-from app.repositories.sqlite_radio_operator_repository import (
+from infrastructure.repositories.sqlite_radio_operator_repository import (
     SqliteRadioOperatorRepository,
 )
 from app.services.radio_operator_service import RadioOperatorService
