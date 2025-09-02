@@ -86,6 +86,8 @@ src/
 # ✅ PASO 3 COMPLETADO: Reubicación de interfaces/contratos de casos de uso a domain/use_cases según Clean Architecture. Sin referencias pendientes ni imports a actualizar.
 
 # ✅ PASO 4 COMPLETADO: Infraestructura limpia y agrupada por tipo (db, pdf, repositories). Sin archivos ni carpetas residuales. Cumple Clean Architecture.
+
 # ✅ PASO 5 COMPLETADO: Adaptadores de interfaz limpios. Configuración y traducción migradas a carpetas raíz. Imports y lógica verificados. Sin residuos.
+# ✅ PASO 6 COMPLETADO: Entidades y contratos de dominio correctamente ubicados en domain/. Estructura y lógica alineadas a Clean Architecture.
 
 **Este plan debe ser seguido paso a paso para garantizar una migración segura y ordenada.**
