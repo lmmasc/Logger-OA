@@ -5,6 +5,7 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QStackedWidget,
     QFileDialog,
+    QPushButton,
 )
 from PySide6.QtCore import Qt, QUrl
 from PySide6.QtGui import QDesktopServices
@@ -342,14 +343,16 @@ class MainWindow(QMainWindow):
         from translation.translation_service import translation_service
         from infrastructure.db.reset import reset_database
 
-        reply = QMessageBox.warning(
-            self,
-            translation_service.tr("delete_db_confirm"),
-            translation_service.tr("delete_db_warning"),
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No,
-        )
-        if reply == QMessageBox.Yes:
+        yes_text = translation_service.tr("yes_button")
+        no_text = translation_service.tr("no_button")
+        box = QMessageBox(self)
+        box.setWindowTitle(translation_service.tr("delete_db_confirm"))
+        box.setText(translation_service.tr("delete_db_warning"))
+        yes_button = box.addButton(yes_text, QMessageBox.YesRole)
+        no_button = box.addButton(no_text, QMessageBox.NoRole)
+        box.setDefaultButton(no_button)
+        box.exec()
+        if box.clickedButton() == yes_button:
             try:
                 reset_database()
                 QMessageBox.information(

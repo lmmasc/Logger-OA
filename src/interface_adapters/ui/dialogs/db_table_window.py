@@ -1,4 +1,11 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem
+from PySide6.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
+    QTableWidget,
+    QTableWidgetItem,
+    QMessageBox,
+    QPushButton,
+)
 from PySide6.QtCore import Qt, QEvent
 from interface_adapters.controllers.radio_operator_controller import (
     RadioOperatorController,
@@ -22,6 +29,80 @@ class DBTableWindow(QWidget):
         self.controller = RadioOperatorController()
         self.load_data()
         self.setLayout(layout)
+        self.table.itemChanged.connect(self._on_item_changed)
+        self._ignore_item_changed = False
+
+    def _on_item_changed(self, item):
+        """
+        Handler para confirmar y guardar cambios en la base de datos o descartarlos.
+        """
+        if self._ignore_item_changed:
+            return
+        row = item.row()
+        col = item.column()
+        header = self.table.horizontalHeaderItem(col).text()
+        callsign = self.table.item(
+            row, 0
+        ).text()  # Se asume que la columna 0 es el indicativo
+        old_value = item.data(Qt.UserRole)
+        new_value = item.text()
+        yes_text = translation_service.tr("yes_button")
+        no_text = translation_service.tr("no_button")
+        box = QMessageBox(self)
+        box.setWindowTitle(translation_service.tr("main_window_title"))
+        box.setText(
+            translation_service.tr("confirm_update_field").format(
+                field=header, value=new_value
+            )
+        )
+        yes_button = box.addButton(yes_text, QMessageBox.YesRole)
+        no_button = box.addButton(no_text, QMessageBox.NoRole)
+        box.setDefaultButton(no_button)
+        box.exec()
+        if box.clickedButton() == yes_button:
+            # Actualizar en base de datos
+            operator = next(
+                (
+                    op
+                    for op in self.controller.list_operators()
+                    if op.callsign == callsign
+                ),
+                None,
+            )
+            if operator:
+                attr_map = {
+                    translation_service.tr("name"): "name",
+                    translation_service.tr("category"): "category",
+                    translation_service.tr("type"): "type_",
+                    translation_service.tr("district"): "district",
+                    translation_service.tr("province"): "province",
+                    translation_service.tr("department"): "department",
+                    translation_service.tr("license"): "license_",
+                    translation_service.tr("resolution"): "resolution",
+                    translation_service.tr("expiration_date"): "expiration_date",
+                    translation_service.tr("cutoff_date"): "cutoff_date",
+                    translation_service.tr("enabled"): "enabled",
+                    translation_service.tr("country"): "country",
+                    translation_service.tr("updated_at"): "updated_at",
+                }
+                field = attr_map.get(header)
+                if field:
+                    # Convertir SI/NO a 1/0 si es el campo habilitado
+                    if field == "enabled":
+                        if new_value.strip().upper() in (
+                            translation_service.tr("yes"),
+                            "1",
+                        ):
+                            new_value = 1
+                        else:
+                            new_value = 0
+                    setattr(operator, field, new_value)
+                    self.controller.service.update_operator(operator)
+        else:
+            # Descartar el cambio visualmente
+            self._ignore_item_changed = True
+            item.setText(old_value if old_value is not None else "")
+            self._ignore_item_changed = False
 
     def load_data(self):
         """
@@ -62,7 +143,10 @@ class DBTableWindow(QWidget):
                     op.updated_at,
                 ]
             ):
-                self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(value)))
+                item = QTableWidgetItem(str(value))
+                # Guardar el valor original para poder restaurar si se cancela
+                item.setData(Qt.UserRole, str(value))
+                self.table.setItem(row_idx, col_idx, item)
 
     def get_translated_headers(self):
         """
