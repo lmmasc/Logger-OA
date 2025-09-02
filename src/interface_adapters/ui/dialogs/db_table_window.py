@@ -27,6 +27,8 @@ class DBTableWindow(QWidget):
         Carga los operadores desde el controlador y actualiza la tabla con los datos y headers traducidos.
         """
         operators = self.controller.list_operators()
+        # Ordenar por indicativo (callsign) antes de mostrar
+        operators = sorted(operators, key=lambda op: op.callsign)
         headers = self.get_translated_headers()
         if not operators:
             self.table.setRowCount(0)
