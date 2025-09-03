@@ -6,8 +6,11 @@ from PySide6.QtWidgets import (
     QStackedWidget,
     QFileDialog,
     QPushButton,
+    QDialog,
+    QVBoxLayout,
+    QLabel,
 )
-from PySide6.QtCore import Qt, QUrl
+from PySide6.QtCore import Qt, QUrl, QTimer
 from PySide6.QtGui import QDesktopServices
 import os
 from config.paths import get_db_path
@@ -316,8 +319,6 @@ class MainWindow(QMainWindow):
             "PDF Files (*.pdf)",
         )
         if file_path:
-            from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel
-
             wait_dialog = QDialog(self)
             wait_dialog.setWindowTitle(translation_service.tr("main_window_title"))
             wait_dialog.setModal(True)
