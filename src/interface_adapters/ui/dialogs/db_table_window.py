@@ -1,5 +1,4 @@
 from functools import partial
-import json
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -39,12 +38,13 @@ class DBTableWindow(QWidget):
         "updated_at",
     ]
 
+    # --- Inicialización y eventos principales ---
     def __init__(self, parent=None):
+        """
+        Inicializa la ventana de la tabla de operadores, crea la UI, checkboxes de visibilidad,
+        filtro, y conecta señales para persistencia y edición.
+        """
         super().__init__(parent)
-        print(
-            "[SETTINGS-DEBUG] (init) db_table_column_visible_dict:",
-            settings_service.get_value("db_table_column_visible_dict", None),
-        )
         self.setWindowTitle(translation_service.tr("db_table"))
         self.setWindowFlag(Qt.Window)
         self.resize(1200, 700)
@@ -96,7 +96,11 @@ class DBTableWindow(QWidget):
         # Conectar señal para guardar anchos de columnas al redimensionar
         self.table.horizontalHeader().sectionResized.connect(self.save_column_widths)
 
+    # --- Métodos de UI y traducción ---
     def retranslate_ui(self):
+        """
+        Actualiza los textos de la UI y los headers según el idioma actual.
+        """
         self._updating_ui = True
         self.setWindowTitle(translation_service.tr("db_table"))
         self.headers = self.get_translated_headers()
@@ -127,7 +131,32 @@ class DBTableWindow(QWidget):
                         item.setText(translation_service.tr("no"))
             self._ignore_item_changed = False
 
+    def get_translated_headers(self):
+        """
+        Devuelve la lista de headers traducidos para la tabla y los checkboxes.
+        """
+        return [
+            translation_service.tr("callsign"),
+            translation_service.tr("name"),
+            translation_service.tr("category"),
+            translation_service.tr("type"),
+            translation_service.tr("district"),
+            translation_service.tr("province"),
+            translation_service.tr("department"),
+            translation_service.tr("license"),
+            translation_service.tr("resolution"),
+            translation_service.tr("expiration_date"),
+            translation_service.tr("cutoff_date"),
+            translation_service.tr("enabled"),
+            translation_service.tr("country"),
+            translation_service.tr("updated_at"),
+        ]
+
+    # --- Métodos de visibilidad y checkboxes ---
     def toggle_column(self, col, state):
+        """
+        Cambia la visibilidad de una columna según el checkbox correspondiente y guarda el estado.
+        """
         if self._updating_ui:
             return
         key = self.COLUMN_KEYS[col]
@@ -140,6 +169,9 @@ class DBTableWindow(QWidget):
         self.apply_column_visibility()
 
     def apply_column_visibility(self):
+        """
+        Aplica la visibilidad de columnas según el estado de los checkboxes.
+        """
         if self.table.columnCount() != len(self.column_checkboxes):
             return
         vis_states = {}
@@ -147,7 +179,11 @@ class DBTableWindow(QWidget):
             self.table.setColumnHidden(idx, not cb.isChecked())
             vis_states[self.COLUMN_KEYS[idx]] = cb.isChecked()
 
+    # --- Métodos de filtro ---
     def apply_filter(self):
+        """
+        Aplica el filtro de texto a la columna seleccionada en el combo.
+        """
         text = self.filter_edit.text().strip().lower()
         col = self.filter_column_combo.currentIndex()
         for row in range(self.table.rowCount()):
@@ -158,54 +194,11 @@ class DBTableWindow(QWidget):
                 value = item.text().strip().lower() if item else ""
                 self.table.setRowHidden(row, text not in value)
 
-    def _on_item_changed(self, item):
-        if self._ignore_item_changed or self._updating_ui:
-            return
-        row = item.row()
-        col = item.column()
-        key = self.COLUMN_KEYS[col]
-        callsign = self.table.item(row, 0).text()
-        old_value = item.data(Qt.UserRole)
-        new_value = item.text()
-        yes_text = translation_service.tr("yes_button")
-        no_text = translation_service.tr("no_button")
-        box = QMessageBox(self)
-        box.setWindowTitle(translation_service.tr("main_window_title"))
-        box.setText(
-            translation_service.tr("confirm_update_field").format(
-                field=self.headers[col], value=new_value
-            )
-        )
-        yes_button = box.addButton(yes_text, QMessageBox.YesRole)
-        no_button = box.addButton(no_text, QMessageBox.NoRole)
-        box.setDefaultButton(no_button)
-        box.exec()
-        if box.clickedButton() == yes_button:
-            operator = next(
-                (
-                    op
-                    for op in self.controller.list_operators()
-                    if op.callsign == callsign
-                ),
-                None,
-            )
-            if operator:
-                if key == "enabled":
-                    if new_value.strip().upper() in (
-                        translation_service.tr("yes"),
-                        "1",
-                    ):
-                        new_value = 1
-                    else:
-                        new_value = 0
-                setattr(operator, key if key != "type" else "type_", new_value)
-                self.controller.service.update_operator(operator)
-        else:
-            self._ignore_item_changed = True
-            item.setText(old_value if old_value is not None else "")
-            self._ignore_item_changed = False
-
+    # --- Métodos de datos y edición ---
     def load_data(self):
+        """
+        Carga los datos de operadores en la tabla, aplica headers, visibilidad y anchos.
+        """
         self._updating_ui = True
         self.table.blockSignals(True)
         operators = self.controller.list_operators()
@@ -264,7 +257,61 @@ class DBTableWindow(QWidget):
         self._updating_ui = False
         self.table.blockSignals(False)
 
+    def _on_item_changed(self, item):
+        """
+        Maneja la edición de celdas, mostrando confirmación y actualizando el modelo si es necesario.
+        """
+        if self._ignore_item_changed or self._updating_ui:
+            return
+        row = item.row()
+        col = item.column()
+        key = self.COLUMN_KEYS[col]
+        callsign = self.table.item(row, 0).text()
+        old_value = item.data(Qt.UserRole)
+        new_value = item.text()
+        yes_text = translation_service.tr("yes_button")
+        no_text = translation_service.tr("no_button")
+        box = QMessageBox(self)
+        box.setWindowTitle(translation_service.tr("main_window_title"))
+        box.setText(
+            translation_service.tr("confirm_update_field").format(
+                field=self.headers[col], value=new_value
+            )
+        )
+        yes_button = box.addButton(yes_text, QMessageBox.YesRole)
+        no_button = box.addButton(no_text, QMessageBox.NoRole)
+        box.setDefaultButton(no_button)
+        box.exec()
+        if box.clickedButton() == yes_button:
+            operator = next(
+                (
+                    op
+                    for op in self.controller.list_operators()
+                    if op.callsign == callsign
+                ),
+                None,
+            )
+            if operator:
+                if key == "enabled":
+                    if new_value.strip().upper() in (
+                        translation_service.tr("yes"),
+                        "1",
+                    ):
+                        new_value = 1
+                    else:
+                        new_value = 0
+                setattr(operator, key if key != "type" else "type_", new_value)
+                self.controller.service.update_operator(operator)
+        else:
+            self._ignore_item_changed = True
+            item.setText(old_value if old_value is not None else "")
+            self._ignore_item_changed = False
+
+    # --- Persistencia de anchos de columna ---
     def save_column_widths(self, *args):
+        """
+        Guarda los anchos de columna, evitando sobrescribir con 0 y manteniendo el último valor válido.
+        """
         # Guardar solo si el ancho es >0, si no, mantener el último valor guardado
         prev_widths = settings_service.get_value("db_table_column_widths", None)
         if prev_widths is None:
@@ -281,28 +328,3 @@ class DBTableWindow(QWidget):
             else:
                 widths.append(w)
         settings_service.set_value("db_table_column_widths", widths)
-
-    def closeEvent(self, event):
-        print(
-            "[SETTINGS-DEBUG] (close) db_table_column_visible_dict:",
-            settings_service.get_value("db_table_column_visible_dict", None),
-        )
-        super().closeEvent(event)
-
-    def get_translated_headers(self):
-        return [
-            translation_service.tr("callsign"),
-            translation_service.tr("name"),
-            translation_service.tr("category"),
-            translation_service.tr("type"),
-            translation_service.tr("district"),
-            translation_service.tr("province"),
-            translation_service.tr("department"),
-            translation_service.tr("license"),
-            translation_service.tr("resolution"),
-            translation_service.tr("expiration_date"),
-            translation_service.tr("cutoff_date"),
-            translation_service.tr("enabled"),
-            translation_service.tr("country"),
-            translation_service.tr("updated_at"),
-        ]
