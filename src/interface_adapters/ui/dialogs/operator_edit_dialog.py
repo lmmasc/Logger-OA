@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QDate
 from translation.translation_service import translation_service
+import datetime
 
 
 class OperatorEditDialog(QDialog):
@@ -34,6 +35,18 @@ class OperatorEditDialog(QDialog):
     def _setup_ui(self):
         layout = QVBoxLayout(self)
         self.inputs = {}
+        self._peru_fields = [
+            "category",
+            "type",
+            "district",
+            "province",
+            "department",
+            "license",
+            "resolution",
+            "expiration_date",
+            "cutoff_date",
+            "enabled",
+        ]
         # Campos básicos (sin country)
         fields = [
             ("callsign", QLineEdit),
@@ -89,7 +102,7 @@ class OperatorEditDialog(QDialog):
         self.country_other.setPlaceholderText(
             translation_service.tr("other_country_placeholder")
         )
-        self.country_other.setEnabled(False)
+        self.country_other.setEnabled(True)
         self.country_other.textChanged.connect(
             lambda text: (
                 self.country_other.setText(text.upper())
@@ -111,12 +124,37 @@ class OperatorEditDialog(QDialog):
         layout.addLayout(btns)
         self.btn_ok.clicked.connect(self.accept)
         self.btn_cancel.clicked.connect(self.reject)
+        # Estado inicial: país OTROS
+        if not self.operator:
+            self.country_combo.setCurrentText("OTROS")
+            self.inputs["enabled"].setCurrentIndex(0)  # SI/YES por defecto
+            self._on_country_changed(self.country_combo.currentIndex())
 
     def _on_country_changed(self, idx):
-        if self.country_combo.currentText() == "OTROS":
-            self.country_other.setEnabled(True)
-        else:
-            self.country_other.setEnabled(False)
+        is_peru = self.country_combo.currentText() == "PERU"
+        for key in self._peru_fields:
+            widget = self.inputs[key]
+            if key in ("category", "type"):
+                if is_peru:
+                    widget.setEnabled(True)
+                else:
+                    widget.setCurrentText("NO_APLICA")
+                    widget.setEnabled(False)
+            elif key == "enabled":
+                if is_peru:
+                    widget.setEnabled(True)
+                else:
+                    widget.setCurrentIndex(0)  # SI/YES
+                    widget.setEnabled(False)
+            else:
+                widget.setEnabled(is_peru)
+                if not is_peru:
+                    if isinstance(widget, QLineEdit):
+                        widget.clear()
+                    elif isinstance(widget, QDateEdit):
+                        widget.setDate(QDate.currentDate())
+        self.country_other.setEnabled(not is_peru)
+        if is_peru:
             self.country_other.clear()
 
     def _load_operator(self, op):
@@ -156,6 +194,7 @@ class OperatorEditDialog(QDialog):
             self.country_combo.setCurrentText("OTROS")
             self.country_other.setEnabled(True)
             self.country_other.setText(country_val)
+        self._on_country_changed(self.country_combo.currentIndex())
 
     def get_operator_data(self):
         # Devuelve un dict con los datos ingresados/validados
@@ -177,6 +216,8 @@ class OperatorEditDialog(QDialog):
                     data[key] = widget.currentText()
             elif isinstance(widget, QDateEdit):
                 data[key] = widget.date().toString("dd/MM/yyyy")
+        # Campo actualizado
+        data["updated_at"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         return data
 
     def accept(self):
