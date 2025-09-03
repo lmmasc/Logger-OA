@@ -39,7 +39,7 @@ class OperatorEditDialog(QDialog):
             ("callsign", QLineEdit),
             ("name", QLineEdit),
             ("category", QComboBox),
-            ("type", QLineEdit),
+            ("type", QComboBox),  # Cambiado a QComboBox
             ("district", QLineEdit),
             ("province", QLineEdit),
             ("department", QLineEdit),
@@ -66,6 +66,8 @@ class OperatorEditDialog(QDialog):
                 widget = QComboBox()
                 if key == "category":
                     widget.addItems(["NOVICIO", "INTERMEDIO", "SUPERIOR", "NO_APLICA"])
+                elif key == "type":
+                    widget.addItems(["OPERADOR", "INSTALADOR/OPERADOR", "NO_APLICA"])
                 elif key == "enabled":
                     widget.addItems(
                         [translation_service.tr("yes"), translation_service.tr("no")]
@@ -93,7 +95,10 @@ class OperatorEditDialog(QDialog):
         cat = getattr(op, "category", "NOVICIO")
         idx = self.inputs["category"].findText(cat)
         self.inputs["category"].setCurrentIndex(idx if idx >= 0 else 0)
-        self.inputs["type"].setText(getattr(op, "type_", "").upper())
+        # type como combo
+        type_val = getattr(op, "type_", "OPERADOR")
+        idx_type = self.inputs["type"].findText(type_val)
+        self.inputs["type"].setCurrentIndex(idx_type if idx_type >= 0 else 0)
         self.inputs["district"].setText(getattr(op, "district", "").upper())
         self.inputs["province"].setText(getattr(op, "province", "").upper())
         self.inputs["department"].setText(getattr(op, "department", "").upper())
@@ -131,9 +136,15 @@ class OperatorEditDialog(QDialog):
     def accept(self):
         # Validar campos obligatorios y formato
         callsign = self.inputs["callsign"].text().strip()
+        name = self.inputs["name"].text().strip()
         if not callsign:
             QMessageBox.warning(
                 self, self.windowTitle(), translation_service.tr("callsign_required")
+            )
+            return
+        if not name:
+            QMessageBox.warning(
+                self, self.windowTitle(), translation_service.tr("name_required")
             )
             return
         # Validar categoría
