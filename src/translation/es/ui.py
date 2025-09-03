@@ -22,4 +22,5 @@ UI_TRANSLATIONS = {
     "filter_placeholder": "Filtrar...",
     "filter_by": "Filtrar por columna:",
     "wait_message": "Procesando, por favor espere...",
+    "import_summary": "Importación completada.\nTotal: {total}\nNuevos: {new}\nActualizados: {updated}\nInhabilitados: {disabled}\nRehabilitados: {reenabled}",
 }

@@ -342,7 +342,22 @@ class MainWindow(QMainWindow):
                     )
                     return
                 wait_dialog.close()
-                if result:
+                # --- NUEVO: Mostrar resumen si está disponible ---
+                if isinstance(result, dict) and result.get("ok"):
+                    summary = result
+                    msg = translation_service.tr("import_summary").format(
+                        total=summary["total"],
+                        new=summary["new"],
+                        updated=summary["updated"],
+                        disabled=summary["disabled"],
+                        reenabled=summary["reenabled"],
+                    )
+                    QMessageBox.information(
+                        self,
+                        translation_service.tr("main_window_title"),
+                        msg,
+                    )
+                elif result:
                     QMessageBox.information(
                         self,
                         translation_service.tr("main_window_title"),

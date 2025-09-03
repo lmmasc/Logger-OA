@@ -61,6 +61,12 @@ def update_operators_from_pdf(pdf_path):
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     to_upsert = []
+    # --- NUEVO: Inicializar contadores ---
+    total = len(normalized_data)
+    new = 0
+    updated = 0
+    disabled = 0
+    reenabled = 0
     # 3. Procesar nuevos y actualizar existentes
     for cs, op in new_map.items():
         op = op.copy()
@@ -77,10 +83,15 @@ def update_operators_from_pdf(pdf_path):
                 d_prev = d_new = None
             if d_new and (not d_prev or d_new > d_prev):
                 op["enabled"] = 1
+                updated += 1
             elif existing[cs]["enabled"] != 1:
                 op["enabled"] = 1
+                reenabled += 1
             else:
                 op["enabled"] = existing[cs]["enabled"]
+                updated += 1
+        else:
+            new += 1
         to_upsert.append(op)
 
     # 4. Deshabilitar OA ausentes
@@ -90,6 +101,16 @@ def update_operators_from_pdf(pdf_path):
             op["enabled"] = 0
             op["updated_at"] = now
             to_upsert.append(op)
+            disabled += 1
 
     result = integrate_operators_to_db(to_upsert)
-    return result
+    # --- NUEVO: Retornar resumen ---
+    summary = {
+        "total": total,
+        "new": new,
+        "updated": updated,
+        "disabled": disabled,
+        "reenabled": reenabled,
+        "ok": result,
+    }
+    return summary
