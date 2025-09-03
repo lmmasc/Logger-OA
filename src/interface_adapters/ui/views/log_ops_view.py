@@ -6,11 +6,11 @@ class LogOpsView(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         layout = QVBoxLayout()
-        self.label = QLabel(translation_service.tr("log_ops"))
+        self.label = QLabel(translation_service.tr("log_ops_title"))
         layout.addWidget(self.label)
         self.setLayout(layout)
 
         translation_service.signal.language_changed.connect(self.retranslate_ui)
 
     def retranslate_ui(self):
-        self.label.setText(translation_service.tr("log_ops"))
+        self.label.setText(translation_service.tr("log_ops_title"))

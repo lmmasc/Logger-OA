@@ -3,8 +3,8 @@ UI_TRANSLATIONS = {
     "main_window_title": "Logger OA",
     "about_message": "Logger OA\nHerramienta de registro de radioaficionados para concursos y operaciones especiales.\nDesarrollado por Miguel OA4BAU y Raquel OA4EHN.",
     "welcome_message": "Bienvenido a Logger OA",
-    "log_contest": "Vista Concurso",
-    "log_ops": "Vista Operativo",
+    # "log_contest": "Vista Concurso",  # migrado a log_contest.py
+    # "log_ops": "Vista Operativo",  # migrado a log_ops.py
     "db_table": "Tabla de Base de Datos",
     "credits_message": "Desarrollado por Miguel OA4BAU y Raquel OA4EHN",
     "import_success": "Importación completada: {count} operadores actualizados.",

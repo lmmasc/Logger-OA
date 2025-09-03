@@ -4,6 +4,8 @@ import importlib
 TRANSLATION_MODULES = [
     "ui",
     "menu",
+    "log_ops",
+    "log_contest",
     # Agrega aquí más módulos según crezcan las secciones
 ]
 
