@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
     QCheckBox,
     QLabel,
     QPushButton,
+    QDialog,
 )
 from PySide6.QtCore import Qt
 from interface_adapters.controllers.radio_operator_controller import (
@@ -237,7 +238,7 @@ class DBTableWindow(QWidget):
             from .operator_edit_dialog import OperatorEditDialog
 
             dlg = OperatorEditDialog(operator, self)
-            if dlg.exec() == dlg.Accepted and dlg.result_operator:
+            if dlg.exec() == QDialog.Accepted and dlg.result_operator:
                 # Actualizar el operador en la base de datos
                 for k, v in dlg.result_operator.items():
                     setattr(operator, k if k != "type" else "type_", v)
@@ -249,9 +250,10 @@ class DBTableWindow(QWidget):
         Abre el diálogo de alta manual de operador y agrega el registro si es válido.
         """
         from .operator_edit_dialog import OperatorEditDialog
+        from PySide6.QtWidgets import QDialog
 
         dlg = OperatorEditDialog(parent=self)
-        if dlg.exec() == dlg.Accepted and dlg.result_operator:
+        if dlg.exec() == QDialog.Accepted and dlg.result_operator:
             # Crear nuevo operador y guardar
             op_data = dlg.result_operator
             Operator = (
