@@ -345,13 +345,34 @@ class MainWindow(QMainWindow):
                 # --- NUEVO: Mostrar resumen si está disponible ---
                 if isinstance(result, dict) and result.get("ok"):
                     summary = result
-                    msg = translation_service.tr("import_summary").format(
-                        total=summary["total"],
-                        new=summary["new"],
-                        updated=summary["updated"],
-                        disabled=summary["disabled"],
-                        reenabled=summary["reenabled"],
-                    )
+                    summary_lines = [
+                        translation_service.tr("import_summary_total").format(
+                            summary.get("total", 0)
+                        ),
+                        translation_service.tr("import_summary_new").format(
+                            summary.get("new", 0)
+                        ),
+                        translation_service.tr("import_summary_updated").format(
+                            summary.get("updated", 0)
+                        ),
+                        translation_service.tr("import_summary_unchanged").format(
+                            summary.get("unchanged", 0)
+                        ),
+                        translation_service.tr("import_summary_disabled").format(
+                            summary.get("disabled", 0)
+                        ),
+                        translation_service.tr("import_summary_reenabled").format(
+                            summary.get("reenabled", 0)
+                        ),
+                    ]
+                    if "protected" in summary:
+                        summary_lines.append(
+                            translation_service.tr("import_summary_protected").format(
+                                summary["protected"]
+                            )
+                        )
+                    # No mostrar 'ok' en el resumen, ya que solo indica éxito/fallo
+                    msg = "<br>".join(summary_lines)
                     QMessageBox.information(
                         self,
                         translation_service.tr("main_window_title"),
