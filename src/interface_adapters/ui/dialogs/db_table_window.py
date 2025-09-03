@@ -90,7 +90,6 @@ class DBTableWindow(QWidget):
         self.checkbox_layout.addStretch()
         main_layout.insertLayout(1, self.checkbox_layout)
         self.load_data()
-        self.table.itemChanged.connect(self._on_item_changed)
         self.filter_edit.textChanged.connect(self.apply_filter)
         self.filter_column_combo.currentIndexChanged.connect(self.apply_filter)
         # Conectar señal para guardar anchos de columnas al redimensionar
@@ -251,56 +250,6 @@ class DBTableWindow(QWidget):
                 self.table.setColumnWidth(i, int(w))
         self._updating_ui = False
         self.table.blockSignals(False)
-
-    def _on_item_changed(self, item):
-        """
-        Maneja la edición de celdas, mostrando confirmación y actualizando el modelo si es necesario.
-        """
-        if self._ignore_item_changed or self._updating_ui:
-            return
-        row = item.row()
-        col = item.column()
-        key = self.COLUMN_KEYS[col]
-        callsign = self.table.item(row, 0).text()
-        old_value = item.data(Qt.UserRole)
-        new_value = item.text()
-        yes_text = translation_service.tr("yes_button")
-        no_text = translation_service.tr("no_button")
-        box = QMessageBox(self)
-        box.setWindowTitle(translation_service.tr("main_window_title"))
-        box.setText(
-            translation_service.tr("confirm_update_field").format(
-                field=self.headers[col], value=new_value
-            )
-        )
-        yes_button = box.addButton(yes_text, QMessageBox.YesRole)
-        no_button = box.addButton(no_text, QMessageBox.NoRole)
-        box.setDefaultButton(no_button)
-        box.exec()
-        if box.clickedButton() == yes_button:
-            operator = next(
-                (
-                    op
-                    for op in self.controller.list_operators()
-                    if op.callsign == callsign
-                ),
-                None,
-            )
-            if operator:
-                if key == "enabled":
-                    if new_value.strip().upper() in (
-                        translation_service.tr("yes"),
-                        "1",
-                    ):
-                        new_value = 1
-                    else:
-                        new_value = 0
-                setattr(operator, key if key != "type" else "type_", new_value)
-                self.controller.service.update_operator(operator)
-        else:
-            self._ignore_item_changed = True
-            item.setText(old_value if old_value is not None else "")
-            self._ignore_item_changed = False
 
     def _on_item_double_clicked(self, item):
         """
