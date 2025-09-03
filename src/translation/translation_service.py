@@ -1,5 +1,5 @@
 from PySide6.QtCore import QObject, Signal
-from .translations import TRANSLATIONS
+from .translations import load_translations
 
 
 class TranslationSignal(QObject):
@@ -14,14 +14,18 @@ class TranslationService:
         """
         self._lang = default_lang
         self._signal = TranslationSignal()
+        self._translations = load_translations(self._lang)
 
     def set_language(self, lang: str):
         """
         Cambia el idioma actual del servicio y emite la señal de cambio de idioma si el idioma es válido.
         :param lang: Código de idioma a establecer.
         """
-        if lang in TRANSLATIONS:
+        # Intentar cargar traducciones para el idioma dado
+        translations = load_translations(lang)
+        if translations:
             self._lang = lang
+            self._translations = translations
             self._signal.language_changed.emit()
 
     @property
@@ -42,7 +46,7 @@ class TranslationService:
         :param key: Clave de traducción.
         :return: Traducción correspondiente o la clave si no existe.
         """
-        return TRANSLATIONS.get(self._lang, {}).get(key, key)
+        return self._translations.get(key, key)
 
 
 # Instancia global para acceso centralizado

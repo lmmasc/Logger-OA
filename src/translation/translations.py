@@ -1,118 +1,27 @@
-# Diccionarios de traducción para la aplicación
+# Loader central de traducciones modularizadas
+import importlib
 
-TRANSLATIONS = {
-    "es": {
-        "main_window_title": "Logger OA",
-        "file_menu": "Archivo",
-        "ops_menu": "Operativo",
-        "contest_menu": "Concurso",
-        "database_menu": "Base de datos",
-        "open_folder": "Abrir carpeta de Archivos",
-        "exit": "Salir",
-        "help_menu": "Ayuda",
-        "about": "Acerca de",
-        "aspect_menu": "Aspecto",
-        "light_theme": "Tema claro",
-        "dark_theme": "Tema oscuro",
-        "about_message": "Logger OA\nHerramienta de registro de radioaficionados para concursos y operaciones especiales.\nDesarrollado por Miguel OA4BAU y Raquel OA4EHN.",
-        "language_menu": "Idioma",
-        "spanish": "Español",
-        "english": "Inglés",
-        "new": "Nuevo",
-        "open": "Abrir",
-        "export": "Exportar",
-        "close": "Cerrar",
-        "import_from_pdf": "Importar desde PDF",
-        "show_database": "Mostrar base de datos",
-        "welcome_message": "Bienvenido a Logger OA",
-        "log_contest": "Vista Concurso",
-        "log_ops": "Vista Operativo",
-        "db_table": "Tabla de Base de Datos",
-        "credits_message": "Desarrollado por Miguel OA4BAU y Raquel OA4EHN",
-        "import_success": "Importación completada: {count} operadores actualizados.",
-        "import_failed": "Error al importar operadores desde PDF. Por favor, revise el archivo y vuelva a intentarlo.",
-        "delete_database": "Borrar base de datos",
-        "delete_db_warning": "¿Está seguro que desea borrar la base de datos? Esta acción no se puede deshacer.",
-        "delete_db_confirm": "Confirmar borrado",
-        "delete_db_success": "La base de datos ha sido borrada y recreada vacía.",
-        "delete_db_cancel": "Operación cancelada. La base de datos no fue modificada.",
-        "callsign": "Indicativo",
-        "name": "Nombre",
-        "category": "Categoría",
-        "type": "Tipo",
-        "district": "Distrito",
-        "province": "Provincia",
-        "department": "Departamento",
-        "license": "Licencia",
-        "resolution": "Resolución",
-        "expiration_date": "Vencimiento",
-        "cutoff_date": "Fecha corte",
-        "enabled": "Habilitado",
-        "country": "País",
-        "updated_at": "Actualizado",
-        "yes": "SI",
-        "no": "NO",
-        "yes_button": "Sí",
-        "no_button": "No",
-        "confirm_update_field": "¿Desea guardar el cambio en el campo '{field}' a '{value}' en la base de datos?",
-        "filter_placeholder": "Filtrar...",
-        "filter_by": "Filtrar por columna:",
-    },
-    "en": {
-        "main_window_title": "Logger OA",
-        "file_menu": "File",
-        "ops_menu": "Operations",
-        "contest_menu": "Contest",
-        "database_menu": "Database",
-        "open_folder": "Open Data Folder",
-        "exit": "Exit",
-        "help_menu": "Help",
-        "about": "About",
-        "aspect_menu": "Appearance",
-        "light_theme": "Light Theme",
-        "dark_theme": "Dark Theme",
-        "about_message": "Logger OA\nLogging tool for amateur radio contests and special operations.\nDeveloped by Miguel OA4BAU and Raquel OA4EHN.",
-        "language_menu": "Language",
-        "spanish": "Spanish",
-        "english": "English",
-        "new": "New",
-        "open": "Open",
-        "export": "Export",
-        "close": "Close",
-        "import_from_pdf": "Import from PDF",
-        "show_database": "Show database",
-        "welcome_message": "Welcome to Logger OA",
-        "log_contest": "Contest View",
-        "log_ops": "Operations View",
-        "db_table": "Database Table",
-        "credits_message": "Developed by Miguel OA4BAU and Raquel OA4EHN",
-        "import_success": "Import completed: {count} operators updated.",
-        "import_failed": "Failed to import operators from PDF. Please check the file and try again.",
-        "delete_database": "Delete database",
-        "delete_db_warning": "Are you sure you want to delete the database? This action cannot be undone.",
-        "delete_db_confirm": "Confirm deletion",
-        "delete_db_success": "The database has been deleted and recreated empty.",
-        "delete_db_cancel": "Operation cancelled. The database was not modified.",
-        "callsign": "Callsign",
-        "name": "Name",
-        "category": "Category",
-        "type": "Type",
-        "district": "District",
-        "province": "Province",
-        "department": "Department",
-        "license": "License",
-        "resolution": "Resolution",
-        "expiration_date": "Expiration Date",
-        "cutoff_date": "Cutoff Date",
-        "enabled": "Enabled",
-        "country": "Country",
-        "updated_at": "Updated At",
-        "yes": "YES",
-        "no": "NO",
-        "yes_button": "Yes",
-        "no_button": "No",
-        "confirm_update_field": "Do you want to save the change in field '{field}' to '{value}' in the database?",
-        "filter_placeholder": "Filter...",
-        "filter_by": "Filter by column:",
-    },
-}
+TRANSLATION_MODULES = [
+    "ui",
+    # Agrega aquí más módulos según crezcan las secciones
+]
+
+
+def load_translations(lang_code):
+    """
+    Carga y combina los diccionarios de traducción para el idioma dado desde src/translation/<lang_code>/.
+    """
+    translations = {}
+    for module_name in TRANSLATION_MODULES:
+        try:
+            mod = importlib.import_module(f"translation.{lang_code}.{module_name}")
+            dict_name = f"{module_name.upper()}_TRANSLATIONS"
+            section = getattr(mod, dict_name, {})
+            translations.update(section)
+        except Exception:
+            pass  # Si el módulo no existe, lo ignora
+    return translations
+
+
+# Ejemplo de uso:
+# translations = load_translations('es')
