@@ -21,4 +21,5 @@ UI_TRANSLATIONS = {
     "confirm_update_field": "¿Desea guardar el cambio en el campo '{field}' a '{value}' en la base de datos?",
     "filter_placeholder": "Filtrar...",
     "filter_by": "Filtrar por columna:",
+    "wait_message": "Procesando, por favor espere...",
 }

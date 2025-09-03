@@ -305,8 +305,10 @@ class MainWindow(QMainWindow):
 
     def _action_db_import_pdf(self) -> None:
         """
-        Handler para importar operadores desde PDF. Lógica delegada a un servicio externo.
+        Handler para importar operadores desde PDF. Muestra spinner y asegura repintado antes del proceso bloqueante.
         """
+        from PySide6.QtCore import QTimer
+
         file_path, _ = QFileDialog.getOpenFileName(
             self,
             translation_service.tr("import_from_pdf"),
@@ -314,8 +316,31 @@ class MainWindow(QMainWindow):
             "PDF Files (*.pdf)",
         )
         if file_path:
-            try:
-                result = update_operators_from_pdf(file_path)
+            from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel
+
+            wait_dialog = QDialog(self)
+            wait_dialog.setWindowTitle(translation_service.tr("main_window_title"))
+            wait_dialog.setModal(True)
+            layout = QVBoxLayout(wait_dialog)
+            label = QLabel(translation_service.tr("wait_message"))
+            label.setAlignment(Qt.AlignCenter)
+            layout.addWidget(label)
+            wait_dialog.setFixedSize(300, 100)
+            wait_dialog.show()
+            QApplication.processEvents()
+
+            def do_import():
+                try:
+                    result = update_operators_from_pdf(file_path)
+                except Exception as e:
+                    wait_dialog.close()
+                    QMessageBox.critical(
+                        self,
+                        translation_service.tr("main_window_title"),
+                        f"{translation_service.tr('import_failed')}: {e}",
+                    )
+                    return
+                wait_dialog.close()
                 if result:
                     QMessageBox.information(
                         self,
@@ -328,12 +353,8 @@ class MainWindow(QMainWindow):
                         translation_service.tr("main_window_title"),
                         translation_service.tr("import_failed"),
                     )
-            except Exception as e:
-                QMessageBox.critical(
-                    self,
-                    translation_service.tr("main_window_title"),
-                    f"{translation_service.tr('import_failed')}: {e}",
-                )
+
+            QTimer.singleShot(100, do_import)  # 100 ms para asegurar repintado
 
     def _action_db_export(self):
         # Lógica de exportar base de datos
