@@ -1,4 +1,3 @@
-
 # Logger OA v2
 
 Aplicación de escritorio multiplataforma para la gestión de concursos y operaciones de radioaficionados OA (Perú), con arquitectura desacoplada, interfaz moderna y soporte para importación de datos desde PDF.
@@ -25,6 +24,7 @@ Logger OA v2 es una aplicación de escritorio para registrar, consultar y gestio
 - **Gestión de concursos y operaciones**: Registro, consulta y exportación de logs.
 - **Base de datos local**: Persistencia en SQLite, sin dependencias externas.
 - **Importación desde PDF**: Extracción automática de operadores OA desde listados oficiales en PDF.
+- **Feedback visual en importación**: Durante la importación desde PDF se muestra un diálogo de espera traducido y, al finalizar, un resumen detallado (total, nuevos, actualizados, deshabilitados, rehabilitados).
 - **Interfaz moderna**: UI con PySide6, soporte para temas claro/oscuro y cambio de idioma (internacionalización).
 - **Arquitectura desacoplada**: Basada en Clean Architecture para facilitar mantenimiento y escalabilidad.
 - **Soporte multiplataforma**: Funciona en Linux, Windows y macOS.
@@ -42,7 +42,7 @@ src/
     repositories/          # Interfaces de repositorios
     use_cases/             # Casos de uso del dominio
   application/             # Casos de uso y lógica de aplicación
-    use_cases/             # Casos de uso específicos (gestión, actualización, etc.)
+    use_cases/             # Casos de uso específicos (gestión, actualización, importación desde PDF, etc.)
   infrastructure/          # Implementaciones técnicas
     db/                    # Acceso y gestión de base de datos SQLite
     pdf/                   # Extracción y procesamiento de PDF
@@ -50,12 +50,13 @@ src/
   interface_adapters/      # Adaptadores de interfaz
     ui/                    # Interfaz gráfica (PySide6)
       views/               # Vistas principales (Welcome, LogOps, LogContest, etc.)
-      dialogs/             # Diálogos y ventanas auxiliares
+      dialogs/             # Diálogos y ventanas auxiliares (incl. feedback visual)
       themes/              # Temas visuales (claro/oscuro)
     controllers/           # Controladores de UI
   config/                  # Configuración, rutas y settings
   translation/             # Internacionalización y traducciones
   utils/                   # Utilidades puras
+assets/                    # Recursos gráficos (iconos, GIFs de feedback, etc.)
 tests/                     # Pruebas unitarias y de integración
 ```
 
@@ -109,7 +110,7 @@ Instalación automática desde `requirements.txt` y `requirements-dev.txt`.
 ## Guía de Uso
 
 1. **Inicio**: Al abrir la aplicación, se muestra la pantalla de bienvenida.
-2. **Gestión de Operadores**: Importa operadores OA desde PDF oficiales (menú: Importar PDF), consulta y edita la base de datos local.
+2. **Gestión de Operadores**: Importa operadores OA desde PDF oficiales (menú: Importar PDF), consulta y edita la base de datos local. Al finalizar la importación, se muestra un resumen detallado de la operación.
 3. **Gestión de Concursos y Operaciones**: Crea, edita y exporta logs de concursos y operaciones.
 4. **Temas e Idioma**: Cambia entre tema claro/oscuro y selecciona idioma desde el menú principal.
 5. **Persistencia**: Todos los datos se guardan automáticamente en la base SQLite local.
