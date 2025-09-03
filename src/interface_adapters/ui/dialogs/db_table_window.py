@@ -262,9 +262,16 @@ class DBTableWindow(QWidget):
                 else None
             )
             if Operator:
-                new_op = Operator(
-                    **{k if k != "type" else "type_": v for k, v in op_data.items()}
-                )
+                # Mapear 'license' a 'license_' y 'type' a 'type_' para el constructor
+                op_data_fixed = {}
+                for k, v in op_data.items():
+                    if k == "license":
+                        op_data_fixed["license_"] = v
+                    elif k == "type":
+                        op_data_fixed["type_"] = v
+                    else:
+                        op_data_fixed[k] = v
+                new_op = Operator(**op_data_fixed)
                 self.controller.service.add_operator(new_op)
                 self.load_data()
 
