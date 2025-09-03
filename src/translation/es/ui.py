@@ -36,4 +36,5 @@ UI_TRANSLATIONS = {
     "callsign_required": "El indicativo es obligatorio.",
     "invalid_category": "Categoría inválida. Debe ser NOVICIO, INTERMEDIO, SUPERIOR o NO_APLICA.",
     "name_required": "El campo NOMBRE es obligatorio.",
+    "other_country_placeholder": "Ingrese país (en mayúsculas)",
 }

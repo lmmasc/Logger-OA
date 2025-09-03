@@ -36,4 +36,5 @@ UI_TRANSLATIONS = {
     "callsign_required": "Callsign is required.",
     "invalid_category": "Invalid category. Must be NOVICIO, INTERMEDIO, SUPERIOR or NO_APLICA.",
     "name_required": "The NAME field is required.",
+    "other_country_placeholder": "Enter country (uppercase)",
 }

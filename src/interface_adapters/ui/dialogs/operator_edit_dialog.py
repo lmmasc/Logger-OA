@@ -34,12 +34,12 @@ class OperatorEditDialog(QDialog):
     def _setup_ui(self):
         layout = QVBoxLayout(self)
         self.inputs = {}
-        # Campos básicos
+        # Campos básicos (sin country)
         fields = [
             ("callsign", QLineEdit),
             ("name", QLineEdit),
             ("category", QComboBox),
-            ("type", QComboBox),  # Cambiado a QComboBox
+            ("type", QComboBox),
             ("district", QLineEdit),
             ("province", QLineEdit),
             ("department", QLineEdit),
@@ -48,7 +48,6 @@ class OperatorEditDialog(QDialog):
             ("expiration_date", QDateEdit),
             ("cutoff_date", QDateEdit),
             ("enabled", QComboBox),
-            ("country", QLineEdit),
         ]
         for key, widget_cls in fields:
             row = QHBoxLayout()
@@ -79,6 +78,30 @@ class OperatorEditDialog(QDialog):
             row.addWidget(widget)
             self.inputs[key] = widget
             layout.addLayout(row)
+        # --- Campo country como combo y campo adicional ---
+        row_country = QHBoxLayout()
+        label_country = QLabel(translation_service.tr("table_header_country"))
+        row_country.addWidget(label_country)
+        self.country_combo = QComboBox()
+        self.country_combo.addItems(["PERU", "OTROS"])
+        row_country.addWidget(self.country_combo)
+        self.country_other = QLineEdit()
+        self.country_other.setPlaceholderText(
+            translation_service.tr("other_country_placeholder")
+        )
+        self.country_other.setEnabled(False)
+        self.country_other.textChanged.connect(
+            lambda text: (
+                self.country_other.setText(text.upper())
+                if text != text.upper()
+                else None
+            )
+        )
+        row_country.addWidget(self.country_other)
+        layout.addLayout(row_country)
+        self.inputs["country"] = self.country_combo
+        self.inputs["country_other"] = self.country_other
+        self.country_combo.currentIndexChanged.connect(self._on_country_changed)
         # Botones
         btns = QHBoxLayout()
         self.btn_ok = QPushButton(translation_service.tr("yes_button"))
@@ -88,6 +111,13 @@ class OperatorEditDialog(QDialog):
         layout.addLayout(btns)
         self.btn_ok.clicked.connect(self.accept)
         self.btn_cancel.clicked.connect(self.reject)
+
+    def _on_country_changed(self, idx):
+        if self.country_combo.currentText() == "OTROS":
+            self.country_other.setEnabled(True)
+        else:
+            self.country_other.setEnabled(False)
+            self.country_other.clear()
 
     def _load_operator(self, op):
         self.inputs["callsign"].setText(getattr(op, "callsign", "").upper())
@@ -116,13 +146,29 @@ class OperatorEditDialog(QDialog):
         # Enabled
         enabled = getattr(op, "enabled", 1)
         self.inputs["enabled"].setCurrentIndex(0 if enabled == 1 else 1)
-        self.inputs["country"].setText(getattr(op, "country", "").upper())
+        # --- country ---
+        country_val = getattr(op, "country", "PERU").upper()
+        if country_val == "PERU":
+            self.country_combo.setCurrentText("PERU")
+            self.country_other.setEnabled(False)
+            self.country_other.clear()
+        else:
+            self.country_combo.setCurrentText("OTROS")
+            self.country_other.setEnabled(True)
+            self.country_other.setText(country_val)
 
     def get_operator_data(self):
         # Devuelve un dict con los datos ingresados/validados
         data = {}
         for key, widget in self.inputs.items():
-            if isinstance(widget, QLineEdit):
+            if key == "country":
+                if self.country_combo.currentText() == "PERU":
+                    data["country"] = "PERU"
+                else:
+                    data["country"] = self.country_other.text().strip().upper()
+            elif key == "country_other":
+                continue
+            elif isinstance(widget, QLineEdit):
                 data[key] = widget.text().strip().upper()
             elif isinstance(widget, QComboBox):
                 if key == "enabled":
