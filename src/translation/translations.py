@@ -6,6 +6,7 @@ TRANSLATION_MODULES = [
     "menu",
     "log_ops",
     "log_contest",
+    "table_headers",
     # Agrega aquí más módulos según crezcan las secciones
 ]
 

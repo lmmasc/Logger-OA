@@ -136,20 +136,7 @@ class DBTableWindow(QWidget):
         Devuelve la lista de headers traducidos para la tabla y los checkboxes.
         """
         return [
-            translation_service.tr("callsign"),
-            translation_service.tr("name"),
-            translation_service.tr("category"),
-            translation_service.tr("type"),
-            translation_service.tr("district"),
-            translation_service.tr("province"),
-            translation_service.tr("department"),
-            translation_service.tr("license"),
-            translation_service.tr("resolution"),
-            translation_service.tr("expiration_date"),
-            translation_service.tr("cutoff_date"),
-            translation_service.tr("enabled"),
-            translation_service.tr("country"),
-            translation_service.tr("updated_at"),
+            translation_service.tr(f"table_header_{key}") for key in self.COLUMN_KEYS
         ]
 
     # --- Métodos de visibilidad y checkboxes ---
