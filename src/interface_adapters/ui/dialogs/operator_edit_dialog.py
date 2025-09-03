@@ -22,6 +22,9 @@ class OperatorEditDialog(QDialog):
             else translation_service.tr("add_operator")
         )
         self.setModal(True)
+        self.setMinimumSize(
+            500, 500
+        )  # Tamaño mínimo recomendado para evitar textos cortados
         self.operator = operator
         self.result_operator = None
         self._setup_ui()
@@ -53,6 +56,12 @@ class OperatorEditDialog(QDialog):
             row.addWidget(label)
             if widget_cls == QLineEdit:
                 widget = QLineEdit()
+                # Forzar mayúsculas en tiempo real
+                widget.textChanged.connect(
+                    lambda text, w=widget: (
+                        w.setText(text.upper()) if text != text.upper() else None
+                    )
+                )
             elif widget_cls == QComboBox:
                 widget = QComboBox()
                 if key == "category":
@@ -79,17 +88,17 @@ class OperatorEditDialog(QDialog):
         self.btn_cancel.clicked.connect(self.reject)
 
     def _load_operator(self, op):
-        self.inputs["callsign"].setText(getattr(op, "callsign", ""))
-        self.inputs["name"].setText(getattr(op, "name", ""))
+        self.inputs["callsign"].setText(getattr(op, "callsign", "").upper())
+        self.inputs["name"].setText(getattr(op, "name", "").upper())
         cat = getattr(op, "category", "NOVICIO")
         idx = self.inputs["category"].findText(cat)
         self.inputs["category"].setCurrentIndex(idx if idx >= 0 else 0)
-        self.inputs["type"].setText(getattr(op, "type_", ""))
-        self.inputs["district"].setText(getattr(op, "district", ""))
-        self.inputs["province"].setText(getattr(op, "province", ""))
-        self.inputs["department"].setText(getattr(op, "department", ""))
-        self.inputs["license"].setText(getattr(op, "license_", ""))
-        self.inputs["resolution"].setText(getattr(op, "resolution", ""))
+        self.inputs["type"].setText(getattr(op, "type_", "").upper())
+        self.inputs["district"].setText(getattr(op, "district", "").upper())
+        self.inputs["province"].setText(getattr(op, "province", "").upper())
+        self.inputs["department"].setText(getattr(op, "department", "").upper())
+        self.inputs["license"].setText(getattr(op, "license_", "").upper())
+        self.inputs["resolution"].setText(getattr(op, "resolution", "").upper())
         # Fechas
         for key in ("expiration_date", "cutoff_date"):
             val = getattr(op, key, "")
@@ -102,14 +111,14 @@ class OperatorEditDialog(QDialog):
         # Enabled
         enabled = getattr(op, "enabled", 1)
         self.inputs["enabled"].setCurrentIndex(0 if enabled == 1 else 1)
-        self.inputs["country"].setText(getattr(op, "country", ""))
+        self.inputs["country"].setText(getattr(op, "country", "").upper())
 
     def get_operator_data(self):
         # Devuelve un dict con los datos ingresados/validados
         data = {}
         for key, widget in self.inputs.items():
             if isinstance(widget, QLineEdit):
-                data[key] = widget.text().strip()
+                data[key] = widget.text().strip().upper()
             elif isinstance(widget, QComboBox):
                 if key == "enabled":
                     data[key] = 1 if widget.currentIndex() == 0 else 0
