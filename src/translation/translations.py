@@ -3,6 +3,7 @@ import importlib
 
 TRANSLATION_MODULES = [
     "ui",
+    "menu",
     # Agrega aquí más módulos según crezcan las secciones
 ]
 
