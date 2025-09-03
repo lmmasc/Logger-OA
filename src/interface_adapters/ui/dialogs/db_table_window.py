@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QPushButton,
     QDialog,
+    QSizePolicy,
 )
 from PySide6.QtCore import Qt
 from interface_adapters.controllers.radio_operator_controller import (
@@ -99,15 +100,20 @@ class DBTableWindow(QWidget):
             QTableWidget.NoEditTriggers
         )  # Deshabilitar edición directa
         self.table.itemDoubleClicked.connect(self._on_item_double_clicked)
-        # Botón para agregar operador manualmente
+        # Botones para agregar y eliminar operador
+        btns_layout = QHBoxLayout()
         btn_add = QPushButton(translation_service.tr("add_operator"))
+        btn_add.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         btn_add.clicked.connect(self._on_add_operator)
+        self.btn_add = btn_add
         btn_delete = QPushButton(translation_service.tr("delete_operator"))
+        btn_delete.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         btn_delete.setEnabled(False)
         btn_delete.clicked.connect(self._on_delete_operator)
         self.btn_delete = btn_delete
-        main_layout.insertWidget(0, btn_add)
-        main_layout.insertWidget(1, btn_delete)
+        btns_layout.addWidget(btn_add)
+        btns_layout.addWidget(btn_delete)
+        main_layout.insertLayout(0, btns_layout)
         self.table.itemSelectionChanged.connect(self._on_selection_changed)
 
     # --- Métodos de UI y traducción ---
@@ -282,8 +288,8 @@ class DBTableWindow(QWidget):
                 self.load_data()
 
     def _on_selection_changed(self):
-        selected = self.table.selectedItems()
-        self.btn_delete.setEnabled(bool(selected))
+        selected_rows = self.table.selectionModel().selectedRows()
+        self.btn_delete.setEnabled(len(selected_rows) == 1)
 
     def _on_delete_operator(self):
         selected = self.table.selectedItems()
