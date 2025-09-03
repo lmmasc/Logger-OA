@@ -35,4 +35,5 @@ UI_TRANSLATIONS = {
     "add_operator": "Add operator",
     "callsign_required": "Callsign is required.",
     "invalid_category": "Invalid category. Must be NOVICIO, INTERMEDIO, SUPERIOR or NO_APLICA.",
+    "name_required": "The NAME field is required.",
 }

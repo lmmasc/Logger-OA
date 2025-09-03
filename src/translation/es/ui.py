@@ -35,4 +35,5 @@ UI_TRANSLATIONS = {
     "add_operator": "Agregar operador",
     "callsign_required": "El indicativo es obligatorio.",
     "invalid_category": "Categoría inválida. Debe ser NOVICIO, INTERMEDIO, SUPERIOR o NO_APLICA.",
+    "name_required": "El campo NOMBRE es obligatorio.",
 }
