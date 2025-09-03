@@ -121,22 +121,7 @@ class DBTableWindow(QWidget):
             cb.blockSignals(False)
         self._updating_ui = False
         self.apply_column_visibility()
-        # Actualizar valores de la columna 'habilitado' (protegido para no disparar itemChanged)
-        try:
-            enabled_col = self.headers.index(translation_service.tr("enabled"))
-        except ValueError:
-            enabled_col = None
-        if enabled_col is not None:
-            self._ignore_item_changed = True
-            for row in range(self.table.rowCount()):
-                item = self.table.item(row, enabled_col)
-                if item:
-                    val = item.text().strip().upper()
-                    if val in ("1", "SI", "YES"):
-                        item.setText(translation_service.tr("yes"))
-                    else:
-                        item.setText(translation_service.tr("no"))
-            self._ignore_item_changed = False
+        self.load_data()  # Recarga la tabla para asegurar traducción y sincronización
 
     def get_translated_headers(self):
         """
@@ -212,30 +197,17 @@ class DBTableWindow(QWidget):
         self.filter_column_combo.clear()
         self.filter_column_combo.addItems(headers)
         for row_idx, op in enumerate(operators):
-            for col_idx, value in enumerate(
-                [
-                    op.callsign,
-                    op.name,
-                    op.category,
-                    op.type_,
-                    op.district,
-                    op.province,
-                    op.department,
-                    op.license_,
-                    op.resolution,
-                    op.expiration_date,
-                    op.cutoff_date,
-                    (
+            for col_idx, key in enumerate(self.COLUMN_KEYS):
+                if key == "enabled":
+                    display = (
                         translation_service.tr("yes")
                         if op.enabled == 1
                         else translation_service.tr("no")
-                    ),
-                    op.country,
-                    op.updated_at,
-                ]
-            ):
-                item = QTableWidgetItem(str(value))
-                item.setData(Qt.UserRole, str(value))
+                    )
+                    item = QTableWidgetItem(display)
+                else:
+                    value = getattr(op, key if key != "type" else "type_", "")
+                    item = QTableWidgetItem(str(value))
                 self.table.setItem(row_idx, col_idx, item)
         self.apply_column_visibility()
         self.apply_filter()
