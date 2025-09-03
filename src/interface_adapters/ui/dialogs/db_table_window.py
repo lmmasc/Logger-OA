@@ -1,12 +1,19 @@
+from functools import partial
+import json
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QTableWidget,
     QTableWidgetItem,
     QMessageBox,
+    QHBoxLayout,
+    QLineEdit,
+    QComboBox,
+    QCheckBox,
+    QLabel,
     QPushButton,
 )
-from PySide6.QtCore import Qt, QEvent
+from PySide6.QtCore import Qt
 from interface_adapters.controllers.radio_operator_controller import (
     RadioOperatorController,
 )
@@ -15,35 +22,149 @@ from config.settings_service import settings_service
 
 
 class DBTableWindow(QWidget):
+    COLUMN_KEYS = [
+        "callsign",
+        "name",
+        "category",
+        "type",
+        "district",
+        "province",
+        "department",
+        "license",
+        "resolution",
+        "expiration_date",
+        "cutoff_date",
+        "enabled",
+        "country",
+        "updated_at",
+    ]
+
     def __init__(self, parent=None):
-        """
-        Inicializa la ventana de tabla de operadores, configura el layout y carga los datos.
-        """
         super().__init__(parent)
-        self.resize(1200, 700)  # Tamaño inicial, no fijo
+        print(
+            "[SETTINGS-DEBUG] (init) db_table_column_visible_dict:",
+            settings_service.get_value("db_table_column_visible_dict", None),
+        )
         self.setWindowTitle(translation_service.tr("db_table"))
         self.setWindowFlag(Qt.Window)
-        layout = QVBoxLayout()
+        self.resize(1200, 700)
+        main_layout = QVBoxLayout()
+        filter_layout = QHBoxLayout()
+        self.filter_edit = QLineEdit()
+        self.filter_edit.setPlaceholderText(
+            translation_service.tr("filter_placeholder")
+        )
+        self.filter_column_combo = QComboBox()
+        self.filter_column_combo.setMinimumWidth(150)
+        filter_label = QLabel(translation_service.tr("filter_by"))
+        filter_layout.addWidget(filter_label)
+        filter_layout.addWidget(self.filter_edit)
+        filter_layout.addWidget(self.filter_column_combo)
+        filter_layout.addStretch()
+        main_layout.addLayout(filter_layout)
         self.table = QTableWidget()
-        layout.addWidget(self.table)
+        main_layout.addWidget(self.table)
         self.controller = RadioOperatorController()
-        self.load_data()
-        self.setLayout(layout)
-        self.table.itemChanged.connect(self._on_item_changed)
+        self.setLayout(main_layout)
         self._ignore_item_changed = False
+        self._updating_ui = False
+        self.checkbox_layout = QHBoxLayout()
+        self.column_checkboxes = []
+        self.headers = self.get_translated_headers()
+        col_visible = settings_service.get_value("db_table_column_visible_dict", None)
+        if not col_visible or not isinstance(col_visible, dict):
+            col_visible = {k: True for k in self.COLUMN_KEYS}
+        col_visible["callsign"] = True
+        col_visible["name"] = True
+        for idx, key in enumerate(self.COLUMN_KEYS):
+            cb = QCheckBox(self.headers[idx])
+            cb.setObjectName(key)
+            if idx in (0, 1):
+                cb.setChecked(True)
+                cb.setEnabled(False)
+            else:
+                cb.setChecked(bool(col_visible.get(key, True)))
+                cb.stateChanged.connect(partial(self.toggle_column, idx))
+            self.column_checkboxes.append(cb)
+            self.checkbox_layout.addWidget(cb)
+        self.checkbox_layout.addStretch()
+        main_layout.insertLayout(1, self.checkbox_layout)
+        self.load_data()
+        self.table.itemChanged.connect(self._on_item_changed)
+        self.filter_edit.textChanged.connect(self.apply_filter)
+        self.filter_column_combo.currentIndexChanged.connect(self.apply_filter)
+        # Conectar señal para guardar anchos de columnas al redimensionar
+        self.table.horizontalHeader().sectionResized.connect(self.save_column_widths)
+
+    def retranslate_ui(self):
+        self._updating_ui = True
+        self.setWindowTitle(translation_service.tr("db_table"))
+        self.headers = self.get_translated_headers()
+        self.table.setHorizontalHeaderLabels(self.headers)
+        self.filter_column_combo.clear()
+        self.filter_column_combo.addItems(self.headers)
+        # Solo actualiza el texto de los checkboxes, sin recrearlos
+        for idx, cb in enumerate(self.column_checkboxes):
+            cb.blockSignals(True)
+            cb.setText(self.headers[idx])
+            cb.blockSignals(False)
+        self._updating_ui = False
+        self.apply_column_visibility()
+        # Actualizar valores de la columna 'habilitado' (protegido para no disparar itemChanged)
+        try:
+            enabled_col = self.headers.index(translation_service.tr("enabled"))
+        except ValueError:
+            enabled_col = None
+        if enabled_col is not None:
+            self._ignore_item_changed = True
+            for row in range(self.table.rowCount()):
+                item = self.table.item(row, enabled_col)
+                if item:
+                    val = item.text().strip().upper()
+                    if val in ("1", "SI", "YES"):
+                        item.setText(translation_service.tr("yes"))
+                    else:
+                        item.setText(translation_service.tr("no"))
+            self._ignore_item_changed = False
+
+    def toggle_column(self, col, state):
+        if self._updating_ui:
+            return
+        key = self.COLUMN_KEYS[col]
+        col_visible = settings_service.get_value("db_table_column_visible_dict", None)
+        if not col_visible or not isinstance(col_visible, dict):
+            col_visible = {k: True for k in self.COLUMN_KEYS}
+        for idx, key in enumerate(self.COLUMN_KEYS):
+            col_visible[key] = self.column_checkboxes[idx].isChecked()
+        settings_service.set_value("db_table_column_visible_dict", col_visible)
+        self.apply_column_visibility()
+
+    def apply_column_visibility(self):
+        if self.table.columnCount() != len(self.column_checkboxes):
+            return
+        vis_states = {}
+        for idx, cb in enumerate(self.column_checkboxes):
+            self.table.setColumnHidden(idx, not cb.isChecked())
+            vis_states[self.COLUMN_KEYS[idx]] = cb.isChecked()
+
+    def apply_filter(self):
+        text = self.filter_edit.text().strip().lower()
+        col = self.filter_column_combo.currentIndex()
+        for row in range(self.table.rowCount()):
+            item = self.table.item(row, col)
+            if not text:
+                self.table.setRowHidden(row, False)
+            else:
+                value = item.text().strip().lower() if item else ""
+                self.table.setRowHidden(row, text not in value)
 
     def _on_item_changed(self, item):
-        """
-        Handler para confirmar y guardar cambios en la base de datos o descartarlos.
-        """
-        if self._ignore_item_changed:
+        if self._ignore_item_changed or self._updating_ui:
             return
         row = item.row()
         col = item.column()
-        header = self.table.horizontalHeaderItem(col).text()
-        callsign = self.table.item(
-            row, 0
-        ).text()  # Se asume que la columna 0 es el indicativo
+        key = self.COLUMN_KEYS[col]
+        callsign = self.table.item(row, 0).text()
         old_value = item.data(Qt.UserRole)
         new_value = item.text()
         yes_text = translation_service.tr("yes_button")
@@ -52,7 +173,7 @@ class DBTableWindow(QWidget):
         box.setWindowTitle(translation_service.tr("main_window_title"))
         box.setText(
             translation_service.tr("confirm_update_field").format(
-                field=header, value=new_value
+                field=self.headers[col], value=new_value
             )
         )
         yes_button = box.addButton(yes_text, QMessageBox.YesRole)
@@ -60,7 +181,6 @@ class DBTableWindow(QWidget):
         box.setDefaultButton(no_button)
         box.exec()
         if box.clickedButton() == yes_button:
-            # Actualizar en base de datos
             operator = next(
                 (
                     op
@@ -70,56 +190,40 @@ class DBTableWindow(QWidget):
                 None,
             )
             if operator:
-                attr_map = {
-                    translation_service.tr("name"): "name",
-                    translation_service.tr("category"): "category",
-                    translation_service.tr("type"): "type_",
-                    translation_service.tr("district"): "district",
-                    translation_service.tr("province"): "province",
-                    translation_service.tr("department"): "department",
-                    translation_service.tr("license"): "license_",
-                    translation_service.tr("resolution"): "resolution",
-                    translation_service.tr("expiration_date"): "expiration_date",
-                    translation_service.tr("cutoff_date"): "cutoff_date",
-                    translation_service.tr("enabled"): "enabled",
-                    translation_service.tr("country"): "country",
-                    translation_service.tr("updated_at"): "updated_at",
-                }
-                field = attr_map.get(header)
-                if field:
-                    # Convertir SI/NO a 1/0 si es el campo habilitado
-                    if field == "enabled":
-                        if new_value.strip().upper() in (
-                            translation_service.tr("yes"),
-                            "1",
-                        ):
-                            new_value = 1
-                        else:
-                            new_value = 0
-                    setattr(operator, field, new_value)
-                    self.controller.service.update_operator(operator)
+                if key == "enabled":
+                    if new_value.strip().upper() in (
+                        translation_service.tr("yes"),
+                        "1",
+                    ):
+                        new_value = 1
+                    else:
+                        new_value = 0
+                setattr(operator, key if key != "type" else "type_", new_value)
+                self.controller.service.update_operator(operator)
         else:
-            # Descartar el cambio visualmente
             self._ignore_item_changed = True
             item.setText(old_value if old_value is not None else "")
             self._ignore_item_changed = False
 
     def load_data(self):
-        """
-        Carga los operadores desde el controlador y actualiza la tabla con los datos y headers traducidos.
-        """
+        self._updating_ui = True
+        self.table.blockSignals(True)
         operators = self.controller.list_operators()
-        # Ordenar por indicativo (callsign) antes de mostrar
         operators = sorted(operators, key=lambda op: op.callsign)
-        headers = self.get_translated_headers()
+        headers = self.headers
         if not operators:
             self.table.setRowCount(0)
             self.table.setColumnCount(0)
             self.table.setHorizontalHeaderLabels([])
+            self.filter_column_combo.clear()
+            self._updating_ui = False
+            self.table.blockSignals(False)
             return
         self.table.setRowCount(len(operators))
         self.table.setColumnCount(len(headers))
         self.table.setHorizontalHeaderLabels(headers)
+        self.filter_column_combo.clear()
+        self.filter_column_combo.addItems(headers)
         for row_idx, op in enumerate(operators):
             for col_idx, value in enumerate(
                 [
@@ -144,14 +248,48 @@ class DBTableWindow(QWidget):
                 ]
             ):
                 item = QTableWidgetItem(str(value))
-                # Guardar el valor original para poder restaurar si se cancela
                 item.setData(Qt.UserRole, str(value))
                 self.table.setItem(row_idx, col_idx, item)
+        self.apply_column_visibility()
+        self.apply_filter()
+        # --- ANCHOS DE COLUMNA ---
+        widths = settings_service.get_value("db_table_column_widths", None)
+        if widths:
+            # Si hay valores en 0, ponerlos en 100
+            for i, w in enumerate(widths):
+                if int(w) == 0:
+                    widths[i] = 100
+            for i, w in enumerate(widths):
+                self.table.setColumnWidth(i, int(w))
+        self._updating_ui = False
+        self.table.blockSignals(False)
+
+    def save_column_widths(self, *args):
+        # Guardar solo si el ancho es >0, si no, mantener el último valor guardado
+        prev_widths = settings_service.get_value("db_table_column_widths", None)
+        if prev_widths is None:
+            prev_widths = [100] * self.table.columnCount()
+        widths = []
+        for i in range(self.table.columnCount()):
+            w = self.table.columnWidth(i)
+            if w == 0:
+                # Mantener el último valor guardado
+                if prev_widths and i < len(prev_widths):
+                    widths.append(prev_widths[i])
+                else:
+                    widths.append(100)
+            else:
+                widths.append(w)
+        settings_service.set_value("db_table_column_widths", widths)
+
+    def closeEvent(self, event):
+        print(
+            "[SETTINGS-DEBUG] (close) db_table_column_visible_dict:",
+            settings_service.get_value("db_table_column_visible_dict", None),
+        )
+        super().closeEvent(event)
 
     def get_translated_headers(self):
-        """
-        Devuelve la lista de encabezados traducidos para la tabla de operadores.
-        """
         return [
             translation_service.tr("callsign"),
             translation_service.tr("name"),
@@ -168,55 +306,3 @@ class DBTableWindow(QWidget):
             translation_service.tr("country"),
             translation_service.tr("updated_at"),
         ]
-
-    def retranslate_ui(self):
-        """
-        Actualiza el título y los encabezados de la tabla según el idioma actual, y traduce los valores de la columna 'habilitado'.
-        """
-        self.setWindowTitle(translation_service.tr("db_table"))
-        headers = self.get_translated_headers()
-        self.table.setHorizontalHeaderLabels(headers)
-        # Buscar el índice de la columna 'habilitado' de forma robusta
-        try:
-            enabled_col = headers.index(translation_service.tr("enabled"))
-        except ValueError:
-            enabled_col = None
-        if enabled_col is not None:
-            for row in range(self.table.rowCount()):
-                item = self.table.item(row, enabled_col)
-                if item:
-                    val = item.text().strip().upper()
-                    if val in ("1", "SI", "YES"):  # Puede venir de distintas formas
-                        item.setText(translation_service.tr("yes"))
-                    else:
-                        item.setText(translation_service.tr("no"))
-
-    def showEvent(self, event):
-        """
-        Restaura el ancho de las columnas al mostrar la ventana.
-        """
-        super().showEvent(event)
-        widths = settings_service.get_value("db_table_column_widths", None)
-        if widths:
-            for i, w in enumerate(widths):
-                self.table.setColumnWidth(i, int(w))
-        # Conectar señal solo una vez
-        if not hasattr(self, "_resize_connected"):
-            self.table.horizontalHeader().sectionResized.connect(
-                self.save_column_widths
-            )
-            self._resize_connected = True
-
-    def save_column_widths(self, *args):
-        """
-        Guarda el ancho de las columnas en la configuración al ser redimensionadas.
-        """
-        widths = [self.table.columnWidth(i) for i in range(self.table.columnCount())]
-        settings_service.set_value("db_table_column_widths", widths)
-
-    def closeEvent(self, event):
-        """
-        Guarda el ancho de las columnas al cerrar la ventana.
-        """
-        self.save_column_widths()
-        super().closeEvent(event)

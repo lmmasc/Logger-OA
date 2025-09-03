@@ -55,6 +55,8 @@ TRANSLATIONS = {
         "yes_button": "Sí",
         "no_button": "No",
         "confirm_update_field": "¿Desea guardar el cambio en el campo '{field}' a '{value}' en la base de datos?",
+        "filter_placeholder": "Filtrar...",
+        "filter_by": "Filtrar por columna:",
     },
     "en": {
         "main_window_title": "Logger OA",
@@ -110,5 +112,7 @@ TRANSLATIONS = {
         "yes_button": "Yes",
         "no_button": "No",
         "confirm_update_field": "Do you want to save the change in field '{field}' to '{value}' in the database?",
+        "filter_placeholder": "Filter...",
+        "filter_by": "Filter by column:",
     },
 }

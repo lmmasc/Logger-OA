@@ -24,7 +24,7 @@ class ThemeManager:
     def apply_theme(self, theme_name: str):
         """
         Carga y aplica el archivo QSS correspondiente al tema.
-        Guarda la preferencia del usuario.
+        Guarda la preferencia del usuario solo si realmente cambió.
         Args:
             theme_name (str): "light" o "dark"
         """
@@ -33,8 +33,10 @@ class ThemeManager:
             with open(qss_path, "r") as f:
                 qss = f.read()
                 QApplication.instance().setStyleSheet(qss)
-                self.current_theme = theme_name
+            # Solo guardar si el valor cambió
+            if self.current_theme != theme_name:
                 self.settings.set_value("theme", theme_name)
+            self.current_theme = theme_name
         except Exception as e:
             print(f"Error aplicando tema: {e}")
 
