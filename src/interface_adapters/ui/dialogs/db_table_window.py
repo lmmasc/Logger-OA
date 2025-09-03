@@ -95,6 +95,14 @@ class DBTableWindow(QWidget):
         self.filter_column_combo.currentIndexChanged.connect(self.apply_filter)
         # Conectar señal para guardar anchos de columnas al redimensionar
         self.table.horizontalHeader().sectionResized.connect(self.save_column_widths)
+        self.table.setEditTriggers(
+            QTableWidget.NoEditTriggers
+        )  # Deshabilitar edición directa
+        self.table.itemDoubleClicked.connect(self._on_item_double_clicked)
+        # Botón para agregar operador manualmente
+        btn_add = QPushButton(translation_service.tr("add_operator"))
+        btn_add.clicked.connect(self._on_add_operator)
+        main_layout.insertWidget(0, btn_add)
 
     # --- Métodos de UI y traducción ---
     def retranslate_ui(self):
@@ -293,6 +301,49 @@ class DBTableWindow(QWidget):
             self._ignore_item_changed = True
             item.setText(old_value if old_value is not None else "")
             self._ignore_item_changed = False
+
+    def _on_item_double_clicked(self, item):
+        """
+        Abre el diálogo de edición para el registro seleccionado.
+        """
+        row = item.row()
+        callsign = self.table.item(row, 0).text()
+        operator = next(
+            (op for op in self.controller.list_operators() if op.callsign == callsign),
+            None,
+        )
+        if operator:
+            from .operator_edit_dialog import OperatorEditDialog
+
+            dlg = OperatorEditDialog(operator, self)
+            if dlg.exec() == dlg.Accepted and dlg.result_operator:
+                # Actualizar el operador en la base de datos
+                for k, v in dlg.result_operator.items():
+                    setattr(operator, k if k != "type" else "type_", v)
+                self.controller.service.update_operator(operator)
+                self.load_data()
+
+    def _on_add_operator(self):
+        """
+        Abre el diálogo de alta manual de operador y agrega el registro si es válido.
+        """
+        from .operator_edit_dialog import OperatorEditDialog
+
+        dlg = OperatorEditDialog(parent=self)
+        if dlg.exec() == dlg.Accepted and dlg.result_operator:
+            # Crear nuevo operador y guardar
+            op_data = dlg.result_operator
+            Operator = (
+                type(self.controller.list_operators()[0])
+                if self.controller.list_operators()
+                else None
+            )
+            if Operator:
+                new_op = Operator(
+                    **{k if k != "type" else "type_": v for k, v in op_data.items()}
+                )
+                self.controller.service.add_operator(new_op)
+                self.load_data()
 
     # --- Persistencia de anchos de columna ---
     def save_column_widths(self, *args):

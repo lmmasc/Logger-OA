@@ -31,4 +31,8 @@ UI_TRANSLATIONS = {
     "import_summary_ok": "Operadores procesados correctamente: {}",
     "import_summary_protected": "Protegidos (no deshabilitados por fecha): {}",
     "import_summary_unchanged": "Sin cambios: {}",
+    "edit_operator": "Editar operador",
+    "add_operator": "Agregar operador",
+    "callsign_required": "El indicativo es obligatorio.",
+    "invalid_category": "Categoría inválida. Debe ser NOVICIO, INTERMEDIO, SUPERIOR o NO_APLICA.",
 }

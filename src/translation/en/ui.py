@@ -31,4 +31,8 @@ UI_TRANSLATIONS = {
     "import_summary_ok": "Operators processed successfully: {}",
     "import_summary_protected": "Protected (not disabled due to date): {}",
     "import_summary_unchanged": "Unchanged: {}",
+    "edit_operator": "Edit operator",
+    "add_operator": "Add operator",
+    "callsign_required": "Callsign is required.",
+    "invalid_category": "Invalid category. Must be NOVICIO, INTERMEDIO, SUPERIOR or NO_APLICA.",
 }
