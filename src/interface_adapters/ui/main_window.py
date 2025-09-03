@@ -130,12 +130,15 @@ class MainWindow(QMainWindow):
     def set_language(self, lang: str) -> None:
         """
         Cambia el idioma de la aplicación, lo guarda en la configuración y actualiza los textos de la interfaz.
+        Solo guarda si el idioma realmente cambió.
 
         Args:
                 lang (str): Código del idioma a establecer ("es" o "en").
         """
         translation_service.set_language(lang)
-        settings_service.set_value("language", lang)
+        current_lang = settings_service.get_value("language", "es")
+        if current_lang != lang:
+            settings_service.set_value("language", lang)
         self.refresh_ui()
 
     def set_light_theme(self) -> None:
