@@ -37,4 +37,6 @@ UI_TRANSLATIONS = {
     "invalid_category": "Invalid category. Must be NOVICIO, INTERMEDIO, SUPERIOR or NO_APLICA.",
     "name_required": "The NAME field is required.",
     "other_country_placeholder": "Enter country (uppercase)",
+    "delete_operator": "Delete operator",
+    "confirm_delete_operator": "Are you sure you want to delete the operator?",
 }

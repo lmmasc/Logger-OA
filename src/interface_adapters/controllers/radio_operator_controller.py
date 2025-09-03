@@ -17,4 +17,7 @@ class RadioOperatorController:
     def list_operators(self):
         return self.service.list_operators()
 
+    def delete_operator_by_callsign(self, callsign: str) -> None:
+        self.service.delete_operator_by_callsign(callsign)
+
     # Métodos adicionales para agregar, actualizar, etc. pueden agregarse aquí

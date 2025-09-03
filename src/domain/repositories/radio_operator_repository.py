@@ -19,3 +19,7 @@ class RadioOperatorRepository(ABC):
     @abstractmethod
     def disable_absent(self, present_callsigns: list[str]) -> None:
         pass
+
+    @abstractmethod
+    def delete_by_callsign(self, callsign: str) -> None:
+        pass

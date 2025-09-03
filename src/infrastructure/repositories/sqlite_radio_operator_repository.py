@@ -49,3 +49,6 @@ class SqliteRadioOperatorRepository(RadioOperatorRepository):
     def disable_absent(self, present_callsigns: list[str]) -> None:
         # Implementación pendiente según lógica de negocio
         pass
+
+    def delete_by_callsign(self, callsign: str) -> None:
+        queries.delete_radio_operator_by_callsign(callsign)

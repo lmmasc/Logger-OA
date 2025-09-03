@@ -23,3 +23,6 @@ class RadioOperatorManagement:
 
     def disable_absent_operators(self, present_callsigns: list[str]) -> None:
         self.repository.disable_absent(present_callsigns)
+
+    def delete_operator_by_callsign(self, callsign: str) -> None:
+        self.repository.delete_by_callsign(callsign)

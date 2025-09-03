@@ -186,3 +186,10 @@ def delete_radio_operator(callsign):
     cursor.execute(sql, (callsign,))
     conn.commit()
     conn.close()
+
+
+def delete_radio_operator_by_callsign(callsign):
+    """
+    Elimina un operador de radio por callsign (alias para compatibilidad con repositorio).
+    """
+    return delete_radio_operator(callsign)

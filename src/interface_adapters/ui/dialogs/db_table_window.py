@@ -102,7 +102,13 @@ class DBTableWindow(QWidget):
         # Botón para agregar operador manualmente
         btn_add = QPushButton(translation_service.tr("add_operator"))
         btn_add.clicked.connect(self._on_add_operator)
+        btn_delete = QPushButton(translation_service.tr("delete_operator"))
+        btn_delete.setEnabled(False)
+        btn_delete.clicked.connect(self._on_delete_operator)
+        self.btn_delete = btn_delete
         main_layout.insertWidget(0, btn_add)
+        main_layout.insertWidget(1, btn_delete)
+        self.table.itemSelectionChanged.connect(self._on_selection_changed)
 
     # --- Métodos de UI y traducción ---
     def retranslate_ui(self):
@@ -274,6 +280,33 @@ class DBTableWindow(QWidget):
                 new_op = Operator(**op_data_fixed)
                 self.controller.service.add_operator(new_op)
                 self.load_data()
+
+    def _on_selection_changed(self):
+        selected = self.table.selectedItems()
+        self.btn_delete.setEnabled(bool(selected))
+
+    def _on_delete_operator(self):
+        selected = self.table.selectedItems()
+        if not selected:
+            return
+        row = selected[0].row()
+        callsign = self.table.item(row, 0).text()
+        name = self.table.item(row, 1).text()
+        msg_box = QMessageBox(self)
+        msg_box.setIcon(QMessageBox.Question)
+        msg_box.setWindowTitle(translation_service.tr("delete_operator"))
+        msg_box.setText(translation_service.tr("confirm_delete_operator"))
+        msg_box.setInformativeText(
+            f"{translation_service.tr('table_header_callsign')}: {callsign}\n{translation_service.tr('table_header_name')}: {name}"
+        )
+        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msg_box.setDefaultButton(QMessageBox.No)
+        msg_box.button(QMessageBox.Yes).setText(translation_service.tr("yes_button"))
+        msg_box.button(QMessageBox.No).setText(translation_service.tr("no_button"))
+        reply = msg_box.exec()
+        if reply == QMessageBox.Yes:
+            self.controller.service.delete_operator_by_callsign(callsign)
+            self.load_data()
 
     # --- Persistencia de anchos de columna ---
     def save_column_widths(self, *args):
