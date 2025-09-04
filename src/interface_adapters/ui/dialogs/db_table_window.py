@@ -59,9 +59,13 @@ class DBTableWindow(QWidget):
         self.filter_column_combo = QComboBox()
         self.filter_column_combo.setMinimumWidth(150)
         self.filter_label = QLabel(translation_service.tr("filter_by"))
+        self.filter_results_label = QLabel(translation_service.tr("filter_results"))
+        self.filter_results_count = QLabel("0")
         filter_layout.addWidget(self.filter_label)
         filter_layout.addWidget(self.filter_edit)
         filter_layout.addWidget(self.filter_column_combo)
+        filter_layout.addWidget(self.filter_results_label)
+        filter_layout.addWidget(self.filter_results_count)
         filter_layout.addStretch()
         main_layout.addLayout(filter_layout)
         self.table = QTableWidget()
@@ -123,6 +127,15 @@ class DBTableWindow(QWidget):
 
     # --- Métodos de UI y traducción ---
     def retranslate_ui(self):
+        # Actualizar label y placeholder del filtro
+        if hasattr(self, "filter_label"):
+            self.filter_label.setText(translation_service.tr("filter_by"))
+        if hasattr(self, "filter_edit"):
+            self.filter_edit.setPlaceholderText(
+                translation_service.tr("filter_placeholder")
+            )
+        if hasattr(self, "filter_results_label"):
+            self.filter_results_label.setText(translation_service.tr("filter_results"))
         # Actualizar label y placeholder del filtro
         if hasattr(self, "filter_label"):
             self.filter_label.setText(translation_service.tr("filter_by"))
@@ -195,13 +208,20 @@ class DBTableWindow(QWidget):
         """
         text = self.filter_edit.text().strip().lower()
         col = self.filter_column_combo.currentIndex()
+        visible_count = 0
         for row in range(self.table.rowCount()):
             item = self.table.item(row, col)
             if not text:
                 self.table.setRowHidden(row, False)
+                visible_count += 1
             else:
                 value = item.text().strip().lower() if item else ""
-                self.table.setRowHidden(row, text not in value)
+                match = text in value
+                self.table.setRowHidden(row, not match)
+                if match:
+                    visible_count += 1
+        if hasattr(self, "filter_results_count"):
+            self.filter_results_count.setText(str(visible_count))
 
     # --- Métodos de datos y edición ---
     def load_data(self):
@@ -246,6 +266,10 @@ class DBTableWindow(QWidget):
                 self.table.setItem(row_idx, col_idx, item)
         self.apply_column_visibility()
         self.apply_filter()
+        # Reiniciar el contador de resultados si existe
+        if hasattr(self, "filter_results_count"):
+            total = self.table.rowCount()
+            self.filter_results_count.setText(str(total))
         # --- ANCHOS DE COLUMNA ---
         widths = settings_service.get_value("db_table_column_widths", None)
         if widths:
