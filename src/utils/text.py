@@ -67,10 +67,11 @@ def extract_cutoff_date(text: str) -> str | None:
 
 
 def filter_text_match(
-    haystack, needle, ignore_case=True, ignore_accents=True
-):  # noqa: C901
+    haystack, needle, ignore_case=True, ignore_accents=True, wildcards=True
+):
     """
-    Devuelve True si needle está en haystack, con opciones para ignorar mayúsculas y tildes.
+    Devuelve True si needle coincide con haystack usando * como comodín de un solo carácter.
+    Coincidencia en cualquier parte del texto.
     """
     if ignore_case:
         haystack = haystack.lower()
@@ -82,4 +83,15 @@ def filter_text_match(
         needle = (
             unicodedata.normalize("NFKD", needle).encode("ASCII", "ignore").decode()
         )
-    return needle in haystack
+    if wildcards:
+        # Convertir * a . (un solo carácter), escapar el resto
+        pattern = ""
+        for c in needle:
+            if c == "*":
+                pattern += "."
+            else:
+                pattern += re.escape(c)
+        # Buscar el patrón en cualquier parte del texto
+        return re.search(pattern, haystack) is not None
+    else:
+        return needle in haystack
