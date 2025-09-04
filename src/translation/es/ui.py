@@ -1,5 +1,6 @@
 # Traducciones de la interfaz de usuario (español)
 UI_TRANSLATIONS = {
+    "about": "Acerca de",
     "main_window_title": "Logger OA",
     "about_message": "Logger OA\nHerramienta de registro de radioaficionados para concursos y operaciones especiales.\nDesarrollado por Miguel OA4BAU y Raquel OA4EHN.",
     "welcome_message": "Bienvenido a Logger OA",

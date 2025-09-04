@@ -1,5 +1,6 @@
 # UI translations (English)
 UI_TRANSLATIONS = {
+    "about": "About",
     "main_window_title": "Logger OA",
     "about_message": "Logger OA\nLogging tool for amateur radio contests and special operations.\nDeveloped by Miguel OA4BAU and Raquel OA4EHN.",
     "welcome_message": "Welcome to Logger OA",
