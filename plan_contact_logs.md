@@ -2,86 +2,76 @@
 
 ## 1. Modelo de Dominio
 - **ContactLog (base/abstracta):**
-  - Campos comunes: `id` (UUID/autoincremental), `start_time`, `end_time`, `operator`, lista de contactos, metadatos.
-  - Clase base para todos los logs, facilita extensibilidad y validaciones generales.
+  - Campos: `id` (UUID), `operator`, `start_time`, `end_time`, `contacts`, `metadata`.
+  - Métodos: agregar/eliminar contactos, validaciones generales.
 - **OperationLog** y **ContestLog**:
-  - Heredan de ContactLog, agregan campos y reglas específicas (ej: nombre de concurso, tipo de operativo, validaciones propias).
+  - Heredan de ContactLog, agregan campos y reglas específicas (ej: nombre de concurso, tipo de operativo).
 - **Contact:**
-  - Entidad individual (indicativo, hora, banda, modo, reportes, etc.), relacionada uno-a-muchos con cada log.
-- Subtipos mediante subclases según la complejidad futura.
+  - Entidad individual (OperationContact, ContestContact) con campos como indicativo, hora, banda, modo, reportes, etc.
+  - Relación uno-a-muchos con cada log.
 
-## 2. Casos de Uso (Application/Domain)
-- Crear, abrir, editar, cerrar y exportar logs.
-- Agregar, editar, eliminar contactos en un log.
-- Validar reglas específicas (concursos, duplicados, formatos, etc.).
-- Sugerir indicativos (autocomplete) y gestionar la cola de espera.
-
-### Flujo principal
-- Al crear un log (operativo o concurso), se genera un archivo SQLite en la carpeta correspondiente (`/operativos/` o `/concursos/`).
-- El nombre del archivo incluye el indicativo del operador, el tipo de log y un timestamp para unicidad y trazabilidad.
-- Los logs pueden abrirse, editarse, cerrarse y exportarse desde el menú principal.
-- Exportación soportada a CSV, PDF, ADIF y otros formatos.
-
-## 3. Persistencia
+## 2. Persistencia y Paths
 - Cada log se guarda en un archivo SQLite independiente, ubicado en `/operativos/` o `/concursos/` según el tipo.
 - El nombre del archivo sigue el patrón: `<indicativo>_<tipo>_<timestamp>.sqlite`.
-- Repositorios abstraen el acceso a los archivos/logs y permiten operaciones CRUD sobre logs y contactos.
+- El módulo `src/config/paths.py` centraliza la lógica de generación de paths y nombres de archivo, y asegura la existencia de carpetas.
 - Estructura de tablas:
-  - Tabla `logs`: id, tipo, operador, start_time, end_time, metadatos.
-  - Tabla `contacts`: id, log_id (FK), campos de contacto (indicativo, hora, banda, modo, etc.).
+  - Tabla `logs`: id, tipo, operador, start_time, end_time, metadata.
+  - Tabla `contacts`: id, log_id (FK), data (JSON serializado).
 
-## 4. UI/Interface Adapters
-- Ventanas separadas para Operativos y Concursos, ambas basadas en una ventana base reutilizable.
-- Componentes comunes: formulario de datos del log, tabla de contactos, campo de entrada con sugerencias, cola de espera.
-- Diferencias puntuales: campos adicionales, validaciones, reglas de negocio, formatos de exportación.
+## 3. Repositorios
+- `ContactLogRepository` implementa métodos CRUD para logs y contactos en SQLite.
+- Métodos: crear, guardar, eliminar logs y contactos, obtener contactos de un log.
 
-### Paths y organización de archivos
-- El módulo de paths centraliza la lógica para crear y ubicar los archivos de logs.
-- Al crear un log, se utiliza el módulo para generar el path y nombre de archivo adecuado.
+## 4. Casos de Uso Implementados
+- **Crear log:**
+  - Crea un log operativo o de concurso, genera el archivo y guarda el log inicial.
+- **Abrir log:**
+  - Lista archivos de logs disponibles y permite cargar un log y sus contactos desde SQLite.
+- **Gestión de contactos:**
+  - Agregar, editar y eliminar contactos en un log abierto.
+- **Exportar log:**
+  - Exporta los contactos de un log a CSV en la carpeta de exportación.
 
-## 5. Sugerencias y Autocompletado
-- Servicio desacoplado que consulta la base de operadores o historial de contactos.
+## 5. Flujo actual de la aplicación
+1. Crear log (operativo/concurso) → genera archivo y registro inicial.
+2. Abrir log existente → carga datos y contactos.
+3. Agregar, editar o eliminar contactos.
+4. Exportar log a CSV.
 
-## 6. Exportación
-- Casos de uso para exportar en diferentes formatos (ADIF, Cabrillo, CSV, etc.), como servicios o utilidades.
+## 6. Validaciones y reglas de negocio (pendiente de profundizar)
+- Validaciones básicas en la capa de dominio (duplicados, formato de campos, etc.).
+- Validaciones específicas para concursos (no duplicados, reglas de intercambio, etc.).
 
-### Detalles
-- La exportación toma los datos desde el archivo SQLite y los transforma al formato deseado.
-- Se pueden agregar nuevos formatos de exportación fácilmente mediante servicios o utilidades.
+## 7. Exportación (pendiente de ampliar)
+- Exportación a ADIF, PDF y otros formatos estándar de radioaficionados.
+- Servicios/utilidades para transformar los datos desde SQLite a los formatos requeridos.
 
-## 7. Validaciones
-- Validaciones en la capa de dominio o aplicación, no en la UI.
-- Para concursos, reglas específicas (no duplicados, formatos de campo, etc.).
+## 8. UI/Interface Adapters (pendiente)
+- Ventanas separadas para Operativos y Concursos, basadas en una ventana base reutilizable.
+- Componentes: formulario de datos del log, tabla de contactos, campo de entrada con sugerencias, cola de espera.
 
-### Ejemplos de validaciones
-- No permitir contactos duplicados en concursos.
-- Validar formato de campos (indicativo, hora, etc.) al agregar contactos.
-- Validaciones extensibles por tipo de log.
-
-## 8. Extensibilidad
-- Permitir agregar nuevos subtipos de logs o reglas sin modificar la lógica central.
-- Usar interfaces/abstracciones para los repositorios y servicios.
-
-### Consideraciones
-- La arquitectura y los modelos permiten agregar nuevos tipos de logs o reglas de negocio sin afectar el núcleo del sistema.
-- Los repositorios y servicios están desacoplados y pueden extenderse fácilmente.
+## 9. Extensibilidad
+- Arquitectura preparada para agregar nuevos tipos de logs, reglas o formatos de exportación sin modificar la lógica central.
+- Repositorios y servicios desacoplados y fácilmente extensibles.
 
 ---
 
-## Resumen visual de arquitectura
-```
-UI (Ventanas de Log) 
-   |
-Interface Adapters (Controladores, Adaptadores de Repositorio)
-   |
-Application/Domain (Casos de uso, Entidades: ContactLog, Contact, etc.)
-   |
-Infrastructure (Repositorios de archivos, servicios de exportación)
-```
+## Avances realizados (al 2025-09-04)
+- Refactorización de entidades y modelos de dominio.
+- Implementación de paths y generación de archivos por log.
+- Repositorio base para persistencia en SQLite.
+- Casos de uso para crear, abrir, editar y exportar logs y contactos.
+- Exportación a CSV funcional.
+- Commits realizados en cada etapa para trazabilidad.
 
-## Siguientes pasos sugeridos
-- Refactorizar modelos de dominio para incluir clase base `ContactLog`, campos `id`, `start_time`, `end_time` y metadatos.
-- Implementar lógica de generación de paths y nombres de archivo en el módulo de paths.
-- Crear repositorios para manejo de archivos SQLite por log.
-- Implementar casos de uso principales: crear, abrir, editar, cerrar y exportar logs.
-- Iterar agregando reglas, validaciones y exportaciones según necesidades.
+## Próximos pasos sugeridos
+- Implementar validaciones de dominio y reglas específicas para concursos.
+- Ampliar exportación a ADIF, PDF y otros formatos.
+- Desarrollar la UI base y los flujos principales de interacción.
+- Integrar sugerencias/autocompletado de indicativos.
+- Mejorar la gestión de metadatos y cierre de logs.
+- Pruebas automatizadas y documentación de los módulos clave.
+
+---
+
+Este documento refleja el estado actual del desarrollo y sirve como referencia para retomar el trabajo en cualquier momento.
