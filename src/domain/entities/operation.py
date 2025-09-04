@@ -1,16 +1,15 @@
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Optional
 from .operation_contact import OperationContact
+from .contact_log import ContactLog
 
 
 @dataclass
-class Operation:
-    type: str
-    operator: str
+class OperationLog(ContactLog):
+    type: str = ""
     band: str = ""
     frequency: str = ""
     mode: str = ""
     repeater: str = ""
-    created_at: str = ""
-    stations: List[OperationContact] = field(default_factory=list)
     schema_version: int = 1
+    contacts: List[OperationContact] = field(default_factory=list)
