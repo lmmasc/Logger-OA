@@ -100,17 +100,22 @@ class DBTableWindow(QWidget):
             QTableWidget.NoEditTriggers
         )  # Deshabilitar edición directa
         self.table.itemDoubleClicked.connect(self._on_item_double_clicked)
+
         # Botones para agregar y eliminar operador
-        btns_layout = QHBoxLayout()
         btn_add = QPushButton(translation_service.tr("add_operator"))
+        btn_add.setObjectName("AddOperatorButton")
         btn_add.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         btn_add.clicked.connect(self._on_add_operator)
         self.btn_add = btn_add
+
         btn_delete = QPushButton(translation_service.tr("delete_operator"))
+        btn_delete.setObjectName("DeleteOperatorButton")
         btn_delete.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         btn_delete.setEnabled(False)
         btn_delete.clicked.connect(self._on_delete_operator)
         self.btn_delete = btn_delete
+
+        btns_layout = QHBoxLayout()
         btns_layout.addWidget(btn_add)
         btns_layout.addWidget(btn_delete)
         main_layout.insertLayout(0, btns_layout)

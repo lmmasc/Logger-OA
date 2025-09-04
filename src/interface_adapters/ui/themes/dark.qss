@@ -1,7 +1,69 @@
+
 /* dark.qss
    Tema oscuro para la aplicación. */
-
 @import "base.qss";
+
+QMenuBar {
+    background: #232629;
+    color: #f5f5f5;
+}
+QMenuBar::item:selected {
+    background: #33373a;
+}
+QMenu {
+    background: #181a1b;
+    color: #f5f5f5;
+}
+QMenu::item:selected {
+    background: #388e3c;
+    color: #fff;
+}
+
+QPushButton#AddOperatorButton {
+    background-color: #181a1b;
+    color: #fff;
+    border-radius: 6px;
+    padding: 6px 18px;
+    font-weight: bold;
+    border: 2px solid #388e3c;
+}
+QPushButton#AddOperatorButton:hover {
+    border: 2px solid #43a047;
+    background-color: #232629;
+}
+QPushButton#AddOperatorButton:pressed {
+    border: 2px solid #2e7031;
+    background-color: #232629;
+}
+QPushButton#AddOperatorButton:disabled {
+    background-color: #232629;
+    color: #888;
+    border: 2px solid #444;
+    opacity: 0.7;
+}
+
+QPushButton#DeleteOperatorButton {
+    background-color: #181a1b;
+    color: #fff;
+    border-radius: 6px;
+    padding: 6px 18px;
+    font-weight: bold;
+    border: 2px solid #b71c1c;
+}
+QPushButton#DeleteOperatorButton:hover {
+    border: 2px solid #e53935;
+    background-color: #232629;
+}
+QPushButton#DeleteOperatorButton:pressed {
+    border: 2px solid #7f1010;
+    background-color: #232629;
+}
+QPushButton#DeleteOperatorButton:disabled {
+    background-color: #232629;
+    color: #888;
+    border: 2px solid #444;
+    opacity: 0.7;
+}
 
 QWidget {
     background-color: #232629;
