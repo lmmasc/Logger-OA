@@ -58,8 +58,8 @@ class DBTableWindow(QWidget):
         )
         self.filter_column_combo = QComboBox()
         self.filter_column_combo.setMinimumWidth(150)
-        filter_label = QLabel(translation_service.tr("filter_by"))
-        filter_layout.addWidget(filter_label)
+        self.filter_label = QLabel(translation_service.tr("filter_by"))
+        filter_layout.addWidget(self.filter_label)
         filter_layout.addWidget(self.filter_edit)
         filter_layout.addWidget(self.filter_column_combo)
         filter_layout.addStretch()
@@ -123,6 +123,13 @@ class DBTableWindow(QWidget):
 
     # --- Métodos de UI y traducción ---
     def retranslate_ui(self):
+        # Actualizar label y placeholder del filtro
+        if hasattr(self, "filter_label"):
+            self.filter_label.setText(translation_service.tr("filter_by"))
+        if hasattr(self, "filter_edit"):
+            self.filter_edit.setPlaceholderText(
+                translation_service.tr("filter_placeholder")
+            )
         """
         Actualiza los textos de la UI y los headers según el idioma actual.
         """
@@ -132,6 +139,11 @@ class DBTableWindow(QWidget):
         self.table.setHorizontalHeaderLabels(self.headers)
         self.filter_column_combo.clear()
         self.filter_column_combo.addItems(self.headers)
+        # Actualizar texto de los botones de agregar y eliminar operador
+        if hasattr(self, "btn_add"):
+            self.btn_add.setText(translation_service.tr("add_operator"))
+        if hasattr(self, "btn_delete"):
+            self.btn_delete.setText(translation_service.tr("delete_operator"))
         # Solo actualiza el texto de los checkboxes, sin recrearlos
         for idx, cb in enumerate(self.column_checkboxes):
             cb.blockSignals(True)
