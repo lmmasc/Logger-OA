@@ -76,14 +76,10 @@ class MainWindow(QMainWindow):
         self._connect_menu_actions()
 
         self._menu_action_map = {
-            "ops_new": self._action_ops_new,
-            "ops_open": self._action_ops_open,
-            "ops_export": self._action_ops_export,
-            "ops_close": self._action_ops_close,
-            "contest_new": self._action_contest_new,
-            "contest_open": self._action_contest_open,
-            "contest_export": self._action_contest_export,
-            "contest_close": self._action_contest_close,
+            "log_new": self._action_log_new,
+            "log_open": self._action_log_open,
+            "log_export": self._action_log_export,
+            "log_close": self._action_log_close,
             "db_import_pdf": self._action_db_import_pdf,
             "db_export": self._action_db_export,
             "db_delete": self._action_db_delete,
@@ -212,27 +208,15 @@ class MainWindow(QMainWindow):
         self.menu_bar.dark_theme_requested.connect(self.set_dark_theme)
         self.menu_bar.lang_es_requested.connect(lambda: self.set_language("es"))
         self.menu_bar.lang_en_requested.connect(lambda: self.set_language("en"))
-        self.menu_bar.ops_new_requested.connect(lambda: self._on_menu_action("ops_new"))
-        self.menu_bar.ops_open_requested.connect(
-            lambda: self._on_menu_action("ops_open")
+        self.menu_bar.log_new_requested.connect(lambda: self._on_menu_action("log_new"))
+        self.menu_bar.log_open_requested.connect(
+            lambda: self._on_menu_action("log_open")
         )
-        self.menu_bar.ops_export_requested.connect(
-            lambda: self._on_menu_action("ops_export")
+        self.menu_bar.log_export_requested.connect(
+            lambda: self._on_menu_action("log_export")
         )
-        self.menu_bar.ops_close_requested.connect(
-            lambda: self._on_menu_action("ops_close")
-        )
-        self.menu_bar.contest_new_requested.connect(
-            lambda: self._on_menu_action("contest_new")
-        )
-        self.menu_bar.contest_open_requested.connect(
-            lambda: self._on_menu_action("contest_open")
-        )
-        self.menu_bar.contest_export_requested.connect(
-            lambda: self._on_menu_action("contest_export")
-        )
-        self.menu_bar.contest_close_requested.connect(
-            lambda: self._on_menu_action("contest_close")
+        self.menu_bar.log_close_requested.connect(
+            lambda: self._on_menu_action("log_close")
         )
         self.menu_bar.db_import_pdf_requested.connect(
             lambda: self._on_menu_action("db_import_pdf")
@@ -281,30 +265,53 @@ class MainWindow(QMainWindow):
                 self, "Acción no implementada", f"No handler for {action}"
             )
 
-    # Handlers de acciones de menú
-    def _action_ops_new(self):
-        self.show_view("log_ops")
+    # Handler unificado para acciones de log
+    def _action_log_new(self):
+        """
+        Muestra un diálogo para elegir el tipo de log y cambia la vista.
+        """
+        dialog = QDialog(self)
+        dialog.setWindowTitle(translation_service.tr("select_log_type"))
+        layout = QVBoxLayout(dialog)
+        label = QLabel(translation_service.tr("select_log_type_label"))
+        layout.addWidget(label)
+        btn_ops = QPushButton(translation_service.tr("log_type_ops"), dialog)
+        btn_contest = QPushButton(translation_service.tr("log_type_contest"), dialog)
+        layout.addWidget(btn_ops)
+        layout.addWidget(btn_contest)
+        selected = {"type": None}
 
-    def _action_ops_open(self):
-        self.show_view("log_ops")
+        def select_ops():
+            selected["type"] = "ops"
+            dialog.accept()
 
-    def _action_ops_export(self):
-        self.show_view("log_ops")
+        def select_contest():
+            selected["type"] = "contest"
+            dialog.accept()
 
-    def _action_ops_close(self):
-        self.show_view("log_ops")
+        btn_ops.clicked.connect(select_ops)
+        btn_contest.clicked.connect(select_contest)
+        dialog.exec()
+        if selected["type"] == "ops":
+            self.show_view("log_ops")
+        elif selected["type"] == "contest":
+            self.show_view("log_contest")
 
-    def _action_contest_new(self):
-        self.show_view("log_contest")
+    def _action_log_open(self):
+        # Aquí puedes implementar lógica para abrir log y elegir tipo si es necesario
+        self._action_log_new()
 
-    def _action_contest_open(self):
-        self.show_view("log_contest")
+    def _action_log_export(self):
+        # Exportar el log actual según el tipo
+        current_view = self.view_manager.get_current_view_name()
+        if current_view == "log_ops":
+            self.show_view("log_ops")
+        elif current_view == "log_contest":
+            self.show_view("log_contest")
 
-    def _action_contest_export(self):
-        self.show_view("log_contest")
-
-    def _action_contest_close(self):
-        self.show_view("log_contest")
+    def _action_log_close(self):
+        # Cerrar el log actual y volver a la bienvenida
+        self.show_view("welcome")
 
     def _action_db_import_pdf(self) -> None:
         """

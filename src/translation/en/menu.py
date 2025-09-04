@@ -1,8 +1,7 @@
 # Menu translations (English)
 MENU_TRANSLATIONS = {
     "menu_file_menu": "File",
-    "menu_ops_menu": "Operations",
-    "menu_contest_menu": "Contest",
+    "menu_log_menu": "Log",
     "menu_database_menu": "Database",
     "menu_aspect_menu": "Appearance",
     "menu_language_menu": "Language",

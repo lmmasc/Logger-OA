@@ -1,8 +1,7 @@
 # Traducciones de menús (español)
 MENU_TRANSLATIONS = {
     "menu_file_menu": "Archivo",
-    "menu_ops_menu": "Operativo",
-    "menu_contest_menu": "Concurso",
+    "menu_log_menu": "Log",
     "menu_database_menu": "Base de datos",
     "menu_aspect_menu": "Aspecto",
     "menu_language_menu": "Idioma",

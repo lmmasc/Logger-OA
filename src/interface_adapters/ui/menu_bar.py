@@ -18,15 +18,11 @@ class MainMenuBar(QMenuBar):
     Expone señales personalizadas para desacoplar la lógica de UI.
     """
 
-    # Señales personalizadas para cada acción relevante
-    ops_new_requested = Signal()
-    ops_open_requested = Signal()
-    ops_export_requested = Signal()
-    ops_close_requested = Signal()
-    contest_new_requested = Signal()
-    contest_open_requested = Signal()
-    contest_export_requested = Signal()
-    contest_close_requested = Signal()
+    # Señales personalizadas para acciones de log unificadas
+    log_new_requested = Signal()
+    log_open_requested = Signal()
+    log_export_requested = Signal()
+    log_close_requested = Signal()
     db_import_pdf_requested = Signal()
     db_export_requested = Signal()
     db_show_requested = Signal()
@@ -56,31 +52,17 @@ class MainMenuBar(QMenuBar):
         self.file_menu.addAction(self.exit_action)
         self.addMenu(self.file_menu)
 
-        # Menú Operativo
-        self.operativo_menu = QMenu(translation_service.tr("menu_ops_menu"), self)
-        self.ops_new_action = QAction(translation_service.tr("menu_new"), self)
-        self.ops_open_action = QAction(translation_service.tr("menu_open"), self)
-        self.ops_export_action = QAction(translation_service.tr("menu_export"), self)
-        self.ops_close_action = QAction(translation_service.tr("menu_close"), self)
-        self.operativo_menu.addAction(self.ops_new_action)
-        self.operativo_menu.addAction(self.ops_open_action)
-        self.operativo_menu.addAction(self.ops_export_action)
-        self.operativo_menu.addAction(self.ops_close_action)
-        self.addMenu(self.operativo_menu)
-
-        # Menú Concurso
-        self.concurso_menu = QMenu(translation_service.tr("menu_contest_menu"), self)
-        self.contest_new_action = QAction(translation_service.tr("menu_new"), self)
-        self.contest_open_action = QAction(translation_service.tr("menu_open"), self)
-        self.contest_export_action = QAction(
-            translation_service.tr("menu_export"), self
-        )
-        self.contest_close_action = QAction(translation_service.tr("menu_close"), self)
-        self.concurso_menu.addAction(self.contest_new_action)
-        self.concurso_menu.addAction(self.contest_open_action)
-        self.concurso_menu.addAction(self.contest_export_action)
-        self.concurso_menu.addAction(self.contest_close_action)
-        self.addMenu(self.concurso_menu)
+        # Menú Log unificado
+        self.log_menu = QMenu(translation_service.tr("menu_log_menu"), self)
+        self.log_new_action = QAction(translation_service.tr("menu_new"), self)
+        self.log_open_action = QAction(translation_service.tr("menu_open"), self)
+        self.log_export_action = QAction(translation_service.tr("menu_export"), self)
+        self.log_close_action = QAction(translation_service.tr("menu_close"), self)
+        self.log_menu.addAction(self.log_new_action)
+        self.log_menu.addAction(self.log_open_action)
+        self.log_menu.addAction(self.log_export_action)
+        self.log_menu.addAction(self.log_close_action)
+        self.addMenu(self.log_menu)
 
         # Menú Base de datos
         self.database_menu = QMenu(translation_service.tr("menu_database_menu"), self)
@@ -137,14 +119,10 @@ class MainMenuBar(QMenuBar):
         """
         Conecta las acciones del menú a las señales personalizadas.
         """
-        self.ops_new_action.triggered.connect(self.ops_new_requested.emit)
-        self.ops_open_action.triggered.connect(self.ops_open_requested.emit)
-        self.ops_export_action.triggered.connect(self.ops_export_requested.emit)
-        self.ops_close_action.triggered.connect(self.ops_close_requested.emit)
-        self.contest_new_action.triggered.connect(self.contest_new_requested.emit)
-        self.contest_open_action.triggered.connect(self.contest_open_requested.emit)
-        self.contest_export_action.triggered.connect(self.contest_export_requested.emit)
-        self.contest_close_action.triggered.connect(self.contest_close_requested.emit)
+        self.log_new_action.triggered.connect(self.log_new_requested.emit)
+        self.log_open_action.triggered.connect(self.log_open_requested.emit)
+        self.log_export_action.triggered.connect(self.log_export_requested.emit)
+        self.log_close_action.triggered.connect(self.log_close_requested.emit)
         self.db_import_pdf_action.triggered.connect(self.db_import_pdf_requested.emit)
         self.db_export_action.triggered.connect(self.db_export_requested.emit)
         self.db_show_action.triggered.connect(self.db_show_requested.emit)
@@ -162,21 +140,11 @@ class MainMenuBar(QMenuBar):
         Actualiza los textos de todos los menús y acciones según el idioma actual.
         """
 
-        self.file_menu.setTitle(translation_service.tr("menu_file_menu"))
-        self.open_folder_action.setText(translation_service.tr("menu_open_folder"))
-        self.exit_action.setText(translation_service.tr("menu_exit"))
-
-        self.operativo_menu.setTitle(translation_service.tr("menu_ops_menu"))
-        self.ops_new_action.setText(translation_service.tr("menu_new"))
-        self.ops_open_action.setText(translation_service.tr("menu_open"))
-        self.ops_export_action.setText(translation_service.tr("menu_export"))
-        self.ops_close_action.setText(translation_service.tr("menu_close"))
-
-        self.concurso_menu.setTitle(translation_service.tr("menu_contest_menu"))
-        self.contest_new_action.setText(translation_service.tr("menu_new"))
-        self.contest_open_action.setText(translation_service.tr("menu_open"))
-        self.contest_export_action.setText(translation_service.tr("menu_export"))
-        self.contest_close_action.setText(translation_service.tr("menu_close"))
+        self.log_menu.setTitle(translation_service.tr("menu_log_menu"))
+        self.log_new_action.setText(translation_service.tr("menu_new"))
+        self.log_open_action.setText(translation_service.tr("menu_open"))
+        self.log_export_action.setText(translation_service.tr("menu_export"))
+        self.log_close_action.setText(translation_service.tr("menu_close"))
 
         self.database_menu.setTitle(translation_service.tr("menu_database_menu"))
         self.db_import_pdf_action.setText(

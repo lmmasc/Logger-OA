@@ -39,16 +39,21 @@
 4. Exportar log a CSV.
 
 ## 6. Validaciones y reglas de negocio (pendiente de profundizar)
-- Validaciones básicas en la capa de dominio (duplicados, formato de campos, etc.).
-- Validaciones específicas para concursos (no duplicados, reglas de intercambio, etc.).
+### Estado actual:
+- Validaciones genéricas y específicas refactorizadas en módulos independientes (`validators.py`, `contest_rules.py`, `operation_rules.py`).
+- Integración de validaciones en los casos de uso de gestión de contactos.
+- Estructura lista para agregar nuevas reglas y reglamentos.
 
 ## 7. Exportación (pendiente de ampliar)
 - Exportación a ADIF, PDF y otros formatos estándar de radioaficionados.
 - Servicios/utilidades para transformar los datos desde SQLite a los formatos requeridos.
 
 ## 8. UI/Interface Adapters (pendiente)
-- Ventanas separadas para Operativos y Concursos, basadas en una ventana base reutilizable.
-- Componentes: formulario de datos del log, tabla de contactos, campo de entrada con sugerencias, cola de espera.
+### Estado actual:
+- Ventana principal con `QStackedWidget` y vistas separadas para bienvenida, operativos y concursos.
+- Menú de log unificado con selector de tipo (operativo/concurso).
+- Sistema global de tema e idioma integrado en toda la UI.
+- Estructura lista para componentes compartidos (formulario, tabla, sugerencias, cola).
 
 ## 9. Extensibilidad
 - Arquitectura preparada para agregar nuevos tipos de logs, reglas o formatos de exportación sin modificar la lógica central.
@@ -62,7 +67,10 @@
 - Repositorio base para persistencia en SQLite.
 - Casos de uso para crear, abrir, editar y exportar logs y contactos.
 - Exportación a CSV funcional.
-- Commits realizados en cada etapa para trazabilidad.
+- Validaciones y reglas de negocio refactorizadas y extensibles.
+- Menú de log unificado y selector de tipo de log en la UI.
+- Integración completa de temas e idioma en la interfaz.
+- Estructura de UI lista para componentes compartidos y flujos avanzados.
 
 ## Próximos pasos sugeridos
 - Implementar validaciones de dominio y reglas específicas para concursos.
