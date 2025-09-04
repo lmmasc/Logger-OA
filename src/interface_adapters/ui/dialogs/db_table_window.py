@@ -236,7 +236,12 @@ class DBTableWindow(QWidget):
                     )
                     item = QTableWidgetItem(display)
                 else:
-                    value = getattr(op, key if key != "type" else "type_", "")
+                    attr = (
+                        "type_"
+                        if key == "type"
+                        else ("license_" if key == "license" else key)
+                    )
+                    value = getattr(op, attr, "")
                     item = QTableWidgetItem(str(value))
                 self.table.setItem(row_idx, col_idx, item)
         self.apply_column_visibility()
