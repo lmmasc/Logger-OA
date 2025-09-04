@@ -39,7 +39,7 @@ def normalize_callsign(raw: str) -> str:
 
 def extract_cutoff_date(text: str) -> str | None:
     m = re.search(
-        r"AL\s+(\d{1,2})\s+([A-Z\u00c1\u00c9\u00cd\u00d3\u00da\u00d1]+)\s+(\d{4})",
+        r"AL\s+(\d{1,2})\s+([A-Z\u00c1\u00c9\u00CD\u00d3\u00DA\u00d1]+)\s+(\d{4})",
         text,
         re.IGNORECASE,
     )
@@ -64,3 +64,22 @@ def extract_cutoff_date(text: str) -> str | None:
         if month_num:
             return f"{day.zfill(2)}/{month_num}/{year}"
     return None
+
+
+def filter_text_match(
+    haystack, needle, ignore_case=True, ignore_accents=True
+):  # noqa: C901
+    """
+    Devuelve True si needle está en haystack, con opciones para ignorar mayúsculas y tildes.
+    """
+    if ignore_case:
+        haystack = haystack.lower()
+        needle = needle.lower()
+    if ignore_accents:
+        haystack = (
+            unicodedata.normalize("NFKD", haystack).encode("ASCII", "ignore").decode()
+        )
+        needle = (
+            unicodedata.normalize("NFKD", needle).encode("ASCII", "ignore").decode()
+        )
+    return needle in haystack

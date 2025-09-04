@@ -20,6 +20,7 @@ from interface_adapters.controllers.radio_operator_controller import (
 )
 from translation.translation_service import translation_service
 from config.settings_service import settings_service
+from utils.text import filter_text_match
 
 
 class DBTableWindow(QWidget):
@@ -206,7 +207,7 @@ class DBTableWindow(QWidget):
         """
         Aplica el filtro de texto a la columna seleccionada en el combo.
         """
-        text = self.filter_edit.text().strip().lower()
+        text = self.filter_edit.text().strip()
         col = self.filter_column_combo.currentIndex()
         visible_count = 0
         for row in range(self.table.rowCount()):
@@ -215,8 +216,8 @@ class DBTableWindow(QWidget):
                 self.table.setRowHidden(row, False)
                 visible_count += 1
             else:
-                value = item.text().strip().lower() if item else ""
-                match = text in value
+                value = item.text().strip() if item else ""
+                match = filter_text_match(value, text)
                 self.table.setRowHidden(row, not match)
                 if match:
                     visible_count += 1
