@@ -44,6 +44,9 @@ class MainWindow(QMainWindow):
         gestor de temas y conecta las acciones del menú.
         """
         super().__init__()
+        self.current_log = None  # Estado del log abierto (None si no hay log)
+        self.current_log_type = None  # "ops" o "contest"
+
         # Leer idioma guardado o usar por defecto
         lang = settings_service.get_value("language", "es")
         translation_service.set_language(lang)
@@ -90,6 +93,7 @@ class MainWindow(QMainWindow):
         # 2. Al iniciar, actualizar checks de tema e idioma según configuración guardada
         # Llama este método al final del __init__
         self._set_initial_theme_and_language()
+        self.update_menu_state()  # Estado inicial del menú
 
     # =====================
     # Métodos públicos principales
@@ -193,6 +197,16 @@ class MainWindow(QMainWindow):
         lang = settings_service.get_value("language", "es")
         self.set_language(lang)
 
+    def update_menu_state(self):
+        """
+        Habilita/deshabilita las acciones del menú según el estado del log abierto.
+        """
+        log_open = self.current_log is not None
+        self.menu_bar.log_new_action.setEnabled(not log_open)
+        self.menu_bar.log_open_action.setEnabled(not log_open)
+        self.menu_bar.log_export_action.setEnabled(log_open)
+        self.menu_bar.log_close_action.setEnabled(log_open)
+
     # =====================
     # Métodos de conexión de menús y handlers de acciones
     # =====================
@@ -268,7 +282,7 @@ class MainWindow(QMainWindow):
     # Handler unificado para acciones de log
     def _action_log_new(self):
         """
-        Muestra un diálogo para elegir el tipo de log y cambia la vista.
+        Muestra un diálogo para elegir el tipo de log y crea el archivo SQLite usando el módulo de paths y casos de uso.
         """
         dialog = QDialog(self)
         dialog.setWindowTitle(translation_service.tr("select_log_type"))
@@ -292,14 +306,63 @@ class MainWindow(QMainWindow):
         btn_ops.clicked.connect(select_ops)
         btn_contest.clicked.connect(select_contest)
         dialog.exec()
-        if selected["type"] == "ops":
-            self.show_view("log_ops")
-        elif selected["type"] == "contest":
-            self.show_view("log_contest")
+        if selected["type"] in ("ops", "contest"):
+            # Aquí integrar lógica para crear y abrir log de operaciones/concurso
+            self.current_log = object()  # Simulación de log creado
+            self.current_log_type = selected["type"]
+            self.show_view(f"log_{self.current_log_type}")
+        else:
+            self.current_log = None
+            self.current_log_type = None
+            self.show_view("welcome")
+        self.update_menu_state()
 
     def _action_log_open(self):
-        # Aquí puedes implementar lógica para abrir log y elegir tipo si es necesario
-        self._action_log_new()
+        """
+        Abre un log existente usando el módulo de paths y casos de uso.
+        """
+        file_path, _ = QFileDialog.getOpenFileName(
+            self,
+            translation_service.tr("open_log"),
+            "",
+            "SQLite Files (*.sqlite);;All Files (*)",
+        )
+        if file_path:
+            try:
+                from application.use_cases.open_log import open_log
+
+                log = open_log(file_path)
+                self.current_log = log
+                # Determinar tipo de log por instancia
+                if hasattr(
+                    log, "__class__"
+                ) and log.__class__.__name__.lower().startswith("operation"):
+                    self.current_log_type = "ops"
+                elif hasattr(
+                    log, "__class__"
+                ) and log.__class__.__name__.lower().startswith("contest"):
+                    self.current_log_type = "contest"
+                else:
+                    self.current_log_type = None
+                if self.current_log_type:
+                    self.show_view(f"log_{self.current_log_type}")
+                else:
+                    self.show_view("welcome")
+                    self.current_log = None
+            except Exception as e:
+                QMessageBox.critical(
+                    self,
+                    translation_service.tr("main_window_title"),
+                    f"{translation_service.tr('open_failed')}: {e}",
+                )
+                self.current_log = None
+                self.current_log_type = None
+                self.show_view("welcome")
+        else:
+            self.current_log = None
+            self.current_log_type = None
+            self.show_view("welcome")
+        self.update_menu_state()
 
     def _action_log_export(self):
         # Exportar el log actual según el tipo
@@ -310,8 +373,13 @@ class MainWindow(QMainWindow):
             self.show_view("log_contest")
 
     def _action_log_close(self):
-        # Cerrar el log actual y volver a la bienvenida
+        """
+        Cierra el log actual y regresa a la vista de bienvenida.
+        """
+        self.current_log = None
+        self.current_log_type = None
         self.show_view("welcome")
+        self.update_menu_state()
 
     def _action_db_import_pdf(self) -> None:
         """
