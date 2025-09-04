@@ -1,7 +1,0 @@
-Introducir una capa de servicios para desacoplar UI y lógica de negocio.
-Refactorizar funciones largas en funciones pequeñas y testeables.
-Usar repositorios como interfaces para acceso a datos.
-Mejorar la organización de utilidades si crecen.
-Centralizar la gestión de configuración y traducción.
-Crear una estructura de tests unitarios.
-Mantener la UI desacoplada de la lógica de negocio y datos.
