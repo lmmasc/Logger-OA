@@ -2,6 +2,9 @@ from src.domain.repositories.contact_log_repository import ContactLogRepository
 from src.domain.entities.operation_contact import OperationContact
 from src.domain.entities.contest_contact import ContestContact
 from src.domain.entities.contact_log import ContactLog
+from src.domain.validators import LogValidator
+from src.domain.contest_rules import ContestRules
+from src.domain.operation_rules import OperationRules
 
 
 def add_contact_to_log(
@@ -21,9 +24,16 @@ def add_contact_to_log(
         contact = ContestContact(**contact_data)
     else:
         raise ValueError("Tipo de contacto no soportado")
-    # Validar usando ContactLog
-    log = ContactLog(id=log_id, contacts=contacts)
-    log.add_contact(contact)  # Lanza excepción si hay error
+    # Validaciones genéricas
+    errors = LogValidator.validate_contact(contact, contacts)
+    # Validaciones específicas
+    if contact_type == "operativo":
+        errors += OperationRules.validate(contact, contacts)
+    elif contact_type == "concurso":
+        errors += ContestRules.validate(contact, contacts)
+    if errors:
+        raise ValueError("; ".join(errors))
+    # Si todo es válido, guardar
     repo.save_contact(log_id, contact)
     return contact
 
@@ -57,7 +67,15 @@ def update_contact_in_log(
         contact = ContestContact(**updated_data)
     else:
         raise ValueError("Tipo de contacto no soportado")
-    log = ContactLog(id=log_id, contacts=contacts)
-    log.add_contact(contact)  # Lanza excepción si hay error
+    # Validaciones genéricas
+    errors = LogValidator.validate_contact(contact, contacts)
+    # Validaciones específicas
+    if contact_type == "operativo":
+        errors += OperationRules.validate(contact, contacts)
+    elif contact_type == "concurso":
+        errors += ContestRules.validate(contact, contacts)
+    if errors:
+        raise ValueError("; ".join(errors))
+    # Si todo es válido, guardar
     repo.save_contact(log_id, contact)
     return contact
