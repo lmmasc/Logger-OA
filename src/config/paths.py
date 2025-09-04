@@ -54,3 +54,18 @@ def file_exists(path):
     Verifica si un archivo existe.
     """
     return Path(path).exists()
+
+
+def get_log_file_path(operator_callsign: str, log_type: str, timestamp: str) -> str:
+    """
+    Genera el path absoluto para un archivo de log SQLite según el tipo (operativo/concurso),
+    el indicativo del operador y el timestamp.
+    Ejemplo: /.../operativos/LU1ABC_operativo_20250904T153000.sqlite
+    """
+    log_type_folder = {"operativo": "operativos", "concurso": "concursos"}.get(
+        log_type.lower(), "otros"
+    )
+    folder = os.path.join(BASE_DIR, log_type_folder)
+    ensure_dir_exists(folder)
+    filename = f"{operator_callsign}_{log_type}_{timestamp}.sqlite"
+    return os.path.join(folder, filename)
