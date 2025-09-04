@@ -53,7 +53,13 @@
 - Ventana principal con `QStackedWidget` y vistas separadas para bienvenida, operativos y concursos.
 - Menú de log unificado con selector de tipo (operativo/concurso).
 - Sistema global de tema e idioma integrado en toda la UI.
-- Estructura lista para componentes compartidos (formulario, tabla, sugerencias, cola).
+- Componentes compartidos implementados:
+  - `LogFormWidget`: formulario base reutilizable para datos de contacto/log.
+  - `ContactTableWidget`: tabla adaptable para mostrar contactos agregados.
+  - `CallsignSuggestionWidget`: campo de entrada con autocompletado de indicativos.
+  - `ContactQueueWidget`: visualización de la cola de contactos en espera.
+- Integración de estos componentes en las views de operativos y concursos.
+- Estructura lista para conectar lógica de datos y eventos.
 
 ## 9. Extensibilidad
 - Arquitectura preparada para agregar nuevos tipos de logs, reglas o formatos de exportación sin modificar la lógica central.
@@ -70,13 +76,12 @@
 - Validaciones y reglas de negocio refactorizadas y extensibles.
 - Menú de log unificado y selector de tipo de log en la UI.
 - Integración completa de temas e idioma en la interfaz.
-- Estructura de UI lista para componentes compartidos y flujos avanzados.
+- Componentes compartidos de UI implementados e integrados en las vistas principales.
 
 ## Próximos pasos sugeridos
-- Implementar validaciones de dominio y reglas específicas para concursos.
+- Finalizar la conexión de los componentes UI con la lógica de datos y eventos.
+- Implementar validaciones de dominio y reglas específicas para concursos y operativos.
 - Ampliar exportación a ADIF, PDF y otros formatos.
-- Desarrollar la UI base y los flujos principales de interacción.
-- Integrar sugerencias/autocompletado de indicativos.
 - Mejorar la gestión de metadatos y cierre de logs.
 - Pruebas automatizadas y documentación de los módulos clave.
 
