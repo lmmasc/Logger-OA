@@ -13,7 +13,7 @@ def show_db_window(self):
     Muestra la ventana de tabla de base de datos como instancia única.
     """
     try:
-        from .dialogs.db_table_window import DBTableWindow
+        from .views.db_table_window import DBTableWindow
 
         if self.db_table_window is not None and self.db_table_window.isVisible():
             self.db_table_window.raise_()

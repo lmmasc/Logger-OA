@@ -294,7 +294,9 @@ class DBTableWindow(QWidget):
             None,
         )
         if operator:
-            from .operator_edit_dialog import OperatorEditDialog
+            from interface_adapters.ui.dialogs.operator_edit_dialog import (
+                OperatorEditDialog,
+            )
 
             dlg = OperatorEditDialog(operator, self)
             if dlg.exec() == QDialog.Accepted and dlg.result_operator:
@@ -308,7 +310,9 @@ class DBTableWindow(QWidget):
         """
         Abre el diálogo de alta manual de operador y agrega el registro si es válido.
         """
-        from .operator_edit_dialog import OperatorEditDialog
+        from interface_adapters.ui.dialogs.operator_edit_dialog import (
+            OperatorEditDialog,
+        )
         from PySide6.QtWidgets import QDialog
 
         dlg = OperatorEditDialog(parent=self)

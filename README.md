@@ -49,7 +49,7 @@ src/
     repositories/          # Repositorios concretos
   interface_adapters/      # Adaptadores de interfaz
     ui/                    # Interfaz gráfica (PySide6)
-      views/               # Vistas principales (Welcome, LogOps, LogContest, etc.)
+      views/               # Vistas principales (Welcome, LogOps, LogContest, DBTableWindow, etc.)
       dialogs/             # Diálogos y ventanas auxiliares (incl. feedback visual)
       themes/              # Temas visuales (claro/oscuro)
     controllers/           # Controladores de UI
