@@ -68,6 +68,22 @@ tests/                     # Pruebas unitarias y de integración
 
 ---
 
+## Modularización y Arquitectura de la UI
+
+La interfaz gráfica principal (`MainWindow`) está dividida en módulos temáticos para facilitar el mantenimiento y la escalabilidad. Los archivos con prefijo `main_window_` agrupan la lógica de acciones, diálogos, configuración, gestión de vistas y ventanas secundarias:
+
+```
+interface_adapters/ui/
+  main_window.py                  # Clase principal de la ventana
+  main_window_actions.py          # Handlers de acciones del menú
+  main_window_dialogs.py          # Diálogos personalizados
+  main_window_config.py           # Configuración y actualización de UI
+  main_window_view_management.py  # Gestión de vistas y navegación
+  main_window_db_window.py        # Gestión de ventana de base de datos
+```
+
+---
+
 ## Dependencias
 
 **Principales:**
@@ -114,6 +130,56 @@ Instalación automática desde `requirements.txt` y `requirements-dev.txt`.
 3. **Gestión de Concursos y Operaciones**: Crea, edita y exporta logs de concursos y operaciones.
 4. **Temas e Idioma**: Cambia entre tema claro/oscuro y selecciona idioma desde el menú principal.
 5. **Persistencia**: Todos los datos se guardan automáticamente en la base SQLite local.
+
+---
+
+## Pruebas
+
+Las pruebas unitarias y de integración se encuentran en la carpeta `tests/` y utilizan `pytest`.
+
+Para ejecutar todas las pruebas:
+```bash
+pytest
+```
+
+---
+
+## Internacionalización y Traducciones
+
+El sistema de traducciones es modular y extensible. Los archivos de traducción se encuentran en `src/translation/<idioma>/` y están organizados por secciones (`ui.py`, `menu.py`, `messages.py`, etc.).
+
+Para agregar un nuevo idioma:
+1. Crea una carpeta en `src/translation/` con el código del idioma (ej: `fr/` para francés).
+2. Copia y adapta los archivos de traducción existentes.
+3. El loader central (`translations.py`) combinará automáticamente los módulos.
+
+---
+
+## Scripts de Build Multiplataforma
+
+En la carpeta `scripts/` hay scripts para generar ejecutables en Linux, macOS y Windows usando PyInstaller:
+- `build-linux.sh`
+- `build-mac.sh`
+- `build-windows.bat`
+
+Ejecuta el script correspondiente para generar el ejecutable standalone.
+
+---
+
+## Contribución
+
+¡Contribuciones son bienvenidas! Para colaborar:
+- Sigue la arquitectura y estilo modular del proyecto.
+- Usa `pytest` para pruebas.
+- Reporta bugs o solicita mejoras vía issues en el repositorio.
+- Antes de hacer un pull request, asegúrate de que las pruebas pasen y la documentación esté actualizada.
+
+---
+
+## Requisitos del Sistema
+- Python >= 3.10
+- Linux, Windows o macOS
+- Recomendado: entorno virtual para aislar dependencias
 
 ---
 
