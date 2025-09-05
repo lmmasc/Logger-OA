@@ -22,6 +22,29 @@ from .views.log_ops_view import LogOpsView
 from .views.log_contest_view import LogContestView
 from .view_manager import ViewManager
 from application.use_cases.update_operators_from_pdf import update_operators_from_pdf
+from .main_window_actions import (
+    action_log_new,
+    action_log_open,
+    action_log_export,
+    action_log_close,
+    action_db_import_pdf,
+    action_db_export,
+    action_db_delete,
+    on_menu_action,
+)
+from .main_window_dialogs import show_about_dialog
+from .main_window_config import (
+    set_language,
+    set_light_theme,
+    set_dark_theme,
+    _set_initial_theme_and_language,
+    _update_theme_menu_checks,
+    _update_language_menu_checks,
+    refresh_ui,
+    _retranslate_ui,
+)
+from .main_window_view_management import show_view as mw_show_view
+from .main_window_db_window import show_db_window, on_db_table_window_closed
 
 """
 Módulo de la ventana principal de la aplicación.
@@ -78,21 +101,11 @@ class MainWindow(QMainWindow):
         # Conectar acciones del menú de forma explícita
         self._connect_menu_actions()
 
-        self._menu_action_map = {
-            "log_new": self._action_log_new,
-            "log_open": self._action_log_open,
-            "log_export": self._action_log_export,
-            "log_close": self._action_log_close,
-            "db_import_pdf": self._action_db_import_pdf,
-            "db_export": self._action_db_export,
-            "db_delete": self._action_db_delete,
-        }
-
         # --- CORRECCIONES Y MEJORAS ---
         # 1. show_view debe ser método de instancia (faltaba tras refactor)
         # 2. Al iniciar, actualizar checks de tema e idioma según configuración guardada
         # Llama este método al final del __init__
-        self._set_initial_theme_and_language()
+        _set_initial_theme_and_language(self)
         self.update_menu_state()  # Estado inicial del menú
 
     # =====================
@@ -100,102 +113,31 @@ class MainWindow(QMainWindow):
     # =====================
 
     def show_view(self, view_name: str) -> None:
-        """
-        Cambia la vista central según el nombre dado usando el gestor de vistas.
-
-        Args:
-                view_name (str): Nombre de la vista a mostrar.
-        """
-        self.view_manager.show_view(view_name)
-
-    def refresh_ui(self) -> None:
-        """
-        Refresca todos los textos y checks de la interfaz gráfica según el idioma y tema actual.
-        Llama a este método tras cambiar idioma o tema para garantizar consistencia visual.
-        """
-        self.setWindowTitle(translation_service.tr("main_window_title"))
-        if hasattr(self.menu_bar, "retranslate_ui"):
-            self.menu_bar.retranslate_ui()
-        for view in self.view_manager.views.values():
-            if hasattr(view, "retranslate_ui"):
-                view.retranslate_ui()
-        if self.db_table_window is not None and hasattr(
-            self.db_table_window, "retranslate_ui"
-        ):
-            self.db_table_window.retranslate_ui()
-        self._update_language_menu_checks()
-        self._update_theme_menu_checks()
-
-    # =====================
-    # Métodos de configuración y actualización de UI
-    # =====================
+        mw_show_view(self, view_name)
 
     def set_language(self, lang: str) -> None:
-        """
-        Cambia el idioma de la aplicación, lo guarda en la configuración y actualiza los textos de la interfaz.
-        Solo guarda si el idioma realmente cambió.
-
-        Args:
-                lang (str): Código del idioma a establecer ("es" o "en").
-        """
-        translation_service.set_language(lang)
-        current_lang = settings_service.get_value("language", "es")
-        if current_lang != lang:
-            settings_service.set_value("language", lang)
-        self.refresh_ui()
+        set_language(self, lang)
 
     def set_light_theme(self) -> None:
-        """
-        Aplica el tema claro a la aplicación y actualiza la interfaz.
-        """
-        self.theme_manager.apply_theme("light")
-        self.refresh_ui()
+        set_light_theme(self)
 
     def set_dark_theme(self) -> None:
-        """
-        Aplica el tema oscuro a la aplicación y actualiza la interfaz.
-        """
-        self.theme_manager.apply_theme("dark")
-        self.refresh_ui()
-
-    def _update_theme_menu_checks(self) -> None:
-        """
-        Actualiza el estado (checked) de las acciones del menú de temas según el tema actual.
-        """
-        theme = self.theme_manager.current_theme
-        self.menu_bar.light_theme_action.setChecked(theme == "light")
-        self.menu_bar.dark_theme_action.setChecked(theme == "dark")
-
-    def _update_language_menu_checks(self) -> None:
-        """
-        Actualiza el estado (checked) de las acciones del menú de idioma según el idioma actual.
-        """
-        current_lang = translation_service.get_language()
-        self.menu_bar.lang_es_action.setChecked(current_lang == "es")
-        self.menu_bar.lang_en_action.setChecked(current_lang == "en")
-
-    def _retranslate_ui(self) -> None:
-        """
-        Actualiza los textos de la interfaz según el idioma seleccionado.
-        """
-        self.setWindowTitle(translation_service.tr("main_window_title"))
-        if hasattr(self.menu_bar, "retranslate_ui"):
-            self.menu_bar.retranslate_ui()
-        for view in self.view_manager.views.values():
-            if hasattr(view, "retranslate_ui"):
-                view.retranslate_ui()
+        set_dark_theme(self)
 
     def _set_initial_theme_and_language(self) -> None:
-        """
-        Aplica el tema y el idioma guardados al iniciar la aplicación.
-        """
-        theme = self.theme_manager.current_theme
-        if theme == "dark":
-            self.set_dark_theme()
-        else:
-            self.set_light_theme()
-        lang = settings_service.get_value("language", "es")
-        self.set_language(lang)
+        _set_initial_theme_and_language(self)
+
+    def _update_theme_menu_checks(self) -> None:
+        _update_theme_menu_checks(self)
+
+    def _update_language_menu_checks(self) -> None:
+        _update_language_menu_checks(self)
+
+    def refresh_ui(self) -> None:
+        refresh_ui(self)
+
+    def _retranslate_ui(self) -> None:
+        _retranslate_ui(self)
 
     def update_menu_state(self):
         """
@@ -216,29 +158,21 @@ class MainWindow(QMainWindow):
         Conecta las señales personalizadas de la barra de menús a los handlers de MainWindow.
         """
         self.menu_bar.exit_requested.connect(self.close)
-        self.menu_bar.about_requested.connect(self.show_about_dialog)
+        self.menu_bar.about_requested.connect(lambda: show_about_dialog(self))
         self.menu_bar.open_folder_requested.connect(self._open_data_folder)
         self.menu_bar.light_theme_requested.connect(self.set_light_theme)
         self.menu_bar.dark_theme_requested.connect(self.set_dark_theme)
         self.menu_bar.lang_es_requested.connect(lambda: self.set_language("es"))
         self.menu_bar.lang_en_requested.connect(lambda: self.set_language("en"))
-        self.menu_bar.log_new_requested.connect(lambda: self._on_menu_action("log_new"))
-        self.menu_bar.log_open_requested.connect(
-            lambda: self._on_menu_action("log_open")
-        )
-        self.menu_bar.log_export_requested.connect(
-            lambda: self._on_menu_action("log_export")
-        )
-        self.menu_bar.log_close_requested.connect(
-            lambda: self._on_menu_action("log_close")
-        )
+        self.menu_bar.log_new_requested.connect(lambda: action_log_new(self))
+        self.menu_bar.log_open_requested.connect(lambda: action_log_open(self))
+        self.menu_bar.log_export_requested.connect(lambda: action_log_export(self))
+        self.menu_bar.log_close_requested.connect(lambda: action_log_close(self))
         self.menu_bar.db_import_pdf_requested.connect(
-            lambda: self._on_menu_action("db_import_pdf")
+            lambda: action_db_import_pdf(self)
         )
-        self.menu_bar.db_export_requested.connect(
-            lambda: self._on_menu_action("db_export")
-        )
-        self.menu_bar.db_delete_requested.connect(self._action_db_delete)
+        self.menu_bar.db_export_requested.connect(lambda: action_db_export(self))
+        self.menu_bar.db_delete_requested.connect(lambda: action_db_delete(self))
         self.menu_bar.db_show_requested.connect(self._show_db_window)
 
     def _open_data_folder(self) -> None:
@@ -259,347 +193,18 @@ class MainWindow(QMainWindow):
         window_geometry.moveCenter(screen_geometry.center())
         self.move(window_geometry.topLeft())
 
-    def show_about_dialog(self):
-        """
-        Muestra un cuadro de diálogo con información sobre la aplicación.
-        """
-
-        QMessageBox.information(
-            self,
-            translation_service.tr("about"),
-            translation_service.tr("about_message"),
-        )
-
     def _on_menu_action(self, action: str):
-        handler = self._menu_action_map.get(action)
-        if handler:
-            handler()
-        else:
-            QMessageBox.warning(
-                self, "Acción no implementada", f"No handler for {action}"
-            )
-
-    # Handler unificado para acciones de log
-    def _action_log_new(self):
-        """
-        Muestra un diálogo para elegir el tipo de log y el indicativo, y crea el archivo SQLite en la carpeta correspondiente usando el módulo de paths y casos de uso.
-        """
-        dialog = QDialog(self)
-        dialog.setWindowTitle(translation_service.tr("select_log_type"))
-        layout = QVBoxLayout(dialog)
-        label = QLabel(translation_service.tr("select_log_type_label"))
-        layout.addWidget(label)
-        btn_ops = QPushButton(translation_service.tr("log_type_ops"), dialog)
-        btn_contest = QPushButton(translation_service.tr("log_type_contest"), dialog)
-        layout.addWidget(btn_ops)
-        layout.addWidget(btn_contest)
-        selected = {"type": None}
-
-        def select_ops():
-            selected["type"] = "operativo"
-            dialog.accept()
-
-        def select_contest():
-            selected["type"] = "concurso"
-            dialog.accept()
-
-        btn_ops.clicked.connect(select_ops)
-        btn_contest.clicked.connect(select_contest)
-        dialog.exec()
-
-        if selected["type"]:
-            # Pedir indicativo
-            indicativo_dialog = QDialog(self)
-            indicativo_dialog.setWindowTitle(translation_service.tr("enter_callsign"))
-            indicativo_layout = QVBoxLayout(indicativo_dialog)
-            indicativo_label = QLabel(translation_service.tr("callsign"))
-            indicativo_layout.addWidget(indicativo_label)
-            indicativo_input = QPushButton()
-            from PySide6.QtWidgets import QLineEdit
-
-            callsign_edit = QLineEdit(indicativo_dialog)
-            indicativo_layout.addWidget(callsign_edit)
-            ok_btn = QPushButton(translation_service.tr("ok_button"), indicativo_dialog)
-            indicativo_layout.addWidget(ok_btn)
-            indicativo = {"callsign": None}
-
-            def set_callsign():
-                indicativo["callsign"] = callsign_edit.text().strip()
-                indicativo_dialog.accept()
-
-            ok_btn.clicked.connect(set_callsign)
-            indicativo_dialog.exec()
-            if indicativo["callsign"]:
-                from application.use_cases.create_log import create_log
-
-                db_path, log = create_log(selected["type"], indicativo["callsign"])
-                self.current_log = log
-                self.current_log_type = (
-                    "ops" if selected["type"] == "operativo" else "contest"
-                )
-                self.show_view(f"log_{self.current_log_type}")
-            else:
-                self.current_log = None
-                self.current_log_type = None
-                self.show_view("welcome")
-        else:
-            self.current_log = None
-            self.current_log_type = None
-            self.show_view("welcome")
-        self.update_menu_state()
-
-    def _action_log_open(self):
-        """
-        Permite al usuario seleccionar el tipo de log y luego abre el diálogo en la carpeta correspondiente.
-        """
-        # Diálogo para seleccionar tipo de log
-        dialog = QDialog(self)
-        dialog.setWindowTitle(translation_service.tr("select_log_type"))
-        layout = QVBoxLayout(dialog)
-        label = QLabel(translation_service.tr("select_log_type_label"))
-        layout.addWidget(label)
-        btn_ops = QPushButton(translation_service.tr("log_type_ops"), dialog)
-        btn_contest = QPushButton(translation_service.tr("log_type_contest"), dialog)
-        layout.addWidget(btn_ops)
-        layout.addWidget(btn_contest)
-        selected = {"type": None}
-
-        def select_ops():
-            selected["type"] = "operativo"
-            dialog.accept()
-
-        def select_contest():
-            selected["type"] = "concurso"
-            dialog.accept()
-
-        btn_ops.clicked.connect(select_ops)
-        btn_contest.clicked.connect(select_contest)
-        dialog.exec()
-
-        if selected["type"]:
-            from config.paths import get_log_path
-
-            log_folder = os.path.join(
-                get_log_path(),
-                "operativos" if selected["type"] == "operativo" else "concursos",
-            )
-            os.makedirs(log_folder, exist_ok=True)
-            file_path, _ = QFileDialog.getOpenFileName(
-                self,
-                translation_service.tr("open_log"),
-                log_folder,
-                "SQLite Files (*.sqlite);;All Files (*)",
-            )
-            if file_path:
-                try:
-                    from application.use_cases.open_log import open_log
-
-                    log = open_log(file_path)
-                    self.current_log = log
-                    # Determinar tipo de log por instancia
-                    if hasattr(
-                        log, "__class__"
-                    ) and log.__class__.__name__.lower().startswith("operation"):
-                        self.current_log_type = "ops"
-                    elif hasattr(
-                        log, "__class__"
-                    ) and log.__class__.__name__.lower().startswith("contest"):
-                        self.current_log_type = "contest"
-                    else:
-                        self.current_log_type = None
-                    if self.current_log_type:
-                        self.show_view(f"log_{self.current_log_type}")
-                    else:
-                        self.show_view("welcome")
-                        self.current_log = None
-                except Exception as e:
-                    QMessageBox.critical(
-                        self,
-                        translation_service.tr("main_window_title"),
-                        f"{translation_service.tr('open_failed')}: {e}",
-                    )
-                    self.current_log = None
-                    self.current_log_type = None
-                    self.show_view("welcome")
-            else:
-                self.current_log = None
-                self.current_log_type = None
-                self.show_view("welcome")
-        else:
-            self.current_log = None
-            self.current_log_type = None
-            self.show_view("welcome")
-        self.update_menu_state()
-
-    def _action_log_export(self):
-        # Exportar el log actual según el tipo
-        current_view = self.view_manager.get_current_view_name()
-        if current_view == "log_ops":
-            self.show_view("log_ops")
-        elif current_view == "log_contest":
-            self.show_view("log_contest")
-
-    def _action_log_close(self):
-        """
-        Cierra el log actual y regresa a la vista de bienvenida.
-        """
-        self.current_log = None
-        self.current_log_type = None
-        self.show_view("welcome")
-        self.update_menu_state()
-
-    def _action_db_import_pdf(self) -> None:
-        """
-        Handler para importar operadores desde PDF. Muestra spinner y asegura repintado antes del proceso bloqueante.
-        """
-        from PySide6.QtCore import QTimer
-
-        file_path, _ = QFileDialog.getOpenFileName(
-            self,
-            translation_service.tr("import_from_pdf"),
-            "",
-            "PDF Files (*.pdf)",
-        )
-        if file_path:
-            wait_dialog = QDialog(self)
-            wait_dialog.setWindowTitle(translation_service.tr("main_window_title"))
-            wait_dialog.setModal(True)
-            layout = QVBoxLayout(wait_dialog)
-            label = QLabel(translation_service.tr("wait_message"))
-            label.setAlignment(Qt.AlignCenter)
-            layout.addWidget(label)
-            wait_dialog.setFixedSize(300, 100)
-            wait_dialog.show()
-            QApplication.processEvents()
-
-            def do_import():
-                try:
-                    result = update_operators_from_pdf(file_path)
-                except Exception as e:
-                    wait_dialog.close()
-                    QMessageBox.critical(
-                        self,
-                        translation_service.tr("main_window_title"),
-                        f"{translation_service.tr('import_failed')}: {e}",
-                    )
-                    return
-                wait_dialog.close()
-                # --- NUEVO: Mostrar resumen si está disponible ---
-                if isinstance(result, dict) and result.get("ok"):
-                    summary = result
-                    summary_lines = [
-                        translation_service.tr("import_summary_total").format(
-                            summary.get("total", 0)
-                        ),
-                        translation_service.tr("import_summary_new").format(
-                            summary.get("new", 0)
-                        ),
-                        translation_service.tr("import_summary_updated").format(
-                            summary.get("updated", 0)
-                        ),
-                        translation_service.tr("import_summary_unchanged").format(
-                            summary.get("unchanged", 0)
-                        ),
-                        translation_service.tr("import_summary_disabled").format(
-                            summary.get("disabled", 0)
-                        ),
-                        translation_service.tr("import_summary_reenabled").format(
-                            summary.get("reenabled", 0)
-                        ),
-                    ]
-                    if "protected" in summary:
-                        summary_lines.append(
-                            translation_service.tr("import_summary_protected").format(
-                                summary["protected"]
-                            )
-                        )
-                    # No mostrar 'ok' en el resumen, ya que solo indica éxito/fallo
-                    msg = "<br>".join(summary_lines)
-                    QMessageBox.information(
-                        self,
-                        translation_service.tr("main_window_title"),
-                        msg,
-                    )
-                elif result:
-                    QMessageBox.information(
-                        self,
-                        translation_service.tr("main_window_title"),
-                        translation_service.tr("import_success"),
-                    )
-                else:
-                    QMessageBox.warning(
-                        self,
-                        translation_service.tr("main_window_title"),
-                        translation_service.tr("import_failed"),
-                    )
-
-            QTimer.singleShot(100, do_import)  # 100 ms para asegurar repintado
-
-    def _action_db_export(self):
-        # Lógica de exportar base de datos
-        pass
-
-    def _action_db_delete(self):
-        """
-        Handler para borrar y recrear la base de datos, mostrando advertencia y confirmación.
-        """
-        from translation.translation_service import translation_service
-        from infrastructure.db.reset import reset_database
-
-        yes_text = translation_service.tr("yes_button")
-        no_text = translation_service.tr("no_button")
-        box = QMessageBox(self)
-        box.setWindowTitle(translation_service.tr("delete_db_confirm"))
-        box.setText(translation_service.tr("delete_db_warning"))
-        yes_button = box.addButton(yes_text, QMessageBox.YesRole)
-        no_button = box.addButton(no_text, QMessageBox.NoRole)
-        box.setDefaultButton(no_button)
-        box.exec()
-        if box.clickedButton() == yes_button:
-            try:
-                reset_database()
-                QMessageBox.information(
-                    self,
-                    translation_service.tr("main_window_title"),
-                    translation_service.tr("delete_db_success"),
-                )
-            except Exception as e:
-                QMessageBox.critical(
-                    self,
-                    translation_service.tr("main_window_title"),
-                    f"{translation_service.tr('import_failed')}: {e}",
-                )
-        else:
-            QMessageBox.information(
-                self,
-                translation_service.tr("main_window_title"),
-                translation_service.tr("delete_db_cancel"),
-            )
+        on_menu_action(self, action)
 
     # =====================
     # Métodos de gestión de ventanas secundarias
     # =====================
 
     def _show_db_window(self):
-        """Muestra la ventana de tabla de base de datos como instancia única."""
-        try:
-            from .dialogs.db_table_window import DBTableWindow
-
-            if self.db_table_window is not None and self.db_table_window.isVisible():
-                self.db_table_window.raise_()
-                self.db_table_window.activateWindow()
-                return
-            self.db_table_window = DBTableWindow(self)
-            self.db_table_window.setAttribute(Qt.WA_DeleteOnClose)
-            self.db_table_window.destroyed.connect(self._on_db_table_window_closed)
-            self.db_table_window.show()
-        except Exception as e:
-            QMessageBox.warning(
-                self, translation_service.tr("main_window_title"), str(e)
-            )
+        show_db_window(self)
 
     def _on_db_table_window_closed(self, *args):
-        self.db_table_window = None
+        on_db_table_window_closed(self, *args)
 
     def closeEvent(self, event):
         # Cerrar la ventana de tabla de base de datos si está abierta
