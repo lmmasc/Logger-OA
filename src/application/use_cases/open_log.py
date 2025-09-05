@@ -1,7 +1,7 @@
 import os
-from src.domain.repositories.contact_log_repository import ContactLogRepository
-from src.domain.entities.operation import OperationLog
-from src.domain.entities.contest import ContestLog
+from domain.repositories.contact_log_repository import ContactLogRepository
+from domain.entities.operation import OperationLog
+from domain.entities.contest import ContestLog
 import json
 
 

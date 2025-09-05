@@ -282,7 +282,7 @@ class MainWindow(QMainWindow):
     # Handler unificado para acciones de log
     def _action_log_new(self):
         """
-        Muestra un diálogo para elegir el tipo de log y crea el archivo SQLite usando el módulo de paths y casos de uso.
+        Muestra un diálogo para elegir el tipo de log y el indicativo, y crea el archivo SQLite en la carpeta correspondiente usando el módulo de paths y casos de uso.
         """
         dialog = QDialog(self)
         dialog.setWindowTitle(translation_service.tr("select_log_type"))
@@ -296,21 +296,52 @@ class MainWindow(QMainWindow):
         selected = {"type": None}
 
         def select_ops():
-            selected["type"] = "ops"
+            selected["type"] = "operativo"
             dialog.accept()
 
         def select_contest():
-            selected["type"] = "contest"
+            selected["type"] = "concurso"
             dialog.accept()
 
         btn_ops.clicked.connect(select_ops)
         btn_contest.clicked.connect(select_contest)
         dialog.exec()
-        if selected["type"] in ("ops", "contest"):
-            # Aquí integrar lógica para crear y abrir log de operaciones/concurso
-            self.current_log = object()  # Simulación de log creado
-            self.current_log_type = selected["type"]
-            self.show_view(f"log_{self.current_log_type}")
+
+        if selected["type"]:
+            # Pedir indicativo
+            indicativo_dialog = QDialog(self)
+            indicativo_dialog.setWindowTitle(translation_service.tr("enter_callsign"))
+            indicativo_layout = QVBoxLayout(indicativo_dialog)
+            indicativo_label = QLabel(translation_service.tr("callsign"))
+            indicativo_layout.addWidget(indicativo_label)
+            indicativo_input = QPushButton()
+            from PySide6.QtWidgets import QLineEdit
+
+            callsign_edit = QLineEdit(indicativo_dialog)
+            indicativo_layout.addWidget(callsign_edit)
+            ok_btn = QPushButton(translation_service.tr("ok_button"), indicativo_dialog)
+            indicativo_layout.addWidget(ok_btn)
+            indicativo = {"callsign": None}
+
+            def set_callsign():
+                indicativo["callsign"] = callsign_edit.text().strip()
+                indicativo_dialog.accept()
+
+            ok_btn.clicked.connect(set_callsign)
+            indicativo_dialog.exec()
+            if indicativo["callsign"]:
+                from application.use_cases.create_log import create_log
+
+                db_path, log = create_log(selected["type"], indicativo["callsign"])
+                self.current_log = log
+                self.current_log_type = (
+                    "ops" if selected["type"] == "operativo" else "contest"
+                )
+                self.show_view(f"log_{self.current_log_type}")
+            else:
+                self.current_log = None
+                self.current_log_type = None
+                self.show_view("welcome")
         else:
             self.current_log = None
             self.current_log_type = None
@@ -319,42 +350,78 @@ class MainWindow(QMainWindow):
 
     def _action_log_open(self):
         """
-        Abre un log existente usando el módulo de paths y casos de uso.
+        Permite al usuario seleccionar el tipo de log y luego abre el diálogo en la carpeta correspondiente.
         """
-        file_path, _ = QFileDialog.getOpenFileName(
-            self,
-            translation_service.tr("open_log"),
-            "",
-            "SQLite Files (*.sqlite);;All Files (*)",
-        )
-        if file_path:
-            try:
-                from application.use_cases.open_log import open_log
+        # Diálogo para seleccionar tipo de log
+        dialog = QDialog(self)
+        dialog.setWindowTitle(translation_service.tr("select_log_type"))
+        layout = QVBoxLayout(dialog)
+        label = QLabel(translation_service.tr("select_log_type_label"))
+        layout.addWidget(label)
+        btn_ops = QPushButton(translation_service.tr("log_type_ops"), dialog)
+        btn_contest = QPushButton(translation_service.tr("log_type_contest"), dialog)
+        layout.addWidget(btn_ops)
+        layout.addWidget(btn_contest)
+        selected = {"type": None}
 
-                log = open_log(file_path)
-                self.current_log = log
-                # Determinar tipo de log por instancia
-                if hasattr(
-                    log, "__class__"
-                ) and log.__class__.__name__.lower().startswith("operation"):
-                    self.current_log_type = "ops"
-                elif hasattr(
-                    log, "__class__"
-                ) and log.__class__.__name__.lower().startswith("contest"):
-                    self.current_log_type = "contest"
-                else:
-                    self.current_log_type = None
-                if self.current_log_type:
-                    self.show_view(f"log_{self.current_log_type}")
-                else:
-                    self.show_view("welcome")
+        def select_ops():
+            selected["type"] = "operativo"
+            dialog.accept()
+
+        def select_contest():
+            selected["type"] = "concurso"
+            dialog.accept()
+
+        btn_ops.clicked.connect(select_ops)
+        btn_contest.clicked.connect(select_contest)
+        dialog.exec()
+
+        if selected["type"]:
+            from config.paths import get_log_path
+
+            log_folder = os.path.join(
+                get_log_path(),
+                "operativos" if selected["type"] == "operativo" else "concursos",
+            )
+            os.makedirs(log_folder, exist_ok=True)
+            file_path, _ = QFileDialog.getOpenFileName(
+                self,
+                translation_service.tr("open_log"),
+                log_folder,
+                "SQLite Files (*.sqlite);;All Files (*)",
+            )
+            if file_path:
+                try:
+                    from application.use_cases.open_log import open_log
+
+                    log = open_log(file_path)
+                    self.current_log = log
+                    # Determinar tipo de log por instancia
+                    if hasattr(
+                        log, "__class__"
+                    ) and log.__class__.__name__.lower().startswith("operation"):
+                        self.current_log_type = "ops"
+                    elif hasattr(
+                        log, "__class__"
+                    ) and log.__class__.__name__.lower().startswith("contest"):
+                        self.current_log_type = "contest"
+                    else:
+                        self.current_log_type = None
+                    if self.current_log_type:
+                        self.show_view(f"log_{self.current_log_type}")
+                    else:
+                        self.show_view("welcome")
+                        self.current_log = None
+                except Exception as e:
+                    QMessageBox.critical(
+                        self,
+                        translation_service.tr("main_window_title"),
+                        f"{translation_service.tr('open_failed')}: {e}",
+                    )
                     self.current_log = None
-            except Exception as e:
-                QMessageBox.critical(
-                    self,
-                    translation_service.tr("main_window_title"),
-                    f"{translation_service.tr('open_failed')}: {e}",
-                )
+                    self.current_log_type = None
+                    self.show_view("welcome")
+            else:
                 self.current_log = None
                 self.current_log_type = None
                 self.show_view("welcome")

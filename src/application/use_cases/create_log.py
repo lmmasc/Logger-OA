@@ -1,8 +1,8 @@
 from datetime import datetime
-from src.domain.entities.operation import OperationLog
-from src.domain.entities.contest import ContestLog
-from src.domain.repositories.contact_log_repository import ContactLogRepository
-from src.config.paths import get_log_file_path
+from domain.entities.operation import OperationLog
+from domain.entities.contest import ContestLog
+from domain.repositories.contact_log_repository import ContactLogRepository
+from config.paths import get_log_file_path
 
 
 def create_log(log_type: str, operator_callsign: str, **kwargs):

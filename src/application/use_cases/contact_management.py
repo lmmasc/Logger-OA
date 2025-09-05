@@ -1,10 +1,10 @@
-from src.domain.repositories.contact_log_repository import ContactLogRepository
-from src.domain.entities.operation_contact import OperationContact
-from src.domain.entities.contest_contact import ContestContact
-from src.domain.entities.contact_log import ContactLog
-from src.domain.validators import LogValidator
-from src.domain.contest_rules import ContestRules
-from src.domain.operation_rules import OperationRules
+from domain.repositories.contact_log_repository import ContactLogRepository
+from domain.entities.operation_contact import OperationContact
+from domain.entities.contest_contact import ContestContact
+from domain.entities.contact_log import ContactLog
+from domain.validators import LogValidator
+from domain.contest_rules import ContestRules
+from domain.operation_rules import OperationRules
 
 
 def add_contact_to_log(
