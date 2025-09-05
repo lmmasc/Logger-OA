@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel
+from PySide6.QtCore import Qt
 from translation.translation_service import translation_service
 
 
@@ -14,6 +15,7 @@ class LogContestView(QWidget):
         # Encabezado dinámico
         header_text = f"{callsign} | {log_type_name} | {log_date}"
         self.header_label = QLabel(header_text)
+        self.header_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.header_label)
         self.form_widget = LogFormWidget(self, log_type="contest")
         layout.addWidget(self.form_widget)
