@@ -140,6 +140,9 @@ class MainMenuBar(QMenuBar):
         Actualiza los textos de todos los menús y acciones según el idioma actual.
         """
 
+        self.file_menu.setTitle(translation_service.tr("menu_file_menu"))
+        self.open_folder_action.setText(translation_service.tr("menu_open_folder"))
+        self.exit_action.setText(translation_service.tr("menu_exit"))
         self.log_menu.setTitle(translation_service.tr("menu_log_menu"))
         self.log_new_action.setText(translation_service.tr("menu_new"))
         self.log_open_action.setText(translation_service.tr("menu_open"))
