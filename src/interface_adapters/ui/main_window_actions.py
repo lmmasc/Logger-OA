@@ -162,11 +162,59 @@ def action_log_open(self):
 
 
 def action_log_export(self):
-    current_view = self.view_manager.get_current_view_name()
-    if current_view == "log_ops":
-        self.show_view("log_ops")
-    elif current_view == "log_contest":
-        self.show_view("log_contest")
+    if not hasattr(self, "current_log") or self.current_log is None:
+        QMessageBox.warning(
+            self,
+            translation_service.tr("main_window_title"),
+            translation_service.tr("no_log_open"),
+        )
+        return
+
+    from application.use_cases.export_log import export_log_to_csv
+    from config.paths import get_export_path
+
+    log_type = getattr(self, "current_log_type", None)
+    if log_type not in ("ops", "contest"):
+        QMessageBox.warning(
+            self,
+            translation_service.tr("main_window_title"),
+            translation_service.tr("no_log_type"),
+        )
+        return
+
+    default_filename = (
+        f"{getattr(self.current_log, 'operator', 'log')}_{log_type}_export.csv"
+    )
+    export_path, _ = QFileDialog.getSaveFileName(
+        self,
+        translation_service.tr("export_log"),
+        get_export_path(default_filename),
+        "CSV Files (*.csv);;All Files (*)",
+    )
+    if not export_path:
+        return
+
+    try:
+        db_path = getattr(self.current_log, "db_path", None)
+        if not db_path:
+            QMessageBox.warning(
+                self,
+                translation_service.tr("main_window_title"),
+                translation_service.tr("no_db_path"),
+            )
+            return
+        export_log_to_csv(db_path, export_path)
+        QMessageBox.information(
+            self,
+            translation_service.tr("main_window_title"),
+            translation_service.tr("export_success"),
+        )
+    except Exception as e:
+        QMessageBox.critical(
+            self,
+            translation_service.tr("main_window_title"),
+            f"{translation_service.tr('export_failed')}: {e}",
+        )
 
 
 def action_log_close(self):

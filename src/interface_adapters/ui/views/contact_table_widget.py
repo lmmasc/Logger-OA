@@ -40,10 +40,34 @@ class ContactTableWidget(QWidget):
         self.table.setHorizontalHeaderLabels(headers)
 
     def set_contacts(self, contacts):
+        print("[DEBUG] set_contacts called with:", contacts)
+        # Define las claves esperadas según el tipo de log
+        if self.log_type == "contest":
+            keys = [
+                "callsign",
+                "qtr_utc",
+                "exchange_received",
+                "exchange_sent",
+                "rs_rx",
+                "rs_tx",
+            ]
+        else:
+            keys = [
+                "callsign",
+                "qtr_utc",
+                "station",
+                "power",
+                "rs_rx",
+                "rs_tx",
+            ]
         self.table.setRowCount(len(contacts))
+        self.table.setColumnCount(len(keys))
         for row, contact in enumerate(contacts):
-            for col, key in enumerate(contact.keys()):
-                self.table.setItem(row, col, QTableWidgetItem(str(contact[key])))
+            print(f"[DEBUG] Contact {row}: {contact}")
+            for col, key in enumerate(keys):
+                value = contact.get(key, "")
+                self.table.setItem(row, col, QTableWidgetItem(str(value)))
+        self.table.viewport().update()
 
     def retranslate_ui(self):
         self.set_columns()

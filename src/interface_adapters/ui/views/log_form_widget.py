@@ -1,4 +1,11 @@
-from PySide6.QtWidgets import QWidget, QFormLayout, QLineEdit, QLabel, QComboBox
+from PySide6.QtWidgets import (
+    QWidget,
+    QFormLayout,
+    QLineEdit,
+    QLabel,
+    QComboBox,
+    QMessageBox,
+)
 from translation.translation_service import translation_service
 
 
@@ -10,6 +17,7 @@ class LogFormWidget(QWidget):
     def __init__(self, parent=None, log_type="ops"):
         super().__init__(parent)
         from .callsign_input_widget import CallsignInputWidget
+        from PySide6.QtWidgets import QPushButton, QMessageBox
 
         self.log_type = log_type
         self.layout = QFormLayout(self)
@@ -50,20 +58,90 @@ class LogFormWidget(QWidget):
                 self.exchange_sent_input,
             )
 
+        # Botón para agregar contacto
+        self.add_contact_btn = QPushButton(translation_service.tr("add_contact"), self)
+        self.layout.addRow(self.add_contact_btn)
+        self.add_contact_btn.clicked.connect(self._on_add_contact)
+
+    def _on_add_contact(self):
+        # Recoge datos y llama al caso de uso
+        data = self.get_data()
+        main_window = self._find_main_window()
+        if (
+            not main_window
+            or not hasattr(main_window, "current_log")
+            or not main_window.current_log
+        ):
+            QMessageBox.warning(
+                self,
+                translation_service.tr("main_window_title"),
+                translation_service.tr("no_log_open"),
+            )
+            return
+        db_path = getattr(main_window.current_log, "db_path", None)
+        log_id = getattr(main_window.current_log, "id", None)
+        contact_type = "operativo" if self.log_type == "ops" else "concurso"
+        try:
+            from application.use_cases.contact_management import add_contact_to_log
+            from domain.repositories.contact_log_repository import ContactLogRepository
+
+            contact = add_contact_to_log(db_path, log_id, data, contact_type)
+            # Recuperar contactos desde la base de datos
+            repo = ContactLogRepository(db_path)
+            contacts = repo.get_contacts(log_id)
+            main_window.current_log.contacts = contacts
+            # Actualiza la tabla en la instancia visible del ViewManager
+            if hasattr(main_window, "view_manager"):
+                if (
+                    self.log_type == "ops"
+                    and "log_ops" in main_window.view_manager.views
+                ):
+                    main_window.view_manager.views["log_ops"].table_widget.set_contacts(
+                        contacts
+                    )
+                elif (
+                    self.log_type == "contest"
+                    and "log_contest" in main_window.view_manager.views
+                ):
+                    main_window.view_manager.views[
+                        "log_contest"
+                    ].table_widget.set_contacts(contacts)
+            QMessageBox.information(
+                self,
+                translation_service.tr("main_window_title"),
+                translation_service.tr("contact_added"),
+            )
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                translation_service.tr("main_window_title"),
+                f"{translation_service.tr('contact_add_failed')}: {e}",
+            )
+
+    def _find_main_window(self):
+        # Busca la instancia de MainWindow en la jerarquía de padres
+        parent = self.parent()
+        while parent:
+            if parent.__class__.__name__ == "MainWindow":
+                return parent
+            parent = parent.parent()
+        return None
+
     def get_data(self):
         """Devuelve los datos del formulario como dict."""
         data = {
             "callsign": self.callsign_input.get_callsign(),
             "rs_rx": self.rs_rx_input.text(),
             "rs_tx": self.rs_tx_input.text(),
-            "observations": self.observations_input.text(),
         }
         if self.log_type == "contest":
             data["exchange_received"] = self.exchange_received_input.text()
             data["exchange_sent"] = self.exchange_sent_input.text()
+            data["observations"] = self.observations_input.text()
         elif self.log_type == "ops":
             data["station"] = self.station_input.text()
             data["power"] = self.power_input.text()
+            data["obs"] = self.observations_input.text()
         return data
 
     def retranslate_ui(self):

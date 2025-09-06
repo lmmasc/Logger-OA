@@ -114,6 +114,19 @@ class MainWindow(QMainWindow):
 
     def show_view(self, view_name: str) -> None:
         mw_show_view(self, view_name)
+        # Actualizar la tabla de contactos en la vista activa si hay un log abierto
+        if self.current_log is not None:
+            contacts = getattr(self.current_log, "contacts", [])
+            if view_name == "log_ops" and hasattr(
+                self.view_manager.views["log_ops"], "table_widget"
+            ):
+                self.view_manager.views["log_ops"].table_widget.set_contacts(contacts)
+            elif view_name == "log_contest" and hasattr(
+                self.view_manager.views["log_contest"], "table_widget"
+            ):
+                self.view_manager.views["log_contest"].table_widget.set_contacts(
+                    contacts
+                )
 
     def set_language(self, lang: str) -> None:
         set_language(self, lang)

@@ -21,5 +21,6 @@ def create_log(log_type: str, operator_callsign: str, **kwargs):
     else:
         raise ValueError("Tipo de log no soportado")
 
+    log.db_path = db_path
     repo.save_log(log)
     return db_path, log

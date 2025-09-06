@@ -1,7 +1,7 @@
 import csv
 import os
-from src.domain.repositories.contact_log_repository import ContactLogRepository
-from src.config.paths import get_export_path
+from domain.repositories.contact_log_repository import ContactLogRepository
+from config.paths import get_export_path
 
 
 def export_log_to_csv(db_path: str, export_filename: str = None) -> str:
@@ -11,7 +11,9 @@ def export_log_to_csv(db_path: str, export_filename: str = None) -> str:
     """
     repo = ContactLogRepository(db_path)
     # Obtener log principal
-    with repo._connect() as conn:
+    import sqlite3
+
+    with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
         c.execute(
             "SELECT id, type, operator, start_time, end_time, metadata FROM logs LIMIT 1"

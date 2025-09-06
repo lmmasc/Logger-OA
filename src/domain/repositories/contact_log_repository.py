@@ -83,8 +83,21 @@ class ContactLogRepository:
             conn.commit()
 
     def get_contacts(self, log_id: str) -> List[Any]:
-        # Implementar: cargar y deserializar contactos
-        pass
+        import json
+
+        contacts = []
+        with sqlite3.connect(self.db_path) as conn:
+            c = conn.cursor()
+            c.execute("SELECT data FROM contacts WHERE log_id = ?", (log_id,))
+            rows = c.fetchall()
+            for row in rows:
+                data = row[0]
+                try:
+                    contact_dict = json.loads(data)
+                    contacts.append(contact_dict)
+                except Exception:
+                    continue
+        return contacts
 
     def delete_contact(self, contact_id: str):
         with sqlite3.connect(self.db_path) as conn:

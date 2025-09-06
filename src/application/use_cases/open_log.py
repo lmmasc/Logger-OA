@@ -27,39 +27,38 @@ def open_log(db_path: str):
     Devuelve una instancia de OperationLog o ContestLog según corresponda.
     """
     repo = ContactLogRepository(db_path)
-    with repo:
-        # Obtener el log principal
-        with repo._connect() as conn:
-            c = conn.cursor()
-            c.execute(
-                "SELECT id, type, operator, start_time, end_time, metadata FROM logs LIMIT 1"
+    import sqlite3
+
+    with sqlite3.connect(db_path) as conn:
+        c = conn.cursor()
+        c.execute(
+            "SELECT id, type, operator, start_time, end_time, metadata FROM logs LIMIT 1"
+        )
+        row = c.fetchone()
+        if not row:
+            raise FileNotFoundError("No se encontró ningún log en la base de datos.")
+        log_type = row[1]
+        metadata = json.loads(row[5]) if row[5] else {}
+        if log_type == "OperationLog":
+            log = OperationLog(
+                id=row[0],
+                operator=row[2],
+                start_time=row[3],
+                end_time=row[4],
+                metadata=metadata,
             )
-            row = c.fetchone()
-            if not row:
-                raise FileNotFoundError(
-                    "No se encontró ningún log en la base de datos."
-                )
-            log_type = row[1]
-            metadata = json.loads(row[5]) if row[5] else {}
-            if log_type == "OperationLog":
-                log = OperationLog(
-                    id=row[0],
-                    operator=row[2],
-                    start_time=row[3],
-                    end_time=row[4],
-                    metadata=metadata,
-                )
-            elif log_type == "ContestLog":
-                log = ContestLog(
-                    id=row[0],
-                    operator=row[2],
-                    start_time=row[3],
-                    end_time=row[4],
-                    metadata=metadata,
-                )
-            else:
-                raise ValueError("Tipo de log no soportado")
-        # Obtener contactos
-        contacts = repo.get_contacts(log.id)
-        log.contacts = contacts
+        elif log_type == "ContestLog":
+            log = ContestLog(
+                id=row[0],
+                operator=row[2],
+                start_time=row[3],
+                end_time=row[4],
+                metadata=metadata,
+            )
+        else:
+            raise ValueError("Tipo de log no soportado")
+    # Obtener contactos
+    contacts = repo.get_contacts(log.id)
+    log.contacts = contacts
+    log.db_path = db_path
     return log
