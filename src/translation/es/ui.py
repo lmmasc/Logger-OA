@@ -21,5 +21,9 @@ UI_TRANSLATIONS = {
     "enter_callsign": "Ingresa indicativo",
     "ok_button": "Aceptar",
     "select_log_type_label": "Selecciona el tipo de log a crear/abrir:",
-    # ...existing code...
+    "select_contest_title": "Selecciona concurso",
+    "select_contest_label": "Por favor selecciona el concurso:",
+    "contest_world_radio_day": "Concurso Día Mundial de la Radioafición",
+    "contest_independence_peru": "Concurso Independencia del Perú",
+    "contest_peruvian_ham_day": "Concurso Día del Radioaficionado Peruano",
 }

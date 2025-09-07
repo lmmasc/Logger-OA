@@ -30,8 +30,28 @@ class LogOpsView(QWidget):
         self.setLayout(layout)
         translation_service.signal.language_changed.connect(self.retranslate_ui)
 
+    def set_log_data(self, log):
+        self._current_log = log
+        self.retranslate_ui()
+
     def retranslate_ui(self):
-        # El encabezado se mantiene parametrizable, puedes actualizarlo aquí si cambian los datos
+        from datetime import datetime
+
+        lang = translation_service.get_language()
+        log_type_name = translation_service.tr("log_type_ops")
+        log = getattr(self, "_current_log", None)
+        callsign = log.operator if log else ""
+        dt = log.start_time if log else ""
+        try:
+            date_obj = datetime.strptime(dt[:8], "%Y%m%d")
+            if lang == "es":
+                log_date = date_obj.strftime("%d/%m/%Y")
+            else:
+                log_date = date_obj.strftime("%m/%d/%Y")
+        except Exception:
+            log_date = dt
+        header_text = f"{callsign} | {log_type_name} | {log_date}"
+        self.header_label.setText(header_text)
         self.form_widget.retranslate_ui()
         self.suggestion_widget.retranslate_ui()
         self.table_widget.retranslate_ui()

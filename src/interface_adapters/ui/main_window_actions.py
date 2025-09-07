@@ -12,14 +12,13 @@ from PySide6.QtWidgets import (
     QFileDialog,
     QLineEdit,
     QApplication,
+    QComboBox,
 )
 from PySide6.QtCore import Qt, QUrl, QTimer
 import os
 from config.paths import get_db_path, get_log_path
 from translation.translation_service import translation_service
 from application.use_cases.update_operators_from_pdf import update_operators_from_pdf
-
-# ...existing code...
 
 
 def action_log_new(self):
@@ -49,6 +48,36 @@ def action_log_new(self):
     btn_ops.clicked.connect(select_ops)
     btn_contest.clicked.connect(select_contest)
     dialog.exec()
+    contest_name = None
+    if selected["type"] == "concurso":
+        # Diálogo para seleccionar concurso
+        contest_dialog = QDialog(self)
+        contest_dialog.setWindowTitle(translation_service.tr("select_contest_title"))
+        contest_dialog.setMinimumWidth(400)
+        contest_layout = QVBoxLayout(contest_dialog)
+        contest_label = QLabel(translation_service.tr("select_contest_label"))
+        contest_layout.addWidget(contest_label)
+        contest_box = QComboBox(contest_dialog)
+        contest_options = [
+            translation_service.tr("contest_world_radio_day"),
+            translation_service.tr("contest_independence_peru"),
+            translation_service.tr("contest_peruvian_ham_day"),
+        ]
+        contest_box.addItems(contest_options)
+        contest_layout.addWidget(contest_box, alignment=Qt.AlignHCenter)
+        ok_btn = QPushButton(translation_service.tr("ok_button"), contest_dialog)
+        ok_btn.setFixedWidth(200)
+        contest_layout.addWidget(ok_btn, alignment=Qt.AlignHCenter)
+
+        def set_contest():
+            nonlocal contest_name
+            contest_name = contest_box.currentText()
+            contest_dialog.accept()
+
+        ok_btn.clicked.connect(set_contest)
+        contest_dialog.exec()
+        if not contest_name:
+            return  # Cancelado
     if selected["type"]:
         indicativo_dialog = QDialog(self)
         indicativo_dialog.setWindowTitle(translation_service.tr("enter_callsign"))
@@ -87,11 +116,30 @@ def action_log_new(self):
         if indicativo["callsign"]:
             from application.use_cases.create_log import create_log
 
-            db_path, log = create_log(selected["type"], indicativo["callsign"])
+            extra_kwargs = {}
+            if selected["type"] == "concurso":
+                # Obtener la clave seleccionada en vez del texto
+                contest_keys = [
+                    "contest_world_radio_day",
+                    "contest_independence_peru",
+                    "contest_peruvian_ham_day",
+                ]
+                contest_key = contest_keys[contest_box.currentIndex()]
+                extra_kwargs["name"] = translation_service.tr(contest_key)
+                extra_kwargs["metadata"] = {"contest_name_key": contest_key}
+            db_path, log = create_log(
+                selected["type"], indicativo["callsign"], **extra_kwargs
+            )
             self.current_log = log
             self.current_log_type = (
                 "ops" if selected["type"] == "operativo" else "contest"
             )
+            # Mostrar en cabecera: Indicativo - nombre del concurso - fecha
+            if selected["type"] == "concurso":
+                cabecera = f"{log.operator} - {contest_name} - {log.start_time}"
+                self.setWindowTitle(cabecera)
+            else:
+                self.setWindowTitle(f"{log.operator} - Operativo - {log.start_time}")
             self.show_view(f"log_{self.current_log_type}")
         else:
             self.current_log = None

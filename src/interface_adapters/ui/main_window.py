@@ -92,9 +92,12 @@ class MainWindow(QMainWindow):
 
         # --- Gestor de vistas ---
         self.view_manager = ViewManager(self)
+        # Instanciar vistas solo una vez
+        self.log_ops_view = LogOpsView(self)
+        self.log_contest_view = LogContestView(self)
         self.view_manager.register_view("welcome", WelcomeView(self))
-        self.view_manager.register_view("log_ops", LogOpsView(self))
-        self.view_manager.register_view("log_contest", LogContestView(self))
+        self.view_manager.register_view("log_ops", self.log_ops_view)
+        self.view_manager.register_view("log_contest", self.log_contest_view)
         self.setCentralWidget(self.view_manager.get_widget())
         self.view_manager.show_view("welcome")
 
@@ -108,6 +111,9 @@ class MainWindow(QMainWindow):
         _set_initial_theme_and_language(self)
         self.update_menu_state()  # Estado inicial del menú
 
+        # Conectar actualización de cabecera al cambiar idioma
+        translation_service.signal.language_changed.connect(self._on_language_changed)
+
     # =====================
     # Métodos públicos principales
     # =====================
@@ -117,16 +123,17 @@ class MainWindow(QMainWindow):
         # Actualizar la tabla de contactos en la vista activa si hay un log abierto
         if self.current_log is not None:
             contacts = getattr(self.current_log, "contacts", [])
-            if view_name == "log_ops" and hasattr(
-                self.view_manager.views["log_ops"], "table_widget"
-            ):
-                self.view_manager.views["log_ops"].table_widget.set_contacts(contacts)
+            if view_name == "log_ops" and hasattr(self.log_ops_view, "table_widget"):
+                self.log_ops_view.table_widget.set_contacts(contacts)
             elif view_name == "log_contest" and hasattr(
-                self.view_manager.views["log_contest"], "table_widget"
+                self.log_contest_view, "table_widget"
             ):
-                self.view_manager.views["log_contest"].table_widget.set_contacts(
-                    contacts
-                )
+                self.log_contest_view.table_widget.set_contacts(contacts)
+        # Actualizar cabecera de la vista activa
+        if view_name == "log_contest" and self.current_log:
+            self.log_contest_view.set_log_data(self.current_log)
+        elif view_name == "log_ops" and self.current_log:
+            self.log_ops_view.set_log_data(self.current_log)
 
     def set_language(self, lang: str) -> None:
         set_language(self, lang)
@@ -224,3 +231,10 @@ class MainWindow(QMainWindow):
         if self.db_table_window is not None:
             self.db_table_window.close()
         super().closeEvent(event)
+
+    def _on_language_changed(self):
+        # Llama retranslate_ui en la vista activa
+        if self.current_log_type == "contest":
+            self.log_contest_view.retranslate_ui()
+        elif self.current_log_type == "ops":
+            self.log_ops_view.retranslate_ui()

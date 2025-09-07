@@ -21,5 +21,9 @@ UI_TRANSLATIONS = {
     "enter_callsign": "Enter callsign",
     "ok_button": "OK",
     "select_log_type_label": "Please select the type of log to create/open:",
-    # ...existing code...
+    "select_contest_title": "Select contest",
+    "select_contest_label": "Please select the contest:",
+    "contest_world_radio_day": "World Radio Day Contest",
+    "contest_independence_peru": "Independence of Peru Contest",
+    "contest_peruvian_ham_day": "Peruvian Ham Day Contest",
 }

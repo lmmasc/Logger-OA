@@ -13,8 +13,10 @@ class LogContestView(QWidget):
 
         layout = QVBoxLayout()
         # Encabezado dinámico
-        header_text = f"{callsign} | {log_type_name} | {log_date}"
-        self.header_label = QLabel(header_text)
+        self.callsign = callsign
+        self.log_type_name = log_type_name
+        self.log_date_raw = log_date  # Guardar la fecha sin formato
+        self.header_label = QLabel()
         self.header_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.header_label)
         self.form_widget = LogFormWidget(self, log_type="contest")
@@ -27,9 +29,41 @@ class LogContestView(QWidget):
         layout.addWidget(self.table_widget)
         self.setLayout(layout)
         translation_service.signal.language_changed.connect(self.retranslate_ui)
+        self.retranslate_ui()
+
+    def set_log_data(self, log):
+        # Actualiza los datos del log y refresca la cabecera
+        self._current_log = log
+        self.retranslate_ui()
 
     def retranslate_ui(self):
-        # El encabezado se mantiene parametrizable, puedes actualizarlo aquí si cambian los datos
+        from datetime import datetime
+
+        lang = translation_service.get_language()
+        # Usar el log actualizado si existe
+        log = getattr(self, "_current_log", None)
+        callsign = log.operator if log else ""
+        contest_key = (
+            log.metadata.get("contest_name_key", None)
+            if log and hasattr(log, "metadata")
+            else None
+        )
+        contest_name = (
+            translation_service.tr(contest_key)
+            if contest_key
+            else translation_service.tr("log_type_contest")
+        )
+        dt = log.start_time if log else ""
+        try:
+            date_obj = datetime.strptime(dt[:8], "%Y%m%d")
+            if lang == "es":
+                log_date = date_obj.strftime("%d/%m/%Y")
+            else:
+                log_date = date_obj.strftime("%m/%d/%Y")
+        except Exception:
+            log_date = dt
+        header_text = f"{callsign} | {contest_name} | {log_date}"
+        self.header_label.setText(header_text)
         self.form_widget.retranslate_ui()
         self.suggestion_widget.retranslate_ui()
         self.table_widget.retranslate_ui()
