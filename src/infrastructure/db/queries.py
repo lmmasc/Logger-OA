@@ -193,3 +193,21 @@ def delete_radio_operator_by_callsign(callsign):
     Elimina un operador de radio por callsign (alias para compatibilidad con repositorio).
     """
     return delete_radio_operator(callsign)
+
+
+def get_radio_operator_by_callsign(callsign: str):
+    """
+    Devuelve el operador de radio con el indicativo exacto.
+    """
+    db_path = get_db_path()
+    conn = get_connection(db_path)
+    sql = (
+        "SELECT callsign, name, category, type, district, province, department, "
+        "license, resolution, expiration_date, cutoff_date, enabled, country, updated_at "
+        "FROM radio_operators WHERE callsign = ?"
+    )
+    cursor = conn.cursor()
+    cursor.execute(sql, (callsign,))
+    result = cursor.fetchone()
+    conn.close()
+    return result

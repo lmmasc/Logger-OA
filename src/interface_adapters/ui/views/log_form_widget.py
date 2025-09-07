@@ -63,6 +63,8 @@ class LogFormWidget(QWidget):
         self.layout.addRow(self.add_contact_btn)
         self.add_contact_btn.clicked.connect(self._on_add_contact)
 
+        self.callsign_input.input.textChanged.connect(self._update_callsign_summary)
+
     def _on_add_contact(self):
         # Recoge datos y llama al caso de uso
         data = self.get_data()
@@ -170,3 +172,44 @@ class LogFormWidget(QWidget):
             self.layout.labelForField(self.power_input).setText(
                 translation_service.tr("power")
             )
+
+    def _update_callsign_summary(self):
+        callsign = self.callsign_input.get_callsign().strip().upper()
+        summary = ""
+        if callsign:
+            from infrastructure.repositories.sqlite_radio_operator_repository import (
+                SqliteRadioOperatorRepository,
+            )
+
+            repo = SqliteRadioOperatorRepository()
+            operator = (
+                repo.get_operator_by_callsign(callsign)
+                if hasattr(repo, "get_operator_by_callsign")
+                else None
+            )
+            if operator:
+                # Formato en tabla 3x3
+                enabled = (
+                    translation_service.tr("enabled")
+                    if operator.enabled
+                    else translation_service.tr("disabled")
+                )
+                summary = f"<table width='100%' style='font-size:14px;'>"
+                summary += "<tr>"
+                summary += f"<td><b>{operator.name}</b></td>"
+                summary += f"<td>{translation_service.tr('district')}: {operator.district}</td>"
+                summary += f"<td>{translation_service.tr('category')}: {operator.category}</td>"
+                summary += "</tr><tr>"
+                summary += (
+                    f"<td>{translation_service.tr('country')}: {operator.country}</td>"
+                )
+                summary += f"<td>{translation_service.tr('province')}: {operator.province}</td>"
+                summary += (
+                    f"<td>{translation_service.tr('type')}: {operator.type_}</td>"
+                )
+                summary += "</tr><tr>"
+                summary += f"<td>{translation_service.tr('enabled') if operator.enabled else translation_service.tr('disabled')}</td>"
+                summary += f"<td>{translation_service.tr('department')}: {operator.department}</td>"
+                summary += f"<td>{translation_service.tr('expiration')}: {operator.expiration_date}</td>"
+                summary += "</tr></table>"
+        self.callsign_input.set_summary(summary)

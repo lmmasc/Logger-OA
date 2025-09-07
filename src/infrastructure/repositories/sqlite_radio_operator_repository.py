@@ -52,3 +52,13 @@ class SqliteRadioOperatorRepository(RadioOperatorRepository):
 
     def delete_by_callsign(self, callsign: str) -> None:
         queries.delete_radio_operator_by_callsign(callsign)
+
+    def get_operator_by_callsign(self, callsign: str):
+        from infrastructure.db.queries import get_radio_operator_by_callsign
+
+        row = get_radio_operator_by_callsign(callsign)
+        if row:
+            from domain.entities.radio_operator import RadioOperator
+
+            return RadioOperator(*row)
+        return None
