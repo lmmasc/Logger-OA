@@ -86,7 +86,7 @@ class LogFormWidget(QWidget):
             from domain.repositories.contact_log_repository import ContactLogRepository
 
             contact = add_contact_to_log(db_path, log_id, data, contact_type)
-            # Recuperar contactos desde la base de datos
+            # Recuperar la lista actualizada desde el repositorio
             repo = ContactLogRepository(db_path)
             contacts = repo.get_contacts(log_id)
             main_window.current_log.contacts = contacts

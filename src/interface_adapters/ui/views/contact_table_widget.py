@@ -40,7 +40,7 @@ class ContactTableWidget(QWidget):
         self.table.setHorizontalHeaderLabels(headers)
 
     def set_contacts(self, contacts):
-        print("[DEBUG] set_contacts called with:", contacts)
+        # ...eliminado debug print...
         # Define las claves esperadas según el tipo de log
         if self.log_type == "contest":
             keys = [
@@ -63,7 +63,7 @@ class ContactTableWidget(QWidget):
         self.table.setRowCount(len(contacts))
         self.table.setColumnCount(len(keys))
         for row, contact in enumerate(contacts):
-            print(f"[DEBUG] Contact {row}: {contact}")
+            # ...eliminado debug print...
             for col, key in enumerate(keys):
                 value = contact.get(key, "")
                 self.table.setItem(row, col, QTableWidgetItem(str(value)))
