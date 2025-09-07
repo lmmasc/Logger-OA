@@ -1,5 +1,6 @@
 # Traducciones de la interfaz de usuario (español)
 UI_TRANSLATIONS = {
+    "enter_callsign_label": "Ingrese su indicativo:",
     "select_log_type_label_create": "Selecciona el tipo de log a crear:",
     "select_log_type_label_open": "Selecciona el tipo de log a abrir:",
     "filter_results": "Resultados",

@@ -52,19 +52,36 @@ def action_log_new(self):
     if selected["type"]:
         indicativo_dialog = QDialog(self)
         indicativo_dialog.setWindowTitle(translation_service.tr("enter_callsign"))
+        indicativo_dialog.setMinimumWidth(400)
         indicativo_layout = QVBoxLayout(indicativo_dialog)
-        indicativo_label = QLabel(translation_service.tr("callsign"))
+        indicativo_label = QLabel(translation_service.tr("enter_callsign_label"))
         indicativo_layout.addWidget(indicativo_label)
         callsign_edit = QLineEdit(indicativo_dialog)
-        indicativo_layout.addWidget(callsign_edit)
+        callsign_edit.setFixedWidth(180)
+        indicativo_layout.addWidget(callsign_edit, alignment=Qt.AlignHCenter)
         ok_btn = QPushButton(translation_service.tr("ok_button"), indicativo_dialog)
-        indicativo_layout.addWidget(ok_btn)
+        ok_btn.setFixedWidth(200)
+        indicativo_layout.addWidget(ok_btn, alignment=Qt.AlignHCenter)
         indicativo = {"callsign": None}
 
         def set_callsign():
-            indicativo["callsign"] = callsign_edit.text().strip()
+            from utils.text import normalize_callsign
+
+            indicativo["callsign"] = normalize_callsign(callsign_edit.text().strip())
             indicativo_dialog.accept()
 
+        def normalize_input():
+            from utils.text import normalize_callsign
+
+            text = callsign_edit.text()
+            normalized = normalize_callsign(text)
+            # Evita bucle infinito: solo actualiza si es diferente
+            if text != normalized:
+                callsign_edit.blockSignals(True)
+                callsign_edit.setText(normalized)
+                callsign_edit.blockSignals(False)
+
+        callsign_edit.textChanged.connect(normalize_input)
         ok_btn.clicked.connect(set_callsign)
         indicativo_dialog.exec()
         if indicativo["callsign"]:

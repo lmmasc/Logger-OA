@@ -1,5 +1,6 @@
 # UI translations (English)
 UI_TRANSLATIONS = {
+    "enter_callsign_label": "Enter your callsign:",
     "select_log_type_label_create": "Please select the type of log to create:",
     "select_log_type_label_open": "Please select the type of log to open:",
     "filter_results": "Results",
