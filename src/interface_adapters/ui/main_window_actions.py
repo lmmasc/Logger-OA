@@ -26,13 +26,16 @@ def action_log_new(self):
     # ...migrated code from MainWindow._action_log_new...
     dialog = QDialog(self)
     dialog.setWindowTitle(translation_service.tr("select_log_type"))
+    dialog.setMinimumWidth(400)
     layout = QVBoxLayout(dialog)
-    label = QLabel(translation_service.tr("select_log_type_label"))
+    label = QLabel(translation_service.tr("select_log_type_label_create"))
     layout.addWidget(label)
     btn_ops = QPushButton(translation_service.tr("log_type_ops"), dialog)
     btn_contest = QPushButton(translation_service.tr("log_type_contest"), dialog)
-    layout.addWidget(btn_ops)
-    layout.addWidget(btn_contest)
+    btn_ops.setFixedWidth(200)
+    btn_contest.setFixedWidth(200)
+    layout.addWidget(btn_ops, alignment=Qt.AlignHCenter)
+    layout.addWidget(btn_contest, alignment=Qt.AlignHCenter)
     selected = {"type": None}
 
     def select_ops():
@@ -88,13 +91,16 @@ def action_log_open(self):
     # ...migrated code from MainWindow._action_log_open...
     dialog = QDialog(self)
     dialog.setWindowTitle(translation_service.tr("select_log_type"))
+    dialog.setMinimumWidth(400)
     layout = QVBoxLayout(dialog)
-    label = QLabel(translation_service.tr("select_log_type_label"))
+    label = QLabel(translation_service.tr("select_log_type_label_open"))
     layout.addWidget(label)
     btn_ops = QPushButton(translation_service.tr("log_type_ops"), dialog)
     btn_contest = QPushButton(translation_service.tr("log_type_contest"), dialog)
-    layout.addWidget(btn_ops)
-    layout.addWidget(btn_contest)
+    btn_ops.setFixedWidth(200)
+    btn_contest.setFixedWidth(200)
+    layout.addWidget(btn_ops, alignment=Qt.AlignHCenter)
+    layout.addWidget(btn_contest, alignment=Qt.AlignHCenter)
     selected = {"type": None}
 
     def select_ops():

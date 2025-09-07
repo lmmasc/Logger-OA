@@ -1,5 +1,7 @@
 # Traducciones de la interfaz de usuario (español)
 UI_TRANSLATIONS = {
+    "select_log_type_label_create": "Selecciona el tipo de log a crear:",
+    "select_log_type_label_open": "Selecciona el tipo de log a abrir:",
     "filter_results": "Resultados",
     "about": "Acerca de",
     "main_window_title": "Logger OA",
@@ -12,5 +14,11 @@ UI_TRANSLATIONS = {
     "no": "NO",
     "yes_button": "Sí",
     "no_button": "No",
+    "select_log_type": "Selecciona tipo de log",
+    "log_type_ops": "Log operativo",
+    "log_type_contest": "Log de concurso",
+    "enter_callsign": "Ingresa indicativo",
+    "ok_button": "Aceptar",
+    "select_log_type_label": "Selecciona el tipo de log a crear/abrir:",
     # ...existing code...
 }
