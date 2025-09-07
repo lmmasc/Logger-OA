@@ -127,6 +127,16 @@ def action_log_new(self):
                 contest_key = contest_keys[contest_box.currentIndex()]
                 extra_kwargs["name"] = translation_service.tr(contest_key)
                 extra_kwargs["metadata"] = {"contest_name_key": contest_key}
+            elif selected["type"] == "operativo":
+                from interface_adapters.ui.dialogs.operativo_config_dialog import (
+                    OperativoConfigDialog,
+                )
+
+                op_dialog = OperativoConfigDialog(self)
+                if not op_dialog.exec():
+                    return  # Cancelado
+                operativo_config = op_dialog.get_config()
+                extra_kwargs["metadata"] = operativo_config
             db_path, log = create_log(
                 selected["type"], indicativo["callsign"], **extra_kwargs
             )

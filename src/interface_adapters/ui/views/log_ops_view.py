@@ -42,6 +42,16 @@ class LogOpsView(QWidget):
         log = getattr(self, "_current_log", None)
         callsign = log.operator if log else ""
         dt = log.start_time if log else ""
+        meta = getattr(log, "metadata", {}) if log else {}
+        tipo = translation_service.tr(meta.get("tipo_key", "")) if meta else ""
+        banda = translation_service.tr(meta.get("banda_key", "")) if meta else ""
+        modo = translation_service.tr(meta.get("modo_key", "")) if meta else ""
+        freq = meta.get("frecuencia", "") if meta else ""
+        rep = (
+            translation_service.tr(meta.get("repetidora_key", ""))
+            if meta and meta.get("repetidora_key")
+            else ""
+        )
         try:
             date_obj = datetime.strptime(dt[:8], "%Y%m%d")
             if lang == "es":
@@ -50,7 +60,12 @@ class LogOpsView(QWidget):
                 log_date = date_obj.strftime("%m/%d/%Y")
         except Exception:
             log_date = dt
-        header_text = f"{callsign} | {log_type_name} | {log_date}"
+        # Cabecera extendida
+        header_parts = [callsign, tipo, banda, modo, freq]
+        if rep:
+            header_parts.append(rep)
+        header_parts.append(log_date)
+        header_text = " | ".join([str(p) for p in header_parts if p])
         self.header_label.setText(header_text)
         self.form_widget.retranslate_ui()
         self.suggestion_widget.retranslate_ui()
