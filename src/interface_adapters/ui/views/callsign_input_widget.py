@@ -73,6 +73,19 @@ class CallsignInputWidget(QWidget):
     def retranslate_ui(self):
         self.label.setText(translation_service.tr("enter_callsign_label"))
         self.summary_box.setTitle(translation_service.tr("callsign_summary"))
-        # Retraducir el resumen si existe
-        if self.summary_label.text():
-            self.set_summary(self.summary_label.text())
+        # Si hay un indicativo y existe en la base, regenerar el resumen traducido
+        callsign = self.get_callsign().strip().upper()
+        if callsign:
+            from infrastructure.repositories.sqlite_radio_operator_repository import (
+                SqliteRadioOperatorRepository,
+            )
+
+            repo = SqliteRadioOperatorRepository()
+            operator = (
+                repo.get_operator_by_callsign(callsign)
+                if hasattr(repo, "get_operator_by_callsign")
+                else None
+            )
+            if operator:
+                # Regenerar el resumen traducido
+                self.parent()._update_callsign_summary()
