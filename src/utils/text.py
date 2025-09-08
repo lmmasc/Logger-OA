@@ -95,3 +95,22 @@ def filter_text_match(
         return re.search(pattern, haystack) is not None
     else:
         return needle in haystack
+
+
+def get_filtered_callsigns(filtro: str) -> list[str]:
+    """
+    Devuelve una lista de indicativos filtrados y ordenados alfabéticamente
+    usando el mismo criterio que la ventana de base de datos.
+    """
+    from infrastructure.repositories.sqlite_radio_operator_repository import (
+        SqliteRadioOperatorRepository,
+    )
+
+    repo = SqliteRadioOperatorRepository()
+    operadores = repo.list_all()
+    from utils.text import filter_text_match
+
+    indicativos = [
+        op.callsign for op in operadores if filter_text_match(op.callsign, filtro)
+    ]
+    return sorted(indicativos)

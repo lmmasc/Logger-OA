@@ -100,69 +100,16 @@ class CallsignInputWidget(QWidget):
             self.summary_scroll.hide()
             self.suggestion_list.show()
             self.suggestion_list.clear()
-            indicativos = [
-                "OA4ABC",
-                "OA2XYZ",
-                "OA7DEF",
-                "OA4/ON5BAU",
-                "OA1QWE",
-                "OA3RTY",
-                "OA5UIO",
-                "OA6PAS",
-                "OA7DFG",
-                "OA8HJK",
-                "OA9LMN",
-                "OA0OPQ",
-                "OA2RST",
-                "OA3UVW",
-                "OA4XYZ",
-                "OA5ABC",
-                "OA6DEF",
-                "OA7GHI",
-                "OA8JKL",
-                "OA9MNO",
-                "OA0PQR",
-                "OA1STU",
-                "OA2VWX",
-                "OA3YZA",
-                "OA4BCD",
-                "OA5EFG",
-                "OA6HIJ",
-                "OA7KLM",
-                "OA8NOP",
-                "OA9QRS",
-                "OA0TUV",
-                "OA1WXY",
-                "OA2ZAB",
-                "OA3CDE",
-                "OA4FGH",
-                "OA5IJK",
-                "OA6LMN",
-                "OA7OPQ",
-                "OA8RST",
-                "OA9UVW",
-                "OA0XYZ",
-                "OA1ABC",
-                "OA2DEF",
-                "OA3GHI",
-                "OA4JKL",
-                "OA5MNO",
-                "OA6PQR",
-                "OA7STU",
-                "OA8VWX",
-                "OA9YZA",
-                "OA4/ON5BAU",
-                "OA4/ON5BAU",
-                "OA4/ON5BAU",
-                "OA4/ON5BAU",
-            ]
+            from utils.text import get_filtered_callsigns
+
+            filtro = self.input.text().strip()
+            indicativos = get_filtered_callsigns(filtro)
             for indicativo in indicativos:
                 item = QListWidgetItem(indicativo)
                 font = QFont()
                 font.setPointSize(18)
                 font.setBold(True)
                 item.setFont(font)
-                # No modificar el alto ni el ancho, solo usar setSpacing para horizontal
                 self.suggestion_list.addItem(item)
         else:
             self.suggestion_list.hide()
