@@ -64,10 +64,12 @@ class CallsignInputWidget(QWidget):
         self.suggestion_list.hide()
         self.suggestion_list.itemClicked.connect(self._on_suggestion_clicked)
         summary_layout = QVBoxLayout(self.summary_box)
-        summary_layout.setContentsMargins(2, 2, 2, 2)  # Reducir márgenes internos
+        summary_layout.setContentsMargins(
+            2, 2, 2, 2
+        )  # Reducir margen inferior a 0, mantener los demás
         self.summary_box.setStyleSheet(
             "QGroupBox { padding: 2px; margin-top: 10px; min-height: 110px; }"
-        )  # Aumenta min-height para evitar solapamiento del título
+        )  # Restaurar el margin-top y min-height original
         summary_layout.addWidget(self.summary_scroll)
         summary_layout.addWidget(self.suggestion_list)
         self.summary_box.setLayout(summary_layout)
