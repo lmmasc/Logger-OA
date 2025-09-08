@@ -35,32 +35,39 @@ class CallsignInputWidget(QWidget):
         left_widget.setMaximumWidth(400)
         main_layout.addWidget(left_widget, 1)
         # Sección derecha: resumen
-
         self.summary_box = QGroupBox(translation_service.tr("callsign_summary"), self)
         self.summary_label = QLabel("", self.summary_box)
         summary_font = QFont()
         summary_font.setPointSize(20)  # Fuente aún más grande para el resumen
         self.summary_label.setFont(summary_font)
+        self.summary_label.setMinimumHeight(
+            80
+        )  # Altura mínima para evitar redimensionamiento
         summary_layout = QVBoxLayout(self.summary_box)
         summary_layout.addWidget(self.summary_label)
         self.summary_box.setLayout(summary_layout)
         main_layout.addWidget(self.summary_box, 3)
         self.setLayout(main_layout)
+        # Normalizar a mayúsculas en tiempo real
+        self.input.textChanged.connect(self._normalize_upper)
+
+    def _normalize_upper(self, text):
+        upper_text = text.upper()
+        if text != upper_text:
+            cursor_pos = self.input.cursorPosition()
+            self.input.blockSignals(True)
+            self.input.setText(upper_text)
+            self.input.setCursorPosition(cursor_pos)
+            self.input.blockSignals(False)
 
     def get_callsign(self):
         return self.input.text()
 
     def set_callsign(self, value):
-        self.input.setText(value)
+        self.input.setText(value.upper())
 
     def set_summary(self, text):
         self.summary_label.setText(text)
-        self.summary_label.setMinimumHeight(
-            80
-        )  # Altura mínima para evitar redimensionamiento
-        summary_font = QFont()
-        summary_font.setPointSize(20)  # Mantener fuente grande en cada actualización
-        self.summary_label.setFont(summary_font)
 
     def retranslate_ui(self):
         self.label.setText(translation_service.tr("callsign"))

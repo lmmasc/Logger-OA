@@ -194,7 +194,7 @@ class LogFormWidget(QWidget):
                     if operator.enabled
                     else translation_service.tr("disabled")
                 )
-                summary = f"<table width='100%' style='font-size:14px;'>"
+                summary = f"<table width='100%' style='font-size:16px;'>"
                 summary += "<tr>"
                 summary += f"<td><b>{operator.name}</b></td>"
                 summary += f"<td>{translation_service.tr('district')}: {operator.district}</td>"
