@@ -71,7 +71,7 @@ class CallsignInputWidget(QWidget):
         self.summary_label.setText(text)
 
     def retranslate_ui(self):
-        self.label.setText(translation_service.tr("callsign"))
+        self.label.setText(translation_service.tr("enter_callsign_label"))
         self.summary_box.setTitle(translation_service.tr("callsign_summary"))
         # Retraducir el resumen si existe
         if self.summary_label.text():
