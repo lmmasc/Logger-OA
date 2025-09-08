@@ -58,4 +58,5 @@ UI_TRANSLATIONS = {
     "district": "District",
     "province": "Province",
     "department": "Department",
+    "suggestions_label": "Suggestions",
 }

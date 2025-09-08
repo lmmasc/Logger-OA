@@ -79,6 +79,7 @@ class CallsignInputWidget(QWidget):
         self.input.textChanged.connect(self._normalize_upper)
         # Traducir label y box al crear el widget
         self.retranslate_ui()
+        self._showing_suggestions = False  # Estado para el título dinámico
 
     def _normalize_upper(self, text):
         upper_text = text.upper()
@@ -96,6 +97,8 @@ class CallsignInputWidget(QWidget):
         self.input.setText(value.upper())
 
     def set_summary(self, text, show_suggestions=False):
+        # Por defecto mostrar sugerencias
+        self._showing_suggestions = True
         if show_suggestions:
             self.summary_scroll.hide()
             self.suggestion_list.show()
@@ -111,17 +114,24 @@ class CallsignInputWidget(QWidget):
                 font.setBold(True)
                 item.setFont(font)
                 self.suggestion_list.addItem(item)
+            self.summary_box.setTitle(translation_service.tr("suggestions_label"))
         else:
+            self._showing_suggestions = False
             self.suggestion_list.hide()
             self.summary_scroll.show()
             self.summary_label.setText(text)
+            self.summary_box.setTitle(translation_service.tr("callsign_summary"))
 
     def _on_suggestion_clicked(self, item):
         self.input.setText(item.text())
 
     def retranslate_ui(self):
         self.label.setText(translation_service.tr("enter_callsign_label"))
-        self.summary_box.setTitle(translation_service.tr("callsign_summary"))
+        # Actualiza el título según el estado actual
+        if getattr(self, "_showing_suggestions", False):
+            self.summary_box.setTitle(translation_service.tr("suggestions_label"))
+        else:
+            self.summary_box.setTitle(translation_service.tr("callsign_summary"))
         # Si hay un indicativo y existe en la base, regenerar el resumen traducido
         callsign = self.get_callsign().strip().upper()
         if callsign:
