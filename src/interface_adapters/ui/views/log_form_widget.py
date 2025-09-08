@@ -24,6 +24,9 @@ class LogFormWidget(QWidget):
         # Campo universal: Indicativo (ahora widget independiente)
         self.callsign_input = CallsignInputWidget(self)
         self.layout.addRow(self.callsign_input)
+        # Mostrar sugerencias por defecto al iniciar el formulario, pero vacías
+        self.callsign_input.set_summary("", show_suggestions=True)
+        self.callsign_input.suggestion_list.clear()
         # Campos específicos según tipo de log (orden para operativos)
         if log_type == "ops":
             self.station_input = QLineEdit(self)
@@ -217,4 +220,4 @@ class LogFormWidget(QWidget):
                 # Si no hay coincidencia, mostrar lista de sugerencias
                 self.callsign_input.set_summary("", show_suggestions=True)
         else:
-            self.callsign_input.set_summary("", show_suggestions=False)
+            self.callsign_input.set_summary("", show_suggestions=True)

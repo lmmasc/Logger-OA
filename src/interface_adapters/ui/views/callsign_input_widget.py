@@ -98,14 +98,21 @@ class CallsignInputWidget(QWidget):
 
     def set_summary(self, text, show_suggestions=False):
         # Por defecto mostrar sugerencias
-        self._showing_suggestions = True
+        filtro = self.input.text().strip()
+        if show_suggestions and len(filtro) == 0:
+            self._showing_suggestions = True
+            self.summary_scroll.hide()
+            self.suggestion_list.show()
+            self.suggestion_list.clear()
+            self.summary_box.setTitle(translation_service.tr("suggestions_label"))
+            return
+        self._showing_suggestions = show_suggestions
         if show_suggestions:
             self.summary_scroll.hide()
             self.suggestion_list.show()
             self.suggestion_list.clear()
             from utils.text import get_filtered_callsigns
 
-            filtro = self.input.text().strip()
             indicativos = get_filtered_callsigns(filtro)
             for indicativo in indicativos:
                 item = QListWidgetItem(indicativo)
