@@ -10,7 +10,8 @@ class LogOpsView(QWidget):
         super().__init__(parent)
         from .log_form_widget import LogFormWidget
         from .contact_table_widget import ContactTableWidget
-        from .callsign_suggestion_widget import CallsignSuggestionWidget
+
+        # from .callsign_suggestion_widget import CallsignSuggestionWidget
         from .contact_queue_widget import ContactQueueWidget
 
         layout = QVBoxLayout()
@@ -21,8 +22,7 @@ class LogOpsView(QWidget):
         layout.addWidget(self.header_label)
         self.form_widget = LogFormWidget(self, log_type="ops")
         layout.addWidget(self.form_widget)
-        self.suggestion_widget = CallsignSuggestionWidget(self)
-        layout.addWidget(self.suggestion_widget)
+        # CallsignSuggestionWidget eliminado
         self.queue_widget = ContactQueueWidget(self)
         layout.addWidget(self.queue_widget)
         self.table_widget = ContactTableWidget(self, log_type="ops")
@@ -68,6 +68,5 @@ class LogOpsView(QWidget):
         header_text = " | ".join([str(p) for p in header_parts if p])
         self.header_label.setText(header_text)
         self.form_widget.retranslate_ui()
-        self.suggestion_widget.retranslate_ui()
         self.table_widget.retranslate_ui()
         self.queue_widget.retranslate_ui()
