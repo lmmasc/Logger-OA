@@ -212,14 +212,9 @@ class LogFormWidget(QWidget):
                 summary += f"<td>{translation_service.tr('department')}: {operator.department}</td>"
                 summary += f"<td>{translation_service.tr('expiration')}: {operator.expiration_date}</td>"
                 summary += "</tr></table>"
+                self.callsign_input.set_summary(summary, show_suggestions=False)
             else:
-                # Si no hay coincidencia, mostrar HTML de prueba con lorem ipsum
-                summary = """
-                <div style='font-size:16px; color:#888; text-align:center;'>
-                    <b>No se encontró operador</b><br>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                    <p>Sed non risus. Suspendisse lectus tortor, dignissim sit amet.</p>
-                    <p>Adipiscing nec, ultricies sed, dolor.</p>
-                </div>
-                """
-        self.callsign_input.set_summary(summary)
+                # Si no hay coincidencia, mostrar lista de sugerencias
+                self.callsign_input.set_summary("", show_suggestions=True)
+        else:
+            self.callsign_input.set_summary("", show_suggestions=False)

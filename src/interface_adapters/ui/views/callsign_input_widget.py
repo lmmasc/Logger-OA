@@ -6,8 +6,11 @@ from PySide6.QtWidgets import (
     QLabel,
     QGroupBox,
     QScrollArea,
+    QListWidget,
+    QListWidgetItem,
 )
 from PySide6.QtGui import QFont
+from PySide6.QtCore import QSize
 from translation.translation_service import translation_service
 
 
@@ -29,27 +32,36 @@ class CallsignInputWidget(QWidget):
         font.setBold(True)
         self.input.setFont(font)
         self.input.setMinimumWidth(200)  # Ajuste leve para evitar recorte
-        # Elimina setMaximumWidth en input y contenedor
         left_box.addWidget(self.label)
         left_box.addWidget(self.input)
         left_widget = QWidget(self)
         left_widget.setLayout(left_box)
         left_widget.setMinimumWidth(200)
         main_layout.addWidget(left_widget, 2)  # Stretch factor bajo para indicativo
-        # Sección derecha: resumen
+        # Sección derecha: resumen y sugerencias
         self.summary_box = QGroupBox("", self)
         self.summary_label = QLabel("", self.summary_box)
         self.summary_label.setWordWrap(True)
         summary_font = QFont()
         summary_font.setPointSize(20)
         self.summary_label.setFont(summary_font)
-        # Scroll area para el resumen
         self.summary_scroll = QScrollArea(self.summary_box)
         self.summary_scroll.setWidgetResizable(True)
         self.summary_scroll.setWidget(self.summary_label)
         self.summary_scroll.setFixedHeight(80)  # Reducido para mejor integración visual
+        # Sugerencias
+        self.suggestion_list = QListWidget(self.summary_box)
+        self.suggestion_list.setFixedHeight(80)
+        self.suggestion_list.setViewMode(QListWidget.IconMode)
+        self.suggestion_list.setFlow(QListWidget.LeftToRight)
+        self.suggestion_list.setWrapping(True)
+        self.suggestion_list.setResizeMode(QListWidget.Adjust)
+        self.suggestion_list.setSpacing(5)  # Espaciado horizontal entre elementos
+        self.suggestion_list.hide()
+        self.suggestion_list.itemClicked.connect(self._on_suggestion_clicked)
         summary_layout = QVBoxLayout(self.summary_box)
         summary_layout.addWidget(self.summary_scroll)
+        summary_layout.addWidget(self.suggestion_list)
         self.summary_box.setLayout(summary_layout)
         main_layout.addWidget(self.summary_box, 5)  # Stretch factor alto para resumen
         self.setLayout(main_layout)
@@ -73,8 +85,82 @@ class CallsignInputWidget(QWidget):
     def set_callsign(self, value):
         self.input.setText(value.upper())
 
-    def set_summary(self, text):
-        self.summary_label.setText(text)
+    def set_summary(self, text, show_suggestions=False):
+        if show_suggestions:
+            self.summary_scroll.hide()
+            self.suggestion_list.show()
+            self.suggestion_list.clear()
+            indicativos = [
+                "OA4ABC",
+                "OA2XYZ",
+                "OA7DEF",
+                "OA4/ON5BAU",
+                "OA1QWE",
+                "OA3RTY",
+                "OA5UIO",
+                "OA6PAS",
+                "OA7DFG",
+                "OA8HJK",
+                "OA9LMN",
+                "OA0OPQ",
+                "OA2RST",
+                "OA3UVW",
+                "OA4XYZ",
+                "OA5ABC",
+                "OA6DEF",
+                "OA7GHI",
+                "OA8JKL",
+                "OA9MNO",
+                "OA0PQR",
+                "OA1STU",
+                "OA2VWX",
+                "OA3YZA",
+                "OA4BCD",
+                "OA5EFG",
+                "OA6HIJ",
+                "OA7KLM",
+                "OA8NOP",
+                "OA9QRS",
+                "OA0TUV",
+                "OA1WXY",
+                "OA2ZAB",
+                "OA3CDE",
+                "OA4FGH",
+                "OA5IJK",
+                "OA6LMN",
+                "OA7OPQ",
+                "OA8RST",
+                "OA9UVW",
+                "OA0XYZ",
+                "OA1ABC",
+                "OA2DEF",
+                "OA3GHI",
+                "OA4JKL",
+                "OA5MNO",
+                "OA6PQR",
+                "OA7STU",
+                "OA8VWX",
+                "OA9YZA",
+                "OA4/ON5BAU",
+                "OA4/ON5BAU",
+                "OA4/ON5BAU",
+                "OA4/ON5BAU",
+            ]
+            for indicativo in indicativos:
+                item = QListWidgetItem(indicativo)
+                font = QFont()
+                font.setPointSize(18)
+                font.setBold(True)
+                item.setFont(font)
+                # No modificar el alto ni el ancho, solo usar setSpacing para horizontal
+                self.suggestion_list.addItem(item)
+        else:
+            self.suggestion_list.hide()
+            self.summary_scroll.show()
+            self.summary_label.setText(text)
+
+    def _on_suggestion_clicked(self, item):
+        self.input.setText(item.text())
 
     def retranslate_ui(self):
         self.label.setText(translation_service.tr("enter_callsign_label"))
