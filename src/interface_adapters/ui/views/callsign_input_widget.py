@@ -5,6 +5,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QGroupBox,
+    QScrollArea,
 )
 from PySide6.QtGui import QFont
 from translation.translation_service import translation_service
@@ -38,12 +39,17 @@ class CallsignInputWidget(QWidget):
         # Sección derecha: resumen
         self.summary_box = QGroupBox("", self)
         self.summary_label = QLabel("", self.summary_box)
+        self.summary_label.setWordWrap(True)
         summary_font = QFont()
         summary_font.setPointSize(20)
         self.summary_label.setFont(summary_font)
-        self.summary_label.setMinimumHeight(80)
+        # Scroll area para el resumen
+        self.summary_scroll = QScrollArea(self.summary_box)
+        self.summary_scroll.setWidgetResizable(True)
+        self.summary_scroll.setWidget(self.summary_label)
+        self.summary_scroll.setFixedHeight(80)  # Reducido para mejor integración visual
         summary_layout = QVBoxLayout(self.summary_box)
-        summary_layout.addWidget(self.summary_label)
+        summary_layout.addWidget(self.summary_scroll)
         self.summary_box.setLayout(summary_layout)
         main_layout.addWidget(self.summary_box, 5)  # Stretch factor alto para resumen
         self.setLayout(main_layout)
