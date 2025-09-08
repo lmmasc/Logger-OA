@@ -99,8 +99,7 @@ def filter_text_match(
 
 def get_filtered_callsigns(filtro: str) -> list[str]:
     """
-    Devuelve una lista de indicativos filtrados y ordenados alfabéticamente
-    usando el mismo criterio que la ventana de base de datos.
+    Devuelve una lista de indicativos filtrados y ordenados primero por longitud y luego alfabéticamente.
     """
     from infrastructure.repositories.sqlite_radio_operator_repository import (
         SqliteRadioOperatorRepository,
@@ -113,4 +112,4 @@ def get_filtered_callsigns(filtro: str) -> list[str]:
     indicativos = [
         op.callsign for op in operadores if filter_text_match(op.callsign, filtro)
     ]
-    return sorted(indicativos)
+    return sorted(indicativos, key=lambda x: (len(x), x))
