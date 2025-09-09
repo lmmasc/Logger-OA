@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel
+from PySide6.QtWidgets import QWidget, QVBoxLayout
 from PySide6.QtCore import Qt
 from translation.translation_service import translation_service
 
@@ -10,6 +10,7 @@ class LogOpsView(QWidget):
         super().__init__(parent)
         from .log_form_widget import LogFormWidget
         from .contact_table_widget import ContactTableWidget
+        from .header_widget import HeaderWidget
 
         # from .callsign_suggestion_widget import CallsignSuggestionWidget
         from .contact_queue_widget import ContactQueueWidget
@@ -18,17 +19,14 @@ class LogOpsView(QWidget):
         layout.setContentsMargins(10, 4, 10, 10)
         layout.setSpacing(2)
         layout.setAlignment(Qt.AlignTop)
-        # Encabezado dinámico
-        header_text = f"{callsign} | {log_type_name} | {log_date}"
-        self.header_label = QLabel(header_text)
-        self.header_label.setAlignment(Qt.AlignCenter)
-        header_font = self.header_label.font()
-        header_font.setPointSize(18)  # Fuente ajustada
-        header_font.setBold(True)
-        self.header_label.setFont(header_font)
-        self.header_label.setFixedHeight(40)
-        layout.addWidget(self.header_label)
-        self.form_widget = LogFormWidget(self, log_type="ops")
+        # Encabezado dinámico eliminado
+        self.form_widget = LogFormWidget(
+            self,
+            log_type="ops",
+            callsign=callsign,
+            log_type_name=log_type_name,
+            log_date=log_date,
+        )
         self.queue_widget = ContactQueueWidget(self)
         self.form_widget.callsign_input.setMinimumHeight(80)
         self.form_widget.callsign_input.setFixedHeight(140)
@@ -83,13 +81,12 @@ class LogOpsView(QWidget):
                 log_date = date_obj.strftime("%m/%d/%Y")
         except Exception:
             log_date = dt
-        # Cabecera extendida
         header_parts = [callsign, tipo, banda, modo, freq]
         if rep:
             header_parts.append(rep)
         header_parts.append(log_date)
         header_text = " | ".join([str(p) for p in header_parts if p])
-        self.header_label.setText(header_text)
+        self.form_widget.update_header(header_text)
         self.form_widget.retranslate_ui()
         self.table_widget.retranslate_ui()
         self.queue_widget.retranslate_ui()

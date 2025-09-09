@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel
+from PySide6.QtWidgets import QWidget, QVBoxLayout
 from PySide6.QtCore import Qt
 from translation.translation_service import translation_service
 
@@ -14,18 +14,16 @@ class LogContestView(QWidget):
 
         layout = QVBoxLayout()
         layout.setContentsMargins(10, 4, 10, 10)  # Márgenes reducidos
-        # Encabezado dinámico
-        self.callsign = callsign
-        self.log_type_name = log_type_name
-        self.log_date_raw = log_date  # Guardar la fecha sin formato
-        self.header_label = QLabel()
-        self.header_label.setAlignment(Qt.AlignCenter)
-        header_font = self.header_label.font()
-        header_font.setPointSize(18)  # Fuente ajustada
-        header_font.setBold(True)
-        self.header_label.setFont(header_font)
-        layout.addWidget(self.header_label)
-        self.form_widget = LogFormWidget(self, log_type="contest")
+        # Encabezado dinámico eliminado
+        # self.header = HeaderWidget("", self)
+        # layout.addWidget(self.header)
+        self.form_widget = LogFormWidget(
+            self,
+            log_type="contest",
+            callsign=callsign,
+            log_type_name=log_type_name,
+            log_date=log_date,
+        )
         layout.addWidget(self.form_widget)
         # CallsignSuggestionWidget eliminado
         self.queue_widget = ContactQueueWidget(self)
@@ -45,7 +43,6 @@ class LogContestView(QWidget):
         from datetime import datetime
 
         lang = translation_service.get_language()
-        # Usar el log actualizado si existe
         log = getattr(self, "_current_log", None)
         callsign = log.operator if log else ""
         contest_key = (
@@ -68,7 +65,7 @@ class LogContestView(QWidget):
         except Exception:
             log_date = dt
         header_text = f"{callsign} | {contest_name} | {log_date}"
-        self.header_label.setText(header_text)
+        self.form_widget.update_header(header_text)
         self.form_widget.retranslate_ui()
         self.table_widget.retranslate_ui()
         self.queue_widget.retranslate_ui()

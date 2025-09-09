@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
 from translation.translation_service import translation_service
 from PySide6.QtCore import Qt
 from .clock_widget import ClockWidget
+from .header_widget import HeaderWidget
 
 
 class LogFormWidget(QWidget):
@@ -19,7 +20,14 @@ class LogFormWidget(QWidget):
     Widget base para formularios de contacto/log. Reutilizable en operativos y concursos.
     """
 
-    def __init__(self, parent=None, log_type="ops"):
+    def __init__(
+        self,
+        parent=None,
+        log_type="ops",
+        callsign="",
+        log_type_name="",
+        log_date="",
+    ):
         super().__init__(parent)
         from .callsign_input_widget import CallsignInputWidget
         from PySide6.QtWidgets import (
@@ -36,6 +44,13 @@ class LogFormWidget(QWidget):
         # Layout principal
         main_layout = QVBoxLayout()
         main_layout.setSpacing(12)
+
+        # Header como componente reutilizable
+        header_text = " | ".join(
+            [str(p) for p in [callsign, log_type_name, log_date] if p]
+        )
+        self.header = HeaderWidget(header_text, self)
+        main_layout.addWidget(self.header)
 
         # --- Formulario horizontal ---
         form_row = QHBoxLayout()
@@ -360,3 +375,7 @@ class LogFormWidget(QWidget):
                 self.callsign_input.set_summary("", show_suggestions=True)
         else:
             self.callsign_input.set_summary("", show_suggestions=True)
+
+    def update_header(self, text):
+        if hasattr(self, "header"):
+            self.header.set_text(text)
