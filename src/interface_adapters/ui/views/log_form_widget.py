@@ -61,28 +61,52 @@ class LogFormWidget(QWidget):
 
         # Campos específicos según tipo de log (orden para operativos)
         if log_type == "ops":
-            self.station_input = QLineEdit(self)
+            # Estación: selector
+            self.station_input = QComboBox(self)
+            self.station_input.addItems(
+                [
+                    translation_service.tr("no_data"),
+                    translation_service.tr("station_base"),
+                    translation_service.tr("station_mobile"),
+                    translation_service.tr("station_portable"),
+                ]
+            )
+            self.station_input.setCurrentIndex(0)
             add_row(
                 col1,
                 "station_label",
                 translation_service.tr("station"),
                 self.station_input,
             )
-            self.energy_input = QLineEdit(self)
+            # Energía: selector
+            self.energy_input = QComboBox(self)
+            self.energy_input.addItems(
+                [
+                    translation_service.tr("no_data"),
+                    translation_service.tr("energy_autonomous"),
+                    translation_service.tr("energy_battery"),
+                    translation_service.tr("energy_commercial"),
+                ]
+            )
+            self.energy_input.setCurrentIndex(0)
             add_row(
                 col1,
                 "energy_label",
                 translation_service.tr("energy"),
                 self.energy_input,
             )
+            # Potencia: valor por defecto 1
             self.power_input = QLineEdit(self)
+            self.power_input.setText("1")
             add_row(
                 col1, "power_label", translation_service.tr("power"), self.power_input
             )
         # Segunda columna: RS_RX, RS_TX, Observaciones
         self.rs_rx_input = QLineEdit(self)
+        self.rs_rx_input.setText("59")
         add_row(col2, "rs_rx_label", translation_service.tr("rs_rx"), self.rs_rx_input)
         self.rs_tx_input = QLineEdit(self)
+        self.rs_tx_input.setText("59")
         add_row(col2, "rs_tx_label", translation_service.tr("rs_tx"), self.rs_tx_input)
         self.observations_input = QLineEdit(self)
         add_row(
@@ -251,8 +275,12 @@ class LogFormWidget(QWidget):
             data["exchange_sent"] = self.exchange_sent_input.text()
             data["observations"] = self.observations_input.text()
         elif self.log_type == "ops":
-            data["station"] = self.station_input.text()
-            data["energy"] = self.energy_input.text()
+            data["station"] = (
+                self.station_input.currentText() if self.station_input else ""
+            )
+            data["energy"] = (
+                self.energy_input.currentText() if self.energy_input else ""
+            )
             data["power"] = self.power_input.text()
             data["obs"] = self.observations_input.text()
         return data
@@ -279,6 +307,29 @@ class LogFormWidget(QWidget):
             )
         if hasattr(self, "exchange_sent_label"):
             self.exchange_sent_label.setText(translation_service.tr("exchange_sent"))
+        # Traducir opciones de los selectores
+        if hasattr(self, "station_input") and isinstance(self.station_input, QComboBox):
+            items = [
+                translation_service.tr("no_data"),
+                translation_service.tr("station_base"),
+                translation_service.tr("station_mobile"),
+                translation_service.tr("station_portable"),
+            ]
+            current = self.station_input.currentIndex()
+            self.station_input.clear()
+            self.station_input.addItems(items)
+            self.station_input.setCurrentIndex(current)
+        if hasattr(self, "energy_input") and isinstance(self.energy_input, QComboBox):
+            items = [
+                translation_service.tr("no_data"),
+                translation_service.tr("energy_autonomous"),
+                translation_service.tr("energy_battery"),
+                translation_service.tr("energy_commercial"),
+            ]
+            current = self.energy_input.currentIndex()
+            self.energy_input.clear()
+            self.energy_input.addItems(items)
+            self.energy_input.setCurrentIndex(current)
         self.oa_label.setText(translation_service.tr("clock_oa_label"))
         self.utc_label.setText(translation_service.tr("clock_utc_label"))
 

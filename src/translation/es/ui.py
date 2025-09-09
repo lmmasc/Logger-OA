@@ -1,5 +1,12 @@
 # Traducciones de la interfaz de usuario (español)
 UI_TRANSLATIONS = {
+    "no_data": "Sin Datos",
+    "station_base": "Base",
+    "station_mobile": "Móvil",
+    "station_portable": "Portátil",
+    "energy_autonomous": "Autónoma",
+    "energy_battery": "Batería",
+    "energy_commercial": "Comercial",
     "enter_callsign_label": "Ingrese indicativo:",
     "select_log_type_label_create": "Selecciona el tipo de log a crear:",
     "select_log_type_label_open": "Selecciona el tipo de log a abrir:",

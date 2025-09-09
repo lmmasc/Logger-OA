@@ -1,5 +1,12 @@
 # UI translations (English)
 UI_TRANSLATIONS = {
+    "no_data": "No Data",
+    "station_base": "Base",
+    "station_mobile": "Mobile",
+    "station_portable": "Portable",
+    "energy_autonomous": "Autonomous",
+    "energy_battery": "Battery",
+    "energy_commercial": "Commercial",
     "enter_callsign_label": "Enter callsign:",
     "select_log_type_label_create": "Please select the type of log to create:",
     "select_log_type_label_open": "Please select the type of log to open:",
