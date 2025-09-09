@@ -2,7 +2,6 @@ from PySide6.QtWidgets import (
     QWidget,
     QLineEdit,
     QVBoxLayout,
-    QHBoxLayout,
     QLabel,
 )
 from PySide6.QtGui import QFont
@@ -20,11 +19,10 @@ class CallsignInputWidget(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        main_layout = QHBoxLayout(self)
-        left_box = QVBoxLayout()
-        left_box.setContentsMargins(0, 0, 0, 0)
-        left_box.setSpacing(0)
-        left_box.setAlignment(Qt.AlignTop)
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        layout.setAlignment(Qt.AlignTop)
         self.label = QLabel("", self)
         self.input = QLineEdit(self)
         font = QFont()
@@ -34,13 +32,9 @@ class CallsignInputWidget(QWidget):
         self.input.setMinimumWidth(200)
         self.label.setFixedHeight(32)
         self.input.setFixedHeight(64)
-        left_box.addWidget(self.label)
-        left_box.addWidget(self.input)
-        left_widget = QWidget(self)
-        left_widget.setLayout(left_box)
-        left_widget.setMinimumWidth(200)
-        main_layout.addWidget(left_widget, 2)
-        self.setLayout(main_layout)
+        layout.addWidget(self.label)
+        layout.addWidget(self.input)
+        self.setLayout(layout)
         self.input.textChanged.connect(self._normalize_upper)
         self.retranslate_ui()
         self.input.returnPressed.connect(self._on_return_pressed)
