@@ -62,6 +62,7 @@ UI_TRANSLATIONS = {
     "contact_queue": "Cola de espera",
     "station": "Estación",
     "power": "Potencia",
+    "energy": "Energía",
     "rs_rx": "RS (RX)",
     "rs_tx": "RS (TX)",
     "observations": "Observaciones",

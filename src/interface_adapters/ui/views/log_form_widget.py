@@ -50,6 +50,10 @@ class LogFormWidget(QWidget):
             form_layout.addRow(
                 QLabel(translation_service.tr("station")), self.station_input
             )
+            self.energy_input = QLineEdit(self)
+            form_layout.addRow(
+                QLabel(translation_service.tr("energy")), self.energy_input
+            )
             self.power_input = QLineEdit(self)
             form_layout.addRow(
                 QLabel(translation_service.tr("power")), self.power_input
@@ -219,6 +223,7 @@ class LogFormWidget(QWidget):
             data["observations"] = self.observations_input.text()
         elif self.log_type == "ops":
             data["station"] = self.station_input.text()
+            data["energy"] = self.energy_input.text()
             data["power"] = self.power_input.text()
             data["obs"] = self.observations_input.text()
         return data
@@ -245,6 +250,9 @@ class LogFormWidget(QWidget):
         elif self.log_type == "ops":
             self.form_layout.labelForField(self.station_input).setText(
                 translation_service.tr("station")
+            )
+            self.form_layout.labelForField(self.energy_input).setText(
+                translation_service.tr("energy")
             )
             self.form_layout.labelForField(self.power_input).setText(
                 translation_service.tr("power")
