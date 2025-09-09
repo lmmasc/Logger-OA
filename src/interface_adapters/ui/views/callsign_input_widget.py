@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (
     QListWidgetItem,
 )
 from PySide6.QtGui import QFont
-from PySide6.QtCore import QSize, Signal
+from PySide6.QtCore import QSize, Signal, Qt
 from translation.translation_service import translation_service
 
 
@@ -27,13 +27,18 @@ class CallsignInputWidget(QWidget):
         main_layout = QHBoxLayout(self)
         # Sección izquierda: label encima del campo
         left_box = QVBoxLayout()
-        self.label = QLabel("", self)  # Inicializa vacío para traducir luego
+        left_box.setContentsMargins(0, 0, 0, 0)
+        left_box.setSpacing(0)
+        left_box.setAlignment(Qt.AlignTop)
+        self.label = QLabel("", self)
         self.input = QLineEdit(self)
         font = QFont()
         font.setPointSize(32)  # Fuente mucho más grande
         font.setBold(True)
         self.input.setFont(font)
         self.input.setMinimumWidth(200)  # Ajuste leve para evitar recorte
+        self.label.setFixedHeight(32)
+        self.input.setFixedHeight(64)
         left_box.addWidget(self.label)
         left_box.addWidget(self.input)
         left_widget = QWidget(self)
@@ -71,7 +76,7 @@ class CallsignInputWidget(QWidget):
         )  # Reducir margen inferior a 0, mantener los demás
         self.summary_box.setStyleSheet(
             "QGroupBox { padding: 2px; margin-top: 10px; min-height: 110px; }"
-        )  # Restaurar el margin-top y min-height original
+        )
         summary_layout.addWidget(self.summary_scroll)
         summary_layout.addWidget(self.suggestion_list)
         self.summary_box.setLayout(summary_layout)

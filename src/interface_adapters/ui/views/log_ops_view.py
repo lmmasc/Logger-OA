@@ -15,7 +15,9 @@ class LogOpsView(QWidget):
         from .contact_queue_widget import ContactQueueWidget
 
         layout = QVBoxLayout()
-        layout.setContentsMargins(10, 4, 10, 10)  # Márgenes reducidos
+        layout.setContentsMargins(10, 4, 10, 10)
+        layout.setSpacing(2)
+        layout.setAlignment(Qt.AlignTop)
         # Encabezado dinámico
         header_text = f"{callsign} | {log_type_name} | {log_date}"
         self.header_label = QLabel(header_text)
@@ -24,18 +26,22 @@ class LogOpsView(QWidget):
         header_font.setPointSize(18)  # Fuente ajustada
         header_font.setBold(True)
         self.header_label.setFont(header_font)
+        self.header_label.setFixedHeight(40)
         layout.addWidget(self.header_label)
         self.form_widget = LogFormWidget(self, log_type="ops")
         self.queue_widget = ContactQueueWidget(self)
-        # layout.addWidget(self.form_widget)
-        # layout.addWidget(self.queue_widget)
-        # Nuevo orden: primero el widget de ingreso de indicativo, luego la cola, luego el formulario
+        self.form_widget.callsign_input.setMinimumHeight(80)
+        self.form_widget.callsign_input.setFixedHeight(140)
         layout.addWidget(self.form_widget.callsign_input)
+        self.queue_widget.setFixedHeight(90)
         layout.addWidget(self.queue_widget)
-        # Agregar el resto del formulario
+        # El formulario ya no tiene altura fija, solo política preferida
+        from PySide6.QtWidgets import QSizePolicy
+
+        self.form_widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         layout.addWidget(self.form_widget)
-        # CallsignSuggestionWidget eliminado
         self.table_widget = ContactTableWidget(self, log_type="ops")
+        self.table_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         layout.addWidget(self.table_widget)
         self.setLayout(layout)
         translation_service.signal.language_changed.connect(self.retranslate_ui)

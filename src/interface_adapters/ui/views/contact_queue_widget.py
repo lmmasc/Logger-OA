@@ -26,7 +26,8 @@ class ContactQueueWidget(QWidget):
         self.queue_list = QListWidget(self)
         self.queue_list.setFlow(QListView.LeftToRight)
         self.queue_list.setWrapping(False)
-        self.queue_list.setFixedHeight(60)  # Contenedor más alto
+        self.label.setFixedHeight(42)
+        self.queue_list.setFixedHeight(58)
         font = self.queue_list.font()
         font.setPointSize(18)
         self.queue_list.setFont(font)
