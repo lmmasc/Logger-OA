@@ -40,6 +40,13 @@ class LogOpsView(QWidget):
         self.setLayout(layout)
         translation_service.signal.language_changed.connect(self.retranslate_ui)
 
+        self.form_widget.callsign_input.addToQueue.connect(
+            self.queue_widget.add_to_queue
+        )
+        self.queue_widget.setCallsign.connect(
+            self.form_widget.callsign_input.input.setText
+        )
+
     def set_log_data(self, log):
         self._current_log = log
         self.retranslate_ui()

@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (
     QListWidgetItem,
 )
 from PySide6.QtGui import QFont
-from PySide6.QtCore import QSize
+from PySide6.QtCore import QSize, Signal
 from translation.translation_service import translation_service
 
 
@@ -19,6 +19,8 @@ class CallsignInputWidget(QWidget):
     Widget independiente para el campo de indicativo (callsign).
     Permite reutilización y fácil integración de validaciones/autocompletado.
     """
+
+    addToQueue = Signal(str)  # Señal para agregar a la cola
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -80,6 +82,7 @@ class CallsignInputWidget(QWidget):
         # Traducir label y box al crear el widget
         self.retranslate_ui()
         self._showing_suggestions = False  # Estado para el título dinámico
+        self.input.returnPressed.connect(self._on_return_pressed)
 
     def _normalize_upper(self, text):
         upper_text = text.upper()
@@ -133,6 +136,12 @@ class CallsignInputWidget(QWidget):
 
     def _on_suggestion_clicked(self, item):
         self.input.setText(item.text())
+
+    def _on_return_pressed(self):
+        text = self.input.text().strip()
+        if text:
+            self.addToQueue.emit(text)
+            self.input.clear()
 
     def retranslate_ui(self):
         self.label.setText(translation_service.tr("enter_callsign_label"))
