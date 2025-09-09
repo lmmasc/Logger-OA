@@ -59,4 +59,5 @@ UI_TRANSLATIONS = {
     "province": "Provincia",
     "department": "Departamento",
     "suggestions_label": "Sugerencias",
+    "contact_queue": "Cola de espera",
 }

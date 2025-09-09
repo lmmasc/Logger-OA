@@ -26,10 +26,15 @@ class LogOpsView(QWidget):
         self.header_label.setFont(header_font)
         layout.addWidget(self.header_label)
         self.form_widget = LogFormWidget(self, log_type="ops")
+        self.queue_widget = ContactQueueWidget(self)
+        # layout.addWidget(self.form_widget)
+        # layout.addWidget(self.queue_widget)
+        # Nuevo orden: primero el widget de ingreso de indicativo, luego la cola, luego el formulario
+        layout.addWidget(self.form_widget.callsign_input)
+        layout.addWidget(self.queue_widget)
+        # Agregar el resto del formulario
         layout.addWidget(self.form_widget)
         # CallsignSuggestionWidget eliminado
-        self.queue_widget = ContactQueueWidget(self)
-        layout.addWidget(self.queue_widget)
         self.table_widget = ContactTableWidget(self, log_type="ops")
         layout.addWidget(self.table_widget)
         self.setLayout(layout)

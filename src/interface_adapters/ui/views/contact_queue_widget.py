@@ -9,7 +9,9 @@ class ContactQueueWidget(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.layout = QVBoxLayout(self)
+        from PySide6.QtWidgets import QHBoxLayout
+
+        self.layout = QHBoxLayout(self)
         self.label = QLabel(translation_service.tr("contact_queue"), self)
         self.queue_list = QListWidget(self)
         self.layout.addWidget(self.label)
