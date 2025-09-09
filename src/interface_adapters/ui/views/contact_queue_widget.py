@@ -6,6 +6,8 @@ from PySide6.QtWidgets import (
     QLabel,
     QMenu,
     QHBoxLayout,
+    QListWidgetItem,
+    QListView,
 )
 from translation.translation_service import translation_service
 
@@ -19,10 +21,19 @@ class ContactQueueWidget(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-
         self.layout = QHBoxLayout(self)
         self.label = QLabel(translation_service.tr("contact_queue"), self)
         self.queue_list = QListWidget(self)
+        self.queue_list.setFlow(QListView.LeftToRight)
+        self.queue_list.setWrapping(False)
+        self.queue_list.setFixedHeight(60)  # Contenedor más alto
+        font = self.queue_list.font()
+        font.setPointSize(18)
+        self.queue_list.setFont(font)
+        self.queue_list.setStyleSheet(
+            "QListWidget::item { background: #1976d2; color: white; border-radius: 8px; margin: 2px 8px; padding: 2px 8px; min-width: 0px; font-weight: bold; min-height: 28px; max-height: 32px; } QListWidget::item:selected { background: #1565c0; }"
+        )
+        self.queue_list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.layout.addWidget(self.label)
         self.layout.addWidget(self.queue_list)
         self.setLayout(self.layout)
@@ -37,7 +48,8 @@ class ContactQueueWidget(QWidget):
             self.queue_list.addItem(str(contact))
 
     def add_to_queue(self, text):
-        self.queue_list.addItem(text)
+        item = QListWidgetItem(text)
+        self.queue_list.addItem(item)
 
     def remove_selected(self):
         item = self.queue_list.currentItem()
