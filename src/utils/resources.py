@@ -8,4 +8,6 @@ def get_resource_path(relative_path):
     """
     if hasattr(sys, "_MEIPASS"):
         return os.path.join(sys._MEIPASS, relative_path)
-    return os.path.join(os.path.dirname(__file__), "..", relative_path)
+    # En desarrollo, usar la raíz del proyecto
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    return os.path.join(base_dir, relative_path)
