@@ -15,10 +15,15 @@ class LogOpsView(QWidget):
         from .contact_queue_widget import ContactQueueWidget
 
         layout = QVBoxLayout()
+        layout.setContentsMargins(10, 4, 10, 10)  # Márgenes reducidos
         # Encabezado dinámico
         header_text = f"{callsign} | {log_type_name} | {log_date}"
         self.header_label = QLabel(header_text)
         self.header_label.setAlignment(Qt.AlignCenter)
+        header_font = self.header_label.font()
+        header_font.setPointSize(18)  # Fuente ajustada
+        header_font.setBold(True)
+        self.header_label.setFont(header_font)
         layout.addWidget(self.header_label)
         self.form_widget = LogFormWidget(self, log_type="ops")
         layout.addWidget(self.form_widget)

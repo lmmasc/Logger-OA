@@ -21,6 +21,7 @@ class LogFormWidget(QWidget):
 
         self.log_type = log_type
         self.layout = QFormLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)  # Sin margen superior
         # Campo universal: Indicativo (ahora widget independiente)
         self.callsign_input = CallsignInputWidget(self)
         self.layout.addRow(self.callsign_input)
