@@ -7,6 +7,7 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QHBoxLayout,
     QVBoxLayout,
+    QSizePolicy,
 )
 from translation.translation_service import translation_service
 from PySide6.QtCore import Qt
@@ -32,116 +33,123 @@ class LogFormWidget(QWidget):
         from PySide6.QtCore import QTimer
 
         self.log_type = log_type
-        main_layout = QHBoxLayout(self)
-        # Sección izquierda: formulario en dos columnas
-        form_widget = QWidget(self)
-        columns_layout = QHBoxLayout(form_widget)
-        columns_layout.setContentsMargins(0, 0, 0, 0)
-        # Primera columna
-        col1 = QVBoxLayout()
-        col1.setSpacing(4)
-        # Segunda columna
-        col2 = QVBoxLayout()
-        col2.setSpacing(4)
-        # Campo universal: Indicativo (arriba de todo, ocupa ambas columnas)
+        # Layout principal
+        main_layout = QVBoxLayout()
+        main_layout.setSpacing(12)
+
+        # --- Formulario horizontal ---
+        form_row = QHBoxLayout()
+        form_row.setSpacing(4)
+        form_row.setContentsMargins(0, 0, 0, 0)
+
+        # Indicativo (callsign)
         self.callsign_input = CallsignInputWidget(self)
-        columns_layout.addWidget(self.callsign_input)
         self.callsign_input.set_summary("", show_suggestions=True)
         self.callsign_input.suggestion_list.clear()
+        self.callsign_input.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        form_row.addWidget(self.callsign_input)
 
-        # Helper para crear fila label-campo
-        def add_row(layout, label_name, label_text, field):
-            row = QHBoxLayout()
-            label = QLabel(label_text)
-            label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-            row.addWidget(label)
-            row.addWidget(field)
-            layout.addLayout(row)
-            setattr(self, label_name, label)
+        # Station
+        self.station_input = QComboBox(self)
+        self.station_input.addItems(
+            [
+                translation_service.tr("no_data"),
+                translation_service.tr("station_base"),
+                translation_service.tr("station_mobile"),
+                translation_service.tr("station_portable"),
+            ]
+        )
+        self.station_input.setCurrentIndex(0)
+        self.station_input.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        station_label = QLabel(translation_service.tr("station"))
+        station_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        station_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        form_row.addWidget(station_label)
+        form_row.addWidget(self.station_input)
+        self.station_label = station_label
 
-        # Campos específicos según tipo de log (orden para operativos)
-        if log_type == "ops":
-            # Estación: selector
-            self.station_input = QComboBox(self)
-            self.station_input.addItems(
-                [
-                    translation_service.tr("no_data"),
-                    translation_service.tr("station_base"),
-                    translation_service.tr("station_mobile"),
-                    translation_service.tr("station_portable"),
-                ]
-            )
-            self.station_input.setCurrentIndex(0)
-            add_row(
-                col1,
-                "station_label",
-                translation_service.tr("station"),
-                self.station_input,
-            )
-            # Energía: selector
-            self.energy_input = QComboBox(self)
-            self.energy_input.addItems(
-                [
-                    translation_service.tr("no_data"),
-                    translation_service.tr("energy_autonomous"),
-                    translation_service.tr("energy_battery"),
-                    translation_service.tr("energy_commercial"),
-                ]
-            )
-            self.energy_input.setCurrentIndex(0)
-            add_row(
-                col1,
-                "energy_label",
-                translation_service.tr("energy"),
-                self.energy_input,
-            )
-            # Potencia: valor por defecto 1
-            self.power_input = QLineEdit(self)
-            self.power_input.setText("1")
-            add_row(
-                col1, "power_label", translation_service.tr("power"), self.power_input
-            )
-        # Segunda columna: RS_RX, RS_TX, Observaciones
+        # Energy
+        self.energy_input = QComboBox(self)
+        self.energy_input.addItems(
+            [
+                translation_service.tr("no_data"),
+                translation_service.tr("energy_autonomous"),
+                translation_service.tr("energy_battery"),
+                translation_service.tr("energy_commercial"),
+            ]
+        )
+        self.energy_input.setCurrentIndex(0)
+        self.energy_input.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        energy_label = QLabel(translation_service.tr("energy"))
+        energy_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        energy_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        form_row.addWidget(energy_label)
+        form_row.addWidget(self.energy_input)
+        self.energy_label = energy_label
+
+        # Power
+        self.power_input = QLineEdit(self)
+        self.power_input.setText("1")
+        self.power_input.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        power_label = QLabel(translation_service.tr("power"))
+        power_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        power_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        form_row.addWidget(power_label)
+        form_row.addWidget(self.power_input)
+        self.power_label = power_label
+
+        # RS_RX
         self.rs_rx_input = QLineEdit(self)
         self.rs_rx_input.setText("59")
-        add_row(col2, "rs_rx_label", translation_service.tr("rs_rx"), self.rs_rx_input)
+        self.rs_rx_input.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        rs_rx_label = QLabel(translation_service.tr("rs_rx"))
+        rs_rx_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        rs_rx_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        form_row.addWidget(rs_rx_label)
+        form_row.addWidget(self.rs_rx_input)
+        self.rs_rx_label = rs_rx_label
+
+        # RS_TX
         self.rs_tx_input = QLineEdit(self)
         self.rs_tx_input.setText("59")
-        add_row(col2, "rs_tx_label", translation_service.tr("rs_tx"), self.rs_tx_input)
+        self.rs_tx_input.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        rs_tx_label = QLabel(translation_service.tr("rs_tx"))
+        rs_tx_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        rs_tx_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        form_row.addWidget(rs_tx_label)
+        form_row.addWidget(self.rs_tx_input)
+        self.rs_tx_label = rs_tx_label
+
+        # Observaciones (expansivo)
         self.observations_input = QLineEdit(self)
-        add_row(
-            col2,
-            "observations_label",
-            translation_service.tr("observations"),
-            self.observations_input,
-        )
-        # Campos específicos para concursos
-        if log_type == "contest":
-            self.exchange_received_input = QLineEdit(self)
-            add_row(
-                col2,
-                "exchange_received_label",
-                translation_service.tr("exchange_received"),
-                self.exchange_received_input,
-            )
-            self.exchange_sent_input = QLineEdit(self)
-            add_row(
-                col2,
-                "exchange_sent_label",
-                translation_service.tr("exchange_sent"),
-                self.exchange_sent_input,
-            )
-        # Añadir columnas al layout
-        columns_layout.addLayout(col1)
-        columns_layout.addLayout(col2)
-        form_widget.setLayout(columns_layout)
-        main_layout.addWidget(form_widget, 3)
-        # Sección derecha: relojes
-        clock_widget = QWidget(self)
-        clock_layout = QHBoxLayout(clock_widget)
+        self.observations_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        obs_label = QLabel(translation_service.tr("observations"))
+        obs_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        obs_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        form_row.addWidget(obs_label)
+        form_row.addWidget(self.observations_input)
+        self.observations_label = obs_label
+
+        # Widget del formulario
+        form_row_widget = QWidget(self)
+        form_row_widget.setLayout(form_row)
+        form_row_widget.setMinimumWidth(700)
+        form_row_widget.setSizePolicy(
+            QSizePolicy.Preferred, QSizePolicy.Fixed
+        )  # No expansivo, solo lo necesario
+        main_layout.addWidget(form_row_widget)
+
+        # --- Bloque de relojes y botones ---
+        block_layout = QHBoxLayout()
+        block_layout.setContentsMargins(0, 0, 0, 0)
+        block_layout.setSpacing(16)
+
+        # Relojes
+        clock_layout = QHBoxLayout()
         clock_layout.setContentsMargins(0, 0, 0, 0)
         clock_layout.setSpacing(16)
-        # Subwidget OA
+
+        # OA
         oa_box = QVBoxLayout()
         oa_box.setSpacing(2)
         self.oa_label = QLabel(self)
@@ -159,7 +167,8 @@ class LogFormWidget(QWidget):
         oa_box.addWidget(self.oa_date)
         oa_widget = QWidget(self)
         oa_widget.setLayout(oa_box)
-        # Subwidget UTC
+
+        # UTC
         utc_box = QVBoxLayout()
         utc_box.setSpacing(2)
         self.utc_label = QLabel(self)
@@ -177,26 +186,30 @@ class LogFormWidget(QWidget):
         utc_box.addWidget(self.utc_date)
         utc_widget = QWidget(self)
         utc_widget.setLayout(utc_box)
-        # Añadir ambos al layout horizontal
+
         clock_layout.addWidget(oa_widget)
         clock_layout.addWidget(utc_widget)
+
+        clock_widget = QWidget(self)
         clock_widget.setLayout(clock_layout)
-        main_layout.insertWidget(1, clock_widget, 1)
-        # Timer para actualizar los relojes
-        self._clock_timer = QTimer(self)
-        self._clock_timer.timeout.connect(self._update_clocks)
-        self._clock_timer.start(1000)
-        # Sección final: botones
-        button_widget = QWidget(self)
-        button_layout = QVBoxLayout(button_widget)
+        block_layout.addWidget(clock_widget)
+
+        # Botón
+        button_layout = QVBoxLayout()
         self.add_contact_btn = QPushButton(translation_service.tr("add_contact"), self)
         button_layout.addWidget(self.add_contact_btn)
+        button_widget = QWidget(self)
         button_widget.setLayout(button_layout)
-        main_layout.addWidget(button_widget, 1)
+        block_layout.addWidget(button_widget)
+
+        block_widget = QWidget(self)
+        block_widget.setLayout(block_layout)
+        main_layout.addWidget(block_widget)
+
+        # Asignar layout principal
         self.setLayout(main_layout)
 
         self.add_contact_btn.clicked.connect(self._on_add_contact)
-
         self.callsign_input.input.textChanged.connect(self._update_callsign_summary)
 
     def _on_add_contact(self):
