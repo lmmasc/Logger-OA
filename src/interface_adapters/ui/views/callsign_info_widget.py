@@ -24,7 +24,7 @@ class CallsignInfoWidget(QWidget):
         self._showing_suggestions = False
         self._current_callsign = ""
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(2, 2, 2, 2)
+        layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(4)
         # Título dinámico
         self.title_label = QLabel("", self)
