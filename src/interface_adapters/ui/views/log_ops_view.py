@@ -17,6 +17,8 @@ class LogOpsView(QWidget):
 
         # from .callsign_suggestion_widget import CallsignSuggestionWidget
         from .contact_queue_widget import ContactQueueWidget
+        from .callsign_input_widget import CallsignInputWidget
+        from .callsign_info_widget import CallsignInfoWidget
 
         layout = QVBoxLayout()
         layout.setContentsMargins(10, 4, 10, 10)
@@ -33,10 +35,6 @@ class LogOpsView(QWidget):
             log_date=log_date,
         )
         self.queue_widget = ContactQueueWidget(self)
-        self.form_widget.callsign_input.setMinimumHeight(80)
-        self.form_widget.callsign_input.setFixedHeight(140)
-        layout.addWidget(self.form_widget.callsign_input)
-        self.queue_widget.setFixedHeight(90)
         layout.addWidget(self.queue_widget)
         # El formulario ya no tiene altura fija, solo política preferida
         from PySide6.QtWidgets import QSizePolicy
@@ -46,15 +44,25 @@ class LogOpsView(QWidget):
         self.table_widget = ContactTableWidget(self, log_type="ops")
         self.table_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         layout.addWidget(self.table_widget)
+        # Nuevo bloque: input y área de info
+        self.callsign_input = CallsignInputWidget(self)
+        self.callsign_info = CallsignInfoWidget(self)
+        layout.addWidget(self.callsign_input)
+        layout.addWidget(self.callsign_info)
+        # Conexión de sugerencias
+        self.callsign_info.suggestionSelected.connect(self.callsign_input.set_callsign)
+        # Actualización dinámica del área de info
+        self.callsign_input.input.textChanged.connect(self.callsign_info.update_info)
+        self.callsign_info.update_info(self.callsign_input.get_callsign())
         self.setLayout(layout)
         translation_service.signal.language_changed.connect(self.retranslate_ui)
 
-        self.form_widget.callsign_input.addToQueue.connect(
-            self.queue_widget.add_to_queue
-        )
-        self.queue_widget.setCallsign.connect(
-            self.form_widget.callsign_input.input.setText
-        )
+        # self.form_widget.callsign_input.addToQueue.connect(
+        #     self.queue_widget.add_to_queue
+        # )
+        # self.queue_widget.setCallsign.connect(
+        #     self.form_widget.callsign_input.input.setText
+        # )
         self.update_header()
 
     def set_log_data(self, log):
@@ -100,3 +108,27 @@ class LogOpsView(QWidget):
     def update_header(self):
         header_text = f"{self.log_type_name} - {self.callsign} - {self.log_date}"
         self.header_widget.update_text(header_text)
+
+    def _update_callsign_info(self):
+        filtro = self.callsign_input.get_callsign().strip()
+        if filtro:
+            # Si hay texto, mostrar sugerencias si el texto es corto, si no mostrar resumen
+            if len(filtro) < 3:
+                self.callsign_info.show_suggestions(filtro)
+            else:
+                # Buscar operador y mostrar resumen si existe
+                from infrastructure.repositories.sqlite_radio_operator_repository import (
+                    SqliteRadioOperatorRepository,
+                )
+
+                repo = SqliteRadioOperatorRepository()
+                operator = repo.get_operator_by_callsign(filtro)
+                if operator:
+                    resumen = f"{operator.callsign} - {operator.name}"
+                    self.callsign_info.show_summary(resumen)
+                else:
+                    self.callsign_info.show_summary(
+                        translation_service.tr("callsign_not_found")
+                    )
+        else:
+            self.callsign_info.show_suggestions("")

@@ -40,15 +40,6 @@ class LogFormWidget(QWidget):
         form_row.setSpacing(4)
         form_row.setContentsMargins(0, 0, 0, 0)
 
-        # Indicativo (callsign)
-        from .callsign_input_widget import CallsignInputWidget
-
-        self.callsign_input = CallsignInputWidget(self)
-        self.callsign_input.set_summary("", show_suggestions=True)
-        self.callsign_input.suggestion_list.clear()
-        self.callsign_input.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        form_row.addWidget(self.callsign_input)
-
         # Station
         self.station_input = QComboBox(self)
         self.station_input.addItems(
@@ -176,7 +167,7 @@ class LogFormWidget(QWidget):
         self.setLayout(main_layout)
 
         self.add_contact_btn.clicked.connect(self._on_add_contact)
-        self.callsign_input.input.textChanged.connect(self._update_callsign_summary)
+        # self.callsign_input.input.textChanged.connect(self._update_callsign_summary)
 
     def _on_add_contact(self):
         # Recoge datos y llama al caso de uso
@@ -266,7 +257,6 @@ class LogFormWidget(QWidget):
 
     def retranslate_ui(self):
         """Actualiza los textos según el idioma."""
-        self.callsign_input.retranslate_ui()
         # Actualizar todos los labels manualmente por el nuevo layout
         if hasattr(self, "station_label"):
             self.station_label.setText(translation_service.tr("station"))
@@ -314,49 +304,3 @@ class LogFormWidget(QWidget):
             self.oa_clock.set_label_text(translation_service.tr("clock_oa_label"))
         if hasattr(self, "utc_clock"):
             self.utc_clock.set_label_text(translation_service.tr("clock_utc_label"))
-
-    def _update_callsign_summary(self):
-        callsign = self.callsign_input.get_callsign().strip().upper()
-        summary = ""
-        if callsign:
-            from infrastructure.repositories.sqlite_radio_operator_repository import (
-                SqliteRadioOperatorRepository,
-            )
-
-            repo = SqliteRadioOperatorRepository()
-            operator = (
-                repo.get_operator_by_callsign(callsign)
-                if hasattr(repo, "get_operator_by_callsign")
-                else None
-            )
-            if operator:
-                # Formato en tabla 3x3
-                enabled = (
-                    translation_service.tr("enabled")
-                    if operator.enabled
-                    else translation_service.tr("disabled")
-                )
-                summary = f"<table width='100%' style='font-size:16px;'>"
-                summary += "<tr>"
-                summary += f"<td><b>{operator.name}</b></td>"
-                summary += f"<td>{translation_service.tr('district')}: {operator.district}</td>"
-                summary += f"<td>{translation_service.tr('category')}: {operator.category}</td>"
-                summary += "</tr><tr>"
-                summary += (
-                    f"<td>{translation_service.tr('country')}: {operator.country}</td>"
-                )
-                summary += f"<td>{translation_service.tr('province')}: {operator.province}</td>"
-                summary += (
-                    f"<td>{translation_service.tr('type')}: {operator.type_}</td>"
-                )
-                summary += "</tr><tr>"
-                summary += f"<td>{translation_service.tr('enabled') if operator.enabled else translation_service.tr('disabled')}</td>"
-                summary += f"<td>{translation_service.tr('department')}: {operator.department}</td>"
-                summary += f"<td>{translation_service.tr('expiration')}: {operator.expiration_date}</td>"
-                summary += "</tr></table>"
-                self.callsign_input.set_summary(summary, show_suggestions=False)
-            else:
-                # Si no hay coincidencia, mostrar lista de sugerencias
-                self.callsign_input.set_summary("", show_suggestions=True)
-        else:
-            self.callsign_input.set_summary("", show_suggestions=True)
