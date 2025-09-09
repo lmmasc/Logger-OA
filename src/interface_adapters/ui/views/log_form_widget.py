@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (
 )
 from translation.translation_service import translation_service
 from PySide6.QtCore import Qt
-import datetime
+from .clock_widget import ClockWidget
 
 
 class LogFormWidget(QWidget):
@@ -144,55 +144,18 @@ class LogFormWidget(QWidget):
         block_layout.setContentsMargins(0, 0, 0, 0)
         block_layout.setSpacing(16)
 
-        # Relojes en fila
+        # Relojes en fila usando ClockWidget
+        self.oa_clock = ClockWidget(
+            translation_service.tr("clock_oa_label"), "red", self, utc=False
+        )
+        self.utc_clock = ClockWidget(
+            translation_service.tr("clock_utc_label"), "green", self, utc=True
+        )
         clock_layout = QHBoxLayout()
         clock_layout.setContentsMargins(0, 0, 0, 0)
         clock_layout.setSpacing(16)
-
-        # OA y UTC: datos internos en fila
-        # OA
-        oa_widget = QWidget(self)
-        oa_widget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        oa_data_layout = QHBoxLayout()
-        oa_data_layout.setSpacing(8)
-        self.oa_label = QLabel(self)
-        self.oa_label.setText(translation_service.tr("clock_oa_label"))
-        self.oa_label.setAlignment(Qt.AlignCenter)
-        self.oa_label.setStyleSheet("color: red; font-weight: bold;")
-        self.oa_time = QLabel(self)
-        self.oa_time.setAlignment(Qt.AlignCenter)
-        self.oa_time.setStyleSheet("color: red; font-size: 30px; font-weight: bold;")
-        self.oa_date = QLabel(self)
-        self.oa_date.setAlignment(Qt.AlignCenter)
-        self.oa_date.setStyleSheet("color: red;")
-        oa_data_layout.addWidget(self.oa_label)
-        oa_data_layout.addWidget(self.oa_time)
-        oa_data_layout.addWidget(self.oa_date)
-        oa_widget.setLayout(oa_data_layout)
-
-        # UTC
-        utc_widget = QWidget(self)
-        utc_widget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        utc_data_layout = QHBoxLayout()
-        utc_data_layout.setSpacing(8)
-        self.utc_label = QLabel(self)
-        self.utc_label.setText(translation_service.tr("clock_utc_label"))
-        self.utc_label.setAlignment(Qt.AlignCenter)
-        self.utc_label.setStyleSheet("color: green; font-weight: bold;")
-        self.utc_time = QLabel(self)
-        self.utc_time.setAlignment(Qt.AlignCenter)
-        self.utc_time.setStyleSheet("color: green; font-size: 30px; font-weight: bold;")
-        self.utc_date = QLabel(self)
-        self.utc_date.setAlignment(Qt.AlignCenter)
-        self.utc_date.setStyleSheet("color: green;")
-        utc_data_layout.addWidget(self.utc_label)
-        utc_data_layout.addWidget(self.utc_time)
-        utc_data_layout.addWidget(self.utc_date)
-        utc_widget.setLayout(utc_data_layout)
-
-        clock_layout.addWidget(oa_widget)
-        clock_layout.addWidget(utc_widget)
-
+        clock_layout.addWidget(self.oa_clock)
+        clock_layout.addWidget(self.utc_clock)
         clock_widget = QWidget(self)
         clock_widget.setLayout(clock_layout)
         block_layout.addWidget(clock_widget)
@@ -214,12 +177,6 @@ class LogFormWidget(QWidget):
 
         self.add_contact_btn.clicked.connect(self._on_add_contact)
         self.callsign_input.input.textChanged.connect(self._update_callsign_summary)
-
-        # Inicializar y conectar QTimer para actualizar los relojes
-        self.clock_timer = QTimer(self)
-        self.clock_timer.timeout.connect(self._update_clocks)
-        self.clock_timer.start(1000)  # Actualiza cada segundo
-        self._update_clocks()  # Actualiza al iniciar
 
     def _on_add_contact(self):
         # Recoge datos y llama al caso de uso
@@ -352,8 +309,11 @@ class LogFormWidget(QWidget):
             self.energy_input.clear()
             self.energy_input.addItems(items)
             self.energy_input.setCurrentIndex(current)
-        self.oa_label.setText(translation_service.tr("clock_oa_label"))
-        self.utc_label.setText(translation_service.tr("clock_utc_label"))
+        # Actualizar los labels de los relojes
+        if hasattr(self, "oa_clock"):
+            self.oa_clock.set_label_text(translation_service.tr("clock_oa_label"))
+        if hasattr(self, "utc_clock"):
+            self.utc_clock.set_label_text(translation_service.tr("clock_utc_label"))
 
     def _update_callsign_summary(self):
         callsign = self.callsign_input.get_callsign().strip().upper()
@@ -400,16 +360,3 @@ class LogFormWidget(QWidget):
                 self.callsign_input.set_summary("", show_suggestions=True)
         else:
             self.callsign_input.set_summary("", show_suggestions=True)
-
-    def _update_clocks(self):
-        now = datetime.datetime.now()
-        now_utc = datetime.datetime.utcnow()
-        lang = translation_service.get_language()
-        if lang == "es":
-            date_fmt = "%d/%m/%Y"
-        else:
-            date_fmt = "%m/%d/%Y"
-        self.oa_time.setText(now.strftime("%H:%M:%S"))
-        self.oa_date.setText(now.strftime(date_fmt))
-        self.utc_time.setText(now_utc.strftime("%H:%M:%S"))
-        self.utc_date.setText(now_utc.strftime(date_fmt))
