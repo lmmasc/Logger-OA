@@ -6,6 +6,9 @@ from translation.translation_service import translation_service
 class LogContestView(QWidget):
     def __init__(self, parent=None, callsign="", log_type_name="Concurso", log_date=""):
         super().__init__(parent)
+        self.callsign = callsign
+        self.log_type_name = log_type_name
+        self.log_date = log_date
         from .log_form_widget import LogFormWidget
         from .contact_table_widget import ContactTableWidget
 
@@ -32,6 +35,13 @@ class LogContestView(QWidget):
         layout.addWidget(self.table_widget)
         self.setLayout(layout)
         translation_service.signal.language_changed.connect(self.retranslate_ui)
+
+        # Header
+        from .header_widget import HeaderWidget
+
+        self.header_widget = HeaderWidget()
+        layout.addWidget(self.header_widget)
+        self.update_header()
         self.retranslate_ui()
 
     def set_log_data(self, log):
@@ -65,7 +75,35 @@ class LogContestView(QWidget):
         except Exception:
             log_date = dt
         header_text = f"{callsign} | {contest_name} | {log_date}"
-        self.form_widget.update_header(header_text)
+        self.header_widget.update_text(header_text)
         self.form_widget.retranslate_ui()
         self.table_widget.retranslate_ui()
         self.queue_widget.retranslate_ui()
+
+    def update_header(self):
+        log = getattr(self, "_current_log", None)
+        callsign = log.operator if log else ""
+        contest_key = (
+            log.metadata.get("contest_name_key", None)
+            if log and hasattr(log, "metadata")
+            else None
+        )
+        contest_name = (
+            translation_service.tr(contest_key)
+            if contest_key
+            else translation_service.tr("log_type_contest")
+        )
+        dt = log.start_time if log else ""
+        from datetime import datetime
+
+        lang = translation_service.get_language()
+        try:
+            date_obj = datetime.strptime(dt[:8], "%Y%m%d")
+            if lang == "es":
+                log_date = date_obj.strftime("%d/%m/%Y")
+            else:
+                log_date = date_obj.strftime("%m/%d/%Y")
+        except Exception:
+            log_date = dt
+        header_text = f"{self.log_type_name} - {callsign} - {log_date}"
+        self.header_widget.update_text(header_text)

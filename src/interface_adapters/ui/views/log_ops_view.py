@@ -8,6 +8,9 @@ class LogOpsView(QWidget):
         self, parent=None, callsign="", log_type_name="Operativo", log_date=""
     ):
         super().__init__(parent)
+        self.callsign = callsign
+        self.log_type_name = log_type_name
+        self.log_date = log_date
         from .log_form_widget import LogFormWidget
         from .contact_table_widget import ContactTableWidget
         from .header_widget import HeaderWidget
@@ -20,6 +23,8 @@ class LogOpsView(QWidget):
         layout.setSpacing(2)
         layout.setAlignment(Qt.AlignTop)
         # Encabezado dinámico eliminado
+        self.header_widget = HeaderWidget()
+        layout.addWidget(self.header_widget)
         self.form_widget = LogFormWidget(
             self,
             log_type="ops",
@@ -50,6 +55,7 @@ class LogOpsView(QWidget):
         self.queue_widget.setCallsign.connect(
             self.form_widget.callsign_input.input.setText
         )
+        self.update_header()
 
     def set_log_data(self, log):
         self._current_log = log
@@ -86,7 +92,11 @@ class LogOpsView(QWidget):
             header_parts.append(rep)
         header_parts.append(log_date)
         header_text = " | ".join([str(p) for p in header_parts if p])
-        self.form_widget.update_header(header_text)
+        self.header_widget.update_text(header_text)
         self.form_widget.retranslate_ui()
         self.table_widget.retranslate_ui()
         self.queue_widget.retranslate_ui()
+
+    def update_header(self):
+        header_text = f"{self.log_type_name} - {self.callsign} - {self.log_date}"
+        self.header_widget.update_text(header_text)

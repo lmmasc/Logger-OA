@@ -15,3 +15,6 @@ class HeaderWidget(QWidget):
 
     def set_text(self, text):
         self.label.setText(text)
+
+    def update_text(self, text):
+        self.set_text(text)
