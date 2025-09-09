@@ -1,5 +1,6 @@
 # Loader central de traducciones modularizadas
 import importlib
+from utils.resources import get_resource_path
 
 TRANSLATION_MODULES = [
     "ui",
@@ -28,6 +29,8 @@ def load_translations(lang_code):
             translations.update(section)
         except Exception:
             pass  # Si el módulo no existe, lo ignora
+    # Ejemplo de uso universal si se cargan archivos:
+    # path = get_resource_path(f"src/translation/{lang_code}/{module_name}.py")
     return translations
 
 

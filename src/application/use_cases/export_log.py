@@ -2,6 +2,7 @@ import csv
 import os
 from domain.repositories.contact_log_repository import ContactLogRepository
 from config.paths import get_export_path
+from utils.resources import get_resource_path
 
 
 def export_log_to_csv(db_path: str, export_filename: str = None) -> str:
@@ -33,6 +34,7 @@ def export_log_to_csv(db_path: str, export_filename: str = None) -> str:
     if not export_filename:
         export_filename = f"{operator}_{log_type}_{start_time}.csv"
     export_path = get_export_path(export_filename)
+    export_path = get_resource_path(export_path)
     # Escribir CSV
     with open(export_path, "w", newline="", encoding="utf-8") as csvfile:
         if hasattr(contacts[0], "__dataclass_fields__"):

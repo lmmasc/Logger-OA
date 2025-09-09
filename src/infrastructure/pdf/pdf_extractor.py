@@ -5,6 +5,7 @@ Funciones para extraer datos de operadores desde archivos PDF.
 import pdfplumber
 import re
 from utils.text import normalize_ascii, normalize_callsign, extract_cutoff_date
+from utils.resources import get_resource_path
 
 
 def extract_operators_from_pdf(pdf_path):
@@ -27,6 +28,7 @@ def extract_operators_from_pdf(pdf_path):
     ]
     results = []
     seen_callsigns = set()
+    pdf_path = get_resource_path(pdf_path)  # Adaptación universal
     with pdfplumber.open(pdf_path) as pdf:
         # Extraer fecha de corte del texto de la primera página
         try:

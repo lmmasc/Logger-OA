@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QSpacerItem, QSizePolicy
 from PySide6.QtGui import QPixmap, Qt
 from translation.translation_service import translation_service
+from utils.resources import get_resource_path
 
 
 class WelcomeView(QWidget):
@@ -24,7 +25,7 @@ class WelcomeView(QWidget):
 
         # Logo en el centro
         self.logo_label = QLabel()
-        pixmap = QPixmap("assets/rcp_logo.png")
+        pixmap = QPixmap(get_resource_path("assets/rcp_logo.png"))
         self.logo_label.setPixmap(
             pixmap.scaled(400, 400, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         )
