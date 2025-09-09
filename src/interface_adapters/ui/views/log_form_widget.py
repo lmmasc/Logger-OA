@@ -33,55 +33,84 @@ class LogFormWidget(QWidget):
 
         self.log_type = log_type
         main_layout = QHBoxLayout(self)
-        # Sección izquierda: formulario
+        # Sección izquierda: formulario en dos columnas
         form_widget = QWidget(self)
-        form_layout = QFormLayout(form_widget)
-        form_layout.setContentsMargins(0, 0, 0, 0)
-        self.form_layout = form_layout
-        # Campo universal: Indicativo (ahora widget independiente)
+        columns_layout = QHBoxLayout(form_widget)
+        columns_layout.setContentsMargins(0, 0, 0, 0)
+        # Primera columna
+        col1 = QVBoxLayout()
+        col1.setSpacing(4)
+        # Segunda columna
+        col2 = QVBoxLayout()
+        col2.setSpacing(4)
+        # Campo universal: Indicativo (arriba de todo, ocupa ambas columnas)
         self.callsign_input = CallsignInputWidget(self)
-        form_layout.addRow(self.callsign_input)
-        # Mostrar sugerencias por defecto al iniciar el formulario, pero vacías
+        columns_layout.addWidget(self.callsign_input)
         self.callsign_input.set_summary("", show_suggestions=True)
         self.callsign_input.suggestion_list.clear()
+
+        # Helper para crear fila label-campo
+        def add_row(layout, label_name, label_text, field):
+            row = QHBoxLayout()
+            label = QLabel(label_text)
+            label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            row.addWidget(label)
+            row.addWidget(field)
+            layout.addLayout(row)
+            setattr(self, label_name, label)
+
         # Campos específicos según tipo de log (orden para operativos)
         if log_type == "ops":
             self.station_input = QLineEdit(self)
-            form_layout.addRow(
-                QLabel(translation_service.tr("station")), self.station_input
+            add_row(
+                col1,
+                "station_label",
+                translation_service.tr("station"),
+                self.station_input,
             )
             self.energy_input = QLineEdit(self)
-            form_layout.addRow(
-                QLabel(translation_service.tr("energy")), self.energy_input
+            add_row(
+                col1,
+                "energy_label",
+                translation_service.tr("energy"),
+                self.energy_input,
             )
             self.power_input = QLineEdit(self)
-            form_layout.addRow(
-                QLabel(translation_service.tr("power")), self.power_input
+            add_row(
+                col1, "power_label", translation_service.tr("power"), self.power_input
             )
-        # Campo universal: Reporte RX
+        # Segunda columna: RS_RX, RS_TX, Observaciones
         self.rs_rx_input = QLineEdit(self)
-        form_layout.addRow(QLabel(translation_service.tr("rs_rx")), self.rs_rx_input)
-        # Campo universal: Reporte TX
+        add_row(col2, "rs_rx_label", translation_service.tr("rs_rx"), self.rs_rx_input)
         self.rs_tx_input = QLineEdit(self)
-        form_layout.addRow(QLabel(translation_service.tr("rs_tx")), self.rs_tx_input)
-        # Campo de observaciones
+        add_row(col2, "rs_tx_label", translation_service.tr("rs_tx"), self.rs_tx_input)
         self.observations_input = QLineEdit(self)
-        form_layout.addRow(
-            QLabel(translation_service.tr("observations")), self.observations_input
+        add_row(
+            col2,
+            "observations_label",
+            translation_service.tr("observations"),
+            self.observations_input,
         )
         # Campos específicos para concursos
         if log_type == "contest":
             self.exchange_received_input = QLineEdit(self)
-            form_layout.addRow(
-                QLabel(translation_service.tr("exchange_received")),
+            add_row(
+                col2,
+                "exchange_received_label",
+                translation_service.tr("exchange_received"),
                 self.exchange_received_input,
             )
             self.exchange_sent_input = QLineEdit(self)
-            form_layout.addRow(
-                QLabel(translation_service.tr("exchange_sent")),
+            add_row(
+                col2,
+                "exchange_sent_label",
+                translation_service.tr("exchange_sent"),
                 self.exchange_sent_input,
             )
-        form_widget.setLayout(form_layout)
+        # Añadir columnas al layout
+        columns_layout.addLayout(col1)
+        columns_layout.addLayout(col2)
+        form_widget.setLayout(columns_layout)
         main_layout.addWidget(form_widget, 3)
         # Sección derecha: relojes
         clock_widget = QWidget(self)
@@ -231,32 +260,25 @@ class LogFormWidget(QWidget):
     def retranslate_ui(self):
         """Actualiza los textos según el idioma."""
         self.callsign_input.retranslate_ui()
-        self.form_layout.labelForField(self.rs_rx_input).setText(
-            translation_service.tr("rs_rx")
-        )
-        self.form_layout.labelForField(self.rs_tx_input).setText(
-            translation_service.tr("rs_tx")
-        )
-        self.form_layout.labelForField(self.observations_input).setText(
-            translation_service.tr("observations")
-        )
-        if self.log_type == "contest":
-            self.form_layout.labelForField(self.exchange_received_input).setText(
+        # Actualizar todos los labels manualmente por el nuevo layout
+        if hasattr(self, "station_label"):
+            self.station_label.setText(translation_service.tr("station"))
+        if hasattr(self, "energy_label"):
+            self.energy_label.setText(translation_service.tr("energy"))
+        if hasattr(self, "power_label"):
+            self.power_label.setText(translation_service.tr("power"))
+        if hasattr(self, "rs_rx_label"):
+            self.rs_rx_label.setText(translation_service.tr("rs_rx"))
+        if hasattr(self, "rs_tx_label"):
+            self.rs_tx_label.setText(translation_service.tr("rs_tx"))
+        if hasattr(self, "observations_label"):
+            self.observations_label.setText(translation_service.tr("observations"))
+        if hasattr(self, "exchange_received_label"):
+            self.exchange_received_label.setText(
                 translation_service.tr("exchange_received")
             )
-            self.form_layout.labelForField(self.exchange_sent_input).setText(
-                translation_service.tr("exchange_sent")
-            )
-        elif self.log_type == "ops":
-            self.form_layout.labelForField(self.station_input).setText(
-                translation_service.tr("station")
-            )
-            self.form_layout.labelForField(self.energy_input).setText(
-                translation_service.tr("energy")
-            )
-            self.form_layout.labelForField(self.power_input).setText(
-                translation_service.tr("power")
-            )
+        if hasattr(self, "exchange_sent_label"):
+            self.exchange_sent_label.setText(translation_service.tr("exchange_sent"))
         self.oa_label.setText(translation_service.tr("clock_oa_label"))
         self.utc_label.setText(translation_service.tr("clock_utc_label"))
 

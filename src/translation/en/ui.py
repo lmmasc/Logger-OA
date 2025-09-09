@@ -65,7 +65,7 @@ UI_TRANSLATIONS = {
     "energy": "Energy",
     "rs_rx": "RS (RX)",
     "rs_tx": "RS (TX)",
-    "observations": "Observations",
+    "observations": "Obs.",
     "exchange_received": "Exchange received",
     "exchange_sent": "Exchange sent",
     "add_contact": "Add contact",
