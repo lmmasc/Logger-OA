@@ -1,8 +1,6 @@
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
-    QGroupBox,
-    QScrollArea,
     QLabel,
     QListWidget,
     QListWidgetItem,
@@ -14,29 +12,43 @@ from utils.text import get_filtered_operators
 
 
 class CallsignInfoWidget(QWidget):
+    """
+    Widget para mostrar información y sugerencias de indicativos.
+    Presenta un título dinámico, un área de resumen y una lista de sugerencias.
+    """
+
     suggestionSelected = Signal(str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._showing_suggestions = False
         self._current_callsign = ""
-        self.layout = QVBoxLayout(self)
-        self.group_box = QGroupBox("", self)
-        self.group_box.setStyleSheet(
-            "QGroupBox { padding: 2px; margin-top: 10px; min-height: 110px; }"
-        )
-        self.summary_label = QLabel("", self.group_box)
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(2, 8, 2, 2)
+        layout.setSpacing(4)
+        # Título dinámico
+        self.title_label = QLabel("", self)
+        title_font = QFont()
+        title_font.setPointSize(14)
+        title_font.setBold(True)
+        self.title_label.setFont(title_font)
+        layout.addWidget(self.title_label)
+        # Resumen
+        self.summary_label = QLabel("", self)
         self.summary_label.setWordWrap(True)
         summary_font = QFont()
         summary_font.setPointSize(20)
         self.summary_label.setFont(summary_font)
-        self.summary_label.setMinimumHeight(40)
-        self.summary_scroll = QScrollArea(self.group_box)
-        self.summary_scroll.setWidgetResizable(True)
-        self.summary_scroll.setWidget(self.summary_label)
-        self.summary_scroll.setFixedHeight(90)
-        self.suggestion_list = QListWidget(self.group_box)
-        self.suggestion_list.setFixedHeight(90)
+        self.summary_label.setMinimumHeight(90)
+        self.summary_label.setMaximumHeight(90)
+        self.summary_label.setStyleSheet(
+            "border: 1px solid #bdbdbd; border-radius: 4px; padding: 6px; background: #fafafa;"
+        )
+        layout.addWidget(self.summary_label)
+        # Sugerencias
+        self.suggestion_list = QListWidget(self)
+        self.suggestion_list.setMinimumHeight(90)
+        self.suggestion_list.setMaximumHeight(90)
         self.suggestion_list.setViewMode(QListWidget.IconMode)
         self.suggestion_list.setFlow(QListWidget.LeftToRight)
         self.suggestion_list.setWrapping(True)
@@ -45,26 +57,26 @@ class CallsignInfoWidget(QWidget):
         self.suggestion_list.setStyleSheet("QListWidget::item { color: #1976d2; }")
         self.suggestion_list.hide()
         self.suggestion_list.itemClicked.connect(self._on_suggestion_clicked)
-        group_layout = QVBoxLayout(self.group_box)
-        group_layout.setContentsMargins(2, 2, 2, 2)
-        group_layout.addWidget(self.summary_scroll)
-        group_layout.addWidget(self.suggestion_list)
-        self.group_box.setLayout(group_layout)
-        self.layout.addWidget(self.group_box)
-        self.setLayout(self.layout)
+        layout.addWidget(self.suggestion_list)
+        self.setLayout(layout)
         self.retranslate_ui()
 
     def show_summary(self, text):
-        print(f"[CallsignInfoWidget] show_summary called with text: {text[:60]}")
+        """
+        Muestra el resumen del indicativo en el área correspondiente.
+        """
         self._showing_suggestions = False
         self.suggestion_list.hide()
-        self.summary_scroll.show()
+        self.summary_label.show()
         self.summary_label.setText(text)
-        self.group_box.setTitle(translation_service.tr("callsign_summary"))
+        self.title_label.setText(translation_service.tr("callsign_summary"))
 
     def show_suggestions(self, filtro):
+        """
+        Muestra la lista de sugerencias filtradas por el texto ingresado.
+        """
         self._showing_suggestions = True
-        self.summary_scroll.hide()
+        self.summary_label.hide()
         self.suggestion_list.show()
         self.suggestion_list.clear()
         if not filtro or len(filtro) < 2:
@@ -80,18 +92,28 @@ class CallsignInfoWidget(QWidget):
             if op.name:
                 item.setToolTip(op.name)
             self.suggestion_list.addItem(item)
-        self.group_box.setTitle(translation_service.tr("suggestions_label"))
+        self.title_label.setText(translation_service.tr("suggestions_label"))
 
     def _on_suggestion_clicked(self, item):
+        """
+        Emite la señal cuando se selecciona una sugerencia.
+        """
         self.suggestionSelected.emit(item.text())
 
     def retranslate_ui(self):
+        """
+        Actualiza el título según el estado actual (sugerencias o resumen).
+        """
         if self._showing_suggestions:
-            self.group_box.setTitle(translation_service.tr("suggestions_label"))
+            self.title_label.setText(translation_service.tr("suggestions_label"))
         else:
-            self.group_box.setTitle(translation_service.tr("callsign_summary"))
+            self.title_label.setText(translation_service.tr("callsign_summary"))
 
     def update_info(self, text):
+        """
+        Actualiza el área de información según el texto ingresado.
+        Muestra sugerencias si hay más de 2 caracteres, o el resumen si hay coincidencia exacta.
+        """
         filtro = text.strip().upper()
         if len(filtro) < 2:
             # Menos de 2 caracteres: título sugerencias, lista vacía
