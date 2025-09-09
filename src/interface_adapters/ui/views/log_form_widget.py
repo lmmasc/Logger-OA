@@ -5,8 +5,12 @@ from PySide6.QtWidgets import (
     QLabel,
     QComboBox,
     QMessageBox,
+    QHBoxLayout,
+    QVBoxLayout,
 )
 from translation.translation_service import translation_service
+from PySide6.QtCore import Qt
+import datetime
 
 
 class LogFormWidget(QWidget):
@@ -17,54 +21,123 @@ class LogFormWidget(QWidget):
     def __init__(self, parent=None, log_type="ops"):
         super().__init__(parent)
         from .callsign_input_widget import CallsignInputWidget
-        from PySide6.QtWidgets import QPushButton, QMessageBox
+        from PySide6.QtWidgets import (
+            QPushButton,
+            QMessageBox,
+            QHBoxLayout,
+            QVBoxLayout,
+            QWidget,
+            QGridLayout,
+        )
+        from PySide6.QtCore import QTimer
 
         self.log_type = log_type
-        self.layout = QFormLayout(self)
-        self.layout.setContentsMargins(0, 0, 0, 0)  # Sin margen superior
+        main_layout = QHBoxLayout(self)
+        # Sección izquierda: formulario
+        form_widget = QWidget(self)
+        form_layout = QFormLayout(form_widget)
+        form_layout.setContentsMargins(0, 0, 0, 0)
+        self.form_layout = form_layout
         # Campo universal: Indicativo (ahora widget independiente)
         self.callsign_input = CallsignInputWidget(self)
-        self.layout.addRow(self.callsign_input)
+        form_layout.addRow(self.callsign_input)
         # Mostrar sugerencias por defecto al iniciar el formulario, pero vacías
         self.callsign_input.set_summary("", show_suggestions=True)
         self.callsign_input.suggestion_list.clear()
         # Campos específicos según tipo de log (orden para operativos)
         if log_type == "ops":
             self.station_input = QLineEdit(self)
-            self.layout.addRow(
+            form_layout.addRow(
                 QLabel(translation_service.tr("station")), self.station_input
             )
             self.power_input = QLineEdit(self)
-            self.layout.addRow(
+            form_layout.addRow(
                 QLabel(translation_service.tr("power")), self.power_input
             )
         # Campo universal: Reporte RX
         self.rs_rx_input = QLineEdit(self)
-        self.layout.addRow(QLabel(translation_service.tr("rs_rx")), self.rs_rx_input)
+        form_layout.addRow(QLabel(translation_service.tr("rs_rx")), self.rs_rx_input)
         # Campo universal: Reporte TX
         self.rs_tx_input = QLineEdit(self)
-        self.layout.addRow(QLabel(translation_service.tr("rs_tx")), self.rs_tx_input)
+        form_layout.addRow(QLabel(translation_service.tr("rs_tx")), self.rs_tx_input)
         # Campo de observaciones
         self.observations_input = QLineEdit(self)
-        self.layout.addRow(
+        form_layout.addRow(
             QLabel(translation_service.tr("observations")), self.observations_input
         )
         # Campos específicos para concursos
         if log_type == "contest":
             self.exchange_received_input = QLineEdit(self)
-            self.layout.addRow(
+            form_layout.addRow(
                 QLabel(translation_service.tr("exchange_received")),
                 self.exchange_received_input,
             )
             self.exchange_sent_input = QLineEdit(self)
-            self.layout.addRow(
+            form_layout.addRow(
                 QLabel(translation_service.tr("exchange_sent")),
                 self.exchange_sent_input,
             )
-
-        # Botón para agregar contacto
+        form_widget.setLayout(form_layout)
+        main_layout.addWidget(form_widget, 3)
+        # Sección derecha: relojes
+        clock_widget = QWidget(self)
+        clock_layout = QHBoxLayout(clock_widget)
+        clock_layout.setContentsMargins(0, 0, 0, 0)
+        clock_layout.setSpacing(16)
+        # Subwidget OA
+        oa_box = QVBoxLayout()
+        oa_box.setSpacing(2)
+        self.oa_label = QLabel(self)
+        self.oa_time = QLabel(self)
+        self.oa_date = QLabel(self)
+        self.oa_label.setText(translation_service.tr("clock_oa_label"))
+        self.oa_label.setAlignment(Qt.AlignCenter)
+        self.oa_time.setAlignment(Qt.AlignCenter)
+        self.oa_date.setAlignment(Qt.AlignCenter)
+        self.oa_time.setStyleSheet("color: red; font-size: 30px; font-weight: bold;")
+        self.oa_label.setStyleSheet("color: red; font-weight: bold;")
+        self.oa_date.setStyleSheet("color: red;")
+        oa_box.addWidget(self.oa_label)
+        oa_box.addWidget(self.oa_time)
+        oa_box.addWidget(self.oa_date)
+        oa_widget = QWidget(self)
+        oa_widget.setLayout(oa_box)
+        # Subwidget UTC
+        utc_box = QVBoxLayout()
+        utc_box.setSpacing(2)
+        self.utc_label = QLabel(self)
+        self.utc_time = QLabel(self)
+        self.utc_date = QLabel(self)
+        self.utc_label.setText(translation_service.tr("clock_utc_label"))
+        self.utc_label.setAlignment(Qt.AlignCenter)
+        self.utc_time.setAlignment(Qt.AlignCenter)
+        self.utc_date.setAlignment(Qt.AlignCenter)
+        self.utc_time.setStyleSheet("color: green; font-size: 30px; font-weight: bold;")
+        self.utc_label.setStyleSheet("color: green; font-weight: bold;")
+        self.utc_date.setStyleSheet("color: green;")
+        utc_box.addWidget(self.utc_label)
+        utc_box.addWidget(self.utc_time)
+        utc_box.addWidget(self.utc_date)
+        utc_widget = QWidget(self)
+        utc_widget.setLayout(utc_box)
+        # Añadir ambos al layout horizontal
+        clock_layout.addWidget(oa_widget)
+        clock_layout.addWidget(utc_widget)
+        clock_widget.setLayout(clock_layout)
+        main_layout.insertWidget(1, clock_widget, 1)
+        # Timer para actualizar los relojes
+        self._clock_timer = QTimer(self)
+        self._clock_timer.timeout.connect(self._update_clocks)
+        self._clock_timer.start(1000)
+        # Sección final: botones
+        button_widget = QWidget(self)
+        button_layout = QVBoxLayout(button_widget)
         self.add_contact_btn = QPushButton(translation_service.tr("add_contact"), self)
-        self.layout.addRow(self.add_contact_btn)
+        button_layout.addWidget(self.add_contact_btn)
+        button_widget.setLayout(button_layout)
+        main_layout.addWidget(button_widget, 1)
+        self.setLayout(main_layout)
+
         self.add_contact_btn.clicked.connect(self._on_add_contact)
 
         self.callsign_input.input.textChanged.connect(self._update_callsign_summary)
@@ -153,29 +226,31 @@ class LogFormWidget(QWidget):
     def retranslate_ui(self):
         """Actualiza los textos según el idioma."""
         self.callsign_input.retranslate_ui()
-        self.layout.labelForField(self.rs_rx_input).setText(
+        self.form_layout.labelForField(self.rs_rx_input).setText(
             translation_service.tr("rs_rx")
         )
-        self.layout.labelForField(self.rs_tx_input).setText(
+        self.form_layout.labelForField(self.rs_tx_input).setText(
             translation_service.tr("rs_tx")
         )
-        self.layout.labelForField(self.observations_input).setText(
+        self.form_layout.labelForField(self.observations_input).setText(
             translation_service.tr("observations")
         )
         if self.log_type == "contest":
-            self.layout.labelForField(self.exchange_received_input).setText(
+            self.form_layout.labelForField(self.exchange_received_input).setText(
                 translation_service.tr("exchange_received")
             )
-            self.layout.labelForField(self.exchange_sent_input).setText(
+            self.form_layout.labelForField(self.exchange_sent_input).setText(
                 translation_service.tr("exchange_sent")
             )
         elif self.log_type == "ops":
-            self.layout.labelForField(self.station_input).setText(
+            self.form_layout.labelForField(self.station_input).setText(
                 translation_service.tr("station")
             )
-            self.layout.labelForField(self.power_input).setText(
+            self.form_layout.labelForField(self.power_input).setText(
                 translation_service.tr("power")
             )
+        self.oa_label.setText(translation_service.tr("clock_oa_label"))
+        self.utc_label.setText(translation_service.tr("clock_utc_label"))
 
     def _update_callsign_summary(self):
         callsign = self.callsign_input.get_callsign().strip().upper()
@@ -222,3 +297,16 @@ class LogFormWidget(QWidget):
                 self.callsign_input.set_summary("", show_suggestions=True)
         else:
             self.callsign_input.set_summary("", show_suggestions=True)
+
+    def _update_clocks(self):
+        now = datetime.datetime.now()
+        now_utc = datetime.datetime.utcnow()
+        lang = translation_service.get_language()
+        if lang == "es":
+            date_fmt = "%d/%m/%Y"
+        else:
+            date_fmt = "%m/%d/%Y"
+        self.oa_time.setText(now.strftime("%H:%M:%S"))
+        self.oa_date.setText(now.strftime(date_fmt))
+        self.utc_time.setText(now_utc.strftime("%H:%M:%S"))
+        self.utc_date.setText(now_utc.strftime(date_fmt))

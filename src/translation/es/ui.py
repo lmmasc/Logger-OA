@@ -68,4 +68,6 @@ UI_TRANSLATIONS = {
     "exchange_received": "Intercambio recibido",
     "exchange_sent": "Intercambio enviado",
     "add_contact": "Agregar contacto",
+    "clock_oa_label": "Hora OA",
+    "clock_utc_label": "Hora UTC",
 }
