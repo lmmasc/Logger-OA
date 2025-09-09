@@ -111,15 +111,17 @@ class CallsignInputWidget(QWidget):
             self.summary_scroll.hide()
             self.suggestion_list.show()
             self.suggestion_list.clear()
-            from utils.text import get_filtered_callsigns
+            from utils.text import get_filtered_operators
 
-            indicativos = get_filtered_callsigns(filtro)
-            for indicativo in indicativos:
-                item = QListWidgetItem(indicativo)
+            operadores = get_filtered_operators(filtro)
+            for op in operadores:
+                item = QListWidgetItem(op.callsign)
                 font = QFont()
                 font.setPointSize(18)
                 font.setBold(True)
                 item.setFont(font)
+                if op.name:
+                    item.setToolTip(op.name)
                 self.suggestion_list.addItem(item)
             self.summary_box.setTitle(translation_service.tr("suggestions_label"))
         else:

@@ -97,9 +97,9 @@ def filter_text_match(
         return needle in haystack
 
 
-def get_filtered_callsigns(filtro: str) -> list[str]:
+def get_filtered_operators(filtro: str) -> list:
     """
-    Devuelve una lista de indicativos filtrados y ordenados primero por longitud y luego alfabéticamente.
+    Devuelve una lista de operadores filtrados y ordenados primero por longitud de indicativo y luego alfabéticamente.
     """
     from infrastructure.repositories.sqlite_radio_operator_repository import (
         SqliteRadioOperatorRepository,
@@ -109,7 +109,5 @@ def get_filtered_callsigns(filtro: str) -> list[str]:
     operadores = repo.list_all()
     from utils.text import filter_text_match
 
-    indicativos = [
-        op.callsign for op in operadores if filter_text_match(op.callsign, filtro)
-    ]
-    return sorted(indicativos, key=lambda x: (len(x), x))
+    filtered = [op for op in operadores if filter_text_match(op.callsign, filtro)]
+    return sorted(filtered, key=lambda op: (len(op.callsign), op.callsign))
