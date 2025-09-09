@@ -1,32 +1,51 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout
+"""
+Vista principal para la gestión de logs operativos (LogOpsView).
+Incluye formulario, cola de contactos, tabla y área de información de indicativos.
+"""
+
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QSizePolicy
 from PySide6.QtCore import Qt
 from translation.translation_service import translation_service
+from .log_form_widget import LogFormWidget
+from .contact_table_widget import ContactTableWidget
+from .header_widget import HeaderWidget
+from .contact_queue_widget import ContactQueueWidget
+from .callsign_input_widget import CallsignInputWidget
+from .callsign_info_widget import CallsignInfoWidget
 
 
 class LogOpsView(QWidget):
+    """
+    Vista principal para la gestión de logs operativos.
+    Permite visualizar y editar contactos, gestionar la cola y mostrar información de indicativos.
+    """
+
     def __init__(
         self, parent=None, callsign="", log_type_name="Operativo", log_date=""
     ):
+        """
+        Inicializa la vista de log operativo, configurando todos los componentes visuales y sus conexiones.
+        Args:
+            parent: QWidget padre.
+            callsign: Indicativo inicial.
+            log_type_name: Nombre del tipo de log.
+            log_date: Fecha del log.
+        """
         super().__init__(parent)
         self.callsign = callsign
         self.log_type_name = log_type_name
         self.log_date = log_date
-        from .log_form_widget import LogFormWidget
-        from .contact_table_widget import ContactTableWidget
-        from .header_widget import HeaderWidget
-
-        # from .callsign_suggestion_widget import CallsignSuggestionWidget
-        from .contact_queue_widget import ContactQueueWidget
-        from .callsign_input_widget import CallsignInputWidget
-        from .callsign_info_widget import CallsignInfoWidget
-
         layout = QVBoxLayout()
         layout.setContentsMargins(10, 4, 10, 10)
         layout.setSpacing(2)
         layout.setAlignment(Qt.AlignTop)
-        # Encabezado dinámico eliminado
         self.header_widget = HeaderWidget()
         layout.addWidget(self.header_widget)
+        # Mover widgets de indicativo justo después del header
+        self.callsign_input = CallsignInputWidget(self)
+        self.callsign_info = CallsignInfoWidget(self)
+        layout.addWidget(self.callsign_input)
+        layout.addWidget(self.callsign_info)
         self.form_widget = LogFormWidget(
             self,
             log_type="ops",
@@ -36,40 +55,38 @@ class LogOpsView(QWidget):
         )
         self.queue_widget = ContactQueueWidget(self)
         layout.addWidget(self.queue_widget)
-        # El formulario ya no tiene altura fija, solo política preferida
-        from PySide6.QtWidgets import QSizePolicy
-
         self.form_widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         layout.addWidget(self.form_widget)
         self.table_widget = ContactTableWidget(self, log_type="ops")
         self.table_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         layout.addWidget(self.table_widget)
-        # Nuevo bloque: input y área de info
-        self.callsign_input = CallsignInputWidget(self)
-        self.callsign_info = CallsignInfoWidget(self)
-        layout.addWidget(self.callsign_input)
-        layout.addWidget(self.callsign_info)
-        # Conexión de sugerencias
         self.callsign_info.suggestionSelected.connect(self.callsign_input.set_callsign)
-        # Actualización dinámica del área de info
         self.callsign_input.input.textChanged.connect(self.callsign_info.update_info)
         self.callsign_info.update_info(self.callsign_input.get_callsign())
         self.setLayout(layout)
         translation_service.signal.language_changed.connect(self.retranslate_ui)
-
-        # self.form_widget.callsign_input.addToQueue.connect(
-        #     self.queue_widget.add_to_queue
-        # )
-        # self.queue_widget.setCallsign.connect(
-        #     self.form_widget.callsign_input.input.setText
-        # )
         self.update_header()
 
+    def update_header(self):
+        """
+        Actualiza el texto del encabezado principal de la vista.
+        """
+        header_text = f"{self.log_type_name} - {self.callsign} - {self.log_date}"
+        self.header_widget.update_text(header_text)
+
     def set_log_data(self, log):
+        """
+        Asigna un log actual y actualiza la UI con los datos correspondientes.
+        Args:
+            log: Objeto de log operativo.
+        """
         self._current_log = log
         self.retranslate_ui()
 
     def retranslate_ui(self):
+        """
+        Actualiza los textos de la UI según el idioma seleccionado y los datos del log.
+        """
         from datetime import datetime
 
         lang = translation_service.get_language()
@@ -105,11 +122,11 @@ class LogOpsView(QWidget):
         self.table_widget.retranslate_ui()
         self.queue_widget.retranslate_ui()
 
-    def update_header(self):
-        header_text = f"{self.log_type_name} - {self.callsign} - {self.log_date}"
-        self.header_widget.update_text(header_text)
-
     def _update_callsign_info(self):
+        """
+        Actualiza el área de información de indicativos según el texto ingresado.
+        Muestra sugerencias si el texto es corto, o el resumen si hay coincidencia exacta.
+        """
         filtro = self.callsign_input.get_callsign().strip()
         if filtro:
             # Si hay texto, mostrar sugerencias si el texto es corto, si no mostrar resumen
