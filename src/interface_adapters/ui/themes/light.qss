@@ -82,5 +82,13 @@ QMainWindow {
     background-color: #ffffff;
 }
 
+QLabel#summary-label {
+    border: 1px solid #bdbdbd;
+    border-radius: 4px;
+    padding: 6px;
+    background: #fafafa;
+    color: #222;
+}
+
 
 

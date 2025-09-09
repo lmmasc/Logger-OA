@@ -24,7 +24,7 @@ class CallsignInfoWidget(QWidget):
         self._showing_suggestions = False
         self._current_callsign = ""
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(2, 8, 2, 2)
+        layout.setContentsMargins(2, 2, 2, 2)
         layout.setSpacing(4)
         # Título dinámico
         self.title_label = QLabel("", self)
@@ -35,15 +35,13 @@ class CallsignInfoWidget(QWidget):
         layout.addWidget(self.title_label)
         # Resumen
         self.summary_label = QLabel("", self)
+        self.summary_label.setObjectName("summary-label")
         self.summary_label.setWordWrap(True)
         summary_font = QFont()
         summary_font.setPointSize(20)
         self.summary_label.setFont(summary_font)
         self.summary_label.setMinimumHeight(90)
         self.summary_label.setMaximumHeight(90)
-        self.summary_label.setStyleSheet(
-            "border: 1px solid #bdbdbd; border-radius: 4px; padding: 6px; background: #fafafa;"
-        )
         layout.addWidget(self.summary_label)
         # Sugerencias
         self.suggestion_list = QListWidget(self)
