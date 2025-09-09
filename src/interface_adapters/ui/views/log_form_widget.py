@@ -144,48 +144,51 @@ class LogFormWidget(QWidget):
         block_layout.setContentsMargins(0, 0, 0, 0)
         block_layout.setSpacing(16)
 
-        # Relojes
+        # Relojes en fila
         clock_layout = QHBoxLayout()
         clock_layout.setContentsMargins(0, 0, 0, 0)
         clock_layout.setSpacing(16)
 
+        # OA y UTC: datos internos en fila
         # OA
-        oa_box = QVBoxLayout()
-        oa_box.setSpacing(2)
+        oa_widget = QWidget(self)
+        oa_widget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        oa_data_layout = QHBoxLayout()
+        oa_data_layout.setSpacing(8)
         self.oa_label = QLabel(self)
-        self.oa_time = QLabel(self)
-        self.oa_date = QLabel(self)
         self.oa_label.setText(translation_service.tr("clock_oa_label"))
         self.oa_label.setAlignment(Qt.AlignCenter)
-        self.oa_time.setAlignment(Qt.AlignCenter)
-        self.oa_date.setAlignment(Qt.AlignCenter)
-        self.oa_time.setStyleSheet("color: red; font-size: 30px; font-weight: bold;")
         self.oa_label.setStyleSheet("color: red; font-weight: bold;")
+        self.oa_time = QLabel(self)
+        self.oa_time.setAlignment(Qt.AlignCenter)
+        self.oa_time.setStyleSheet("color: red; font-size: 30px; font-weight: bold;")
+        self.oa_date = QLabel(self)
+        self.oa_date.setAlignment(Qt.AlignCenter)
         self.oa_date.setStyleSheet("color: red;")
-        oa_box.addWidget(self.oa_label)
-        oa_box.addWidget(self.oa_time)
-        oa_box.addWidget(self.oa_date)
-        oa_widget = QWidget(self)
-        oa_widget.setLayout(oa_box)
+        oa_data_layout.addWidget(self.oa_label)
+        oa_data_layout.addWidget(self.oa_time)
+        oa_data_layout.addWidget(self.oa_date)
+        oa_widget.setLayout(oa_data_layout)
 
         # UTC
-        utc_box = QVBoxLayout()
-        utc_box.setSpacing(2)
+        utc_widget = QWidget(self)
+        utc_widget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        utc_data_layout = QHBoxLayout()
+        utc_data_layout.setSpacing(8)
         self.utc_label = QLabel(self)
-        self.utc_time = QLabel(self)
-        self.utc_date = QLabel(self)
         self.utc_label.setText(translation_service.tr("clock_utc_label"))
         self.utc_label.setAlignment(Qt.AlignCenter)
-        self.utc_time.setAlignment(Qt.AlignCenter)
-        self.utc_date.setAlignment(Qt.AlignCenter)
-        self.utc_time.setStyleSheet("color: green; font-size: 30px; font-weight: bold;")
         self.utc_label.setStyleSheet("color: green; font-weight: bold;")
+        self.utc_time = QLabel(self)
+        self.utc_time.setAlignment(Qt.AlignCenter)
+        self.utc_time.setStyleSheet("color: green; font-size: 30px; font-weight: bold;")
+        self.utc_date = QLabel(self)
+        self.utc_date.setAlignment(Qt.AlignCenter)
         self.utc_date.setStyleSheet("color: green;")
-        utc_box.addWidget(self.utc_label)
-        utc_box.addWidget(self.utc_time)
-        utc_box.addWidget(self.utc_date)
-        utc_widget = QWidget(self)
-        utc_widget.setLayout(utc_box)
+        utc_data_layout.addWidget(self.utc_label)
+        utc_data_layout.addWidget(self.utc_time)
+        utc_data_layout.addWidget(self.utc_date)
+        utc_widget.setLayout(utc_data_layout)
 
         clock_layout.addWidget(oa_widget)
         clock_layout.addWidget(utc_widget)
@@ -211,6 +214,12 @@ class LogFormWidget(QWidget):
 
         self.add_contact_btn.clicked.connect(self._on_add_contact)
         self.callsign_input.input.textChanged.connect(self._update_callsign_summary)
+
+        # Inicializar y conectar QTimer para actualizar los relojes
+        self.clock_timer = QTimer(self)
+        self.clock_timer.timeout.connect(self._update_clocks)
+        self.clock_timer.start(1000)  # Actualiza cada segundo
+        self._update_clocks()  # Actualiza al iniciar
 
     def _on_add_contact(self):
         # Recoge datos y llama al caso de uso
