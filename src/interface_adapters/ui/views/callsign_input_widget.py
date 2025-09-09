@@ -68,6 +68,7 @@ class CallsignInputWidget(QWidget):
         self.suggestion_list.setWrapping(True)
         self.suggestion_list.setResizeMode(QListWidget.Adjust)
         self.suggestion_list.setSpacing(5)  # Espaciado horizontal entre elementos
+        self.suggestion_list.setStyleSheet("QListWidget::item { color: #1976d2; }")
         self.suggestion_list.hide()
         self.suggestion_list.itemClicked.connect(self._on_suggestion_clicked)
         summary_layout = QVBoxLayout(self.summary_box)
