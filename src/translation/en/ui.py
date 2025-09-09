@@ -60,4 +60,12 @@ UI_TRANSLATIONS = {
     "department": "Department",
     "suggestions_label": "Suggestions",
     "contact_queue": "Waiting queue",
+    "station": "Station",
+    "power": "Power",
+    "rs_rx": "RS (RX)",
+    "rs_tx": "RS (TX)",
+    "observations": "Observations",
+    "exchange_received": "Exchange received",
+    "exchange_sent": "Exchange sent",
+    "add_contact": "Add contact",
 }
