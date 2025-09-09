@@ -58,6 +58,7 @@ class CallsignInfoWidget(QWidget):
         layout.addWidget(self.suggestion_list)
         self.setLayout(layout)
         self.retranslate_ui()
+        translation_service.signal.language_changed.connect(self.retranslate_ui)
 
     def show_summary(self, text):
         """

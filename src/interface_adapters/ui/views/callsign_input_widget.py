@@ -44,6 +44,7 @@ class CallsignInputWidget(QWidget):
         self.input.textChanged.connect(self._normalize_upper)
         self.retranslate_ui()
         self.input.returnPressed.connect(self._on_return_pressed)
+        translation_service.signal.language_changed.connect(self.retranslate_ui)
 
     def _normalize_upper(self, text):
         upper_text = text.upper()
