@@ -36,6 +36,7 @@ class CallsignInputWidget(QWidget):
         self.label.setFont(label_font)
         # Campo de texto para indicativo
         self.input = QLineEdit(self)
+        self.input.setObjectName("callsignInput")
         font = QFont()
         font.setPointSize(32)
         font.setBold(True)

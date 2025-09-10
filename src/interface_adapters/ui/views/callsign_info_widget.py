@@ -39,7 +39,7 @@ class CallsignInfoWidget(QWidget):
         layout.addWidget(self.title_label)
         # Resumen
         self.summary_label = QLabel("", self)
-        self.summary_label.setObjectName("summary-label")
+        self.summary_label.setObjectName("callsignSummary")
         self.summary_label.setWordWrap(True)
         summary_font = QFont()
         summary_font.setPointSize(20)
@@ -56,7 +56,7 @@ class CallsignInfoWidget(QWidget):
         self.suggestion_list.setWrapping(True)
         self.suggestion_list.setResizeMode(QListWidget.Adjust)
         self.suggestion_list.setSpacing(5)
-        self.suggestion_list.setObjectName("CallsignSuggestionList")
+        self.suggestion_list.setObjectName("callsignSuggestionList")
         self.suggestion_list.hide()
         self.suggestion_list.itemClicked.connect(self._on_suggestion_clicked)
         layout.addWidget(self.suggestion_list)

@@ -125,7 +125,7 @@ QListWidget#ContactQueueList::item:selected {
 }
 
 /* CallsignSuggestionList: Estilo para sugerencias de indicativos (tema oscuro) */
-#CallsignSuggestionList::item {
+QListWidget#callsignSuggestionList::item {
     color: #00e6ff;
     font-weight: bold;
 }
@@ -136,6 +136,24 @@ QLineEdit#callsignInput {
     padding: 4px 8px;
 }
 QLineEdit#callsignInput:focus {
+    border: 2px solid palette(highlight);
+}
+
+QLabel#callsignSummary {
+    border: 2px solid #b0b0b0;
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+QLabel#callsignSummary:focus {
+    border: 2px solid palette(highlight);
+}
+
+QListWidget#callsignSuggestionList {
+    border: 2px solid #b0b0b0;
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+QListWidget#callsignSuggestionList:focus {
     border: 2px solid palette(highlight);
 }
 
