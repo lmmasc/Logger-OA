@@ -96,9 +96,9 @@ class LogFormWidget(QWidget):
         self.power_input.setText("1")
         self.power_input.setFixedWidth(60)
         self.power_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        power_label = QLabel(translation_service.tr("power"))
+        power_label = QLabel(f"{translation_service.tr('power')} (W)")
         power_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        power_label.setFixedWidth(60)
+        power_label.setFixedWidth(90)
         power_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         form_row.addWidget(power_label)
         form_row.addWidget(self.power_input)
@@ -269,7 +269,7 @@ class LogFormWidget(QWidget):
         if hasattr(self, "energy_label"):
             self.energy_label.setText(translation_service.tr("energy"))
         if hasattr(self, "power_label"):
-            self.power_label.setText(translation_service.tr("power"))
+            self.power_label.setText(f"{translation_service.tr('power')} (W)")
         if hasattr(self, "rs_rx_label"):
             self.rs_rx_label.setText(translation_service.tr("rs_rx"))
         if hasattr(self, "rs_tx_label"):
