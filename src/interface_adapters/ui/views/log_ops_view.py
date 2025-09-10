@@ -75,6 +75,8 @@ class LogOpsView(QWidget):
         self.table_widget = ContactTableWidget(self, log_type="ops")
         self.table_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         layout.addWidget(self.table_widget)
+        self.queue_widget.setCallsign.connect(self.callsign_input.set_callsign)
+        self.callsign_input.addToQueue.connect(self.queue_widget.add_to_queue)
         self.callsign_info.suggestionSelected.connect(self.callsign_input.set_callsign)
         self.callsign_input.input.textChanged.connect(self.callsign_info.update_info)
         self.callsign_info.update_info(self.callsign_input.get_callsign())
