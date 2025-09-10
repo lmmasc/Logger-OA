@@ -243,6 +243,15 @@ class LogFormWidget(QWidget):
         Args:
             callsign (str, opcional): Indicativo de llamada.
         """
+        from infrastructure.repositories.sqlite_radio_operator_repository import (
+            SqliteRadioOperatorRepository,
+        )
+        from PySide6.QtWidgets import QMessageBox
+        from interface_adapters.ui.dialogs.operator_edit_dialog import (
+            OperatorEditDialog,
+        )
+
+        repo = SqliteRadioOperatorRepository()
         # Recoge datos y llama al caso de uso
         data = self.get_data(callsign)
         if callsign:
@@ -262,50 +271,148 @@ class LogFormWidget(QWidget):
         db_path = getattr(main_window.current_log, "db_path", None)
         log_id = getattr(main_window.current_log, "id", None)
         contact_type = "operativo" if self.log_type == "ops" else "concurso"
-        try:
-            from application.use_cases.contact_management import add_contact_to_log
-            from domain.repositories.contact_log_repository import ContactLogRepository
-
-            contact = add_contact_to_log(db_path, log_id, data, contact_type)
-            # Recuperar la lista actualizada desde el repositorio
-            repo = ContactLogRepository(db_path)
-            contacts = repo.get_contacts(log_id)
-            main_window.current_log.contacts = contacts
-            # Actualiza la tabla en la instancia visible del ViewManager
-            if hasattr(main_window, "view_manager"):
-                if (
-                    self.log_type == "ops"
-                    and "log_ops" in main_window.view_manager.views
-                ):
-                    main_window.view_manager.views["log_ops"].table_widget.set_contacts(
-                        contacts
-                    )
-                elif (
-                    self.log_type == "contest"
-                    and "log_contest" in main_window.view_manager.views
-                ):
-                    main_window.view_manager.views[
-                        "log_contest"
-                    ].table_widget.set_contacts(contacts)
-            QMessageBox.information(
-                self,
-                translation_service.tr("main_window_title"),
-                translation_service.tr("contact_added"),
-            )
-        except Exception as e:
-            msg = str(e)
-            if "Invalid callsign" in msg:
-                QMessageBox.critical(
-                    self,
-                    translation_service.tr("invalid_callsign_title"),
-                    translation_service.tr("invalid_callsign_msg"),
+        # Verificar si el indicativo existe en la base de datos
+        operator = repo.get_operator_by_callsign(callsign)
+        if operator:
+            # Indicativo existe: agregar contacto y mover scroll
+            try:
+                from application.use_cases.contact_management import add_contact_to_log
+                from domain.repositories.contact_log_repository import (
+                    ContactLogRepository,
                 )
-            else:
+
+                contact = add_contact_to_log(db_path, log_id, data, contact_type)
+                repo_log = ContactLogRepository(db_path)
+                contacts = repo_log.get_contacts(log_id)
+                main_window.current_log.contacts = contacts
+                # Actualiza la tabla y mueve el scroll
+                if hasattr(main_window, "view_manager"):
+                    if (
+                        self.log_type == "ops"
+                        and "log_ops" in main_window.view_manager.views
+                    ):
+                        table_widget = main_window.view_manager.views[
+                            "log_ops"
+                        ].table_widget
+                        table = table_widget.table
+                        table_widget.set_contacts(contacts)
+                        table.scrollToBottom()
+                        table.setFocus()
+                        # Foco al campo de indicativo en LogOpsView
+                        parent = self.parent()
+                        while parent:
+                            if hasattr(parent, "callsign_input"):
+                                parent.callsign_input.input.setFocus()
+                                break
+                            parent = parent.parent()
+                    elif (
+                        self.log_type == "contest"
+                        and "log_contest" in main_window.view_manager.views
+                    ):
+                        table_widget = main_window.view_manager.views[
+                            "log_contest"
+                        ].table_widget
+                        table = table_widget.table
+                        table_widget.set_contacts(contacts)
+                        table.scrollToBottom()
+                        table.setFocus()
+                        parent = self.parent()
+                        while parent:
+                            if hasattr(parent, "callsign_input"):
+                                parent.callsign_input.input.setFocus()
+                                break
+                            parent = parent.parent()
+            except Exception as e:
                 QMessageBox.critical(
                     self,
                     translation_service.tr("main_window_title"),
                     f"{translation_service.tr('contact_add_failed')}: {e}",
                 )
+            return
+        # Si no existe, preguntar si desea agregarlo a la base de datos
+        msg_box = QMessageBox(self)
+        msg_box.setIcon(QMessageBox.Question)
+        msg_box.setWindowTitle(translation_service.tr("add_operator"))
+        msg_box.setText(translation_service.tr("operator_not_found_msg"))
+        msg_box.setInformativeText(
+            f"{translation_service.tr('table_header_callsign')}: {callsign}"
+        )
+        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msg_box.setDefaultButton(QMessageBox.No)
+        msg_box.button(QMessageBox.Yes).setText(translation_service.tr("yes_button"))
+        msg_box.button(QMessageBox.No).setText(translation_service.tr("no_button"))
+        reply = msg_box.exec()
+        if reply == QMessageBox.Yes:
+            # Abrir diálogo para agregar operador
+            dlg = OperatorEditDialog(parent=self)
+            dlg.inputs["callsign"].setText(callsign)
+            if dlg.exec() == QMessageBox.Accepted and dlg.result_operator:
+                # Agregar operador a la base de datos
+                from domain.entities.radio_operator import RadioOperator
+
+                op_data = dlg.result_operator
+                # Mapear claves 'type' y 'license' a 'type_' y 'license_'
+                if "type" in op_data:
+                    op_data["type_"] = op_data.pop("type")
+                if "license" in op_data:
+                    op_data["license_"] = op_data.pop("license")
+                new_operator = RadioOperator(**op_data)
+                repo.add(new_operator)
+                # Recargar base de datos y agregar contacto
+                operator = repo.get_operator_by_callsign(callsign)
+                data["name"] = operator.name
+                data["country"] = operator.country
+        # Agregar contacto con los datos actuales (faltantes en blanco si no existe operador)
+        try:
+            from application.use_cases.contact_management import add_contact_to_log
+            from domain.repositories.contact_log_repository import ContactLogRepository
+
+            contact = add_contact_to_log(db_path, log_id, data, contact_type)
+            repo_log = ContactLogRepository(db_path)
+            contacts = repo_log.get_contacts(log_id)
+            main_window.current_log.contacts = contacts
+            # Actualiza la tabla y mueve el scroll
+            if hasattr(main_window, "view_manager"):
+                if (
+                    self.log_type == "ops"
+                    and "log_ops" in main_window.view_manager.views
+                ):
+                    table_widget = main_window.view_manager.views[
+                        "log_ops"
+                    ].table_widget
+                    table = table_widget.table
+                    table_widget.set_contacts(contacts)
+                    table.scrollToBottom()
+                    table.setFocus()
+                    parent = self.parent()
+                    while parent:
+                        if hasattr(parent, "callsign_input"):
+                            parent.callsign_input.input.setFocus()
+                            break
+                        parent = parent.parent()
+                elif (
+                    self.log_type == "contest"
+                    and "log_contest" in main_window.view_manager.views
+                ):
+                    table_widget = main_window.view_manager.views[
+                        "log_contest"
+                    ].table_widget
+                    table = table_widget.table
+                    table_widget.set_contacts(contacts)
+                    table.scrollToBottom()
+                    table.setFocus()
+                    parent = self.parent()
+                    while parent:
+                        if hasattr(parent, "callsign_input"):
+                            parent.callsign_input.input.setFocus()
+                            break
+                        parent = parent.parent()
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                translation_service.tr("main_window_title"),
+                f"{translation_service.tr('contact_add_failed')}: {e}",
+            )
 
     def retranslate_ui(self):
         """

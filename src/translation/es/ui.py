@@ -84,4 +84,5 @@ UI_TRANSLATIONS = {
     "invalid_callsign_title": "Indicativo inválido",
     "invalid_callsign_msg": "El indicativo ingresado no es válido.",
     "callsign_not_found": "Indicativo no encontrado",
+    "operator_not_found_msg": "El indicativo no existe en la base de datos. ¿Deseas agregarlo como nuevo operador?",
 }
