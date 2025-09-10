@@ -23,13 +23,9 @@ class LogContestView(QWidget):
         # Encabezado dinámico eliminado
         # self.header = HeaderWidget("", self)
         # layout.addWidget(self.header)
-        # Instanciar relojes y gestionar traducción
-        self.oa_clock = ClockWidget(
-            translation_service.tr("clock_oa_label"), "red", self, utc=False
-        )
-        self.utc_clock = ClockWidget(
-            translation_service.tr("clock_utc_label"), "green", self, utc=True
-        )
+        # Instanciar relojes sin traducción de label
+        self.oa_clock = ClockWidget("OA", "red", self, utc=False)
+        self.utc_clock = ClockWidget("UTC", "green", self, utc=True)
         translation_service.signal.language_changed.connect(self._retranslate_clocks)
         from PySide6.QtWidgets import QPushButton
 
@@ -170,8 +166,9 @@ class LogContestView(QWidget):
             self.callsign_info.show_suggestions("")
 
     def _retranslate_clocks(self):
-        self.oa_clock.set_label_text(translation_service.tr("clock_oa_label"))
-        self.utc_clock.set_label_text(translation_service.tr("clock_utc_label"))
+        # Refresca el formato de fecha/hora de los relojes al cambiar idioma
+        self.oa_clock.update_clock()
+        self.utc_clock.update_clock()
 
     def _on_add_contact(self):
         callsign = self.callsign_input.get_callsign().strip()

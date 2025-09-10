@@ -61,7 +61,7 @@ class ClockWidget(QWidget):
             now = datetime.datetime.now(datetime.timezone.utc)
         else:
             now = datetime.datetime.now().astimezone()
-        # Usar el idioma del sistema global de traducción
+        # Obtener idioma para formato de fecha
         try:
             from translation.translation_service import translation_service
 
@@ -71,11 +71,9 @@ class ClockWidget(QWidget):
         date_fmt = "%d/%m/%Y" if lang == "es" else "%m/%d/%Y"
         self.time.setText(now.strftime("%H:%M:%S"))
         self.date.setText(now.strftime(date_fmt))
-        # Asignar texto del label: solo "OA" o "UTC"
+        # Eliminar traducción y actualización dinámica del label
+        # El texto del label es fijo: "OA" o "UTC"
         self.label.setText("OA" if not self.utc else "UTC")
-
-    def set_label_text(self, text):
-        self.label.setText(text)
 
 
 # Sugerencia para light.qss
