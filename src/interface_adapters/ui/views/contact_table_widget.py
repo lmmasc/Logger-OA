@@ -44,7 +44,7 @@ class ContactTableWidget(QWidget):
         self.table.setHorizontalHeaderLabels(headers)
 
     def set_contacts(self, contacts):
-        # ...eliminado debug print...
+        self._last_contacts = contacts
         # Define las claves esperadas según el tipo de log
         if self.log_type == "contest":
             keys = [
@@ -72,6 +72,12 @@ class ContactTableWidget(QWidget):
         self.table.setColumnCount(len(keys))
         import datetime
 
+        lang = translation_service.get_language()
+        if lang == "es":
+            date_fmt = "%d/%m/%Y"
+        else:
+            date_fmt = "%m/%d/%Y"
+
         for row, contact in enumerate(contacts):
             for col, key in enumerate(keys):
                 if key == "qtr_oa":
@@ -82,14 +88,14 @@ class ContactTableWidget(QWidget):
                             int(ts), tz=datetime.timezone.utc
                         )
                         dt_oa = dt_utc - datetime.timedelta(hours=5)
-                        value = dt_oa.strftime("%H:%M")
+                        value = dt_oa.strftime(f"%H:%M {date_fmt}")
                 elif key == "qtr_utc":
                     ts = contact.get("timestamp", None)
                     value = ""
                     if ts:
                         value = datetime.datetime.fromtimestamp(
                             int(ts), tz=datetime.timezone.utc
-                        ).strftime("%H:%M")
+                        ).strftime(f"%H:%M {date_fmt}")
                 else:
                     value = contact.get(key, "")
                 self.table.setItem(row, col, QTableWidgetItem(str(value)))
@@ -97,3 +103,6 @@ class ContactTableWidget(QWidget):
 
     def retranslate_ui(self):
         self.set_columns()
+        # Recarga los datos si existen
+        if hasattr(self, "_last_contacts"):
+            self.set_contacts(self._last_contacts)
