@@ -58,8 +58,6 @@ def update_contact_in_log(
     """
     repo = ContactLogRepository(db_path)
     contacts = repo.get_contacts(log_id)
-    # Eliminar el contacto anterior
-    repo.delete_contact(contact_id)
     # Crear y validar el nuevo contacto actualizado
     if contact_type == "operativo":
         contact = OperationContact(**updated_data)
@@ -76,6 +74,6 @@ def update_contact_in_log(
         errors += ContestRules.validate(contact, contacts)
     if errors:
         raise ValueError("; ".join(errors))
-    # Si todo es válido, guardar
-    repo.save_contact(log_id, contact)
+    # Si todo es válido, actualizar el registro directamente
+    repo.update_contact(contact_id, contact)
     return contact

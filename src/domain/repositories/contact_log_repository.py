@@ -104,3 +104,16 @@ class ContactLogRepository:
             c = conn.cursor()
             c.execute("DELETE FROM contacts WHERE id = ?", (contact_id,))
             conn.commit()
+
+    def update_contact(self, contact_id: str, contact: Any):
+        import json
+
+        with sqlite3.connect(self.db_path) as conn:
+            c = conn.cursor()
+            c.execute(
+                """
+                UPDATE contacts SET data = ? WHERE id = ?
+                """,
+                (json.dumps(contact.__dict__), contact_id),
+            )
+            conn.commit()

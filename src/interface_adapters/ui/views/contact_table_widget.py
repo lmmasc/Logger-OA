@@ -1,4 +1,10 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem
+from PySide6.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
+    QTableWidget,
+    QTableWidgetItem,
+    QAbstractItemView,
+)
 from translation.translation_service import translation_service
 
 
@@ -16,6 +22,55 @@ class ContactTableWidget(QWidget):
         self.layout.addWidget(self.table)
         self.setLayout(self.layout)
         self.set_columns()
+        # Deshabilitar edición directa
+        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        # Conectar doble clic a método personalizado
+        self.table.itemDoubleClicked.connect(self._on_item_double_clicked)
+
+    def _on_item_double_clicked(self, item):
+        """
+        Abre el diálogo de edición para el contacto seleccionado, respetando traducción y tipos.
+        """
+        row = item.row()
+        if not hasattr(self, "_last_contacts") or row >= len(self._last_contacts):
+            return
+        contact = self._last_contacts[row]
+        # Importar y mostrar el diálogo de edición de contacto
+        from interface_adapters.ui.dialogs.contact_edit_dialog import ContactEditDialog
+        from PySide6.QtWidgets import QDialog
+
+        dlg = ContactEditDialog(contact, self.log_type, self)
+        if dlg.exec() == QDialog.Accepted and dlg.result_contact:
+            # Conservar id y timestamp originales
+            updated_data = dlg.result_contact.copy()
+            if "id" in contact:
+                updated_data["id"] = contact["id"]
+            if "timestamp" in contact:
+                updated_data["timestamp"] = contact["timestamp"]
+            # Actualizar el contacto usando caso de uso y refrescar tabla
+            from application.use_cases.contact_management import update_contact_in_log
+            from domain.repositories.contact_log_repository import ContactLogRepository
+
+            main_window = self.parent()
+            while main_window and main_window.__class__.__name__ != "MainWindow":
+                main_window = main_window.parent()
+            if (
+                not main_window
+                or not hasattr(main_window, "current_log")
+                or not main_window.current_log
+            ):
+                return
+            db_path = getattr(main_window.current_log, "db_path", None)
+            log_id = getattr(main_window.current_log, "id", None)
+            contact_id = contact.get("id", None)
+            contact_type = "operativo" if self.log_type == "ops" else "concurso"
+            update_contact_in_log(
+                db_path, log_id, contact_id, updated_data, contact_type
+            )
+            repo = ContactLogRepository(db_path)
+            contacts = repo.get_contacts(log_id)
+            main_window.current_log.contacts = contacts
+            self.set_contacts(contacts)
 
     def set_columns(self):
         if self.log_type == "contest":
