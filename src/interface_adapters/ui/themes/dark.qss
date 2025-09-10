@@ -130,5 +130,14 @@ QListWidget#ContactQueueList::item:selected {
     font-weight: bold;
 }
 
+QLineEdit#callsignInput {
+    border: 2px solid #b0b0b0;
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+QLineEdit#callsignInput:focus {
+    border: 2px solid palette(highlight);
+}
+
 
 
