@@ -293,8 +293,6 @@ class LogFormWidget(QWidget):
                 translation_service.tr("contact_added"),
             )
         except Exception as e:
-            from PySide6.QtWidgets import QMessageBox
-
             msg = str(e)
             if "Invalid callsign" in msg:
                 QMessageBox.critical(
