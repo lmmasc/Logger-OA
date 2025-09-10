@@ -31,12 +31,13 @@ class LogFormWidget(QWidget):
         self.log_type = log_type
         # Layout principal
         main_layout = QVBoxLayout()
-        main_layout.setSpacing(12)
+        main_layout.setSpacing(4)
 
         # --- Formulario horizontal ---
         form_row = QHBoxLayout()
-        form_row.setSpacing(4)
+        form_row.setSpacing(8)
         form_row.setContentsMargins(0, 0, 0, 0)
+        form_row.setAlignment(Qt.AlignLeft)
 
         # Station
         self.station_input = QComboBox(self)
@@ -49,7 +50,8 @@ class LogFormWidget(QWidget):
             ]
         )
         self.station_input.setCurrentIndex(0)
-        self.station_input.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.station_input.setFixedWidth(120)
+        self.station_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         station_label = QLabel(translation_service.tr("station"))
         station_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         station_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
@@ -68,7 +70,8 @@ class LogFormWidget(QWidget):
             ]
         )
         self.energy_input.setCurrentIndex(0)
-        self.energy_input.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.energy_input.setFixedWidth(120)
+        self.energy_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         energy_label = QLabel(translation_service.tr("energy"))
         energy_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         energy_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
@@ -79,7 +82,8 @@ class LogFormWidget(QWidget):
         # Power
         self.power_input = QLineEdit(self)
         self.power_input.setText("1")
-        self.power_input.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.power_input.setFixedWidth(60)
+        self.power_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         power_label = QLabel(translation_service.tr("power"))
         power_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         power_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
@@ -90,7 +94,8 @@ class LogFormWidget(QWidget):
         # RS_RX
         self.rs_rx_input = QLineEdit(self)
         self.rs_rx_input.setText("59")
-        self.rs_rx_input.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.rs_rx_input.setFixedWidth(50)
+        self.rs_rx_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         rs_rx_label = QLabel(translation_service.tr("rs_rx"))
         rs_rx_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         rs_rx_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
@@ -101,7 +106,8 @@ class LogFormWidget(QWidget):
         # RS_TX
         self.rs_tx_input = QLineEdit(self)
         self.rs_tx_input.setText("59")
-        self.rs_tx_input.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        self.rs_tx_input.setFixedWidth(50)
+        self.rs_tx_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         rs_tx_label = QLabel(translation_service.tr("rs_tx"))
         rs_tx_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         rs_tx_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
@@ -116,7 +122,9 @@ class LogFormWidget(QWidget):
         obs_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         obs_label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
         form_row.addWidget(obs_label)
-        form_row.addWidget(self.observations_input)
+        form_row.addWidget(
+            self.observations_input, 1
+        )  # stretch factor 1 para ocupar espacio restante
         self.observations_label = obs_label
 
         # Widget del formulario
