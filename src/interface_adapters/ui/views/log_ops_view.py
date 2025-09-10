@@ -62,6 +62,17 @@ class LogOpsView(QWidget):
         self.queue_widget = ContactQueueWidget(self)
         self.queue_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         layout.addWidget(self.queue_widget)
+        # Formulario sin botón
+        self.form_widget = LogFormWidget(
+            self,
+            log_type="ops",
+            callsign=callsign,
+            log_type_name=log_type_name,
+            log_date=log_date,
+        )
+        self.form_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        layout.addWidget(self.form_widget)
+
         # Instanciar relojes y gestionar traducción
         self.oa_clock = ClockWidget(
             translation_service.tr("clock_oa_label"), "red", self, utc=False
@@ -74,15 +85,6 @@ class LogOpsView(QWidget):
 
         self.add_contact_btn = QPushButton(translation_service.tr("add_contact"), self)
         self.add_contact_btn.clicked.connect(self._on_add_contact)
-        # Formulario sin botón
-        self.form_widget = LogFormWidget(
-            self,
-            log_type="ops",
-            callsign=callsign,
-            log_type_name=log_type_name,
-            log_date=log_date,
-        )
-        self.form_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         # Layout horizontal para relojes y botón
         clock_row = QWidget(self)
         clock_layout = QHBoxLayout(clock_row)
@@ -93,7 +95,7 @@ class LogOpsView(QWidget):
         clock_layout.addWidget(self.add_contact_btn)
         clock_row.setLayout(clock_layout)
         layout.addWidget(clock_row)
-        layout.addWidget(self.form_widget)
+
         self.table_widget = ContactTableWidget(self, log_type="ops")
         self.table_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         layout.addWidget(self.table_widget)

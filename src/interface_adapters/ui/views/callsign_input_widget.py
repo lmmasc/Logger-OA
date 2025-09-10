@@ -26,7 +26,7 @@ class CallsignInputWidget(QWidget):
         self.label = QLabel("", self)
         label_font = QFont()
         label_font.setPointSize(14)
-        label_font.setBold(True)
+        # label_font.setBold(True)
         self.label.setFont(label_font)
         self.input = QLineEdit(self)
         font = QFont()

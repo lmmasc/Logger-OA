@@ -30,7 +30,7 @@ class CallsignInfoWidget(QWidget):
         self.title_label = QLabel("", self)
         title_font = QFont()
         title_font.setPointSize(14)
-        title_font.setBold(True)
+        # title_font.setBold(True)
         self.title_label.setFont(title_font)
         layout.addWidget(self.title_label)
         # Resumen
