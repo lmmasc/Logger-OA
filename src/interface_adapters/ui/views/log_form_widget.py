@@ -8,11 +8,9 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QVBoxLayout,
     QSizePolicy,
-    QPushButton,  # <--- Importación agregada
 )
 from translation.translation_service import translation_service
 from PySide6.QtCore import Qt
-from .clock_widget import ClockWidget
 
 
 class LogFormWidget(QWidget):
@@ -130,48 +128,14 @@ class LogFormWidget(QWidget):
         )  # No expansivo, solo lo necesario
         main_layout.addWidget(form_row_widget)
 
-        # --- Bloque de relojes y botones ---
-        block_layout = QHBoxLayout()
-        block_layout.setContentsMargins(0, 0, 0, 0)
-        block_layout.setSpacing(16)
-
-        # Relojes en fila usando ClockWidget
-        self.oa_clock = ClockWidget(
-            translation_service.tr("clock_oa_label"), "red", self, utc=False
-        )
-        self.utc_clock = ClockWidget(
-            translation_service.tr("clock_utc_label"), "green", self, utc=True
-        )
-        clock_layout = QHBoxLayout()
-        clock_layout.setContentsMargins(0, 0, 0, 0)
-        clock_layout.setSpacing(16)
-        clock_layout.addWidget(self.oa_clock)
-        clock_layout.addWidget(self.utc_clock)
-        clock_widget = QWidget(self)
-        clock_widget.setLayout(clock_layout)
-        block_layout.addWidget(clock_widget)
-
-        # Botón
-        button_layout = QVBoxLayout()
-        self.add_contact_btn = QPushButton(translation_service.tr("add_contact"), self)
-        button_layout.addWidget(self.add_contact_btn)
-        button_widget = QWidget(self)
-        button_widget.setLayout(button_layout)
-        block_layout.addWidget(button_widget)
-
-        block_widget = QWidget(self)
-        block_widget.setLayout(block_layout)
-        main_layout.addWidget(block_widget)
-
         # Asignar layout principal
         self.setLayout(main_layout)
 
-        self.add_contact_btn.clicked.connect(self._on_add_contact)
-        # self.callsign_input.input.textChanged.connect(self._update_callsign_summary)
-
-    def _on_add_contact(self):
+    def _on_add_contact(self, callsign=None):
         # Recoge datos y llama al caso de uso
-        data = self.get_data()
+        data = self.get_data(callsign)
+        if callsign:
+            data["callsign"] = callsign
         main_window = self._find_main_window()
         if (
             not main_window
@@ -233,10 +197,10 @@ class LogFormWidget(QWidget):
             parent = parent.parent()
         return None
 
-    def get_data(self):
+    def get_data(self, callsign=None):
         """Devuelve los datos del formulario como dict."""
         data = {
-            "callsign": self.callsign_input.get_callsign(),
+            "callsign": callsign if callsign is not None else "",
             "rs_rx": self.rs_rx_input.text(),
             "rs_tx": self.rs_tx_input.text(),
         }
@@ -299,8 +263,4 @@ class LogFormWidget(QWidget):
             self.energy_input.clear()
             self.energy_input.addItems(items)
             self.energy_input.setCurrentIndex(current)
-        # Actualizar los labels de los relojes
-        if hasattr(self, "oa_clock"):
-            self.oa_clock.set_label_text(translation_service.tr("clock_oa_label"))
-        if hasattr(self, "utc_clock"):
-            self.utc_clock.set_label_text(translation_service.tr("clock_utc_label"))
+        # Eliminar traducción de labels de relojes, ya que ahora se gestionan en las vistas

@@ -1,8 +1,9 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton
 from PySide6.QtCore import Qt
 from translation.translation_service import translation_service
 from .callsign_input_widget import CallsignInputWidget
 from .callsign_info_widget import CallsignInfoWidget
+from .clock_widget import ClockWidget
 
 
 class LogContestView(QWidget):
@@ -22,6 +23,19 @@ class LogContestView(QWidget):
         # Encabezado dinámico eliminado
         # self.header = HeaderWidget("", self)
         # layout.addWidget(self.header)
+        # Instanciar relojes y gestionar traducción
+        self.oa_clock = ClockWidget(
+            translation_service.tr("clock_oa_label"), "red", self, utc=False
+        )
+        self.utc_clock = ClockWidget(
+            translation_service.tr("clock_utc_label"), "green", self, utc=True
+        )
+        translation_service.signal.language_changed.connect(self._retranslate_clocks)
+        from PySide6.QtWidgets import QPushButton
+
+        self.add_contact_btn = QPushButton(translation_service.tr("add_contact"), self)
+        self.add_contact_btn.clicked.connect(self._on_add_contact)
+        # Formulario sin botón
         self.form_widget = LogFormWidget(
             self,
             log_type="contest",
@@ -29,6 +43,16 @@ class LogContestView(QWidget):
             log_type_name=log_type_name,
             log_date=log_date,
         )
+        # Layout horizontal para relojes y botón
+        clock_row = QWidget(self)
+        clock_layout = QHBoxLayout(clock_row)
+        clock_layout.setContentsMargins(0, 0, 0, 0)
+        clock_layout.setSpacing(16)
+        clock_layout.addWidget(self.oa_clock)
+        clock_layout.addWidget(self.utc_clock)
+        clock_layout.addWidget(self.add_contact_btn)
+        clock_row.setLayout(clock_layout)
+        layout.addWidget(clock_row)
         layout.addWidget(self.form_widget)
         # Nuevo bloque: input y área de info
         self.callsign_input = CallsignInputWidget(self)
@@ -144,3 +168,11 @@ class LogContestView(QWidget):
                     )
         else:
             self.callsign_info.show_suggestions("")
+
+    def _retranslate_clocks(self):
+        self.oa_clock.set_label_text(translation_service.tr("clock_oa_label"))
+        self.utc_clock.set_label_text(translation_service.tr("clock_utc_label"))
+
+    def _on_add_contact(self):
+        callsign = self.callsign_input.get_callsign().strip()
+        self.form_widget._on_add_contact(callsign)

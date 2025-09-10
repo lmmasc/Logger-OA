@@ -3,7 +3,7 @@ Vista principal para la gestión de logs operativos (LogOpsView).
 Incluye formulario, cola de contactos, tabla y área de información de indicativos.
 """
 
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QSizePolicy
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QSizePolicy, QHBoxLayout
 from PySide6.QtCore import Qt
 from translation.translation_service import translation_service
 from .log_form_widget import LogFormWidget
@@ -12,6 +12,7 @@ from .header_widget import HeaderWidget
 from .contact_queue_widget import ContactQueueWidget
 from .callsign_input_widget import CallsignInputWidget
 from .callsign_info_widget import CallsignInfoWidget
+from .clock_widget import ClockWidget
 
 
 class LogOpsView(QWidget):
@@ -43,8 +44,6 @@ class LogOpsView(QWidget):
         self.header_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         layout.addWidget(self.header_widget)
         # Widgets de indicativo en una misma fila
-        from PySide6.QtWidgets import QHBoxLayout, QWidget
-
         indicativo_row = QWidget(self)
         indicativo_layout = QHBoxLayout(indicativo_row)
         indicativo_layout.setContentsMargins(0, 0, 0, 0)
@@ -63,6 +62,19 @@ class LogOpsView(QWidget):
         self.queue_widget = ContactQueueWidget(self)
         self.queue_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         layout.addWidget(self.queue_widget)
+        # Instanciar relojes y gestionar traducción
+        self.oa_clock = ClockWidget(
+            translation_service.tr("clock_oa_label"), "red", self, utc=False
+        )
+        self.utc_clock = ClockWidget(
+            translation_service.tr("clock_utc_label"), "green", self, utc=True
+        )
+        translation_service.signal.language_changed.connect(self._retranslate_clocks)
+        from PySide6.QtWidgets import QPushButton
+
+        self.add_contact_btn = QPushButton(translation_service.tr("add_contact"), self)
+        self.add_contact_btn.clicked.connect(self._on_add_contact)
+        # Formulario sin botón
         self.form_widget = LogFormWidget(
             self,
             log_type="ops",
@@ -71,6 +83,16 @@ class LogOpsView(QWidget):
             log_date=log_date,
         )
         self.form_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        # Layout horizontal para relojes y botón
+        clock_row = QWidget(self)
+        clock_layout = QHBoxLayout(clock_row)
+        clock_layout.setContentsMargins(0, 0, 0, 0)
+        clock_layout.setSpacing(16)
+        clock_layout.addWidget(self.oa_clock)
+        clock_layout.addWidget(self.utc_clock)
+        clock_layout.addWidget(self.add_contact_btn)
+        clock_row.setLayout(clock_layout)
+        layout.addWidget(clock_row)
         layout.addWidget(self.form_widget)
         self.table_widget = ContactTableWidget(self, log_type="ops")
         self.table_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -166,3 +188,14 @@ class LogOpsView(QWidget):
                     )
         else:
             self.callsign_info.show_suggestions("")
+
+    def _retranslate_clocks(self):
+        """
+        Retranslate the clock labels when the language is changed.
+        """
+        self.oa_clock.set_label_text(translation_service.tr("clock_oa_label"))
+        self.utc_clock.set_label_text(translation_service.tr("clock_utc_label"))
+
+    def _on_add_contact(self):
+        callsign = self.callsign_input.get_callsign().strip()
+        self.form_widget._on_add_contact(callsign)
