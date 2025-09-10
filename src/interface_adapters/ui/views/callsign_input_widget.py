@@ -1,9 +1,10 @@
-from PySide6.QtWidgets import (
-    QWidget,
-    QLineEdit,
-    QVBoxLayout,
-    QLabel,
-)
+"""
+CallsignInputWidget: Widget para ingreso y normalización de indicativo (callsign).
+- Permite validación, autocompletado y adaptación a idioma.
+- Señal para agregar a la cola de contactos.
+"""
+
+from PySide6.QtWidgets import QWidget, QLineEdit, QVBoxLayout, QLabel
 from PySide6.QtGui import QFont
 from PySide6.QtCore import Signal, Qt
 from translation.translation_service import translation_service
@@ -18,35 +19,44 @@ class CallsignInputWidget(QWidget):
     addToQueue = Signal(str)  # Señal para agregar a la cola
 
     def __init__(self, parent=None):
+        """
+        Inicializa el widget de ingreso de indicativo.
+        Args:
+            parent (QWidget): Widget padre.
+        """
         super().__init__(parent)
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
         layout.setAlignment(Qt.AlignTop)
+        # Label descriptivo
         self.label = QLabel("", self)
         label_font = QFont()
         label_font.setPointSize(14)
-        # label_font.setBold(True)
         self.label.setFont(label_font)
+        # Campo de texto para indicativo
         self.input = QLineEdit(self)
         font = QFont()
         font.setPointSize(32)
         font.setBold(True)
         self.input.setFont(font)
-        # self.input.setMinimumWidth(200)
-        # self.input.setMaximumWidth(200)
         self.input.setFixedWidth(320)
-        # self.label.setFixedHeight(32)
         self.input.setFixedHeight(64)
         layout.addWidget(self.label)
         layout.addWidget(self.input)
         self.setLayout(layout)
+        # Conexiones
         self.input.textChanged.connect(self._normalize_upper)
-        self.retranslate_ui()
         self.input.returnPressed.connect(self._on_return_pressed)
         translation_service.signal.language_changed.connect(self.retranslate_ui)
+        self.retranslate_ui()
 
     def _normalize_upper(self, text):
+        """
+        Normaliza el texto a mayúsculas en tiempo real, manteniendo la posición del cursor.
+        Args:
+            text (str): Texto ingresado.
+        """
         upper_text = text.upper()
         if text != upper_text:
             cursor_pos = self.input.cursorPosition()
@@ -55,17 +65,33 @@ class CallsignInputWidget(QWidget):
             self.input.setCursorPosition(cursor_pos)
             self.input.blockSignals(False)
 
-    def get_callsign(self):
-        return self.input.text()
-
-    def set_callsign(self, value):
-        self.input.setText(value.upper())
-
     def _on_return_pressed(self):
+        """
+        Emite la señal addToQueue con el indicativo ingresado y limpia el campo.
+        """
         text = self.input.text().strip()
         if text:
             self.addToQueue.emit(text)
             self.input.clear()
 
+    def get_callsign(self):
+        """
+        Devuelve el indicativo actual ingresado.
+        Returns:
+            str: Indicativo en el campo de texto.
+        """
+        return self.input.text()
+
+    def set_callsign(self, value):
+        """
+        Establece el indicativo en el campo de texto, normalizado a mayúsculas.
+        Args:
+            value (str): Indicativo a establecer.
+        """
+        self.input.setText(value.upper())
+
     def retranslate_ui(self):
+        """
+        Actualiza el label según el idioma actual.
+        """
         self.label.setText(translation_service.tr("enter_callsign_label"))
