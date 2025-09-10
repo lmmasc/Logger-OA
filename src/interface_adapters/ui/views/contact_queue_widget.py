@@ -1,6 +1,7 @@
 """
 ContactQueueWidget: Widget para mostrar y gestionar la cola de contactos en espera.
 - Permite copiar indicativo, agregar, eliminar y traducir el label.
+- Elimina el focus rectangle nativo en los items usando un delegate personalizado.
 """
 
 from PySide6.QtCore import Signal, Qt
@@ -12,13 +13,26 @@ from PySide6.QtWidgets import (
     QMenu,
     QListWidgetItem,
     QListView,
+    QStyledItemDelegate,
+    QStyle,
 )
 from translation.translation_service import translation_service
+
+
+class NoFocusDelegate(QStyledItemDelegate):
+    """
+    Delegate personalizado para eliminar el focus rectangle nativo en los items de QListWidget.
+    """
+
+    def paint(self, painter, option, index):
+        option.state &= ~QStyle.State_HasFocus
+        super().paint(painter, option, index)
 
 
 class ContactQueueWidget(QWidget):
     """
     Widget para mostrar la cola de contactos en espera de confirmación o revisión.
+    Permite agregar, eliminar y copiar indicativos, y adapta el label al idioma.
     """
 
     setCallsign = Signal(str)
@@ -41,8 +55,8 @@ class ContactQueueWidget(QWidget):
         font.setPointSize(18)
         self.queue_list.setFont(font)
         self.queue_list.setObjectName("ContactQueueList")
-        # El estilo se moverá a los archivos .qss de temas
         self.queue_list.setStyleSheet("")
+        self.queue_list.setItemDelegate(NoFocusDelegate())
         self.queue_list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.layout.addWidget(self.label)
         self.layout.addWidget(self.queue_list)
