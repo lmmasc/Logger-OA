@@ -73,14 +73,9 @@ class LogOpsView(QWidget):
         self.form_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         layout.addWidget(self.form_widget)
 
-        # Instanciar relojes y gestionar traducción
-        self.oa_clock = ClockWidget(
-            translation_service.tr("clock_oa_label"), "red", self, utc=False
-        )
-        self.utc_clock = ClockWidget(
-            translation_service.tr("clock_utc_label"), "green", self, utc=True
-        )
-        translation_service.signal.language_changed.connect(self._retranslate_clocks)
+        # Instanciar relojes sin traducción de label
+        self.oa_clock = ClockWidget("OA", "red", self, utc=False)
+        self.utc_clock = ClockWidget("UTC", "green", self, utc=True)
         from PySide6.QtWidgets import QPushButton
 
         self.add_contact_btn = QPushButton(translation_service.tr("add_contact"), self)
@@ -105,7 +100,17 @@ class LogOpsView(QWidget):
         self.callsign_input.input.textChanged.connect(self.callsign_info.update_info)
         self.callsign_info.update_info(self.callsign_input.get_callsign())
         self.setLayout(layout)
+        # Conexión de señales para refresco de UI y relojes al cambiar idioma
         translation_service.signal.language_changed.connect(self.retranslate_ui)
+        translation_service.signal.language_changed.connect(self._retranslate_clocks)
+        self.update_header()
+
+    def _retranslate_clocks(self):
+        """
+        Refresca el formato de fecha/hora de los relojes OA y UTC al cambiar idioma.
+        """
+        self.oa_clock.update_clock()
+        self.utc_clock.update_clock()
         self.update_header()
 
     def update_header(self):
@@ -190,13 +195,6 @@ class LogOpsView(QWidget):
                     )
         else:
             self.callsign_info.show_suggestions("")
-
-    def _retranslate_clocks(self):
-        """
-        Retranslate the clock labels when the language is changed.
-        """
-        self.oa_clock.set_label_text(translation_service.tr("clock_oa_label"))
-        self.utc_clock.set_label_text(translation_service.tr("clock_utc_label"))
 
     def _on_add_contact(self):
         callsign = self.callsign_input.get_callsign().strip()
