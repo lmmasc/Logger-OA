@@ -79,10 +79,12 @@ class LogOpsView(QWidget):
         from PySide6.QtWidgets import QPushButton
 
         self.add_contact_btn = QPushButton(translation_service.tr("add_contact"), self)
+        self.add_contact_btn.setObjectName("AddContactButton")
         self.add_contact_btn.clicked.connect(self._on_add_contact)
         self.delete_contact_btn = QPushButton(
             translation_service.tr("delete_contact"), self
         )
+        self.delete_contact_btn.setObjectName("DeleteContactButton")
         self.delete_contact_btn.setEnabled(False)
         self.delete_contact_btn.clicked.connect(self._on_delete_contact)
         # Layout horizontal para relojes y botón

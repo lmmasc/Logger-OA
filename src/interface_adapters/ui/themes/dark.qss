@@ -74,6 +74,52 @@ QPushButton#DeleteOperatorButton:disabled {
     opacity: 0.7;
 }
 
+QPushButton#AddContactButton {
+    background-color: #181a1b;
+    color: #fff;
+    border-radius: 6px;
+    padding: 6px 18px;
+    font-weight: bold;
+    border: 2px solid #388e3c;
+}
+QPushButton#AddContactButton:hover {
+    border: 2px solid #43a047;
+    background-color: #232629;
+}
+QPushButton#AddContactButton:pressed {
+    border: 2px solid #2e7031;
+    background-color: #232629;
+}
+QPushButton#AddContactButton:disabled {
+    background-color: #232629;
+    color: #888;
+    border: 2px solid #444;
+    opacity: 0.7;
+}
+
+QPushButton#DeleteContactButton {
+    background-color: #181a1b;
+    color: #fff;
+    border-radius: 6px;
+    padding: 6px 18px;
+    font-weight: bold;
+    border: 2px solid #b71c1c;
+}
+QPushButton#DeleteContactButton:hover {
+    border: 2px solid #e53935;
+    background-color: #232629;
+}
+QPushButton#DeleteContactButton:pressed {
+    border: 2px solid #7f1010;
+    background-color: #232629;
+}
+QPushButton#DeleteContactButton:disabled {
+    background-color: #232629;
+    color: #888;
+    border: 2px solid #444;
+    opacity: 0.7;
+}
+
 QWidget {
     background-color: #232629;
     color: #f5f5f5;
