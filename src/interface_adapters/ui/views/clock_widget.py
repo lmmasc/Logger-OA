@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout
-from PySide6.QtCore import Qt, QTimer, QLocale
+from PySide6.QtCore import Qt, QTimer
 import datetime
 
 
@@ -29,9 +29,18 @@ class ClockWidget(QWidget):
         self.update_clock()
 
     def update_clock(self):
-        now = datetime.datetime.utcnow() if self.utc else datetime.datetime.now()
-        lang = QLocale().name()
-        date_fmt = "%d/%m/%Y" if lang.startswith("es") else "%m/%d/%Y"
+        if self.utc:
+            now = datetime.datetime.now(datetime.timezone.utc)
+        else:
+            now = datetime.datetime.now().astimezone()
+        # Usar el idioma del sistema global de traducción
+        try:
+            from translation.translation_service import translation_service
+
+            lang = translation_service.get_language()
+        except Exception:
+            lang = "es"
+        date_fmt = "%d/%m/%Y" if lang == "es" else "%m/%d/%Y"
         self.time.setText(now.strftime("%H:%M:%S"))
         self.date.setText(now.strftime(date_fmt))
 
