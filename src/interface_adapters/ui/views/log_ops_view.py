@@ -41,11 +41,24 @@ class LogOpsView(QWidget):
         layout.setAlignment(Qt.AlignTop)
         self.header_widget = HeaderWidget()
         layout.addWidget(self.header_widget)
-        # Mover widgets de indicativo justo después del header
-        self.callsign_input = CallsignInputWidget(self)
-        self.callsign_info = CallsignInfoWidget(self)
-        layout.addWidget(self.callsign_input)
-        layout.addWidget(self.callsign_info)
+        # Widgets de indicativo en una misma fila
+        from PySide6.QtWidgets import QHBoxLayout, QWidget
+
+        indicativo_row = QWidget(self)
+        indicativo_layout = QHBoxLayout(indicativo_row)
+        indicativo_layout.setContentsMargins(0, 0, 0, 0)
+        indicativo_layout.setSpacing(8)
+        indicativo_layout.setAlignment(Qt.AlignVCenter)
+        self.callsign_input = CallsignInputWidget(indicativo_row)
+        self.callsign_input.setFixedWidth(320)
+        self.callsign_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.callsign_info = CallsignInfoWidget(indicativo_row)
+        self.callsign_info.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        indicativo_layout.addWidget(self.callsign_input)
+        indicativo_layout.addWidget(self.callsign_info)
+        indicativo_row.setLayout(indicativo_layout)
+        indicativo_row.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        layout.addWidget(indicativo_row)
         self.form_widget = LogFormWidget(
             self,
             log_type="ops",
