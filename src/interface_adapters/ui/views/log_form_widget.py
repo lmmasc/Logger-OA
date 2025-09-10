@@ -206,8 +206,12 @@ class LogFormWidget(QWidget):
                 if self.energy_input
                 else ""
             )
+            import uuid
+
+            contact_id = str(uuid.uuid4())
             data.update(
                 {
+                    "id": contact_id,
                     "name": name,
                     "country": country,
                     "station": station_key,

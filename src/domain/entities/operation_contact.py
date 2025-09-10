@@ -4,6 +4,7 @@ from dataclasses import dataclass
 @dataclass
 class OperationContact:
     callsign: str
+    id: str = ""
     name: str = "-"
     country: str = "-"
     station: str = "-"
