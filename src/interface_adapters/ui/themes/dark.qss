@@ -124,5 +124,11 @@ QListWidget#ContactQueueList::item:selected {
     background: #1976d2;
 }
 
+/* CallsignSuggestionList: Estilo para sugerencias de indicativos (tema oscuro) */
+#CallsignSuggestionList::item {
+    color: #00e6ff;
+    font-weight: bold;
+}
+
 
 
