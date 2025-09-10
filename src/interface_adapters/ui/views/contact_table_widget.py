@@ -65,8 +65,8 @@ class ContactTableWidget(QWidget):
                 "power",
                 "rs_rx",
                 "rs_tx",
-                "hora_oa",
-                "hora_utc",
+                "qtr_oa",
+                "qtr_utc",
             ]
         self.table.setRowCount(len(contacts))
         self.table.setColumnCount(len(keys))

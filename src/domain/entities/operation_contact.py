@@ -5,6 +5,7 @@ from dataclasses import dataclass
 class OperationContact:
     callsign: str
     name: str = "-"
+    country: str = "-"
     station: str = "-"
     energy: str = "-"
     power: str = "-"

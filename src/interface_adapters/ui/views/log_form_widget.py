@@ -10,6 +10,10 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from translation.translation_service import translation_service
+import datetime
+from infrastructure.repositories.sqlite_radio_operator_repository import (
+    SqliteRadioOperatorRepository,
+)
 
 
 class LogFormWidget(QWidget):
@@ -163,8 +167,9 @@ class LogFormWidget(QWidget):
         Returns:
             dict: Datos del formulario.
         """
+        callsign_val = callsign if callsign is not None else ""
         data = {
-            "callsign": callsign if callsign is not None else "",
+            "callsign": callsign_val,
             "rs_rx": self.rs_rx_input.text(),
             "rs_tx": self.rs_tx_input.text(),
         }
@@ -173,14 +178,28 @@ class LogFormWidget(QWidget):
             data["exchange_sent"] = self.exchange_sent_input.text()
             data["observations"] = self.observations_input.text()
         elif self.log_type == "ops":
-            data["station"] = (
-                self.station_input.currentText() if self.station_input else ""
+            repo = SqliteRadioOperatorRepository()
+            operator = repo.get_operator_by_callsign(callsign_val)
+            name = operator.name if operator else ""
+            country = operator.country if operator else ""
+            now_local = datetime.datetime.now().strftime("%H:%M")
+            now_utc = datetime.datetime.utcnow().strftime("%H:%M")
+            data.update(
+                {
+                    "name": name,
+                    "country": country,
+                    "station": (
+                        self.station_input.currentText() if self.station_input else ""
+                    ),
+                    "energy": (
+                        self.energy_input.currentText() if self.energy_input else ""
+                    ),
+                    "power": self.power_input.text(),
+                    "qtr_oa": now_local,
+                    "qtr_utc": now_utc,
+                    "obs": self.observations_input.text(),
+                }
             )
-            data["energy"] = (
-                self.energy_input.currentText() if self.energy_input else ""
-            )
-            data["power"] = self.power_input.text()
-            data["obs"] = self.observations_input.text()
         return data
 
     def _find_main_window(self):
