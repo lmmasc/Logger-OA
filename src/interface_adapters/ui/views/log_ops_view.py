@@ -83,6 +83,7 @@ class LogOpsView(QWidget):
         self.delete_contact_btn = QPushButton(
             translation_service.tr("delete_contact"), self
         )
+        self.delete_contact_btn.setEnabled(False)
         self.delete_contact_btn.clicked.connect(self._on_delete_contact)
         # Layout horizontal para relojes y botón
         clock_row = QWidget(self)
@@ -95,10 +96,11 @@ class LogOpsView(QWidget):
         clock_layout.addWidget(self.delete_contact_btn)
         clock_row.setLayout(clock_layout)
         layout.addWidget(clock_row)
-
         self.table_widget = ContactTableWidget(self, log_type="ops")
         self.table_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         layout.addWidget(self.table_widget)
+        # Habilitar el botón de eliminar solo si hay una fila seleccionada
+        self.table_widget.table.itemSelectionChanged.connect(self._on_selection_changed)
         self.queue_widget.setCallsign.connect(self.callsign_input.set_callsign)
         self.callsign_input.addToQueue.connect(self.queue_widget.add_to_queue)
         self.callsign_info.suggestionSelected.connect(self.callsign_input.set_callsign)
@@ -232,16 +234,11 @@ class LogOpsView(QWidget):
         return None
 
     def _on_delete_contact(self):
-        # Eliminar contacto seleccionado de la tabla
+        # Eliminar contacto seleccionado de la tabla solo si hay una fila seleccionada
         selected_items = self.table_widget.table.selectedItems()
         if not selected_items:
             return
         row = selected_items[0].row()
-        # Obtener el contacto actual
-        contacts = getattr(self, "_current_log", None)
-        if not contacts or not hasattr(self, "table_widget"):
-            return
-        # Obtener el id del contacto (asumiendo que se guarda en el dict)
         contact_list = (
             self.table_widget._last_contacts
             if hasattr(self.table_widget, "_last_contacts")
@@ -251,7 +248,26 @@ class LogOpsView(QWidget):
             return
         contact = contact_list[row]
         contact_id = contact.get("id", None)
-        if not contact_id:
+        callsign = contact.get("callsign", "")
+        name = contact.get("name", "")
+        # Mostrar diálogo de confirmación
+        from PySide6.QtWidgets import QMessageBox
+
+        msg_box = QMessageBox(self)
+        msg_box.setIcon(QMessageBox.Question)
+        msg_box.setWindowTitle(translation_service.tr("delete_contact"))
+        msg_box.setText(translation_service.tr("confirm_delete_contact"))
+        msg_box.setInformativeText(
+            f"{translation_service.tr('table_header_callsign')}: {callsign}\n{translation_service.tr('table_header_name')}: {name}"
+        )
+        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        msg_box.setDefaultButton(QMessageBox.No)
+        yes_button = msg_box.button(QMessageBox.Yes)
+        no_button = msg_box.button(QMessageBox.No)
+        yes_button.setText(translation_service.tr("yes_button"))
+        no_button.setText(translation_service.tr("no_button"))
+        reply = msg_box.exec()
+        if reply != QMessageBox.Yes:
             return
         # Eliminar usando el caso de uso
         main_window = self._find_main_window()
@@ -273,3 +289,7 @@ class LogOpsView(QWidget):
         contacts = repo.get_contacts(log_id)
         main_window.current_log.contacts = contacts
         self.table_widget.set_contacts(contacts)
+
+    def _on_selection_changed(self):
+        selected_rows = self.table_widget.table.selectionModel().selectedRows()
+        self.delete_contact_btn.setEnabled(len(selected_rows) == 1)
