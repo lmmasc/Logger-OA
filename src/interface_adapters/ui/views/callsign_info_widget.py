@@ -1,10 +1,10 @@
-from PySide6.QtWidgets import (
-    QWidget,
-    QVBoxLayout,
-    QLabel,
-    QListWidget,
-    QListWidgetItem,
-)
+"""
+CallsignInfoWidget: Widget para mostrar información y sugerencias de indicativos.
+- Presenta título dinámico, resumen y lista de sugerencias.
+- Permite selección de sugerencia y adaptación a idioma.
+"""
+
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QListWidget, QListWidgetItem
 from PySide6.QtGui import QFont
 from PySide6.QtCore import Signal, Qt
 from translation.translation_service import translation_service
@@ -20,6 +20,11 @@ class CallsignInfoWidget(QWidget):
     suggestionSelected = Signal(str)
 
     def __init__(self, parent=None):
+        """
+        Inicializa el widget de información de indicativo.
+        Args:
+            parent (QWidget): Widget padre.
+        """
         super().__init__(parent)
         self._showing_suggestions = False
         self._current_callsign = ""
@@ -30,7 +35,6 @@ class CallsignInfoWidget(QWidget):
         self.title_label = QLabel("", self)
         title_font = QFont()
         title_font.setPointSize(14)
-        # title_font.setBold(True)
         self.title_label.setFont(title_font)
         layout.addWidget(self.title_label)
         # Resumen
@@ -63,6 +67,8 @@ class CallsignInfoWidget(QWidget):
     def show_summary(self, text):
         """
         Muestra el resumen del indicativo en el área correspondiente.
+        Args:
+            text (str): HTML o texto plano con el resumen.
         """
         self._showing_suggestions = False
         self.suggestion_list.hide()
@@ -73,15 +79,16 @@ class CallsignInfoWidget(QWidget):
     def show_suggestions(self, filtro):
         """
         Muestra la lista de sugerencias filtradas por el texto ingresado.
+        Args:
+            filtro (str): Texto para filtrar operadores.
         """
         self._showing_suggestions = True
         self.summary_label.hide()
         self.suggestion_list.show()
         self.suggestion_list.clear()
-        if not filtro or len(filtro) < 2:
-            operadores = []
-        else:
-            operadores = get_filtered_operators(filtro)
+        operadores = (
+            get_filtered_operators(filtro) if filtro and len(filtro) >= 2 else []
+        )
         for op in operadores:
             item = QListWidgetItem(op.callsign)
             font = QFont()
@@ -96,6 +103,8 @@ class CallsignInfoWidget(QWidget):
     def _on_suggestion_clicked(self, item):
         """
         Emite la señal cuando se selecciona una sugerencia.
+        Args:
+            item (QListWidgetItem): Item seleccionado.
         """
         self.suggestionSelected.emit(item.text())
 
@@ -112,19 +121,14 @@ class CallsignInfoWidget(QWidget):
         """
         Actualiza el área de información según el texto ingresado.
         Muestra sugerencias si hay más de 2 caracteres, o el resumen si hay coincidencia exacta.
+        Args:
+            text (str): Texto ingresado para buscar operadores.
         """
         filtro = text.strip().upper()
         if len(filtro) < 2:
-            # Menos de 2 caracteres: título sugerencias, lista vacía
             self.show_suggestions("")
         else:
-            from infrastructure.repositories.sqlite_radio_operator_repository import (
-                SqliteRadioOperatorRepository,
-            )
-
-            repo = SqliteRadioOperatorRepository()
             operadores = get_filtered_operators(filtro)
-            # Buscar match único y exacto
             exact_matches = [op for op in operadores if op.callsign.upper() == filtro]
             if len(exact_matches) == 1:
                 operator = exact_matches[0]
@@ -153,5 +157,4 @@ class CallsignInfoWidget(QWidget):
                 summary += "</tr></table>"
                 self.show_summary(summary)
             else:
-                # 2+ caracteres: título sugerencias, lista filtrada (puede estar vacía)
                 self.show_suggestions(filtro)
