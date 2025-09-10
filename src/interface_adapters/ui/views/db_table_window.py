@@ -54,12 +54,18 @@ class DBTableWindow(QWidget):
         main_layout = QVBoxLayout()
         filter_layout = QHBoxLayout()
         self.filter_edit = QLineEdit()
+        font = self.filter_edit.font()
+        font.setPointSize(16)
+        font.setBold(True)
+        self.filter_edit.setFont(font)
         self.filter_edit.setPlaceholderText(
             translation_service.tr("filter_placeholder")
         )
+        self.filter_edit.textChanged.connect(self._normalize_filter_text)
         self.filter_column_combo = QComboBox()
-        self.filter_column_combo.setMinimumWidth(150)
+        self.filter_column_combo.setFixedWidth(150)
         self.filter_label = QLabel(translation_service.tr("filter_by"))
+        self.filter_label.setFixedWidth(130)
         self.filter_results_label = QLabel(translation_service.tr("filter_results"))
         self.filter_results_count = QLabel("0")
         filter_layout.addWidget(self.filter_label)
@@ -386,3 +392,12 @@ class DBTableWindow(QWidget):
             else:
                 widths.append(w)
         settings_service.set_value("db_table_column_widths", widths)
+
+    def _normalize_filter_text(self, text):
+        cursor_pos = self.filter_edit.cursorPosition()
+        upper_text = text.upper()
+        if text != upper_text:
+            self.filter_edit.blockSignals(True)
+            self.filter_edit.setText(upper_text)
+            self.filter_edit.setCursorPosition(cursor_pos)
+            self.filter_edit.blockSignals(False)
