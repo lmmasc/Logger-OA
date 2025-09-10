@@ -176,3 +176,16 @@ class LogContestView(QWidget):
     def _on_add_contact(self):
         callsign = self.callsign_input.get_callsign().strip()
         self.form_widget._on_add_contact(callsign)
+        # Limpiar campo y poner foco
+        self.callsign_input.input.clear()
+        self.callsign_input.input.setFocus()
+        # Eliminar de la cola si está presente
+        items = [
+            self.queue_widget.queue_list.item(i).text()
+            for i in range(self.queue_widget.queue_list.count())
+        ]
+        if callsign in items:
+            for i in range(self.queue_widget.queue_list.count()):
+                if self.queue_widget.queue_list.item(i).text() == callsign:
+                    self.queue_widget.queue_list.takeItem(i)
+                    break
