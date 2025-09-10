@@ -156,12 +156,12 @@ QLabel#callsignSummary:focus {
     border: 2px solid palette(highlight);
 }
 
-QLineEdit#callsignInput {
+QLineEdit, QComboBox {
     border: 2px solid #444444;
     border-radius: 6px;
     padding: 4px 8px;
 }
-QLineEdit#callsignInput:focus {
+QLineEdit:focus, QComboBox:focus {
     border: 2px solid palette(highlight);
 }
 

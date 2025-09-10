@@ -185,5 +185,14 @@ QHeaderView::section {
     padding: 6px 8px;
 }
 
+QLineEdit, QComboBox {
+    border: 2px solid #bdbdbd;
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+QLineEdit:focus, QComboBox:focus {
+    border: 2px solid palette(highlight);
+}
+
 
 
