@@ -78,4 +78,6 @@ UI_TRANSLATIONS = {
     "add_contact": "Add contact",
     "clock_oa_label": "OA Time",
     "clock_utc_label": "UTC Time",
+    "delete_contact": "Delete contact",
+    "confirm_delete_contact": "Are you sure you want to delete this contact?",
 }
