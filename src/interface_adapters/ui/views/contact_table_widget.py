@@ -70,10 +70,28 @@ class ContactTableWidget(QWidget):
             ]
         self.table.setRowCount(len(contacts))
         self.table.setColumnCount(len(keys))
+        import datetime
+
         for row, contact in enumerate(contacts):
-            # ...eliminado debug print...
             for col, key in enumerate(keys):
-                value = contact.get(key, "")
+                if key == "qtr_oa":
+                    ts = contact.get("timestamp", None)
+                    value = ""
+                    if ts:
+                        dt_utc = datetime.datetime.fromtimestamp(
+                            int(ts), tz=datetime.timezone.utc
+                        )
+                        dt_oa = dt_utc - datetime.timedelta(hours=5)
+                        value = dt_oa.strftime("%H:%M")
+                elif key == "qtr_utc":
+                    ts = contact.get("timestamp", None)
+                    value = ""
+                    if ts:
+                        value = datetime.datetime.fromtimestamp(
+                            int(ts), tz=datetime.timezone.utc
+                        ).strftime("%H:%M")
+                else:
+                    value = contact.get(key, "")
                 self.table.setItem(row, col, QTableWidgetItem(str(value)))
         self.table.viewport().update()
 

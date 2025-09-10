@@ -182,8 +182,7 @@ class LogFormWidget(QWidget):
             operator = repo.get_operator_by_callsign(callsign_val)
             name = operator.name if operator else ""
             country = operator.country if operator else ""
-            now_local = datetime.datetime.now().strftime("%H:%M")
-            now_utc = datetime.datetime.utcnow().strftime("%H:%M")
+            timestamp = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
             data.update(
                 {
                     "name": name,
@@ -195,8 +194,7 @@ class LogFormWidget(QWidget):
                         self.energy_input.currentText() if self.energy_input else ""
                     ),
                     "power": self.power_input.text(),
-                    "qtr_oa": now_local,
-                    "qtr_utc": now_utc,
+                    "timestamp": timestamp,
                     "obs": self.observations_input.text(),
                 }
             )

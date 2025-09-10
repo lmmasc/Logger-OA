@@ -11,6 +11,5 @@ class OperationContact:
     power: str = "-"
     rs_rx: str = "-"
     rs_tx: str = "-"
-    qtr_oa: str = ""
-    qtr_utc: str = ""
+    timestamp: int = 0
     obs: str = "-"
