@@ -1,6 +1,5 @@
 from PySide6.QtWidgets import (
     QWidget,
-    QFormLayout,
     QLineEdit,
     QLabel,
     QComboBox,
@@ -9,13 +8,14 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QSizePolicy,
 )
-from translation.translation_service import translation_service
 from PySide6.QtCore import Qt
+from translation.translation_service import translation_service
 
 
 class LogFormWidget(QWidget):
     """
     Widget base para formularios de contacto/log. Reutilizable en operativos y concursos.
+    Permite ingresar y gestionar datos de contacto para logs de operativos y concursos, con soporte multilenguaje.
     """
 
     def __init__(
@@ -26,6 +26,15 @@ class LogFormWidget(QWidget):
         log_type_name="",
         log_date="",
     ):
+        """
+        Inicializa el formulario de log/contacto.
+        Args:
+            parent: QWidget padre.
+            log_type: Tipo de log ('ops' o 'contest').
+            callsign: Indicativo de llamada.
+            log_type_name: Nombre del tipo de log.
+            log_date: Fecha del log.
+        """
         super().__init__(parent)
 
         self.log_type = log_type
@@ -139,7 +148,54 @@ class LogFormWidget(QWidget):
         # Asignar layout principal
         self.setLayout(main_layout)
 
+    def get_data(self, callsign=None):
+        """
+        Devuelve los datos del formulario como diccionario.
+        Args:
+            callsign (str, opcional): Indicativo de llamada.
+        Returns:
+            dict: Datos del formulario.
+        """
+        data = {
+            "callsign": callsign if callsign is not None else "",
+            "rs_rx": self.rs_rx_input.text(),
+            "rs_tx": self.rs_tx_input.text(),
+        }
+        if self.log_type == "contest":
+            data["exchange_received"] = self.exchange_received_input.text()
+            data["exchange_sent"] = self.exchange_sent_input.text()
+            data["observations"] = self.observations_input.text()
+        elif self.log_type == "ops":
+            data["station"] = (
+                self.station_input.currentText() if self.station_input else ""
+            )
+            data["energy"] = (
+                self.energy_input.currentText() if self.energy_input else ""
+            )
+            data["power"] = self.power_input.text()
+            data["obs"] = self.observations_input.text()
+        return data
+
+    def _find_main_window(self):
+        """
+        Busca la instancia de MainWindow en la jerarquía de padres.
+        Returns:
+            MainWindow instance o None
+        """
+        # Busca la instancia de MainWindow en la jerarquía de padres
+        parent = self.parent()
+        while parent:
+            if parent.__class__.__name__ == "MainWindow":
+                return parent
+            parent = parent.parent()
+        return None
+
     def _on_add_contact(self, callsign=None):
+        """
+        Recoge datos del formulario y agrega un contacto al log actual.
+        Args:
+            callsign (str, opcional): Indicativo de llamada.
+        """
         # Recoge datos y llama al caso de uso
         data = self.get_data(callsign)
         if callsign:
@@ -196,39 +252,10 @@ class LogFormWidget(QWidget):
                 f"{translation_service.tr('contact_add_failed')}: {e}",
             )
 
-    def _find_main_window(self):
-        # Busca la instancia de MainWindow en la jerarquía de padres
-        parent = self.parent()
-        while parent:
-            if parent.__class__.__name__ == "MainWindow":
-                return parent
-            parent = parent.parent()
-        return None
-
-    def get_data(self, callsign=None):
-        """Devuelve los datos del formulario como dict."""
-        data = {
-            "callsign": callsign if callsign is not None else "",
-            "rs_rx": self.rs_rx_input.text(),
-            "rs_tx": self.rs_tx_input.text(),
-        }
-        if self.log_type == "contest":
-            data["exchange_received"] = self.exchange_received_input.text()
-            data["exchange_sent"] = self.exchange_sent_input.text()
-            data["observations"] = self.observations_input.text()
-        elif self.log_type == "ops":
-            data["station"] = (
-                self.station_input.currentText() if self.station_input else ""
-            )
-            data["energy"] = (
-                self.energy_input.currentText() if self.energy_input else ""
-            )
-            data["power"] = self.power_input.text()
-            data["obs"] = self.observations_input.text()
-        return data
-
     def retranslate_ui(self):
-        """Actualiza los textos según el idioma."""
+        """
+        Actualiza los textos de la interfaz según el idioma seleccionado.
+        """
         # Actualizar todos los labels manualmente por el nuevo layout
         if hasattr(self, "station_label"):
             self.station_label.setText(translation_service.tr("station"))
@@ -271,4 +298,3 @@ class LogFormWidget(QWidget):
             self.energy_input.clear()
             self.energy_input.addItems(items)
             self.energy_input.setCurrentIndex(current)
-        # Eliminar traducción de labels de relojes, ya que ahora se gestionan en las vistas
