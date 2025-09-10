@@ -124,7 +124,7 @@ QListWidget#ContactQueueList::item:selected {
     color: #222;
 }
 QListWidget#ContactQueueList {
-    border: 2px solid #444444;
+    border: 2px solid #bdbdbd;
     border-radius: 6px;
     padding: 4px 8px;
 }
@@ -139,7 +139,7 @@ QListWidget#callsignSuggestionList::item {
 }
 
 QLineEdit#callsignInput {
-    border: 2px solid #444444;
+    border: 2px solid #bdbdbd;
     border-radius: 6px;
     padding: 4px 8px;
 }
@@ -148,7 +148,7 @@ QLineEdit#callsignInput:focus {
 }
 
 QLabel#callsignSummary {
-    border: 2px solid #444444;
+    border: 2px solid #bdbdbd;
     border-radius: 6px;
     padding: 4px 8px;
 }
@@ -157,7 +157,7 @@ QLabel#callsignSummary:focus {
 }
 
 QListWidget#callsignSuggestionList {
-    border: 2px solid #444444;
+    border: 2px solid #bdbdbd;
     border-radius: 6px;
     padding: 4px 8px;
 }
@@ -166,7 +166,7 @@ QListWidget#callsignSuggestionList:focus {
 }
 
 QTableWidget {
-    border: 2px solid #444444;
+    border: 2px solid #bdbdbd;
     border-radius: 6px;
     gridline-color: #bdbdbd;
 }
