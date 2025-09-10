@@ -18,7 +18,8 @@ class ContactEditDialog(QDialog):
 
     def __init__(self, contact, log_type, parent=None):
         super().__init__(parent)
-        self.setWindowTitle(translation_service.tr("edit_contact"))
+        self.setWindowTitle(translation_service.tr("edit_contact_dialog_title"))
+        self.setMinimumWidth(420)
         self.result_contact = None
         self.contact = contact.copy()
         self.log_type = log_type

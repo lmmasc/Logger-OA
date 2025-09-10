@@ -85,4 +85,6 @@ UI_TRANSLATIONS = {
     "invalid_callsign_msg": "The entered callsign is not valid.",
     "callsign_not_found": "Callsign not found",
     "operator_not_found_msg": "The callsign does not exist in the database. Do you want to add it as a new operator?",
+    "edit_contact_dialog_title": "Edit Contact",
+    "cancel_button": "Cancel",
 }
