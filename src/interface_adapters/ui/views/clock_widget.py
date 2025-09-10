@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout
+from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QSizePolicy
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QFont
 import datetime
@@ -9,7 +9,7 @@ class ClockWidget(QWidget):
         super().__init__(parent)
         self.utc = utc
         layout = QHBoxLayout()
-        layout.setSpacing(4)
+        layout.setSpacing(12)
         layout.setContentsMargins(0, 0, 0, 0)
         self.label = QLabel(label_text)
         self.label.setAlignment(Qt.AlignCenter)
@@ -18,6 +18,7 @@ class ClockWidget(QWidget):
         else:
             self.label.setObjectName("ClockLabelUTC")
         font_label = QFont()
+        font_label.setFamily("Consolas, Menlo, Courier New, Liberation Mono, Monospace")
         font_label.setBold(True)
         font_label.setPointSize(20)
         self.label.setFont(font_label)
@@ -28,6 +29,7 @@ class ClockWidget(QWidget):
         else:
             self.time.setObjectName("ClockTimeUTC")
         font_time = QFont()
+        font_time.setFamily("Consolas, Menlo, Courier New, Liberation Mono, Monospace")
         font_time.setBold(True)
         font_time.setPointSize(20)
         self.time.setFont(font_time)
@@ -38,6 +40,7 @@ class ClockWidget(QWidget):
         else:
             self.date.setObjectName("ClockDateUTC")
         font_date = QFont()
+        font_date.setFamily("Consolas, Menlo, Courier New, Liberation Mono, Monospace")
         font_date.setPointSize(20)
         self.date.setFont(font_date)
         layout.addWidget(self.label)
@@ -48,6 +51,10 @@ class ClockWidget(QWidget):
         self.timer.timeout.connect(self.update_clock)
         self.timer.start(1000)
         self.update_clock()
+        self.label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.time.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.date.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
     def update_clock(self):
         if self.utc:
