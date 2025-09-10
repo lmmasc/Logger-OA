@@ -165,5 +165,25 @@ QListWidget#callsignSuggestionList:focus {
     border: 2px solid palette(highlight);
 }
 
+QTableWidget {
+    border: 2px solid #b0b0b0;
+    border-radius: 6px;
+    gridline-color: #444444;
+}
+QTableWidget:focus {
+    border: 2px solid palette(highlight);
+}
+
+QHeaderView::section {
+    background-color: #33373a;
+    color: #fff;
+    font-weight: bold;
+    font-size: 16px;
+    border: none;
+    border-bottom: 2px solid #444444;
+    border-right: 1px solid #444444;
+    padding: 6px 8px;
+}
+
 
 
