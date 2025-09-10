@@ -20,7 +20,7 @@ class ContactTableWidget(QWidget):
     def set_columns(self):
         if self.log_type == "contest":
             headers = [
-                translation_service.tr("callsign"),
+                translation_service.tr("table_header_callsign"),
                 translation_service.tr("time"),
                 translation_service.tr("exchange_received"),
                 translation_service.tr("exchange_sent"),
@@ -29,12 +29,16 @@ class ContactTableWidget(QWidget):
             ]
         else:
             headers = [
-                translation_service.tr("callsign"),
-                translation_service.tr("time"),
+                translation_service.tr("table_header_callsign"),
+                translation_service.tr("name"),
+                translation_service.tr("country"),
                 translation_service.tr("station"),
+                translation_service.tr("energy"),
                 translation_service.tr("power"),
                 translation_service.tr("rs_rx"),
                 translation_service.tr("rs_tx"),
+                translation_service.tr("clock_oa_label"),
+                translation_service.tr("clock_utc_label"),
             ]
         self.table.setColumnCount(len(headers))
         self.table.setHorizontalHeaderLabels(headers)
@@ -54,11 +58,15 @@ class ContactTableWidget(QWidget):
         else:
             keys = [
                 "callsign",
-                "qtr_utc",
+                "name",
+                "country",
                 "station",
+                "energy",
                 "power",
                 "rs_rx",
                 "rs_tx",
+                "hora_oa",
+                "hora_utc",
             ]
         self.table.setRowCount(len(contacts))
         self.table.setColumnCount(len(keys))
