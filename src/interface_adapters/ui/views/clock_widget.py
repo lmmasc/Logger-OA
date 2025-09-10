@@ -1,5 +1,6 @@
 from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout
 from PySide6.QtCore import Qt, QTimer
+from PySide6.QtGui import QFont
 import datetime
 
 
@@ -12,13 +13,33 @@ class ClockWidget(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         self.label = QLabel(label_text)
         self.label.setAlignment(Qt.AlignCenter)
-        self.label.setStyleSheet(f"color: {color}; font-weight: bold;")
+        if not self.utc:
+            self.label.setObjectName("ClockLabelOA")
+        else:
+            self.label.setObjectName("ClockLabelUTC")
+        font_label = QFont()
+        font_label.setBold(True)
+        font_label.setPointSize(12)
+        self.label.setFont(font_label)
         self.time = QLabel()
         self.time.setAlignment(Qt.AlignCenter)
-        self.time.setStyleSheet(f"color: {color}; font-size: 30px; font-weight: bold;")
+        if not self.utc:
+            self.time.setObjectName("ClockTimeOA")
+        else:
+            self.time.setObjectName("ClockTimeUTC")
+        font_time = QFont()
+        font_time.setBold(True)
+        font_time.setPointSize(30)
+        self.time.setFont(font_time)
         self.date = QLabel()
         self.date.setAlignment(Qt.AlignCenter)
-        self.date.setStyleSheet(f"color: {color};")
+        if not self.utc:
+            self.date.setObjectName("ClockDateOA")
+        else:
+            self.date.setObjectName("ClockDateUTC")
+        font_date = QFont()
+        font_date.setPointSize(12)
+        self.date.setFont(font_date)
         layout.addWidget(self.label)
         layout.addWidget(self.time)
         layout.addWidget(self.date)
@@ -46,3 +67,11 @@ class ClockWidget(QWidget):
 
     def set_label_text(self, text):
         self.label.setText(text)
+
+
+# Sugerencia para light.qss
+# QLabel#ClockTimeOA { color: #b71c1c; }      /* Rojo oscuro */
+# QLabel#ClockTimeUTC { color: #1b5e20; }     /* Verde oscuro */
+# Sugerencia para dark.qss
+# QLabel#ClockTimeOA { color: #ff1744; }      /* Rojo fosforescente */
+# QLabel#ClockTimeUTC { color: #00e676; }     /* Verde fosforescente */

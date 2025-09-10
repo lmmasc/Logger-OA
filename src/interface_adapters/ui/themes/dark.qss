@@ -91,5 +91,8 @@ QLabel#summary-label {
     color: #f5f5f5;
 }
 
+QLabel#ClockTimeOA, QLabel#ClockLabelOA, QLabel#ClockDateOA { color: #ff1744; }
+QLabel#ClockTimeUTC, QLabel#ClockLabelUTC, QLabel#ClockDateUTC { color: #00e676; }
+
 
 
