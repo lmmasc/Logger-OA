@@ -123,6 +123,14 @@ QListWidget#ContactQueueList::item:focus {
 QListWidget#ContactQueueList::item:selected {
     background: #1976d2;
 }
+QListWidget#ContactQueueList {
+    border: 2px solid #b0b0b0;
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+QListWidget#ContactQueueList:focus {
+    border: 2px solid palette(highlight);
+}
 
 /* CallsignSuggestionList: Estilo para sugerencias de indicativos (tema oscuro) */
 QListWidget#callsignSuggestionList::item {
