@@ -293,11 +293,21 @@ class LogFormWidget(QWidget):
                 translation_service.tr("contact_added"),
             )
         except Exception as e:
-            QMessageBox.critical(
-                self,
-                translation_service.tr("main_window_title"),
-                f"{translation_service.tr('contact_add_failed')}: {e}",
-            )
+            from PySide6.QtWidgets import QMessageBox
+
+            msg = str(e)
+            if "Invalid callsign" in msg:
+                QMessageBox.critical(
+                    self,
+                    translation_service.tr("invalid_callsign_title"),
+                    translation_service.tr("invalid_callsign_msg"),
+                )
+            else:
+                QMessageBox.critical(
+                    self,
+                    translation_service.tr("main_window_title"),
+                    f"{translation_service.tr('contact_add_failed')}: {e}",
+                )
 
     def retranslate_ui(self):
         """

@@ -204,6 +204,19 @@ class LogOpsView(QWidget):
                     resumen = f"{operator.callsign} - {operator.name}"
                     self.callsign_info.show_summary(resumen)
                 else:
+                    from PySide6.QtWidgets import QMessageBox
+
+                    msg_box = QMessageBox(self)
+                    msg_box.setIcon(QMessageBox.Warning)
+                    msg_box.setWindowTitle(
+                        translation_service.tr("invalid_callsign_title")
+                    )
+                    msg_box.setText(translation_service.tr("invalid_callsign_msg"))
+                    msg_box.setInformativeText(
+                        f"{translation_service.tr('callsign_not_found')}: {filtro}"
+                    )
+                    msg_box.setStandardButtons(QMessageBox.Ok)
+                    msg_box.exec()
                     self.callsign_info.show_summary(
                         translation_service.tr("callsign_not_found")
                     )

@@ -80,4 +80,8 @@ UI_TRANSLATIONS = {
     "clock_utc_label": "Hora UTC",
     "delete_contact": "Eliminar contacto",
     "confirm_delete_contact": "¿Seguro que deseas eliminar este contacto?",
+    "contact_add_failed": "No se pudo agregar el contacto",
+    "invalid_callsign_title": "Indicativo inválido",
+    "invalid_callsign_msg": "El indicativo ingresado no es válido.",
+    "callsign_not_found": "Indicativo no encontrado",
 }
