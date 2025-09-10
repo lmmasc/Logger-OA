@@ -93,5 +93,36 @@ QLabel#summary-label {
 QLabel#ClockTimeOA, QLabel#ClockLabelOA, QLabel#ClockDateOA { color: #b71c1c; }
 QLabel#ClockTimeUTC, QLabel#ClockLabelUTC, QLabel#ClockDateUTC { color: #1b5e20; }
 
+QListWidget#ContactQueueList::item {
+    outline: none;
+    border: 2px solid #64b5f6;
+    background: transparent;
+    color: #222;
+    border-radius: 8px;
+    margin: 2px 8px;
+    padding: 2px 8px;
+    min-width: 0px;
+    font-weight: bold;
+    min-height: 28px;
+    max-height: 32px;
+}
+QListWidget#ContactQueueList::item:focus {
+    outline: none;
+    border: 2px solid #64b5f6;
+    background: transparent;
+    color: #222;
+    border-radius: 8px;
+    margin: 2px 8px;
+    padding: 2px 8px;
+    min-width: 0px;
+    font-weight: bold;
+    min-height: 28px;
+    max-height: 32px;
+}
+QListWidget#ContactQueueList::item:selected {
+    background: #64b5f6;
+    color: #222;
+}
+
 
 

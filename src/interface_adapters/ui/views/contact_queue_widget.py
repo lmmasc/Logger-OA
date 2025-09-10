@@ -1,11 +1,15 @@
+"""
+ContactQueueWidget: Widget para mostrar y gestionar la cola de contactos en espera.
+- Permite copiar indicativo, agregar, eliminar y traducir el label.
+"""
+
 from PySide6.QtCore import Signal, Qt
 from PySide6.QtWidgets import (
     QWidget,
-    QVBoxLayout,
+    QHBoxLayout,
     QListWidget,
     QLabel,
     QMenu,
-    QHBoxLayout,
     QListWidgetItem,
     QListView,
 )
@@ -17,9 +21,14 @@ class ContactQueueWidget(QWidget):
     Widget para mostrar la cola de contactos en espera de confirmación o revisión.
     """
 
-    setCallsign = Signal(str)  # Señal para copiar al campo de indicativo
+    setCallsign = Signal(str)
 
     def __init__(self, parent=None):
+        """
+        Inicializa el widget de cola de contactos.
+        Args:
+            parent (QWidget): Widget padre.
+        """
         super().__init__(parent)
         self.layout = QHBoxLayout(self)
         self.label = QLabel(translation_service.tr("contact_queue"), self)
@@ -31,9 +40,9 @@ class ContactQueueWidget(QWidget):
         font = self.queue_list.font()
         font.setPointSize(18)
         self.queue_list.setFont(font)
-        self.queue_list.setStyleSheet(
-            "QListWidget::item { background: #1976d2; color: white; border-radius: 8px; margin: 2px 8px; padding: 2px 8px; min-width: 0px; font-weight: bold; min-height: 28px; max-height: 32px; } QListWidget::item:selected { background: #1565c0; }"
-        )
+        self.queue_list.setObjectName("ContactQueueList")
+        # El estilo se moverá a los archivos .qss de temas
+        self.queue_list.setStyleSheet("")
         self.queue_list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.layout.addWidget(self.label)
         self.layout.addWidget(self.queue_list)
@@ -44,26 +53,52 @@ class ContactQueueWidget(QWidget):
         self.queue_list.customContextMenuRequested.connect(self._on_context_menu)
 
     def set_queue(self, contacts):
+        """
+        Establece la lista completa de contactos en la cola.
+        Args:
+            contacts (list): Lista de contactos a mostrar.
+        """
         self.queue_list.clear()
         for contact in contacts:
             self.queue_list.addItem(str(contact))
 
     def add_to_queue(self, text):
+        """
+        Agrega un contacto a la cola.
+        Args:
+            text (str): Texto del contacto a agregar.
+        """
         item = QListWidgetItem(text)
         self.queue_list.addItem(item)
 
     def remove_selected(self):
+        """
+        Elimina el contacto seleccionado de la cola.
+        """
         item = self.queue_list.currentItem()
         if item:
             self.queue_list.takeItem(self.queue_list.row(item))
 
     def retranslate_ui(self):
+        """
+        Actualiza el label según el idioma actual.
+        """
         self.label.setText(translation_service.tr("contact_queue"))
 
     def _on_item_clicked(self, item):
+        """
+        Emite la señal setCallsign con el texto del contacto seleccionado.
+        Args:
+            item (QListWidgetItem): Item seleccionado.
+        """
         self.setCallsign.emit(item.text())
 
     def _on_context_menu(self, pos):
+        """
+        Muestra menú contextual para eliminar el contacto seleccionado.
+        Args:
+            pos (QPoint): Posición del menú.
+        """
         item = self.queue_list.itemAt(pos)
         if item:
             menu = QMenu(self)
