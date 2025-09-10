@@ -183,16 +183,35 @@ class LogFormWidget(QWidget):
             name = operator.name if operator else ""
             country = operator.country if operator else ""
             timestamp = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
+            # Definir las keys en el mismo orden que los textos
+            station_keys = [
+                "no_data",
+                "station_base",
+                "station_mobile",
+                "station_portable",
+            ]
+            energy_keys = [
+                "no_data",
+                "energy_autonomous",
+                "energy_battery",
+                "energy_commercial",
+            ]
+            station_key = (
+                station_keys[self.station_input.currentIndex()]
+                if self.station_input
+                else ""
+            )
+            energy_key = (
+                energy_keys[self.energy_input.currentIndex()]
+                if self.energy_input
+                else ""
+            )
             data.update(
                 {
                     "name": name,
                     "country": country,
-                    "station": (
-                        self.station_input.currentText() if self.station_input else ""
-                    ),
-                    "energy": (
-                        self.energy_input.currentText() if self.energy_input else ""
-                    ),
+                    "station": station_key,
+                    "energy": energy_key,
                     "power": self.power_input.text(),
                     "timestamp": timestamp,
                     "obs": self.observations_input.text(),

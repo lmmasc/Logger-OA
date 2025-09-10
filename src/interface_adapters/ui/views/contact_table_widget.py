@@ -96,6 +96,8 @@ class ContactTableWidget(QWidget):
                         value = datetime.datetime.fromtimestamp(
                             int(ts), tz=datetime.timezone.utc
                         ).strftime(f"%H:%M {date_fmt}")
+                elif key in ("station", "energy"):
+                    value = translation_service.tr(contact.get(key, ""))
                 else:
                     value = contact.get(key, "")
                 self.table.setItem(row, col, QTableWidgetItem(str(value)))
