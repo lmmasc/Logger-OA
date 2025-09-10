@@ -1,20 +1,37 @@
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QFont
 
 
 class HeaderWidget(QWidget):
+    """
+    Widget de encabezado reutilizable para mostrar texto centrado y estilizado en la interfaz.
+    Permite actualizar el texto dinámicamente.
+    """
+
     def __init__(self, text="", parent=None):
+        """
+        Inicializa el widget de encabezado.
+        Args:
+            text (str): Texto a mostrar en el encabezado.
+            parent (QWidget, opcional): Widget padre.
+        """
         super().__init__(parent)
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         self.label = QLabel(text)
         self.label.setAlignment(Qt.AlignCenter)
-        self.label.setStyleSheet("font-size: 22px; font-weight: bold; margin: 8px 0;")
+        font = QFont()
+        font.setPointSize(22)
+        font.setBold(True)
+        self.label.setFont(font)
         layout.addWidget(self.label)
         self.setLayout(layout)
 
-    def set_text(self, text):
-        self.label.setText(text)
-
     def update_text(self, text):
-        self.set_text(text)
+        """
+        Actualiza el texto mostrado en el encabezado.
+        Args:
+            text (str): Nuevo texto para el encabezado.
+        """
+        self.label.setText(text)
