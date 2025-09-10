@@ -40,6 +40,7 @@ class LogOpsView(QWidget):
         layout.setSpacing(2)
         layout.setAlignment(Qt.AlignTop)
         self.header_widget = HeaderWidget()
+        self.header_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         layout.addWidget(self.header_widget)
         # Widgets de indicativo en una misma fila
         from PySide6.QtWidgets import QHBoxLayout, QWidget
@@ -59,6 +60,9 @@ class LogOpsView(QWidget):
         indicativo_row.setLayout(indicativo_layout)
         indicativo_row.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         layout.addWidget(indicativo_row)
+        self.queue_widget = ContactQueueWidget(self)
+        self.queue_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        layout.addWidget(self.queue_widget)
         self.form_widget = LogFormWidget(
             self,
             log_type="ops",
@@ -66,9 +70,7 @@ class LogOpsView(QWidget):
             log_type_name=log_type_name,
             log_date=log_date,
         )
-        self.queue_widget = ContactQueueWidget(self)
-        layout.addWidget(self.queue_widget)
-        self.form_widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        self.form_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         layout.addWidget(self.form_widget)
         self.table_widget = ContactTableWidget(self, log_type="ops")
         self.table_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
