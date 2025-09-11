@@ -139,10 +139,10 @@ def action_log_new(self):
                 operativo_config = op_dialog.get_config()
                 # Pasar tipo y banda para el nombre de archivo
                 extra_kwargs["operation_type"] = operativo_config.get(
-                    "tipo_key", "type"
+                    "operation_type", "type"
                 )
                 extra_kwargs["frequency_band"] = operativo_config.get(
-                    "banda_key", "band"
+                    "frequency_band", "band"
                 )
                 extra_kwargs["metadata"] = operativo_config
             db_path, log = create_log(
