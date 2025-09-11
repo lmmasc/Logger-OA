@@ -148,9 +148,6 @@ def action_log_new(self):
                     "repeater_key", None
                 )
                 extra_kwargs["metadata"] = operativo_config
-            print(
-                "[DEBUG] extra_kwargs (main_window_actions):", extra_kwargs
-            )  # <-- Línea agregada para depuración
             db_path, log = create_log(
                 selected["type"], indicativo["callsign"], **extra_kwargs
             )

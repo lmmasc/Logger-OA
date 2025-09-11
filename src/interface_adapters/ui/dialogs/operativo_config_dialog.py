@@ -154,25 +154,6 @@ class OperativoConfigDialog(QDialog):
             - frequency: frecuencia
             - repeater_key: repetidora (si aplica)
         """
-        print(
-            "[DEBUG] operativo_config (get_config):",
-            {
-                "operation_type": self.operation_type_keys[
-                    self.operation_type_combo.currentIndex()
-                ],
-                "frequency_band": self.frequency_band_keys[
-                    self.frequency_band_combo.currentIndex()
-                ],
-                "mode_key": self.modo_keys[self.modo_combo.currentIndex()],
-                "frequency": self.freq_edit.text(),
-                "repeater_key": (
-                    self.rep_keys[self.rep_combo.currentIndex()]
-                    if self.frequency_band_combo.currentText()
-                    == translation_service.tr("band_vhf")
-                    else None
-                ),
-            },
-        )
         return {
             "operation_type": self.operation_type_keys[
                 self.operation_type_combo.currentIndex()

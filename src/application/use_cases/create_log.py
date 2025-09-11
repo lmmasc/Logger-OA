@@ -24,14 +24,6 @@ def create_log(log_type: str, operator_callsign: str, **kwargs):
             frequency_band=frequency_band,
             repeater_key=repeater_key,
         )
-        print(
-            "[DEBUG] create_log kwargs:",
-            {
-                "operation_type": operation_type,
-                "frequency_band": frequency_band,
-                "repeater_key": repeater_key,
-            },
-        )
         # Mapear los campos del config dialog a los esperados por OperationLog
         log = OperationLog(
             operator=operator_callsign,

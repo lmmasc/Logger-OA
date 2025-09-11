@@ -121,12 +121,4 @@ def get_log_file_path(
         filename = (
             f"{operator_callsign.lower()}_{log_type.lower()}_{timestamp.lower()}.sqlite"
         )
-    print(
-        "[DEBUG] get_log_file_path kwargs:",
-        {
-            "operation_type": operation_type_key,
-            "frequency_band": frequency_band_key,
-            "repeater_key": repeater_key,
-        },
-    )
     return os.path.join(folder, filename)
