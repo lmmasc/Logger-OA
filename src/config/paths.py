@@ -104,7 +104,7 @@ def get_log_file_path(
         frequency_band = translation_service.tr(frequency_band_key)
         operation_type = normalize_filename_text(operation_type)
         frequency_band = normalize_filename_text(frequency_band)
-        filename_parts = [operator_callsign.lower(), operation_type, frequency_band]
+        filename_parts = [operator_callsign.upper(), operation_type, frequency_band]
         if repeater_key:
             repeater = translation_service.tr(repeater_key)
             repeater = normalize_filename_text(repeater)
@@ -116,10 +116,10 @@ def get_log_file_path(
         contest_name = translation_service.tr(contest_key)
         contest_name = normalize_filename_text(contest_name)
         filename = (
-            f"{operator_callsign.lower()}_{contest_name}_{timestamp.lower()}.sqlite"
+            f"{operator_callsign.upper()}_{contest_name}_{timestamp.lower()}.sqlite"
         )
     else:
         filename = (
-            f"{operator_callsign.lower()}_{log_type.lower()}_{timestamp.lower()}.sqlite"
+            f"{operator_callsign.upper()}_{log_type.lower()}_{timestamp.lower()}.sqlite"
         )
     return os.path.join(folder, filename)
