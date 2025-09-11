@@ -10,7 +10,7 @@ def create_log(log_type: str, operator_callsign: str, **kwargs):
     Crea un nuevo log (operativo o concurso), genera el archivo SQLite y guarda el log inicial.
     kwargs puede incluir campos adicionales según el tipo de log.
     """
-    timestamp = datetime.now().strftime("%Y%m%dT%H%M%S")
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     # Extraer campos relevantes para el nombre del archivo
     if log_type.lower() == "operation_log":
         operation_type = kwargs.pop("operation_type", "type")
