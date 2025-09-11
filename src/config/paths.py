@@ -61,7 +61,9 @@ def file_exists(path):
     return Path(path).exists()
 
 
-def get_log_file_path(operator_callsign: str, log_type: str, timestamp: str) -> str:
+def get_log_file_path(
+    operator_callsign: str, log_type: str, timestamp: str, **kwargs
+) -> str:
     """
     Genera el path absoluto para un archivo de log SQLite según el tipo (operativo/concurso),
     el indicativo del operador y el timestamp.
@@ -72,5 +74,14 @@ def get_log_file_path(operator_callsign: str, log_type: str, timestamp: str) -> 
     )
     folder = os.path.join(BASE_DIR, LOG_FOLDER, log_type_folder)
     os.makedirs(folder, exist_ok=True)
-    filename = f"{operator_callsign}_{log_type}_{timestamp}.sqlite"
+    # Nuevo formato de nombre de archivo
+    if log_type.lower() == "operativo":
+        tipo = kwargs.get("tipo", "tipo")
+        banda = kwargs.get("banda", "banda")
+        filename = f"{operator_callsign}_{tipo}_{banda}_{timestamp}.sqlite"
+    elif log_type.lower() == "concurso":
+        concurso = kwargs.get("concurso", "concurso")
+        filename = f"{operator_callsign}_{concurso}_{timestamp}.sqlite"
+    else:
+        filename = f"{operator_callsign}_{log_type}_{timestamp}.sqlite"
     return os.path.join(folder, filename)

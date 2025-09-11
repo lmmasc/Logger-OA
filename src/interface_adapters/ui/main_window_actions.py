@@ -118,13 +118,13 @@ def action_log_new(self):
 
             extra_kwargs = {}
             if selected["type"] == "concurso":
-                # Obtener la clave seleccionada en vez del texto
                 contest_keys = [
                     "contest_world_radio_day",
                     "contest_independence_peru",
                     "contest_peruvian_ham_day",
                 ]
                 contest_key = contest_keys[contest_box.currentIndex()]
+                extra_kwargs["concurso"] = contest_key
                 extra_kwargs["name"] = translation_service.tr(contest_key)
                 extra_kwargs["metadata"] = {"contest_name_key": contest_key}
             elif selected["type"] == "operativo":
@@ -136,6 +136,9 @@ def action_log_new(self):
                 if not op_dialog.exec():
                     return  # Cancelado
                 operativo_config = op_dialog.get_config()
+                # Pasar tipo y banda para el nombre de archivo
+                extra_kwargs["tipo"] = operativo_config.get("tipo_key", "tipo")
+                extra_kwargs["banda"] = operativo_config.get("banda_key", "banda")
                 extra_kwargs["metadata"] = operativo_config
             db_path, log = create_log(
                 selected["type"], indicativo["callsign"], **extra_kwargs
