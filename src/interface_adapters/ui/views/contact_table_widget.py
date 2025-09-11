@@ -94,6 +94,7 @@ class ContactTableWidget(QWidget):
                 translation_service.tr("rs_tx"),
                 translation_service.tr("clock_oa_label"),
                 translation_service.tr("clock_utc_label"),
+                translation_service.tr("observations"),  # Observaciones al final
             ]
         self.table.setColumnCount(len(headers))
         self.table.setHorizontalHeaderLabels(headers)
@@ -122,6 +123,7 @@ class ContactTableWidget(QWidget):
                 "rs_tx",
                 "qtr_oa",
                 "qtr_utc",
+                "obs",  # Observaciones al final
             ]
         self.table.setRowCount(len(contacts))
         self.table.setColumnCount(len(keys))

@@ -89,6 +89,10 @@ class ContactEditDialog(QDialog):
             self.inputs["rs_tx"].setText(str(contact.get("rs_tx", "")))
             layout.addWidget(QLabel(translation_service.tr("rs_tx")))
             layout.addWidget(self.inputs["rs_tx"])
+            self.inputs["obs"] = QLineEdit(self)
+            self.inputs["obs"].setText(contact.get("obs", ""))
+            layout.addWidget(QLabel(translation_service.tr("observations")))
+            layout.addWidget(self.inputs["obs"])
         else:
             self.inputs["exchange_received"] = QLineEdit(self)
             self.inputs["exchange_received"].setText(
