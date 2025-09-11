@@ -166,7 +166,19 @@ class LogOpsView(QWidget):
             else ""
         )
         log_date = meta.get("log_date", "") if meta else ""
-        header_parts = [callsign, operation_type, frequency_band, mode, freq]
+        # Lógica para mostrar frecuencia solo si es simplex (y VHF)
+        show_freq = True
+        # Mostrar frecuencia solo si es VHF y la operación es simplex (repeater_key == 'rep_simplex')
+        # Si se usa repetidora (repeater_key != 'rep_simplex'), no mostrar frecuencia
+        if frequency_band.lower() == translation_service.tr("vhf").lower():
+            repeater_key = meta.get("repeater_key", "")
+            if repeater_key and repeater_key != "rep_simplex":
+                show_freq = False
+        header_parts = [callsign, operation_type, frequency_band, mode]
+        if show_freq and freq:
+            header_parts.append(freq)
+        if repeater:
+            header_parts.append(repeater)
         header_parts.append(log_date)
         header_text = " | ".join([str(p) for p in header_parts if p])
         self.header_widget.update_text(header_text)
