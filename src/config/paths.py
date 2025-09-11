@@ -67,9 +67,11 @@ def get_log_file_path(
     """
     Genera el path absoluto para un archivo de log SQLite según el tipo (operativo/concurso),
     el indicativo del operador y el timestamp.
-    Ejemplo: ~/LoggerOA/logs/LU1ABC_operation_20250904T153000.sqlite
+    El nombre de archivo usa los textos en español para tipo y banda.
+    Ejemplo: ~/LoggerOA/logs/LU1ABC_CPS_HF_20250904T153000.sqlite
     """
     from .defaults import OPERATIONS_DIR, CONTESTS_DIR
+    from translation.translation_service import translation_service
 
     log_type_folder = {"operativo": OPERATIONS_DIR, "concurso": CONTESTS_DIR}.get(
         log_type.lower(), "others"
@@ -78,14 +80,17 @@ def get_log_file_path(
     os.makedirs(folder, exist_ok=True)
     # Nuevo formato de nombre de archivo
     if log_type.lower() == "operativo":
-        operation_type = kwargs.get("operation_type", "type")
-        frequency_band = kwargs.get("frequency_band", "band")
+        operation_type_key = kwargs.get("operation_type", "type")
+        frequency_band_key = kwargs.get("frequency_band", "band")
+        operation_type = translation_service.tr(operation_type_key)
+        frequency_band = translation_service.tr(frequency_band_key)
         filename = (
             f"{operator_callsign}_{operation_type}_{frequency_band}_{timestamp}.sqlite"
         )
     elif log_type.lower() == "concurso":
         contest_key = kwargs.get("contest_key", "contest")
-        filename = f"{operator_callsign}_{contest_key}_{timestamp}.sqlite"
+        contest_name = translation_service.tr(contest_key)
+        filename = f"{operator_callsign}_{contest_name}_{timestamp}.sqlite"
     else:
         filename = f"{operator_callsign}_{log_type}_{timestamp}.sqlite"
     return os.path.join(folder, filename)
