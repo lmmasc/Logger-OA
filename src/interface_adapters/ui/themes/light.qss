@@ -1,8 +1,22 @@
 /* light.qss
-    Tema claro para la aplicación. */
+   Tema claro para la aplicación. */
 
 @import "base.qss";
 
+/* =============================
+   Estilos globales y de ventana
+   ============================= */
+QWidget {
+    background-color: #f5f5f5;
+    color: #222;
+}
+QMainWindow {
+    background-color: #ffffff;
+}
+
+/* =============================
+   Barra de menú principal
+   ============================= */
 QMenuBar {
     background: #f5f5f5;
     color: #222;
@@ -15,6 +29,10 @@ QMenuBar::item:disabled {
     background: #f5f5f5;
     opacity: 0.5;
 }
+
+/* =============================
+   Menús desplegables
+   ============================= */
 QMenu {
     background: #ffffff;
     color: #222;
@@ -29,7 +47,10 @@ QMenu::item:disabled {
     opacity: 0.5;
 }
 
-
+/* =============================
+   Botones principales
+   ============================= */
+/* Botón para agregar operador */
 QPushButton#AddOperatorButton {
     background-color: #388e3c;
     color: #fff;
@@ -51,6 +72,7 @@ QPushButton#AddOperatorButton:disabled {
     opacity: 0.7;
 }
 
+/* Botón para eliminar operador */
 QPushButton#DeleteOperatorButton {
     background-color: #d32f2f;
     color: #fff;
@@ -72,7 +94,7 @@ QPushButton#DeleteOperatorButton:disabled {
     opacity: 0.7;
 }
 
-
+/* Botón para agregar contacto */
 QPushButton#AddContactButton {
     background-color: #388e3c;
     color: #fff;
@@ -94,6 +116,7 @@ QPushButton#AddContactButton:disabled {
     opacity: 0.7;
 }
 
+/* Botón para eliminar contacto */
 QPushButton#DeleteContactButton {
     background-color: #d32f2f;
     color: #fff;
@@ -115,16 +138,9 @@ QPushButton#DeleteContactButton:disabled {
     opacity: 0.7;
 }
 
-
-QWidget {
-    background-color: #f5f5f5;
-    color: #222;
-}
-
-QMainWindow {
-    background-color: #ffffff;
-}
-
+/* =============================
+   Etiquetas y resumen
+   ============================= */
 QLabel#summary-label {
     border: 1px solid #bdbdbd;
     border-radius: 4px;
@@ -132,10 +148,20 @@ QLabel#summary-label {
     background: #fafafa;
     color: #222;
 }
-
 QLabel#ClockTimeOA, QLabel#ClockLabelOA, QLabel#ClockDateOA { color: #b71c1c; }
 QLabel#ClockTimeUTC, QLabel#ClockLabelUTC, QLabel#ClockDateUTC { color: #1b5e20; }
+QLabel#callsignSummary {
+    border: 2px solid #bdbdbd;
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+QLabel#callsignSummary:focus {
+    border: 2px solid palette(highlight);
+}
 
+/* =============================
+   Listas de contactos y sugerencias
+   ============================= */
 QListWidget#ContactQueueList::item {
     outline: none;
     border: 2px solid #64b5f6;
@@ -175,30 +201,11 @@ QListWidget#ContactQueueList:focus {
     border: 2px solid palette(highlight);
 }
 
-/* CallsignSuggestionList: Estilo para sugerencias de indicativos (tema claro) */
+/* Sugerencias de indicativos */
 QListWidget#callsignSuggestionList::item {
     color: #1976d2;
     font-weight: bold;
 }
-
-QLineEdit#callsignInput {
-    border: 2px solid #bdbdbd;
-    border-radius: 6px;
-    padding: 4px 8px;
-}
-QLineEdit#callsignInput:focus {
-    border: 2px solid palette(highlight);
-}
-
-QLabel#callsignSummary {
-    border: 2px solid #bdbdbd;
-    border-radius: 6px;
-    padding: 4px 8px;
-}
-QLabel#callsignSummary:focus {
-    border: 2px solid palette(highlight);
-}
-
 QListWidget#callsignSuggestionList {
     border: 2px solid #bdbdbd;
     border-radius: 6px;
@@ -208,6 +215,29 @@ QListWidget#callsignSuggestionList:focus {
     border: 2px solid palette(highlight);
 }
 
+/* =============================
+   Campos de texto y combos
+   ============================= */
+QLineEdit#callsignInput {
+    border: 2px solid #bdbdbd;
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+QLineEdit#callsignInput:focus {
+    border: 2px solid palette(highlight);
+}
+QLineEdit, QComboBox {
+    border: 2px solid #bdbdbd;
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+QLineEdit:focus, QComboBox:focus {
+    border: 2px solid palette(highlight);
+}
+
+/* =============================
+   Tablas y cabeceras
+   ============================= */
 QTableWidget {
     border: 2px solid #bdbdbd;
     border-radius: 6px;
@@ -216,7 +246,6 @@ QTableWidget {
 QTableWidget:focus {
     border: 2px solid palette(highlight);
 }
-
 QHeaderView::section {
     background-color: #e0e0e0;
     color: #222;
@@ -228,14 +257,7 @@ QHeaderView::section {
     padding: 6px 8px;
 }
 
-QLineEdit, QComboBox {
-    border: 2px solid #bdbdbd;
-    border-radius: 6px;
-    padding: 4px 8px;
-}
-QLineEdit:focus, QComboBox:focus {
-    border: 2px solid palette(highlight);
-}
+/* Fin de estilos para tema claro */
 
 
 
