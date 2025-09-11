@@ -78,12 +78,14 @@ def get_log_file_path(
     os.makedirs(folder, exist_ok=True)
     # Nuevo formato de nombre de archivo
     if log_type.lower() == "operativo":
-        operation_type = kwargs.get("tipo", "type")
-        band = kwargs.get("banda", "band")
-        filename = f"{operator_callsign}_{operation_type}_{band}_{timestamp}.sqlite"
+        operation_type = kwargs.get("operation_type", "type")
+        frequency_band = kwargs.get("frequency_band", "band")
+        filename = (
+            f"{operator_callsign}_{operation_type}_{frequency_band}_{timestamp}.sqlite"
+        )
     elif log_type.lower() == "concurso":
-        contest_name = kwargs.get("concurso", "contest")
-        filename = f"{operator_callsign}_{contest_name}_{timestamp}.sqlite"
+        contest_key = kwargs.get("contest_key", "contest")
+        filename = f"{operator_callsign}_{contest_key}_{timestamp}.sqlite"
     else:
         filename = f"{operator_callsign}_{log_type}_{timestamp}.sqlite"
     return os.path.join(folder, filename)

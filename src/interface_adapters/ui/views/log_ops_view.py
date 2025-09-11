@@ -152,26 +152,21 @@ class LogOpsView(QWidget):
         callsign = log.operator if log else ""
         dt = log.start_time if log else ""
         meta = getattr(log, "metadata", {}) if log else {}
-        tipo = translation_service.tr(meta.get("tipo_key", "")) if meta else ""
-        banda = translation_service.tr(meta.get("banda_key", "")) if meta else ""
-        modo = translation_service.tr(meta.get("modo_key", "")) if meta else ""
-        freq = meta.get("frecuencia", "") if meta else ""
-        rep = (
-            translation_service.tr(meta.get("repetidora_key", ""))
-            if meta and meta.get("repetidora_key")
+        operation_type = (
+            translation_service.tr(meta.get("operation_type", "")) if meta else ""
+        )
+        frequency_band = (
+            translation_service.tr(meta.get("frequency_band", "")) if meta else ""
+        )
+        mode = translation_service.tr(meta.get("mode_key", "")) if meta else ""
+        freq = meta.get("frequency", "") if meta else ""
+        repeater = (
+            translation_service.tr(meta.get("repeater_key", ""))
+            if meta and meta.get("repeater_key")
             else ""
         )
-        try:
-            date_obj = datetime.strptime(dt[:8], "%Y%m%d")
-            if lang == "es":
-                log_date = date_obj.strftime("%d/%m/%Y")
-            else:
-                log_date = date_obj.strftime("%m/%d/%Y")
-        except Exception:
-            log_date = dt
-        header_parts = [callsign, tipo, banda, modo, freq]
-        if rep:
-            header_parts.append(rep)
+        log_date = meta.get("log_date", "") if meta else ""
+        header_parts = [callsign, operation_type, frequency_band, mode, freq]
         header_parts.append(log_date)
         header_text = " | ".join([str(p) for p in header_parts if p])
         self.header_widget.update_text(header_text)

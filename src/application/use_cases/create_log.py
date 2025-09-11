@@ -13,31 +13,35 @@ def create_log(log_type: str, operator_callsign: str, **kwargs):
     timestamp = datetime.now().strftime("%Y%m%dT%H%M%S")
     # Extraer campos relevantes para el nombre del archivo
     if log_type.lower() == "operativo":
-        tipo = kwargs.pop("tipo", "tipo")
-        banda = kwargs.pop("banda", "banda")
+        operation_type = kwargs.pop("operation_type", "type")
+        frequency_band = kwargs.pop("frequency_band", "band")
         db_path = get_log_file_path(
-            operator_callsign, log_type, timestamp, tipo=tipo, banda=banda
+            operator_callsign,
+            log_type,
+            timestamp,
+            operation_type=operation_type,
+            frequency_band=frequency_band,
         )
         # Mapear los campos del config dialog a los esperados por OperationLog
         log = OperationLog(
             operator=operator_callsign,
             start_time=timestamp,
-            type=tipo,
-            band=banda,
-            mode=kwargs.get("modo_key", ""),
-            frequency=kwargs.get("frecuencia", ""),
-            repeater=kwargs.get("repetidora_key", ""),
+            type=operation_type,
+            band=frequency_band,
+            mode=kwargs.get("mode_key", ""),
+            frequency=kwargs.get("frequency", ""),
+            repeater=kwargs.get("repeater_key", ""),
             metadata=kwargs.get("metadata", {}),
         )
     elif log_type.lower() == "concurso":
-        concurso = kwargs.pop("concurso", "concurso")
+        contest_key = kwargs.pop("contest_key", "contest")
         db_path = get_log_file_path(
-            operator_callsign, log_type, timestamp, concurso=concurso
+            operator_callsign, log_type, timestamp, contest_key=contest_key
         )
         log = ContestLog(
             operator=operator_callsign,
             start_time=timestamp,
-            name=kwargs.get("name", concurso),
+            name=kwargs.get("name", contest_key),
             metadata=kwargs.get("metadata", {}),
         )
     else:

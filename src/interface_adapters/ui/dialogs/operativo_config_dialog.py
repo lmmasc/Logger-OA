@@ -18,26 +18,34 @@ class OperativoConfigDialog(QDialog):
         self.setMinimumWidth(420)
         layout = QVBoxLayout(self)
 
-        # Tipo de operativo
-        self.tipo_label = QLabel(translation_service.tr("operativo_type_label"))
-        self.tipo_combo = QComboBox(self)
-        self.tipo_keys = [
+        # Operation type
+        self.operation_type_label = QLabel(
+            translation_service.tr("operativo_type_label")
+        )
+        self.operation_type_combo = QComboBox(self)
+        self.operation_type_keys = [
             "operativo_cps",
             "operativo_rener",
             "operativo_boletin",
             "operativo_generico",
         ]
-        self.tipo_combo.addItems([translation_service.tr(k) for k in self.tipo_keys])
-        layout.addWidget(self.tipo_label)
-        layout.addWidget(self.tipo_combo)
+        self.operation_type_combo.addItems(
+            [translation_service.tr(k) for k in self.operation_type_keys]
+        )
+        layout.addWidget(self.operation_type_label)
+        layout.addWidget(self.operation_type_combo)
 
-        # Banda
-        self.banda_label = QLabel(translation_service.tr("operativo_band_label"))
-        self.banda_combo = QComboBox(self)
-        self.banda_keys = ["band_hf", "band_vhf", "band_uhf"]
-        self.banda_combo.addItems([translation_service.tr(k) for k in self.banda_keys])
-        layout.addWidget(self.banda_label)
-        layout.addWidget(self.banda_combo)
+        # Frequency band
+        self.frequency_band_label = QLabel(
+            translation_service.tr("operativo_band_label")
+        )
+        self.frequency_band_combo = QComboBox(self)
+        self.frequency_band_keys = ["band_hf", "band_vhf", "band_uhf"]
+        self.frequency_band_combo.addItems(
+            [translation_service.tr(k) for k in self.frequency_band_keys]
+        )
+        layout.addWidget(self.frequency_band_label)
+        layout.addWidget(self.frequency_band_combo)
 
         # Modo
         self.modo_label = QLabel(translation_service.tr("operativo_mode_label"))
@@ -69,33 +77,37 @@ class OperativoConfigDialog(QDialog):
         self.ok_btn.clicked.connect(self.accept)
 
         # Lógica dinámica
-        self.tipo_combo.currentIndexChanged.connect(self._update_fields)
-        self.banda_combo.currentIndexChanged.connect(self._update_fields)
+        self.operation_type_combo.currentIndexChanged.connect(self._update_fields)
+        self.frequency_band_combo.currentIndexChanged.connect(self._update_fields)
         self.rep_combo.currentIndexChanged.connect(self._update_fields)
         self._update_fields()
 
     def _update_fields(self):
-        tipo = self.tipo_keys[self.tipo_combo.currentIndex()]
-        banda = self.banda_keys[self.banda_combo.currentIndex()]
+        operation_type = self.operation_type_keys[
+            self.operation_type_combo.currentIndex()
+        ]
+        frequency_band = self.frequency_band_keys[
+            self.frequency_band_combo.currentIndex()
+        ]
         # CPS solo HF
-        if tipo == "operativo_cps":
-            self.banda_combo.setCurrentIndex(0)  # HF
-            self.banda_combo.setEnabled(False)
+        if operation_type == "operativo_cps":
+            self.frequency_band_combo.setCurrentIndex(0)  # HF
+            self.frequency_band_combo.setEnabled(False)
             self.modo_combo.setCurrentIndex(0)  # LSB
             self.freq_edit.setText("7100")
             self.rep_label.hide()
             self.rep_combo.hide()
         else:
-            self.banda_combo.setEnabled(True)
-            if banda == "band_hf":
+            self.frequency_band_combo.setEnabled(True)
+            if frequency_band == "band_hf":
                 self.modo_combo.setCurrentIndex(0)  # LSB
                 self.rep_label.hide()
                 self.rep_combo.hide()
-                if tipo == "operativo_rener":
+                if operation_type == "operativo_rener":
                     self.freq_edit.setText("7100")
                 else:
                     self.freq_edit.setText("")
-            elif banda == "band_vhf":
+            elif frequency_band == "band_vhf":
                 self.modo_combo.setCurrentIndex(2)  # FM
                 self.rep_label.show()
                 self.rep_combo.show()
@@ -116,11 +128,15 @@ class OperativoConfigDialog(QDialog):
 
     def get_config(self):
         return {
-            "tipo_key": self.tipo_keys[self.tipo_combo.currentIndex()],
-            "banda_key": self.banda_keys[self.banda_combo.currentIndex()],
-            "modo_key": self.modo_keys[self.modo_combo.currentIndex()],
-            "frecuencia": self.freq_edit.text(),
-            "repetidora_key": (
+            "operation_type": self.operation_type_keys[
+                self.operation_type_combo.currentIndex()
+            ],
+            "frequency_band": self.frequency_band_keys[
+                self.frequency_band_combo.currentIndex()
+            ],
+            "mode_key": self.modo_keys[self.modo_combo.currentIndex()],
+            "frequency": self.freq_edit.text(),
+            "repeater_key": (
                 self.rep_keys[self.rep_combo.currentIndex()]
                 if self.rep_combo.isVisible()
                 else None
