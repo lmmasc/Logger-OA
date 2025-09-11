@@ -92,6 +92,9 @@ class OperativoConfigDialog(QDialog):
         self.rep_combo.currentIndexChanged.connect(self._update_fields)
         self._update_fields()
 
+        # Asegurar que el combo de repetidora tenga siempre una opción seleccionada por defecto ('rep_simplex')
+        self.rep_combo.setCurrentIndex(0)
+
     def _update_fields(self):
         """
         Actualiza los campos dinámicamente según el tipo de operativo y banda seleccionados.
@@ -151,6 +154,25 @@ class OperativoConfigDialog(QDialog):
             - frequency: frecuencia
             - repeater_key: repetidora (si aplica)
         """
+        print(
+            "[DEBUG] operativo_config (get_config):",
+            {
+                "operation_type": self.operation_type_keys[
+                    self.operation_type_combo.currentIndex()
+                ],
+                "frequency_band": self.frequency_band_keys[
+                    self.frequency_band_combo.currentIndex()
+                ],
+                "mode_key": self.modo_keys[self.modo_combo.currentIndex()],
+                "frequency": self.freq_edit.text(),
+                "repeater_key": (
+                    self.rep_keys[self.rep_combo.currentIndex()]
+                    if self.frequency_band_combo.currentText()
+                    == translation_service.tr("band_vhf")
+                    else None
+                ),
+            },
+        )
         return {
             "operation_type": self.operation_type_keys[
                 self.operation_type_combo.currentIndex()
@@ -162,7 +184,8 @@ class OperativoConfigDialog(QDialog):
             "frequency": self.freq_edit.text(),
             "repeater_key": (
                 self.rep_keys[self.rep_combo.currentIndex()]
-                if self.rep_combo.isVisible()
+                if self.frequency_band_combo.currentText()
+                == translation_service.tr("band_vhf")
                 else None
             ),
         }

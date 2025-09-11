@@ -83,8 +83,8 @@ def get_log_file_path(
     """
     Genera el path absoluto para un archivo de log SQLite según el tipo (operativo/concurso),
     el indicativo del operador y el timestamp.
-    El nombre de archivo usa los textos en español para tipo y banda, normalizados.
-    Ejemplo: ~/LoggerOA/logs/oa4clu_cps_hf_20250904t153000.sqlite
+    El nombre de archivo usa los textos en español para tipo, banda y repetidora (si aplica), normalizados.
+    Ejemplo: ~/LoggerOA/logs/oa4clu_cps_hf_r1_20250904t153000.sqlite
     """
     from .defaults import OPERATIONS_DIR, CONTESTS_DIR
     from translation.translation_service import translation_service
@@ -98,11 +98,18 @@ def get_log_file_path(
     if log_type.lower() == "operativo":
         operation_type_key = kwargs.get("operation_type", "type")
         frequency_band_key = kwargs.get("frequency_band", "band")
+        repeater_key = kwargs.get("repeater_key")
         operation_type = translation_service.tr(operation_type_key)
         frequency_band = translation_service.tr(frequency_band_key)
         operation_type = normalize_filename_text(operation_type)
         frequency_band = normalize_filename_text(frequency_band)
-        filename = f"{operator_callsign.lower()}_{operation_type}_{frequency_band}_{timestamp.lower()}.sqlite"
+        filename_parts = [operator_callsign.lower(), operation_type, frequency_band]
+        if repeater_key:
+            repeater = translation_service.tr(repeater_key)
+            repeater = normalize_filename_text(repeater)
+            filename_parts.append(repeater)
+        filename_parts.append(timestamp.lower())
+        filename = "_".join(filename_parts) + ".sqlite"
     elif log_type.lower() == "concurso":
         contest_key = kwargs.get("contest_key", "contest")
         contest_name = translation_service.tr(contest_key)
@@ -114,4 +121,12 @@ def get_log_file_path(
         filename = (
             f"{operator_callsign.lower()}_{log_type.lower()}_{timestamp.lower()}.sqlite"
         )
+    print(
+        "[DEBUG] get_log_file_path kwargs:",
+        {
+            "operation_type": operation_type_key,
+            "frequency_band": frequency_band_key,
+            "repeater_key": repeater_key,
+        },
+    )
     return os.path.join(folder, filename)

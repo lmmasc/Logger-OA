@@ -15,12 +15,22 @@ def create_log(log_type: str, operator_callsign: str, **kwargs):
     if log_type.lower() == "operativo":
         operation_type = kwargs.pop("operation_type", "type")
         frequency_band = kwargs.pop("frequency_band", "band")
+        repeater_key = kwargs.pop("repeater_key", None)
         db_path = get_log_file_path(
             operator_callsign,
             log_type,
             timestamp,
             operation_type=operation_type,
             frequency_band=frequency_band,
+            repeater_key=repeater_key,
+        )
+        print(
+            "[DEBUG] create_log kwargs:",
+            {
+                "operation_type": operation_type,
+                "frequency_band": frequency_band,
+                "repeater_key": repeater_key,
+            },
         )
         # Mapear los campos del config dialog a los esperados por OperationLog
         log = OperationLog(
