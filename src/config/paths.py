@@ -61,14 +61,30 @@ def file_exists(path):
     return Path(path).exists()
 
 
+def normalize_filename_text(text):
+    """
+    Normaliza un texto para uso en nombres de archivo:
+    - Convierte a minúsculas
+    - Reemplaza espacios por '_'
+    - Elimina caracteres especiales/accentos
+    """
+    import unicodedata
+
+    text = text.lower().replace(" ", "_")
+    text = unicodedata.normalize("NFKD", text)
+    text = "".join(c for c in text if not unicodedata.combining(c))
+    text = "".join(c for c in text if c.isalnum() or c == "_")
+    return text
+
+
 def get_log_file_path(
     operator_callsign: str, log_type: str, timestamp: str, **kwargs
 ) -> str:
     """
     Genera el path absoluto para un archivo de log SQLite según el tipo (operativo/concurso),
     el indicativo del operador y el timestamp.
-    El nombre de archivo usa los textos en español para tipo y banda.
-    Ejemplo: ~/LoggerOA/logs/LU1ABC_CPS_HF_20250904T153000.sqlite
+    El nombre de archivo usa los textos en español para tipo y banda, normalizados.
+    Ejemplo: ~/LoggerOA/logs/oa4clu_cps_hf_20250904t153000.sqlite
     """
     from .defaults import OPERATIONS_DIR, CONTESTS_DIR
     from translation.translation_service import translation_service
@@ -84,13 +100,18 @@ def get_log_file_path(
         frequency_band_key = kwargs.get("frequency_band", "band")
         operation_type = translation_service.tr(operation_type_key)
         frequency_band = translation_service.tr(frequency_band_key)
-        filename = (
-            f"{operator_callsign}_{operation_type}_{frequency_band}_{timestamp}.sqlite"
-        )
+        operation_type = normalize_filename_text(operation_type)
+        frequency_band = normalize_filename_text(frequency_band)
+        filename = f"{operator_callsign.lower()}_{operation_type}_{frequency_band}_{timestamp.lower()}.sqlite"
     elif log_type.lower() == "concurso":
         contest_key = kwargs.get("contest_key", "contest")
         contest_name = translation_service.tr(contest_key)
-        filename = f"{operator_callsign}_{contest_name}_{timestamp}.sqlite"
+        contest_name = normalize_filename_text(contest_name)
+        filename = (
+            f"{operator_callsign.lower()}_{contest_name}_{timestamp.lower()}.sqlite"
+        )
     else:
-        filename = f"{operator_callsign}_{log_type}_{timestamp}.sqlite"
+        filename = (
+            f"{operator_callsign.lower()}_{log_type.lower()}_{timestamp.lower()}.sqlite"
+        )
     return os.path.join(folder, filename)
