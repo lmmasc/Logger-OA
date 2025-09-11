@@ -225,16 +225,16 @@ QListWidget#callsignSuggestionList:focus {
 /* =============================
    Campos de texto y combos
    ============================= */
-QLineEdit, QComboBox {
+QLineEdit, QComboBox, QTimeEdit, QDateTimeEdit {
     border: 2px solid #444444;
     border-radius: 6px;
     padding: 4px 8px;
 }
-QLineEdit:focus, QComboBox:focus {
+QLineEdit:focus, QComboBox:focus, QTimeEdit:focus, QDateTimeEdit:focus {
     border: 2px solid palette(highlight);
 }
 /* Estado deshabilitado para campos de texto y combos */
-QLineEdit:disabled, QComboBox:disabled {
+QLineEdit:disabled, QComboBox:disabled, QTimeEdit:disabled, QDateTimeEdit:disabled {
     background-color: #33373a;
     color: #888;
     border: 2px solid #444444;

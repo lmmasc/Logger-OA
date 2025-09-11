@@ -226,16 +226,16 @@ QLineEdit#callsignInput {
 QLineEdit#callsignInput:focus {
     border: 2px solid palette(highlight);
 }
-QLineEdit, QComboBox {
+QLineEdit, QComboBox, QTimeEdit, QDateTimeEdit {
     border: 2px solid #bdbdbd;
     border-radius: 6px;
     padding: 4px 8px;
 }
-QLineEdit:focus, QComboBox:focus {
+QLineEdit:focus, QComboBox:focus, QTimeEdit:focus, QDateTimeEdit:focus {
     border: 2px solid palette(highlight);
 }
 /* Estado deshabilitado para campos de texto y combos */
-QLineEdit:disabled, QComboBox:disabled {
+QLineEdit:disabled, QComboBox:disabled, QTimeEdit:disabled, QDateTimeEdit:disabled {
     background-color: #e0e0e0;
     color: #bdbdbd;
     border: 2px solid #bdbdbd;
