@@ -6,7 +6,9 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QComboBox,
     QPushButton,
+    QDateTimeEdit,
 )
+from PySide6.QtCore import QDateTime, Qt
 from translation.translation_service import translation_service
 
 
@@ -106,6 +108,24 @@ class ContactEditDialog(QDialog):
             self.inputs["rs_tx"].setText(str(contact.get("rs_tx", "")))
             layout.addWidget(QLabel(translation_service.tr("rs_tx")))
             layout.addWidget(self.inputs["rs_tx"])
+        # Campo de edición de fecha/hora UTC con formato según idioma
+        ts = contact.get("timestamp", None)
+        if ts:
+            dt_utc = QDateTime.fromSecsSinceEpoch(int(ts), Qt.UTC)
+        else:
+            dt_utc = QDateTime.currentDateTimeUtc()
+        lang = translation_service.get_language()
+        if lang == "es":
+            date_fmt = "HH:mm dd/MM/yyyy 'UTC'"
+            label = translation_service.tr("edit_contact_datetime_utc_es")
+        else:
+            date_fmt = "HH:mm MM/dd/yyyy 'UTC'"
+            label = translation_service.tr("edit_contact_datetime_utc_en")
+        self.inputs["datetime_utc"] = QDateTimeEdit(dt_utc, self)
+        self.inputs["datetime_utc"].setDisplayFormat(date_fmt)
+        self.inputs["datetime_utc"].setTimeSpec(Qt.UTC)
+        layout.addWidget(QLabel(label))
+        layout.addWidget(self.inputs["datetime_utc"])
         # Botones
         btns = QHBoxLayout()
         btn_ok = QPushButton(translation_service.tr("ok_button"), self)
@@ -141,5 +161,8 @@ class ContactEditDialog(QDialog):
                         "energy_commercial",
                     ]
                     result[k] = keys[widget.currentIndex()]
+            elif k == "datetime_utc" and isinstance(widget, QDateTimeEdit):
+                # Guardar como timestamp UTC
+                result["timestamp"] = widget.dateTime().toSecsSinceEpoch()
         self.result_contact = result
         super().accept()

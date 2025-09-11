@@ -87,4 +87,6 @@ UI_TRANSLATIONS = {
     "operator_not_found_msg": "El indicativo no existe en la base de datos. ¿Deseas agregarlo como nuevo operador?",
     "edit_contact_dialog_title": "Editar contacto",
     "cancel_button": "Cancelar",
+    "edit_contact_datetime_utc": "Fecha y hora (UTC)",
+    "edit_contact_datetime_utc_es": "Hora y fecha (UTC) en formato HH:MM DD/MM/AAAA",
 }
