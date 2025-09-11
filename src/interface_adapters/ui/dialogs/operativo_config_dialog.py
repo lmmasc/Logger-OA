@@ -14,20 +14,20 @@ from translation.translation_service import translation_service
 class OperativoConfigDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle(translation_service.tr("operativo_config_title"))
+        self.setWindowTitle(translation_service.tr("operation_config_title"))
         self.setMinimumWidth(420)
         layout = QVBoxLayout(self)
 
         # Operation type
         self.operation_type_label = QLabel(
-            translation_service.tr("operativo_type_label")
+            translation_service.tr("operation_type_label")
         )
         self.operation_type_combo = QComboBox(self)
         self.operation_type_keys = [
-            "operativo_cps",
-            "operativo_rener",
-            "operativo_boletin",
-            "operativo_generico",
+            "cps_operation",
+            "rener_operation",
+            "bulletin_operation",
+            "generic_operation",
         ]
         self.operation_type_combo.addItems(
             [translation_service.tr(k) for k in self.operation_type_keys]
@@ -37,7 +37,7 @@ class OperativoConfigDialog(QDialog):
 
         # Frequency band
         self.frequency_band_label = QLabel(
-            translation_service.tr("operativo_band_label")
+            translation_service.tr("operation_band_label")
         )
         self.frequency_band_combo = QComboBox(self)
         self.frequency_band_keys = ["band_hf", "band_vhf", "band_uhf"]
@@ -48,7 +48,7 @@ class OperativoConfigDialog(QDialog):
         layout.addWidget(self.frequency_band_combo)
 
         # Modo
-        self.modo_label = QLabel(translation_service.tr("operativo_mode_label"))
+        self.modo_label = QLabel(translation_service.tr("operation_mode_label"))
         self.modo_combo = QComboBox(self)
         self.modo_keys = ["mode_lsb", "mode_usb", "mode_fm", "mode_other"]
         self.modo_combo.addItems([translation_service.tr(k) for k in self.modo_keys])
@@ -56,13 +56,13 @@ class OperativoConfigDialog(QDialog):
         layout.addWidget(self.modo_combo)
 
         # Frecuencia
-        self.freq_label = QLabel(translation_service.tr("operativo_freq_label"))
+        self.freq_label = QLabel(translation_service.tr("operation_freq_label"))
         self.freq_edit = QLineEdit(self)
         layout.addWidget(self.freq_label)
         layout.addWidget(self.freq_edit)
 
         # Repetidora (solo VHF)
-        self.rep_label = QLabel(translation_service.tr("operativo_rep_label"))
+        self.rep_label = QLabel(translation_service.tr("operation_rep_label"))
         self.rep_combo = QComboBox(self)
         self.rep_keys = ["rep_simplex", "rep_r1", "rep_r2", "rep_r3"]
         self.rep_combo.addItems([translation_service.tr(k) for k in self.rep_keys])
@@ -90,7 +90,7 @@ class OperativoConfigDialog(QDialog):
             self.frequency_band_combo.currentIndex()
         ]
         # CPS solo HF
-        if operation_type == "operativo_cps":
+        if operation_type == "cps_operation":
             self.frequency_band_combo.setCurrentIndex(0)  # HF
             self.frequency_band_combo.setEnabled(False)
             self.modo_combo.setCurrentIndex(0)  # LSB
@@ -103,7 +103,7 @@ class OperativoConfigDialog(QDialog):
                 self.modo_combo.setCurrentIndex(0)  # LSB
                 self.rep_label.hide()
                 self.rep_combo.hide()
-                if operation_type == "operativo_rener":
+                if operation_type == "rener_operation":
                     self.freq_edit.setText("7100")
                 else:
                     self.freq_edit.setText("")
