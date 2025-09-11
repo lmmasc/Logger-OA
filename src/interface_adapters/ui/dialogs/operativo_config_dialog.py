@@ -1,7 +1,11 @@
+# Dialogo de configuración de log operativo
+# Permite seleccionar tipo de operativo, banda, modo, frecuencia y repetidora
+# Autor: (tu nombre o equipo)
+# Fecha: 2025-09-11
+
 from PySide6.QtWidgets import (
     QDialog,
     QVBoxLayout,
-    QHBoxLayout,
     QLabel,
     QComboBox,
     QLineEdit,
@@ -12,13 +16,19 @@ from translation.translation_service import translation_service
 
 
 class OperativoConfigDialog(QDialog):
+    """
+    Diálogo para configurar los parámetros de un log operativo.
+    Permite seleccionar tipo de operativo, banda, modo, frecuencia y repetidora.
+    La lógica dinámica ajusta los campos según la selección del usuario.
+    """
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle(translation_service.tr("operation_config_title"))
         self.setMinimumWidth(420)
         layout = QVBoxLayout(self)
 
-        # Operation type
+        # Tipo de operativo
         self.operation_type_label = QLabel(
             translation_service.tr("operation_type_label")
         )
@@ -35,7 +45,7 @@ class OperativoConfigDialog(QDialog):
         layout.addWidget(self.operation_type_label)
         layout.addWidget(self.operation_type_combo)
 
-        # Frequency band
+        # Banda de frecuencia
         self.frequency_band_label = QLabel(
             translation_service.tr("operation_band_label")
         )
@@ -47,7 +57,7 @@ class OperativoConfigDialog(QDialog):
         layout.addWidget(self.frequency_band_label)
         layout.addWidget(self.frequency_band_combo)
 
-        # Modo
+        # Modo de operación
         self.modo_label = QLabel(translation_service.tr("operation_mode_label"))
         self.modo_combo = QComboBox(self)
         self.modo_keys = ["mode_lsb", "mode_usb", "mode_fm", "mode_other"]
@@ -76,20 +86,25 @@ class OperativoConfigDialog(QDialog):
         layout.addWidget(self.ok_btn)
         self.ok_btn.clicked.connect(self.accept)
 
-        # Lógica dinámica
+        # Conexión de lógica dinámica
         self.operation_type_combo.currentIndexChanged.connect(self._update_fields)
         self.frequency_band_combo.currentIndexChanged.connect(self._update_fields)
         self.rep_combo.currentIndexChanged.connect(self._update_fields)
         self._update_fields()
 
     def _update_fields(self):
+        """
+        Actualiza los campos dinámicamente según el tipo de operativo y banda seleccionados.
+        - CPS: solo HF, modo LSB, frecuencia 7100
+        - RENER: si HF, frecuencia 7100
+        - VHF: muestra repetidora y ajusta frecuencia según repetidora
+        """
         operation_type = self.operation_type_keys[
             self.operation_type_combo.currentIndex()
         ]
         frequency_band = self.frequency_band_keys[
             self.frequency_band_combo.currentIndex()
         ]
-        # CPS solo HF
         if operation_type == "cps_operation":
             self.frequency_band_combo.setCurrentIndex(0)  # HF
             self.frequency_band_combo.setEnabled(False)
@@ -127,6 +142,15 @@ class OperativoConfigDialog(QDialog):
                 self.freq_edit.setText("")
 
     def get_config(self):
+        """
+        Devuelve la configuración seleccionada en el diálogo como diccionario.
+        Claves:
+            - operation_type: tipo de operativo
+            - frequency_band: banda seleccionada
+            - mode_key: modo de operación
+            - frequency: frecuencia
+            - repeater_key: repetidora (si aplica)
+        """
         return {
             "operation_type": self.operation_type_keys[
                 self.operation_type_combo.currentIndex()
