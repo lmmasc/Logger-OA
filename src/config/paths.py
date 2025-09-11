@@ -5,49 +5,49 @@ Funciones utilitarias para obtener rutas relevantes según el entorno.
 """
 
 import os
-from .defaults import DATA_FOLDER, EXPORT_FOLDER, LOG_FOLDER
+from .defaults import DATA_DIR, EXPORT_DIR, LOG_DIR
 from pathlib import Path
 
-# BASE_DIR apunta a la carpeta de usuario (~) para almacenar archivos generados por la app
-BASE_DIR = str(Path.home() / "LoggerOA")
-os.makedirs(BASE_DIR, exist_ok=True)
+# BASE_PATH apunta a la carpeta de usuario (~) para almacenar archivos generados por la app
+BASE_PATH = str(Path.home() / "LoggerOA")
+os.makedirs(BASE_PATH, exist_ok=True)
 
 
-def get_data_path(filename=None):
-    path = os.path.join(BASE_DIR, DATA_FOLDER)
+def get_data_dir(filename=None):
+    path = os.path.join(BASE_PATH, DATA_DIR)
     os.makedirs(path, exist_ok=True)
     if filename:
         return os.path.join(path, filename)
     return path
 
 
-def get_export_path(filename=None):
-    path = os.path.join(BASE_DIR, EXPORT_FOLDER)
+def get_export_dir(filename=None):
+    path = os.path.join(BASE_PATH, EXPORT_DIR)
     os.makedirs(path, exist_ok=True)
     if filename:
         return os.path.join(path, filename)
     return path
 
 
-def get_log_path(filename=None):
-    path = os.path.join(BASE_DIR, LOG_FOLDER)
+def get_log_dir(filename=None):
+    path = os.path.join(BASE_PATH, LOG_DIR)
     os.makedirs(path, exist_ok=True)
     if filename:
         return os.path.join(path, filename)
     return path
 
 
-def get_db_path(filename="loggeroa.db"):
+def get_database_path(filename="loggeroa.db"):
     """
     Devuelve la ruta absoluta recomendada para la base de datos SQLite.
     Por defecto, la base se almacena en ~/LoggerOA/loggeroa.db
     """
-    db_dir = Path(BASE_DIR)
+    db_dir = Path(BASE_PATH)
     db_dir.mkdir(exist_ok=True)
     return str(db_dir / filename)
 
 
-def ensure_dir_exists(path):
+def ensure_directory_exists(path):
     """
     Crea el directorio si no existe.
     """
@@ -67,21 +67,21 @@ def get_log_file_path(
     """
     Genera el path absoluto para un archivo de log SQLite según el tipo (operativo/concurso),
     el indicativo del operador y el timestamp.
-    Ejemplo: ~/LoggerOA/logs/LU1ABC_operativo_20250904T153000.sqlite
+    Ejemplo: ~/LoggerOA/logs/LU1ABC_operation_20250904T153000.sqlite
     """
-    log_type_folder = {"operativo": "operativos", "concurso": "concursos"}.get(
-        log_type.lower(), "otros"
+    log_type_folder = {"operativo": "operations", "concurso": "contests"}.get(
+        log_type.lower(), "others"
     )
-    folder = os.path.join(BASE_DIR, LOG_FOLDER, log_type_folder)
+    folder = os.path.join(BASE_PATH, LOG_DIR, log_type_folder)
     os.makedirs(folder, exist_ok=True)
     # Nuevo formato de nombre de archivo
     if log_type.lower() == "operativo":
-        tipo = kwargs.get("tipo", "tipo")
-        banda = kwargs.get("banda", "banda")
-        filename = f"{operator_callsign}_{tipo}_{banda}_{timestamp}.sqlite"
+        operation_type = kwargs.get("tipo", "type")
+        band = kwargs.get("banda", "band")
+        filename = f"{operator_callsign}_{operation_type}_{band}_{timestamp}.sqlite"
     elif log_type.lower() == "concurso":
-        concurso = kwargs.get("concurso", "concurso")
-        filename = f"{operator_callsign}_{concurso}_{timestamp}.sqlite"
+        contest_name = kwargs.get("concurso", "contest")
+        filename = f"{operator_callsign}_{contest_name}_{timestamp}.sqlite"
     else:
         filename = f"{operator_callsign}_{log_type}_{timestamp}.sqlite"
     return os.path.join(folder, filename)

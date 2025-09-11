@@ -7,7 +7,7 @@ Permite trabajar tanto con la base principal como con bases auxiliares.
 
 from typing import Any, List, Tuple, Optional
 from .connection import get_connection
-from config.paths import get_db_path
+from config.paths import get_database_path
 
 
 def fetch_all(db_path: str, query: str, params: Tuple = ()) -> List[Tuple]:
@@ -76,7 +76,7 @@ def add_radio_operator(
     """
     Inserta un nuevo operador de radio.
     """
-    db_path = get_db_path()
+    db_path = get_database_path()
     conn = get_connection(db_path)
     sql = (
         "INSERT INTO radio_operators (callsign, name, category, type, district, province, department, "
@@ -111,7 +111,7 @@ def get_radio_operators():
     """
     Devuelve todos los operadores de radio.
     """
-    db_path = get_db_path()
+    db_path = get_database_path()
     conn = get_connection(db_path)
     sql = (
         "SELECT callsign, name, category, type, district, province, department, "
@@ -144,7 +144,7 @@ def update_radio_operator(
     """
     Actualiza un operador de radio por callsign.
     """
-    db_path = get_db_path()
+    db_path = get_database_path()
     conn = get_connection(db_path)
     sql = (
         "UPDATE radio_operators SET name=?, category=?, type=?, district=?, province=?, department=?, "
@@ -179,7 +179,7 @@ def delete_radio_operator(callsign):
     """
     Elimina un operador de radio por callsign.
     """
-    db_path = get_db_path()
+    db_path = get_database_path()
     conn = get_connection(db_path)
     sql = "DELETE FROM radio_operators WHERE callsign=?"
     cursor = conn.cursor()
@@ -199,7 +199,7 @@ def get_radio_operator_by_callsign(callsign: str):
     """
     Devuelve el operador de radio con el indicativo exacto.
     """
-    db_path = get_db_path()
+    db_path = get_database_path()
     conn = get_connection(db_path)
     sql = (
         "SELECT callsign, name, category, type, district, province, department, "

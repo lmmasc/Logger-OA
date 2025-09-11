@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QUrl, QTimer
 import os
-from config.paths import get_db_path, get_log_path
+from config.paths import get_database_path, get_log_dir
 from translation.translation_service import translation_service
 from application.use_cases.update_operators_from_pdf import update_operators_from_pdf
 
@@ -194,7 +194,7 @@ def action_log_open(self):
     dialog.exec()
     if selected["type"]:
         log_folder = os.path.join(
-            get_log_path(),
+            get_log_dir(),
             "operativos" if selected["type"] == "operativo" else "concursos",
         )
         os.makedirs(log_folder, exist_ok=True)
@@ -255,7 +255,7 @@ def action_log_export(self):
         return
 
     from application.use_cases.export_log import export_log_to_csv
-    from config.paths import get_export_path
+    from config.paths import get_export_dir
 
     log_type = getattr(self, "current_log_type", None)
     if log_type not in ("ops", "contest"):
@@ -272,7 +272,7 @@ def action_log_export(self):
     export_path, _ = QFileDialog.getSaveFileName(
         self,
         translation_service.tr("export_log"),
-        get_export_path(default_filename),
+        get_export_dir(default_filename),
         "CSV Files (*.csv);;All Files (*)",
     )
     if not export_path:

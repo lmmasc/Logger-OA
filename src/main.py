@@ -12,13 +12,13 @@ from PySide6.QtWidgets import QApplication
 from interface_adapters.ui.main_window import MainWindow
 from infrastructure.db.connection import get_connection
 from infrastructure.db.schema import init_radioamateur_table
-from config.paths import get_db_path
+from config.paths import get_database_path
 
 
 def main():
     """Punto de entrada de la aplicación."""
     # Inicializar la tabla de radioaficionados
-    conn = get_connection(get_db_path())
+    conn = get_connection(get_database_path())
     init_radioamateur_table(conn)
     conn.close()
 

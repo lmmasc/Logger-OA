@@ -9,10 +9,10 @@ def list_log_files(log_type: str) -> list:
     """
     Lista los archivos de logs disponibles para el tipo dado (operativo/concurso).
     """
-    from src.config.paths import BASE_DIR
+    from src.config.paths import BASE_PATH
 
     folder = os.path.join(
-        BASE_DIR, "operativos" if log_type == "operativo" else "concursos"
+        BASE_PATH, "operations" if log_type == "operativo" else "contests"
     )
     if not os.path.exists(folder):
         return []

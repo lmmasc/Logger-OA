@@ -12,7 +12,7 @@ def update_operators_from_pdf(pdf_path):
     Ejecuta el flujo completo de extracción, normalización e integración.
     """
     from infrastructure.db.queries import get_radio_operators, update_radio_operator
-    from config.paths import get_db_path
+    from config.paths import get_database_path
     from datetime import datetime
 
     raw_data = extract_operators_from_pdf(pdf_path)
@@ -22,7 +22,7 @@ def update_operators_from_pdf(pdf_path):
     new_map = {op["callsign"]: op for op in normalized_data}
 
     # 2. Obtener existentes
-    db_path = get_db_path()
+    db_path = get_database_path()
     existing_rows = get_radio_operators()
     existing = {}
     for row in existing_rows:

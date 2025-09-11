@@ -13,7 +13,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QUrl, QTimer
 from PySide6.QtGui import QDesktopServices
 import os
-from config.paths import get_db_path
+from config.paths import get_database_path
 from .menu_bar import MainMenuBar
 from .themes.theme_manager import ThemeManager
 from translation.translation_service import translation_service
@@ -199,7 +199,7 @@ class MainWindow(QMainWindow):
         """
         Abre la carpeta donde se guarda la base de datos.
         """
-        db_path = get_db_path()
+        db_path = get_database_path()
         folder = os.path.dirname(db_path)
         QDesktopServices.openUrl(QUrl.fromLocalFile(folder))
 

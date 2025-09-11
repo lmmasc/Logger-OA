@@ -1,3 +1,3 @@
-from config.paths import get_db_path
+from config.paths import get_database_path
 
 # ...existing code...

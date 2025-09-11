@@ -4,7 +4,7 @@ Funciones para integrar los datos normalizados a la base de datos.
 
 import sqlite3
 from datetime import datetime
-from config.paths import get_db_path
+from config.paths import get_database_path
 
 
 def integrate_operators_to_db(operators):
@@ -12,7 +12,7 @@ def integrate_operators_to_db(operators):
     Inserta o actualiza los operadores en la base de datos SQLite local.
     Usa UPSERT para evitar duplicados y mantener actualizados los datos.
     """
-    db_path = get_db_path()
+    db_path = get_database_path()
     conn = sqlite3.connect(db_path)
     cur = conn.cursor()
     # Crear tabla si no existe
