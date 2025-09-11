@@ -12,7 +12,7 @@ def create_log(log_type: str, operator_callsign: str, **kwargs):
     """
     timestamp = datetime.now().strftime("%Y%m%dT%H%M%S")
     # Extraer campos relevantes para el nombre del archivo
-    if log_type.lower() == "operativo":
+    if log_type.lower() == "operation_log":
         operation_type = kwargs.pop("operation_type", "type")
         frequency_band = kwargs.pop("frequency_band", "band")
         repeater_key = kwargs.pop("repeater_key", None)
@@ -35,7 +35,7 @@ def create_log(log_type: str, operator_callsign: str, **kwargs):
             repeater=kwargs.get("repeater_key", ""),
             metadata=kwargs.get("metadata", {}),
         )
-    elif log_type.lower() == "concurso":
+    elif log_type.lower() == "contest_log":
         contest_key = kwargs.pop("contest_key", "contest")
         db_path = get_log_file_path(
             operator_callsign, log_type, timestamp, contest_key=contest_key

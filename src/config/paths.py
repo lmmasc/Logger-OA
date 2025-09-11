@@ -89,13 +89,14 @@ def get_log_file_path(
     from .defaults import OPERATIONS_DIR, CONTESTS_DIR
     from translation.translation_service import translation_service
 
-    log_type_folder = {"operativo": OPERATIONS_DIR, "concurso": CONTESTS_DIR}.get(
-        log_type.lower(), "others"
-    )
+    log_type_folder = {
+        "operation_log": OPERATIONS_DIR,
+        "contest_log": CONTESTS_DIR,
+    }.get(log_type.lower(), "others")
     folder = os.path.join(BASE_PATH, LOG_DIR, log_type_folder)
     os.makedirs(folder, exist_ok=True)
     # Nuevo formato de nombre de archivo
-    if log_type.lower() == "operativo":
+    if log_type.lower() == "operation_log":
         operation_type_key = kwargs.get("operation_type", "type")
         frequency_band_key = kwargs.get("frequency_band", "band")
         repeater_key = kwargs.get("repeater_key")
@@ -110,7 +111,7 @@ def get_log_file_path(
             filename_parts.append(repeater)
         filename_parts.append(timestamp.lower())
         filename = "_".join(filename_parts) + ".sqlite"
-    elif log_type.lower() == "concurso":
+    elif log_type.lower() == "contest_log":
         contest_key = kwargs.get("contest_key", "contest")
         contest_name = translation_service.tr(contest_key)
         contest_name = normalize_filename_text(contest_name)

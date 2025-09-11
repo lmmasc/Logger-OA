@@ -39,18 +39,18 @@ def action_log_new(self):
     selected = {"type": None}
 
     def select_ops():
-        selected["type"] = "operativo"
+        selected["type"] = "operation_log"
         dialog.accept()
 
     def select_contest():
-        selected["type"] = "concurso"
+        selected["type"] = "contest_log"
         dialog.accept()
 
     btn_ops.clicked.connect(select_ops)
     btn_contest.clicked.connect(select_contest)
     dialog.exec()
     contest_name = None
-    if selected["type"] == "concurso":
+    if selected["type"] == "contest_log":
         # Diálogo para seleccionar concurso
         contest_dialog = QDialog(self)
         contest_dialog.setWindowTitle(translation_service.tr("select_contest_title"))
@@ -118,7 +118,7 @@ def action_log_new(self):
             from application.use_cases.create_log import create_log
 
             extra_kwargs = {}
-            if selected["type"] == "concurso":
+            if selected["type"] == "contest_log":
                 contest_keys = [
                     "contest_world_radio_day",
                     "contest_independence_peru",
@@ -128,7 +128,7 @@ def action_log_new(self):
                 extra_kwargs["contest_key"] = contest_key
                 extra_kwargs["name"] = translation_service.tr(contest_key)
                 extra_kwargs["metadata"] = {"contest_name_key": contest_key}
-            elif selected["type"] == "operativo":
+            elif selected["type"] == "operation_log":
                 from interface_adapters.ui.dialogs.operativo_config_dialog import (
                     OperativoConfigDialog,
                 )
@@ -153,10 +153,10 @@ def action_log_new(self):
             )
             self.current_log = log
             self.current_log_type = (
-                "ops" if selected["type"] == "operativo" else "contest"
+                "ops" if selected["type"] == "operation_log" else "contest"
             )
             # Mostrar en cabecera: Indicativo - nombre del concurso - fecha
-            if selected["type"] == "concurso":
+            if selected["type"] == "contest_log":
                 cabecera = f"{log.operator} - {contest_name} - {log.start_time}"
                 self.setWindowTitle(cabecera)
             else:
@@ -190,11 +190,11 @@ def action_log_open(self):
     selected = {"type": None}
 
     def select_ops():
-        selected["type"] = "operativo"
+        selected["type"] = "operation_log"
         dialog.accept()
 
     def select_contest():
-        selected["type"] = "concurso"
+        selected["type"] = "contest_log"
         dialog.accept()
 
     btn_ops.clicked.connect(select_ops)
@@ -203,7 +203,7 @@ def action_log_open(self):
     if selected["type"]:
         log_folder = os.path.join(
             get_log_dir(),
-            OPERATIONS_DIR if selected["type"] == "operativo" else CONTESTS_DIR,
+            OPERATIONS_DIR if selected["type"] == "operation_log" else CONTESTS_DIR,
         )
         os.makedirs(log_folder, exist_ok=True)
         file_path, _ = QFileDialog.getOpenFileName(
