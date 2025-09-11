@@ -233,6 +233,13 @@ QLineEdit, QComboBox {
 QLineEdit:focus, QComboBox:focus {
     border: 2px solid palette(highlight);
 }
+/* Estado deshabilitado para campos de texto y combos */
+QLineEdit:disabled, QComboBox:disabled {
+    background-color: #33373a;
+    color: #888;
+    border: 2px solid #444444;
+    opacity: 0.7;
+}
 
 /* =============================
    Tablas y cabeceras
