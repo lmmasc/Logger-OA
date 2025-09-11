@@ -98,7 +98,9 @@ class LogOpsView(QWidget):
         clock_layout.addWidget(self.delete_contact_btn)
         clock_row.setLayout(clock_layout)
         layout.addWidget(clock_row)
-        self.table_widget = ContactTableWidget(self, log_type="ops")
+        self.table_widget = ContactTableWidget(
+            self, log_type="ops"
+        )  # Persistencia diferenciada por log_type
         self.table_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         layout.addWidget(self.table_widget)
         # Habilitar el botón de eliminar solo si hay una fila seleccionada

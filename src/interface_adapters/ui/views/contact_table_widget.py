@@ -6,6 +6,7 @@ from PySide6.QtWidgets import (
     QAbstractItemView,
 )
 from translation.translation_service import translation_service
+from config.settings_service import settings_service
 
 
 class ContactTableWidget(QWidget):
@@ -22,6 +23,10 @@ class ContactTableWidget(QWidget):
         self.layout.addWidget(self.table)
         self.setLayout(self.layout)
         self.set_columns()
+        # Persistencia de anchos de columna diferenciada por tipo de log
+        self._column_widths_key = f"contact_table_column_widths_{self.log_type}"
+        self.table.horizontalHeader().sectionResized.connect(self.save_column_widths)
+        self.load_column_widths()
         # Deshabilitar edición directa
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         # Conectar doble clic a método personalizado
@@ -165,3 +170,33 @@ class ContactTableWidget(QWidget):
         # Recarga los datos si existen
         if hasattr(self, "_last_contacts"):
             self.set_contacts(self._last_contacts)
+
+    def save_column_widths(self, *args):
+        """
+        Guarda los anchos de columna, evitando sobrescribir con 0 y manteniendo el último valor válido.
+        """
+        prev_widths = settings_service.get_value(self._column_widths_key, None)
+        if prev_widths is None:
+            prev_widths = [100] * self.table.columnCount()
+        widths = []
+        for i in range(self.table.columnCount()):
+            w = self.table.columnWidth(i)
+            if w == 0:
+                if prev_widths and i < len(prev_widths):
+                    widths.append(int(prev_widths[i]))
+                else:
+                    widths.append(100)
+            else:
+                widths.append(w)
+        settings_service.set_value(self._column_widths_key, widths)
+
+    def load_column_widths(self):
+        """
+        Carga los anchos de columna guardados y aplica protección de valores mínimos.
+        """
+        widths = settings_service.get_value(self._column_widths_key, None)
+        if widths:
+            for i, w in enumerate(widths):
+                if int(w) == 0:
+                    w = 100
+                self.table.setColumnWidth(i, int(w))
