@@ -3,16 +3,17 @@ from domain.repositories.contact_log_repository import ContactLogRepository
 from domain.entities.operation import OperationLog
 from domain.entities.contest import ContestLog
 import json
+from config.defaults import OPERATIONS_DIR, CONTESTS_DIR
 
 
 def list_log_files(log_type: str) -> list:
     """
     Lista los archivos de logs disponibles para el tipo dado (operativo/concurso).
     """
-    from src.config.paths import BASE_PATH
+    from config.paths import BASE_PATH
 
     folder = os.path.join(
-        BASE_PATH, "operations" if log_type == "operativo" else "contests"
+        BASE_PATH, OPERATIONS_DIR if log_type == "operativo" else CONTESTS_DIR
     )
     if not os.path.exists(folder):
         return []

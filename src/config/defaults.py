@@ -11,3 +11,7 @@ ORG_NAME = "LoggerOAApp"
 DATA_DIR = "data"
 EXPORT_DIR = "exports"
 LOG_DIR = "logs"
+
+# Subfolder names for logs (values in Spanish, used as constants in code)
+OPERATIONS_DIR = "operativos"
+CONTESTS_DIR = "concursos"

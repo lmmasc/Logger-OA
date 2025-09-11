@@ -69,7 +69,9 @@ def get_log_file_path(
     el indicativo del operador y el timestamp.
     Ejemplo: ~/LoggerOA/logs/LU1ABC_operation_20250904T153000.sqlite
     """
-    log_type_folder = {"operativo": "operations", "concurso": "contests"}.get(
+    from .defaults import OPERATIONS_DIR, CONTESTS_DIR
+
+    log_type_folder = {"operativo": OPERATIONS_DIR, "concurso": CONTESTS_DIR}.get(
         log_type.lower(), "others"
     )
     folder = os.path.join(BASE_PATH, LOG_DIR, log_type_folder)

@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QUrl, QTimer
 import os
 from config.paths import get_database_path, get_log_dir
+from config.defaults import OPERATIONS_DIR, CONTESTS_DIR
 from translation.translation_service import translation_service
 from application.use_cases.update_operators_from_pdf import update_operators_from_pdf
 
@@ -195,7 +196,7 @@ def action_log_open(self):
     if selected["type"]:
         log_folder = os.path.join(
             get_log_dir(),
-            "operativos" if selected["type"] == "operativo" else "concursos",
+            OPERATIONS_DIR if selected["type"] == "operativo" else CONTESTS_DIR,
         )
         os.makedirs(log_folder, exist_ok=True)
         file_path, _ = QFileDialog.getOpenFileName(
