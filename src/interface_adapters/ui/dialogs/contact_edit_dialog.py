@@ -98,24 +98,25 @@ class ContactEditDialog(QDialog):
             layout.addWidget(QLabel(translation_service.tr("observations")))
             layout.addWidget(self.inputs["obs"])
         else:
+            # Orden: indicativo, RS_RX, intercambio recibido, RS_TX, intercambio enviado
+            self.inputs["rs_rx"] = QLineEdit(self)
+            self.inputs["rs_rx"].setText(str(contact.get("rs_rx", "")))
+            layout.addWidget(QLabel(translation_service.tr("rs_rx")))
+            layout.addWidget(self.inputs["rs_rx"])
             self.inputs["exchange_received"] = QLineEdit(self)
             self.inputs["exchange_received"].setText(
                 contact.get("exchange_received", "")
             )
             layout.addWidget(QLabel(translation_service.tr("exchange_received")))
             layout.addWidget(self.inputs["exchange_received"])
-            self.inputs["exchange_sent"] = QLineEdit(self)
-            self.inputs["exchange_sent"].setText(contact.get("exchange_sent", ""))
-            layout.addWidget(QLabel(translation_service.tr("exchange_sent")))
-            layout.addWidget(self.inputs["exchange_sent"])
-            self.inputs["rs_rx"] = QLineEdit(self)
-            self.inputs["rs_rx"].setText(str(contact.get("rs_rx", "")))
-            layout.addWidget(QLabel(translation_service.tr("rs_rx")))
-            layout.addWidget(self.inputs["rs_rx"])
             self.inputs["rs_tx"] = QLineEdit(self)
             self.inputs["rs_tx"].setText(str(contact.get("rs_tx", "")))
             layout.addWidget(QLabel(translation_service.tr("rs_tx")))
             layout.addWidget(self.inputs["rs_tx"])
+            self.inputs["exchange_sent"] = QLineEdit(self)
+            self.inputs["exchange_sent"].setText(contact.get("exchange_sent", ""))
+            layout.addWidget(QLabel(translation_service.tr("exchange_sent")))
+            layout.addWidget(self.inputs["exchange_sent"])
         # Campo de edición de fecha/hora UTC con formato según idioma
         ts = contact.get("timestamp", None)
         if ts:
