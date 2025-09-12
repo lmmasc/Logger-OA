@@ -430,8 +430,53 @@ class LogFormWidget(QWidget):
                                 break
                             parent = parent.parent()
             except Exception as e:
+                raw_errors = str(e).split(";")
+                translated_errors = []
+                for err in raw_errors:
+                    err = err.strip()
+                    if err == "Missing received exchange.":
+                        translated_errors.append(
+                            translation_service.tr(
+                                "validation_missing_received_exchange"
+                            )
+                        )
+                    elif err == "Missing sent exchange.":
+                        translated_errors.append(
+                            translation_service.tr("validation_missing_sent_exchange")
+                        )
+                    elif err.startswith("Duplicate contact"):
+                        translated_errors.append(
+                            translation_service.tr("validation_duplicate_contact")
+                        )
+                    elif err.startswith("Invalid callsign"):
+                        callsign = err.split(":", 1)[-1].strip()
+                        translated_errors.append(
+                            translation_service.tr(
+                                "validation_invalid_callsign"
+                            ).format(callsign=callsign)
+                        )
+                    elif err.startswith("Invalid time format"):
+                        time = err.split(":", 1)[-1].strip()
+                        translated_errors.append(
+                            translation_service.tr(
+                                "validation_invalid_time_format"
+                            ).format(time=time)
+                        )
+                    elif err == "Missing station.":
+                        translated_errors.append(
+                            translation_service.tr("validation_missing_station")
+                        )
+                    elif err.startswith("Invalid power value"):
+                        power = err.split(":", 1)[-1].strip()
+                        translated_errors.append(
+                            translation_service.tr(
+                                "validation_invalid_power_value"
+                            ).format(power=power)
+                        )
+                    else:
+                        translated_errors.append(err)
                 error_msg = translation_service.tr("contact_validation_error").format(
-                    error=str(e)
+                    error="; ".join(translated_errors)
                 )
                 QMessageBox.critical(
                     self,
@@ -519,8 +564,51 @@ class LogFormWidget(QWidget):
                             break
                         parent = parent.parent()
         except Exception as e:
+            raw_errors = str(e).split(";")
+            translated_errors = []
+            for err in raw_errors:
+                err = err.strip()
+                if err == "Missing received exchange.":
+                    translated_errors.append(
+                        translation_service.tr("validation_missing_received_exchange")
+                    )
+                elif err == "Missing sent exchange.":
+                    translated_errors.append(
+                        translation_service.tr("validation_missing_sent_exchange")
+                    )
+                elif err.startswith("Duplicate contact"):
+                    translated_errors.append(
+                        translation_service.tr("validation_duplicate_contact")
+                    )
+                elif err.startswith("Invalid callsign"):
+                    callsign = err.split(":", 1)[-1].strip()
+                    translated_errors.append(
+                        translation_service.tr("validation_invalid_callsign").format(
+                            callsign=callsign
+                        )
+                    )
+                elif err.startswith("Invalid time format"):
+                    time = err.split(":", 1)[-1].strip()
+                    translated_errors.append(
+                        translation_service.tr("validation_invalid_time_format").format(
+                            time=time
+                        )
+                    )
+                elif err == "Missing station.":
+                    translated_errors.append(
+                        translation_service.tr("validation_missing_station")
+                    )
+                elif err.startswith("Invalid power value"):
+                    power = err.split(":", 1)[-1].strip()
+                    translated_errors.append(
+                        translation_service.tr("validation_invalid_power_value").format(
+                            power=power
+                        )
+                    )
+                else:
+                    translated_errors.append(err)
             error_msg = translation_service.tr("contact_validation_error").format(
-                error=str(e)
+                error="; ".join(translated_errors)
             )
             QMessageBox.critical(
                 self,

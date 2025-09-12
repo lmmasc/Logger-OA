@@ -13,4 +13,11 @@ MESSAGES_TRANSLATIONS = {
     "contact_missing_fields": "Some required fields are missing.",
     "contact_validation_error": "Contact validation error: {error}",
     "no_log_open": "No log is currently open.",
+    "validation_missing_received_exchange": "Missing received exchange.",
+    "validation_missing_sent_exchange": "Missing sent exchange.",
+    "validation_duplicate_contact": "Duplicate contact: same callsign and time.",
+    "validation_invalid_callsign": "Invalid callsign: {callsign}",
+    "validation_invalid_time_format": "Invalid time format: {time}",
+    "validation_missing_station": "Missing station.",
+    "validation_invalid_power_value": "Invalid power value: {power}",
 }
