@@ -51,4 +51,11 @@ class LogValidator:
         time_field = getattr(contact, "qtr_utc", getattr(contact, "time_utc", None))
         if time_field and not LogValidator.is_valid_time(time_field):
             errors.append(f"Invalid time format: {time_field}")
+        # Validar RS_RX y RS_TX
+        rs_rx = getattr(contact, "rs_rx", None)
+        rs_tx = getattr(contact, "rs_tx", None)
+        if not rs_rx or rs_rx.strip() == "":
+            errors.append("Missing RS_RX.")
+        if not rs_tx or rs_tx.strip() == "":
+            errors.append("Missing RS_TX.")
         return errors

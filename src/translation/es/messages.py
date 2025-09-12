@@ -20,4 +20,6 @@ MESSAGES_TRANSLATIONS = {
     "validation_invalid_time_format": "Formato de hora inválido: {time}",
     "validation_missing_station": "Falta estación.",
     "validation_invalid_power_value": "Valor de potencia inválido: {power}",
+    "validation_missing_rs_rx": "Falta RS_RX.",
+    "validation_missing_rs_tx": "Falta RS_TX.",
 }

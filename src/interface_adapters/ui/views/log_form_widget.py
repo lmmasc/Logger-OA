@@ -345,11 +345,6 @@ class LogFormWidget(QWidget):
         return None
 
     def _on_add_contact(self, callsign=None):
-        """
-        Recoge datos del formulario y agrega un contacto al log actual.
-        Args:
-            callsign (str, opcional): Indicativo de llamada.
-        """
         from infrastructure.repositories.sqlite_radio_operator_repository import (
             SqliteRadioOperatorRepository,
         )
@@ -359,10 +354,19 @@ class LogFormWidget(QWidget):
         )
 
         repo = SqliteRadioOperatorRepository()
-        # Recoge datos y llama al caso de uso
-        data = self.get_data(callsign)
-        if callsign:
-            data["callsign"] = callsign
+        # Obtener el valor de callsign directamente del campo si no se pasa como argumento
+        callsign_val = (
+            callsign
+            if callsign is not None
+            else (
+                self.parent().callsign_input.get_callsign().strip()
+                if hasattr(self.parent(), "callsign_input")
+                else ""
+            )
+        )
+        data = self.get_data(callsign_val)
+        if callsign_val:
+            data["callsign"] = callsign_val
         main_window = self._find_main_window()
         if (
             not main_window
@@ -378,8 +382,8 @@ class LogFormWidget(QWidget):
         db_path = getattr(main_window.current_log, "db_path", None)
         log_id = getattr(main_window.current_log, "id", None)
         contact_type = "operativo" if self.log_type == "ops" else "concurso"
-        # Verificar si el indicativo existe en la base de datos
-        operator = repo.get_operator_by_callsign(callsign)
+        # Verificar si el indicativo existe en la base de datos usando el valor correcto
+        operator = repo.get_operator_by_callsign(callsign_val)
         if operator:
             # Indicativo existe: agregar contacto y mover scroll
             try:
@@ -405,10 +409,11 @@ class LogFormWidget(QWidget):
                         table_widget.set_contacts(contacts)
                         table.scrollToBottom()
                         table.setFocus()
-                        # Foco al campo de indicativo en LogOpsView
                         parent = self.parent()
                         while parent:
                             if hasattr(parent, "callsign_input"):
+                                # Limpiar campo y mover foco solo si se agregó correctamente
+                                parent.callsign_input.input.clear()
                                 parent.callsign_input.input.setFocus()
                                 break
                             parent = parent.parent()
@@ -426,12 +431,17 @@ class LogFormWidget(QWidget):
                         parent = self.parent()
                         while parent:
                             if hasattr(parent, "callsign_input"):
+                                # Limpiar campo y mover foco solo si se agregó correctamente
+                                parent.callsign_input.input.clear()
                                 parent.callsign_input.input.setFocus()
                                 break
                             parent = parent.parent()
+                # Si todo fue exitoso
+                return True
             except Exception as e:
                 raw_errors = str(e).split(";")
                 translated_errors = []
+                focus_field = None
                 for err in raw_errors:
                     err = err.strip()
                     if err == "Missing received exchange.":
@@ -440,14 +450,24 @@ class LogFormWidget(QWidget):
                                 "validation_missing_received_exchange"
                             )
                         )
+                        if focus_field is None:
+                            focus_field = self.exchange_received_input
                     elif err == "Missing sent exchange.":
                         translated_errors.append(
                             translation_service.tr("validation_missing_sent_exchange")
                         )
+                        if focus_field is None:
+                            focus_field = self.exchange_sent_input
                     elif err.startswith("Duplicate contact"):
                         translated_errors.append(
                             translation_service.tr("validation_duplicate_contact")
                         )
+                        if focus_field is None:
+                            focus_field = (
+                                self.parent().callsign_input.input
+                                if hasattr(self.parent(), "callsign_input")
+                                else None
+                            )
                     elif err.startswith("Invalid callsign"):
                         callsign = err.split(":", 1)[-1].strip()
                         translated_errors.append(
@@ -455,6 +475,12 @@ class LogFormWidget(QWidget):
                                 "validation_invalid_callsign"
                             ).format(callsign=callsign)
                         )
+                        if focus_field is None:
+                            focus_field = (
+                                self.parent().callsign_input.input
+                                if hasattr(self.parent(), "callsign_input")
+                                else None
+                            )
                     elif err.startswith("Invalid time format"):
                         time = err.split(":", 1)[-1].strip()
                         translated_errors.append(
@@ -462,10 +488,13 @@ class LogFormWidget(QWidget):
                                 "validation_invalid_time_format"
                             ).format(time=time)
                         )
+                        # No hay campo específico, mantener foco
                     elif err == "Missing station.":
                         translated_errors.append(
                             translation_service.tr("validation_missing_station")
                         )
+                        if focus_field is None and hasattr(self, "station_input"):
+                            focus_field = self.station_input
                     elif err.startswith("Invalid power value"):
                         power = err.split(":", 1)[-1].strip()
                         translated_errors.append(
@@ -473,6 +502,20 @@ class LogFormWidget(QWidget):
                                 "validation_invalid_power_value"
                             ).format(power=power)
                         )
+                        if focus_field is None and hasattr(self, "power_input"):
+                            focus_field = self.power_input
+                    elif err == "Missing RS_RX.":
+                        translated_errors.append(
+                            translation_service.tr("validation_missing_rs_rx")
+                        )
+                        if focus_field is None:
+                            focus_field = self.rs_rx_input
+                    elif err == "Missing RS_TX.":
+                        translated_errors.append(
+                            translation_service.tr("validation_missing_rs_tx")
+                        )
+                        if focus_field is None:
+                            focus_field = self.rs_tx_input
                     else:
                         translated_errors.append(err)
                 error_msg = translation_service.tr("contact_validation_error").format(
@@ -483,7 +526,10 @@ class LogFormWidget(QWidget):
                     translation_service.tr("main_window_title"),
                     error_msg,
                 )
-            return
+                # Si se identificó el campo, mover el foco SOLO al primero
+                if focus_field:
+                    focus_field.setFocus()
+                return False
         # Si no existe, preguntar si desea agregarlo a la base de datos
         msg_box = QMessageBox(self)
         msg_box.setIcon(QMessageBox.Question)
@@ -543,6 +589,8 @@ class LogFormWidget(QWidget):
                     parent = self.parent()
                     while parent:
                         if hasattr(parent, "callsign_input"):
+                            # Limpiar campo y mover foco solo si se agregó correctamente
+                            parent.callsign_input.input.clear()
                             parent.callsign_input.input.setFocus()
                             break
                         parent = parent.parent()
@@ -560,26 +608,41 @@ class LogFormWidget(QWidget):
                     parent = self.parent()
                     while parent:
                         if hasattr(parent, "callsign_input"):
+                            # Limpiar campo y mover foco solo si se agregó correctamente
+                            parent.callsign_input.input.clear()
                             parent.callsign_input.input.setFocus()
                             break
                         parent = parent.parent()
+            # Si todo fue exitoso
+            return True
         except Exception as e:
             raw_errors = str(e).split(";")
             translated_errors = []
+            focus_field = None
             for err in raw_errors:
                 err = err.strip()
                 if err == "Missing received exchange.":
                     translated_errors.append(
                         translation_service.tr("validation_missing_received_exchange")
                     )
+                    if focus_field is None:
+                        focus_field = self.exchange_received_input
                 elif err == "Missing sent exchange.":
                     translated_errors.append(
                         translation_service.tr("validation_missing_sent_exchange")
                     )
+                    if focus_field is None:
+                        focus_field = self.exchange_sent_input
                 elif err.startswith("Duplicate contact"):
                     translated_errors.append(
                         translation_service.tr("validation_duplicate_contact")
                     )
+                    if focus_field is None:
+                        focus_field = (
+                            self.parent().callsign_input.input
+                            if hasattr(self.parent(), "callsign_input")
+                            else None
+                        )
                 elif err.startswith("Invalid callsign"):
                     callsign = err.split(":", 1)[-1].strip()
                     translated_errors.append(
@@ -587,6 +650,12 @@ class LogFormWidget(QWidget):
                             callsign=callsign
                         )
                     )
+                    if focus_field is None:
+                        focus_field = (
+                            self.parent().callsign_input.input
+                            if hasattr(self.parent(), "callsign_input")
+                            else None
+                        )
                 elif err.startswith("Invalid time format"):
                     time = err.split(":", 1)[-1].strip()
                     translated_errors.append(
@@ -594,10 +663,13 @@ class LogFormWidget(QWidget):
                             time=time
                         )
                     )
+                    # No hay campo específico, mantener foco
                 elif err == "Missing station.":
                     translated_errors.append(
                         translation_service.tr("validation_missing_station")
                     )
+                    if focus_field is None and hasattr(self, "station_input"):
+                        focus_field = self.station_input
                 elif err.startswith("Invalid power value"):
                     power = err.split(":", 1)[-1].strip()
                     translated_errors.append(
@@ -605,6 +677,20 @@ class LogFormWidget(QWidget):
                             power=power
                         )
                     )
+                    if focus_field is None and hasattr(self, "power_input"):
+                        focus_field = self.power_input
+                elif err == "Missing RS_RX.":
+                    translated_errors.append(
+                        translation_service.tr("validation_missing_rs_rx")
+                    )
+                    if focus_field is None:
+                        focus_field = self.rs_rx_input
+                elif err == "Missing RS_TX.":
+                    translated_errors.append(
+                        translation_service.tr("validation_missing_rs_tx")
+                    )
+                    if focus_field is None:
+                        focus_field = self.rs_tx_input
                 else:
                     translated_errors.append(err)
             error_msg = translation_service.tr("contact_validation_error").format(
@@ -615,6 +701,10 @@ class LogFormWidget(QWidget):
                 translation_service.tr("main_window_title"),
                 error_msg,
             )
+            # Si se identificó el campo, mover el foco SOLO al primero
+            if focus_field:
+                focus_field.setFocus()
+            return False
 
     def retranslate_ui(self):
         """
