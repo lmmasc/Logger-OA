@@ -172,6 +172,12 @@ class LogContestView(QWidget):
         self.form_widget.retranslate_ui()
         self.table_widget.retranslate_ui()
         self.queue_widget.retranslate_ui()
+        # Establecer intercambio enviado al abrir el log de concurso
+        if hasattr(self.form_widget, "exchange_sent_input") and hasattr(
+            self.table_widget, "table"
+        ):
+            num_contacts = self.table_widget.table.rowCount()
+            self.form_widget.exchange_sent_input.setText(str(num_contacts + 1).zfill(3))
 
     def update_header(self):
         log = getattr(self, "_current_log", None)
@@ -244,6 +250,14 @@ class LogContestView(QWidget):
                     if self.queue_widget.queue_list.item(i).text() == callsign:
                         self.queue_widget.queue_list.takeItem(i)
                         break
+            # Actualizar intercambio enviado tras agregar contacto
+            if hasattr(self.form_widget, "exchange_sent_input") and hasattr(
+                self.table_widget, "table"
+            ):
+                num_contacts = self.table_widget.table.rowCount()
+                self.form_widget.exchange_sent_input.setText(
+                    str(num_contacts + 1).zfill(3)
+                )
 
     def _on_delete_contact(self):
         # Eliminar contacto seleccionado de la tabla solo si hay una fila seleccionada
@@ -304,6 +318,12 @@ class LogContestView(QWidget):
         contacts = repo.get_contacts(log_id)
         main_window.current_log.contacts = contacts
         self.table_widget.set_contacts(contacts)
+        # Actualizar intercambio enviado tras eliminar contacto
+        if hasattr(self.form_widget, "exchange_sent_input") and hasattr(
+            self.table_widget, "table"
+        ):
+            num_contacts = self.table_widget.table.rowCount()
+            self.form_widget.exchange_sent_input.setText(str(num_contacts + 1).zfill(3))
 
     def _on_selection_changed(self):
         selected_rows = self.table_widget.table.selectionModel().selectedRows()
