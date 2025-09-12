@@ -20,4 +20,10 @@ MENU_TRANSLATIONS = {
     "menu_spanish": "Spanish",
     "menu_english": "English",
     "menu_about": "About",
+    "menu_create_backup": "Create backup",
+    "menu_restore_backup": "Restore backup",
+    "menu_import_from_db": "Import from external database",
+    "menu_database_section_backup": "Backup operations",
+    "menu_database_section_import": "Import operations",
+    "menu_database_section_delete": "Advanced operations",
 }
