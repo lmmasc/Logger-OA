@@ -107,24 +107,27 @@ class LogContestView(QWidget):
         # Refuerzo en botones
         self.add_contact_btn.setFocusPolicy(Qt.StrongFocus)
         self.delete_contact_btn.setFocusPolicy(Qt.StrongFocus)
-        # Orden de tabulación: input de indicativo -> primer campo del formulario de concurso
-        if hasattr(self.form_widget, "exchange_received_input"):
+        # Orden de tabulación: input de indicativo -> RS_RX -> intercambio recibido -> RS_TX -> intercambio enviado -> observaciones -> botones
+        if hasattr(self.form_widget, "rs_rx_input"):
+            QWidget.setTabOrder(self.callsign_input.input, self.form_widget.rs_rx_input)
             QWidget.setTabOrder(
-                self.callsign_input.input, self.form_widget.exchange_received_input
+                self.form_widget.rs_rx_input, self.form_widget.exchange_received_input
             )
             QWidget.setTabOrder(
-                self.form_widget.exchange_received_input,
+                self.form_widget.exchange_received_input, self.form_widget.rs_tx_input
+            )
+            QWidget.setTabOrder(
+                self.form_widget.rs_tx_input, self.form_widget.exchange_sent_input
+            )
+            QWidget.setTabOrder(
                 self.form_widget.exchange_sent_input,
+                self.form_widget.observations_input,
             )
             QWidget.setTabOrder(
-                self.form_widget.exchange_sent_input, self.form_widget.rs_rx_input
+                self.form_widget.observations_input, self.add_contact_btn
             )
-            QWidget.setTabOrder(
-                self.form_widget.rs_rx_input, self.form_widget.rs_tx_input
-            )
-            QWidget.setTabOrder(
-                self.form_widget.rs_tx_input, self.form_widget.observations_input
-            )
+            QWidget.setTabOrder(self.add_contact_btn, self.delete_contact_btn)
+        # ...existing code...
 
     def _on_suggestion_selected(self, callsign):
         self.callsign_input.set_callsign(callsign)
