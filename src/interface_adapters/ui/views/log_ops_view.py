@@ -107,7 +107,7 @@ class LogOpsView(QWidget):
         self.table_widget.table.itemSelectionChanged.connect(self._on_selection_changed)
         self.queue_widget.setCallsign.connect(self.callsign_input.set_callsign)
         self.callsign_input.addToQueue.connect(self.queue_widget.add_to_queue)
-        self.callsign_info.suggestionSelected.connect(self.callsign_input.set_callsign)
+        self.callsign_info.suggestionSelected.connect(self._on_suggestion_selected)
         self.callsign_input.input.textChanged.connect(self.callsign_info.update_info)
         self.callsign_info.update_info(self.callsign_input.get_callsign())
         self.setLayout(layout)
@@ -115,6 +115,16 @@ class LogOpsView(QWidget):
         translation_service.signal.language_changed.connect(self.retranslate_ui)
         translation_service.signal.language_changed.connect(self._retranslate_clocks)
         self.update_header()
+        # Evitar foco en cola y tabla
+        self.queue_widget.setFocusPolicy(Qt.NoFocus)
+        self.table_widget.setFocusPolicy(Qt.NoFocus)
+
+    def _on_suggestion_selected(self, callsign):
+        self.callsign_input.set_callsign(callsign)
+        self.callsign_info.update_info(callsign)
+        # Foco al primer campo del formulario
+        if hasattr(self.form_widget, "station_input"):
+            self.form_widget.station_input.setFocus()
 
     def _retranslate_clocks(self):
         """

@@ -88,11 +88,20 @@ class LogContestView(QWidget):
         self.setLayout(layout)
         # Conexiones y traducción
         translation_service.signal.language_changed.connect(self.retranslate_ui)
-        self.callsign_info.suggestionSelected.connect(self.callsign_input.set_callsign)
+        self.callsign_info.suggestionSelected.connect(self._on_suggestion_selected)
         self.callsign_input.input.textChanged.connect(self.callsign_info.update_info)
         self.callsign_info.update_info(self.callsign_input.get_callsign())
-        self.update_header()
-        self.retranslate_ui()
+        self.setLayout(layout)
+        # Evitar foco en cola y tabla
+        self.queue_widget.setFocusPolicy(Qt.NoFocus)
+        self.table_widget.setFocusPolicy(Qt.NoFocus)
+
+    def _on_suggestion_selected(self, callsign):
+        self.callsign_input.set_callsign(callsign)
+        self.callsign_info.update_info(callsign)
+        # Foco al primer campo del formulario de concurso
+        if hasattr(self.form_widget, "exchange_received_input"):
+            self.form_widget.exchange_received_input.setFocus()
 
     def set_log_data(self, log):
         # Actualiza los datos del log y refresca la cabecera
