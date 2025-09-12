@@ -177,6 +177,12 @@ class ContactTableWidget(QWidget):
                 elif key == "power":
                     val = contact.get(key, "")
                     value = f"{val} W" if val else ""
+                elif self.log_type == "contest" and key in (
+                    "exchange_received",
+                    "exchange_sent",
+                ):
+                    val = contact.get(key, "")
+                    value = str(val).zfill(3) if val else ""
                 else:
                     value = contact.get(key, "")
                 self.table.setItem(row, col, QTableWidgetItem(str(value)))
