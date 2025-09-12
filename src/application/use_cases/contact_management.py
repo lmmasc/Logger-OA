@@ -77,3 +77,101 @@ def update_contact_in_log(
     # Si todo es válido, actualizar el registro directamente
     repo.update_contact(contact_id, contact)
     return contact
+
+
+def validate_contact_for_log(
+    contact_data: dict, contacts: list, contact_type: str, translation_service
+) -> dict:
+    """
+    Valida el contacto, traduce y ordena los errores según el tipo de log y el orden visual del formulario.
+    Devuelve dict con 'errors' (lista de mensajes) y 'focus_field' (str).
+    """
+    if contact_type == "operativo":
+        contact = OperationContact(**contact_data)
+    elif contact_type == "concurso":
+        contact = ContestContact(**contact_data)
+    else:
+        return {
+            "errors": [translation_service.tr("Tipo de contacto no soportado")],
+            "focus_field": None,
+        }
+    errors = LogValidator.validate_contact(contact, contacts)
+    if contact_type == "operativo":
+        errors += OperationRules.validate(contact, contacts)
+    elif contact_type == "concurso":
+        errors += ContestRules.validate(contact, contacts)
+    # Mapear errores a campos y traducir
+    error_map = {}
+    for err in errors:
+        err = err.strip()
+        if err == "Missing received exchange.":
+            error_map["exchange_received_input"] = translation_service.tr(
+                "validation_missing_received_exchange"
+            )
+        elif err == "Missing sent exchange.":
+            error_map["exchange_sent_input"] = translation_service.tr(
+                "validation_missing_sent_exchange"
+            )
+        elif err.startswith("Duplicate contact"):
+            error_map["callsign_input"] = translation_service.tr(
+                "validation_duplicate_contact"
+            )
+        elif err.startswith("Invalid callsign"):
+            callsign = err.split(":", 1)[-1].strip()
+            error_map["callsign_input"] = translation_service.tr(
+                "validation_invalid_callsign"
+            ).format(callsign=callsign)
+        elif err.startswith("Invalid time format"):
+            time = err.split(":", 1)[-1].strip()
+            error_map["time_input"] = translation_service.tr(
+                "validation_invalid_time_format"
+            ).format(time=time)
+        elif err == "Missing station.":
+            error_map["station_input"] = translation_service.tr(
+                "validation_missing_station"
+            )
+        elif err.startswith("Invalid power value"):
+            power = err.split(":", 1)[-1].strip()
+            error_map["power_input"] = translation_service.tr(
+                "validation_invalid_power_value"
+            ).format(power=power)
+        elif err == "Missing RS_RX.":
+            error_map["rs_rx_input"] = translation_service.tr(
+                "validation_missing_rs_rx"
+            )
+        elif err == "Missing RS_TX.":
+            error_map["rs_tx_input"] = translation_service.tr(
+                "validation_missing_rs_tx"
+            )
+        else:
+            error_map["other"] = err
+    # Orden de campos visuales
+    if contact_type == "concurso":
+        field_order = [
+            "callsign_input",
+            "rs_rx_input",
+            "exchange_received_input",
+            "rs_tx_input",
+            "exchange_sent_input",
+            "observations_input",
+        ]
+    else:
+        field_order = [
+            "callsign_input",
+            "station_input",
+            "energy_input",
+            "power_input",
+            "rs_rx_input",
+            "rs_tx_input",
+            "observations_input",
+        ]
+    translated_errors = []
+    focus_field = None
+    for field in field_order:
+        if field in error_map:
+            translated_errors.append(error_map[field])
+            if focus_field is None:
+                focus_field = field
+    if "other" in error_map:
+        translated_errors.append(error_map["other"])
+    return {"errors": translated_errors, "focus_field": focus_field}

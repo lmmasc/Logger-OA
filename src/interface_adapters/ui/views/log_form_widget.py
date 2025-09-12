@@ -250,6 +250,8 @@ class LogFormWidget(QWidget):
         Returns:
             dict: Datos del formulario.
         """
+        from application.use_cases.operator_management import get_operator_by_callsign
+
         callsign_val = callsign if callsign is not None else ""
         data = {
             "callsign": callsign_val,
@@ -262,8 +264,7 @@ class LogFormWidget(QWidget):
 
             contact_id = str(uuid.uuid4())
             timestamp = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
-            repo = SqliteRadioOperatorRepository()
-            operator = repo.get_operator_by_callsign(callsign_val)
+            operator = get_operator_by_callsign(callsign_val)
             name = operator.name if operator else "-"
             region = operator.region if operator else "-"
             data.update(
@@ -282,8 +283,7 @@ class LogFormWidget(QWidget):
                 }
             )
         elif self.log_type == "ops":
-            repo = SqliteRadioOperatorRepository()
-            operator = repo.get_operator_by_callsign(callsign_val)
+            operator = get_operator_by_callsign(callsign_val)
             name = operator.name if operator else ""
             country = operator.country if operator else ""
             region = operator.region if operator else "-"
@@ -345,8 +345,13 @@ class LogFormWidget(QWidget):
         return None
 
     def _on_add_contact(self, callsign=None):
-        from infrastructure.repositories.sqlite_radio_operator_repository import (
-            SqliteRadioOperatorRepository,
+        from application.use_cases.operator_management import (
+            get_operator_by_callsign,
+            create_operator,
+        )
+        from application.use_cases.contact_management import (
+            validate_contact_for_log,
+            add_contact_to_log,
         )
         from PySide6.QtWidgets import QMessageBox
         from interface_adapters.ui.dialogs.operator_edit_dialog import (
@@ -368,32 +373,74 @@ class LogFormWidget(QWidget):
         if callsign_val:
             data["callsign"] = callsign_val
         main_window = self._find_main_window()
-        if (
-            not main_window
-            or not hasattr(main_window, "current_log")
-            or not main_window.current_log
-        ):
-            QMessageBox.warning(
-                self,
-                translation_service.tr("main_window_title"),
-                translation_service.tr("no_log_open"),
-            )
-            return
         db_path = getattr(main_window.current_log, "db_path", None)
         log_id = getattr(main_window.current_log, "id", None)
         contact_type = "operativo" if self.log_type == "ops" else "concurso"
-        # Verificar si el indicativo existe en la base de datos usando el valor correcto
-        operator = repo.get_operator_by_callsign(callsign_val)
-        if operator:
-            # Indicativo existe: agregar contacto y mover scroll
-            try:
-                from application.use_cases.contact_management import add_contact_to_log
-                from domain.repositories.contact_log_repository import (
-                    ContactLogRepository,
-                )
+        # Obtener contactos existentes para validación
+        from domain.repositories.contact_log_repository import ContactLogRepository
 
+        repo_log = ContactLogRepository(db_path)
+        contacts = repo_log.get_contacts(log_id)
+        # Validar antes de agregar
+        validation = validate_contact_for_log(
+            data, contacts, contact_type, translation_service
+        )
+        if validation["errors"]:
+            error_msg = translation_service.tr("contact_validation_error").format(
+                error="; ".join(validation["errors"])
+            )
+            QMessageBox.critical(
+                self,
+                translation_service.tr("main_window_title"),
+                error_msg,
+            )
+            # Asignar foco al campo correspondiente
+            focus_field = None
+            field = validation["focus_field"]
+            if field == "callsign_input" and hasattr(self.parent(), "callsign_input"):
+                focus_field = self.parent().callsign_input.input
+            elif hasattr(self, field):
+                focus_field = getattr(self, field)
+            if focus_field:
+                focus_field.setFocus()
+            return False
+        operator = get_operator_by_callsign(callsign_val)
+        main_window = self._find_main_window()
+        db_path = getattr(main_window.current_log, "db_path", None)
+        log_id = getattr(main_window.current_log, "id", None)
+        contact_type = "operativo" if self.log_type == "ops" else "concurso"
+        # Obtener contactos existentes para validación
+        from domain.repositories.contact_log_repository import ContactLogRepository
+
+        repo_log = ContactLogRepository(db_path)
+        contacts = repo_log.get_contacts(log_id)
+        # Validar antes de agregar
+        validation = validate_contact_for_log(
+            data, contacts, contact_type, translation_service
+        )
+        if validation["errors"]:
+            error_msg = translation_service.tr("contact_validation_error").format(
+                error="; ".join(validation["errors"])
+            )
+            QMessageBox.critical(
+                self,
+                translation_service.tr("main_window_title"),
+                error_msg,
+            )
+            # Asignar foco al campo correspondiente
+            focus_field = None
+            field = validation["focus_field"]
+            if field == "callsign_input" and hasattr(self.parent(), "callsign_input"):
+                focus_field = self.parent().callsign_input.input
+            elif hasattr(self, field):
+                focus_field = getattr(self, field)
+            if focus_field:
+                focus_field.setFocus()
+            return False
+        # Si el operador existe, agregar contacto directamente
+        if operator:
+            try:
                 contact = add_contact_to_log(db_path, log_id, data, contact_type)
-                repo_log = ContactLogRepository(db_path)
                 contacts = repo_log.get_contacts(log_id)
                 main_window.current_log.contacts = contacts
                 # Actualiza la tabla y mueve el scroll
@@ -439,97 +486,12 @@ class LogFormWidget(QWidget):
                 # Si todo fue exitoso
                 return True
             except Exception as e:
-                raw_errors = str(e).split(";")
-                error_map = {}
-                for err in raw_errors:
-                    err = err.strip()
-                    if err == "Missing received exchange.":
-                        error_map["exchange_received_input"] = translation_service.tr(
-                            "validation_missing_received_exchange"
-                        )
-                    elif err == "Missing sent exchange.":
-                        error_map["exchange_sent_input"] = translation_service.tr(
-                            "validation_missing_sent_exchange"
-                        )
-                    elif err.startswith("Duplicate contact"):
-                        error_map["callsign_input"] = translation_service.tr(
-                            "validation_duplicate_contact"
-                        )
-                    elif err.startswith("Invalid callsign"):
-                        callsign = err.split(":", 1)[-1].strip()
-                        error_map["callsign_input"] = translation_service.tr(
-                            "validation_invalid_callsign"
-                        ).format(callsign=callsign)
-                    elif err.startswith("Invalid time format"):
-                        time = err.split(":", 1)[-1].strip()
-                        error_map["time_input"] = translation_service.tr(
-                            "validation_invalid_time_format"
-                        ).format(time=time)
-                    elif err == "Missing station.":
-                        error_map["station_input"] = translation_service.tr(
-                            "validation_missing_station"
-                        )
-                    elif err.startswith("Invalid power value"):
-                        power = err.split(":", 1)[-1].strip()
-                        error_map["power_input"] = translation_service.tr(
-                            "validation_invalid_power_value"
-                        ).format(power=power)
-                    elif err == "Missing RS_RX.":
-                        error_map["rs_rx_input"] = translation_service.tr(
-                            "validation_missing_rs_rx"
-                        )
-                    elif err == "Missing RS_TX.":
-                        error_map["rs_tx_input"] = translation_service.tr(
-                            "validation_missing_rs_tx"
-                        )
-                    else:
-                        error_map["other"] = err
-                # Orden de campos visuales
-                if self.log_type == "contest":
-                    field_order = [
-                        "callsign_input",
-                        "rs_rx_input",
-                        "exchange_received_input",
-                        "rs_tx_input",
-                        "exchange_sent_input",
-                        "observations_input",
-                    ]
-                else:
-                    field_order = [
-                        "callsign_input",
-                        "station_input",
-                        "energy_input",
-                        "power_input",
-                        "rs_rx_input",
-                        "rs_tx_input",
-                        "observations_input",
-                    ]
-                translated_errors = []
-                focus_field = None
-                for field in field_order:
-                    if field in error_map:
-                        translated_errors.append(error_map[field])
-                        if focus_field is None:
-                            # Obtener el widget correspondiente
-                            if field == "callsign_input" and hasattr(
-                                self.parent(), "callsign_input"
-                            ):
-                                focus_field = self.parent().callsign_input.input
-                            elif hasattr(self, field):
-                                focus_field = getattr(self, field)
-                # Agregar otros errores no mapeados
-                if "other" in error_map:
-                    translated_errors.append(error_map["other"])
-                error_msg = translation_service.tr("contact_validation_error").format(
-                    error="; ".join(translated_errors)
-                )
+                # Si ocurre error inesperado, mostrarlo
                 QMessageBox.critical(
                     self,
                     translation_service.tr("main_window_title"),
-                    error_msg,
+                    str(e),
                 )
-                if focus_field:
-                    focus_field.setFocus()
                 return False
         # Si no existe, preguntar si desea agregarlo a la base de datos
         msg_box = QMessageBox(self)
@@ -549,29 +511,14 @@ class LogFormWidget(QWidget):
             dlg = OperatorEditDialog(parent=self)
             dlg.inputs["callsign"].setText(callsign)
             if dlg.exec() == QMessageBox.Accepted and dlg.result_operator:
-                # Agregar operador a la base de datos
-                from domain.entities.radio_operator import RadioOperator
-
                 op_data = dlg.result_operator
-                # Mapear claves 'type' y 'license' a 'type_' y 'license_'
-                if "type" in op_data:
-                    op_data["type_"] = op_data.pop("type")
-                if "license" in op_data:
-                    op_data["license_"] = op_data.pop("license")
-                new_operator = RadioOperator(**op_data)
-                repo.add(new_operator)
-                # Recargar base de datos y agregar contacto
-                operator = repo.get_operator_by_callsign(callsign)
+                operator = create_operator(op_data)
                 data["name"] = operator.name
                 data["country"] = operator.country
                 data["region"] = operator.region
         # Agregar contacto con los datos actuales (faltantes en blanco si no existe operador)
         try:
-            from application.use_cases.contact_management import add_contact_to_log
-            from domain.repositories.contact_log_repository import ContactLogRepository
-
             contact = add_contact_to_log(db_path, log_id, data, contact_type)
-            repo_log = ContactLogRepository(db_path)
             contacts = repo_log.get_contacts(log_id)
             main_window.current_log.contacts = contacts
             # Actualiza la tabla y mueve el scroll
@@ -617,94 +564,11 @@ class LogFormWidget(QWidget):
             # Si todo fue exitoso
             return True
         except Exception as e:
-            raw_errors = str(e).split(";")
-            error_map = {}
-            for err in raw_errors:
-                err = err.strip()
-                if err == "Missing received exchange.":
-                    error_map["exchange_received_input"] = translation_service.tr(
-                        "validation_missing_received_exchange"
-                    )
-                elif err == "Missing sent exchange.":
-                    error_map["exchange_sent_input"] = translation_service.tr(
-                        "validation_missing_sent_exchange"
-                    )
-                elif err.startswith("Duplicate contact"):
-                    error_map["callsign_input"] = translation_service.tr(
-                        "validation_duplicate_contact"
-                    )
-                elif err.startswith("Invalid callsign"):
-                    callsign = err.split(":", 1)[-1].strip()
-                    error_map["callsign_input"] = translation_service.tr(
-                        "validation_invalid_callsign"
-                    ).format(callsign=callsign)
-                elif err.startswith("Invalid time format"):
-                    time = err.split(":", 1)[-1].strip()
-                    error_map["time_input"] = translation_service.tr(
-                        "validation_invalid_time_format"
-                    ).format(time=time)
-                elif err == "Missing station.":
-                    error_map["station_input"] = translation_service.tr(
-                        "validation_missing_station"
-                    )
-                elif err.startswith("Invalid power value"):
-                    power = err.split(":", 1)[-1].strip()
-                    error_map["power_input"] = translation_service.tr(
-                        "validation_invalid_power_value"
-                    ).format(power=power)
-                elif err == "Missing RS_RX.":
-                    error_map["rs_rx_input"] = translation_service.tr(
-                        "validation_missing_rs_rx"
-                    )
-                elif err == "Missing RS_TX.":
-                    error_map["rs_tx_input"] = translation_service.tr(
-                        "validation_missing_rs_tx"
-                    )
-                else:
-                    error_map["other"] = err
-            if self.log_type == "contest":
-                field_order = [
-                    "callsign_input",
-                    "rs_rx_input",
-                    "exchange_received_input",
-                    "rs_tx_input",
-                    "exchange_sent_input",
-                    "observations_input",
-                ]
-            else:
-                field_order = [
-                    "callsign_input",
-                    "station_input",
-                    "energy_input",
-                    "power_input",
-                    "rs_rx_input",
-                    "rs_tx_input",
-                    "observations_input",
-                ]
-            translated_errors = []
-            focus_field = None
-            for field in field_order:
-                if field in error_map:
-                    translated_errors.append(error_map[field])
-                    if focus_field is None:
-                        if field == "callsign_input" and hasattr(
-                            self.parent(), "callsign_input"
-                        ):
-                            focus_field = self.parent().callsign_input.input
-                        elif hasattr(self, field):
-                            focus_field = getattr(self, field)
-            if "other" in error_map:
-                translated_errors.append(error_map["other"])
-            error_msg = translation_service.tr("contact_validation_error").format(
-                error="; ".join(translated_errors)
-            )
             QMessageBox.critical(
                 self,
                 translation_service.tr("main_window_title"),
-                error_msg,
+                str(e),
             )
-            if focus_field:
-                focus_field.setFocus()
             return False
 
     def retranslate_ui(self):
