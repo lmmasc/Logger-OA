@@ -22,6 +22,7 @@ from translation.translation_service import translation_service
 from application.use_cases.update_operators_from_pdf import update_operators_from_pdf
 from interface_adapters.ui.dialogs.select_log_type_dialog import SelectLogTypeDialog
 from interface_adapters.ui.dialogs.select_contest_dialog import SelectContestDialog
+from interface_adapters.ui.dialogs.enter_callsign_dialog import EnterCallsignDialog
 
 
 def action_log_new(self):
@@ -46,40 +47,16 @@ def action_log_new(self):
             return
         contest_name = contest_dialog.selected_contest
     if selected["type"]:
-        indicativo_dialog = QDialog(self)
-        indicativo_dialog.setWindowTitle(translation_service.tr("enter_callsign"))
-        indicativo_dialog.setMinimumWidth(400)
-        indicativo_layout = QVBoxLayout(indicativo_dialog)
-        indicativo_label = QLabel(translation_service.tr("enter_callsign_label"))
-        indicativo_layout.addWidget(indicativo_label)
-        callsign_edit = QLineEdit(indicativo_dialog)
-        callsign_edit.setFixedWidth(180)
-        indicativo_layout.addWidget(callsign_edit, alignment=Qt.AlignHCenter)
-        ok_btn = QPushButton(translation_service.tr("ok_button"), indicativo_dialog)
-        ok_btn.setFixedWidth(200)
-        indicativo_layout.addWidget(ok_btn, alignment=Qt.AlignHCenter)
-        indicativo = {"callsign": None}
+        # Diálogo modularizado para ingresar indicativo
+        indicativo_dialog = EnterCallsignDialog(self)
+        if not indicativo_dialog.exec() or not indicativo_dialog.callsign:
+            self.current_log = None
+            self.current_log_type = None
+            self.show_view("welcome")
+            self.update_menu_state()
+            return
+        indicativo = {"callsign": indicativo_dialog.callsign}
 
-        def set_callsign():
-            from utils.text import normalize_callsign
-
-            indicativo["callsign"] = normalize_callsign(callsign_edit.text().strip())
-            indicativo_dialog.accept()
-
-        def normalize_input():
-            from utils.text import normalize_callsign
-
-            text = callsign_edit.text()
-            normalized = normalize_callsign(text)
-            # Evita bucle infinito: solo actualiza si es diferente
-            if text != normalized:
-                callsign_edit.blockSignals(True)
-                callsign_edit.setText(normalized)
-                callsign_edit.blockSignals(False)
-
-        callsign_edit.textChanged.connect(normalize_input)
-        ok_btn.clicked.connect(set_callsign)
-        indicativo_dialog.exec()
         if indicativo["callsign"]:
             from application.use_cases.create_log import create_log
 
