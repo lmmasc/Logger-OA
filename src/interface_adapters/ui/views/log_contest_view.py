@@ -1,9 +1,19 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton
+from PySide6.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QPushButton,
+    QSizePolicy,
+)
 from PySide6.QtCore import Qt
 from translation.translation_service import translation_service
 from .callsign_input_widget import CallsignInputWidget
 from .callsign_info_widget import CallsignInfoWidget
 from .clock_widget import ClockWidget
+from .log_form_widget import LogFormWidget
+from .contact_table_widget import ContactTableWidget
+from .header_widget import HeaderWidget
+from .contact_queue_widget import ContactQueueWidget
 
 
 class LogContestView(QWidget):
@@ -12,26 +22,35 @@ class LogContestView(QWidget):
         self.callsign = callsign
         self.log_type_name = log_type_name
         self.log_date = log_date
-        from .log_form_widget import LogFormWidget
-        from .contact_table_widget import ContactTableWidget
-
-        # from .callsign_suggestion_widget import CallsignSuggestionWidget
-        from .contact_queue_widget import ContactQueueWidget
-
         layout = QVBoxLayout()
-        layout.setContentsMargins(10, 4, 10, 10)  # Márgenes reducidos
-        # Encabezado dinámico eliminado
-        # self.header = HeaderWidget("", self)
-        # layout.addWidget(self.header)
-        # Instanciar relojes sin traducción de label
-        self.oa_clock = ClockWidget("OA", "red", self, utc=False)
-        self.utc_clock = ClockWidget("UTC", "green", self, utc=True)
-        translation_service.signal.language_changed.connect(self._retranslate_clocks)
-        from PySide6.QtWidgets import QPushButton
-
-        self.add_contact_btn = QPushButton(translation_service.tr("add_contact"), self)
-        self.add_contact_btn.clicked.connect(self._on_add_contact)
-        # Formulario sin botón
+        layout.setContentsMargins(10, 4, 10, 10)
+        layout.setSpacing(2)
+        layout.setAlignment(Qt.AlignTop)
+        # Header al inicio
+        self.header_widget = HeaderWidget()
+        self.header_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        layout.addWidget(self.header_widget)
+        # Fila horizontal: input de indicativo y área de info
+        indicativo_row = QWidget(self)
+        indicativo_layout = QHBoxLayout(indicativo_row)
+        indicativo_layout.setContentsMargins(0, 0, 0, 0)
+        indicativo_layout.setSpacing(8)
+        indicativo_layout.setAlignment(Qt.AlignVCenter)
+        self.callsign_input = CallsignInputWidget(indicativo_row)
+        self.callsign_input.setFixedWidth(320)
+        self.callsign_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.callsign_info = CallsignInfoWidget(indicativo_row)
+        self.callsign_info.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        indicativo_layout.addWidget(self.callsign_input)
+        indicativo_layout.addWidget(self.callsign_info)
+        indicativo_row.setLayout(indicativo_layout)
+        indicativo_row.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        layout.addWidget(indicativo_row)
+        # Cola de contactos
+        self.queue_widget = ContactQueueWidget(self)
+        self.queue_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        layout.addWidget(self.queue_widget)
+        # Formulario de log de concurso
         self.form_widget = LogFormWidget(
             self,
             log_type="contest",
@@ -39,7 +58,19 @@ class LogContestView(QWidget):
             log_type_name=log_type_name,
             log_date=log_date,
         )
-        # Layout horizontal para relojes y botón
+        self.form_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        layout.addWidget(self.form_widget)
+        # Relojes y botón de agregar contacto
+        self.oa_clock = ClockWidget("OA", "red", self, utc=False)
+        self.utc_clock = ClockWidget("UTC", "green", self, utc=True)
+        self.add_contact_btn = QPushButton(translation_service.tr("add_contact"), self)
+        self.add_contact_btn.setObjectName("AddContactButton")
+        self.add_contact_btn.clicked.connect(self._on_add_contact)
+        # Si quieres agregar botón de eliminar contacto, descomenta:
+        # self.delete_contact_btn = QPushButton(translation_service.tr("delete_contact"), self)
+        # self.delete_contact_btn.setObjectName("DeleteContactButton")
+        # self.delete_contact_btn.setEnabled(False)
+        # self.delete_contact_btn.clicked.connect(self._on_delete_contact)
         clock_row = QWidget(self)
         clock_layout = QHBoxLayout(clock_row)
         clock_layout.setContentsMargins(0, 0, 0, 0)
@@ -47,35 +78,18 @@ class LogContestView(QWidget):
         clock_layout.addWidget(self.oa_clock)
         clock_layout.addWidget(self.utc_clock)
         clock_layout.addWidget(self.add_contact_btn)
+        # clock_layout.addWidget(self.delete_contact_btn)  # Si se agrega el botón
         clock_row.setLayout(clock_layout)
         layout.addWidget(clock_row)
-        layout.addWidget(self.form_widget)
-        # Nuevo bloque: input y área de info
-        self.callsign_input = CallsignInputWidget(self)
-        self.callsign_info = CallsignInfoWidget(self)
-        layout.addWidget(self.callsign_input)
-        layout.addWidget(self.callsign_info)
-        # Conexión de sugerencias
-        self.callsign_info.suggestionSelected.connect(self.callsign_input.set_callsign)
-        # Actualización dinámica del área de info
-        self.callsign_input.input.textChanged.connect(self.callsign_info.update_info)
-        self.callsign_info.update_info(self.callsign_input.get_callsign())
-        self.setLayout(layout)
-        translation_service.signal.language_changed.connect(self.retranslate_ui)
-
-        # Header
-        from .header_widget import HeaderWidget
-
-        self.header_widget = HeaderWidget()
-        layout.addWidget(self.header_widget)
-
+        # Tabla de contactos
         self.table_widget = ContactTableWidget(self, log_type="contest")
         layout.addWidget(self.table_widget)
-        from .contact_queue_widget import ContactQueueWidget
-
-        self.queue_widget = ContactQueueWidget(self)
-        layout.addWidget(self.queue_widget)
-
+        self.setLayout(layout)
+        # Conexiones y traducción
+        translation_service.signal.language_changed.connect(self.retranslate_ui)
+        self.callsign_info.suggestionSelected.connect(self.callsign_input.set_callsign)
+        self.callsign_input.input.textChanged.connect(self.callsign_info.update_info)
+        self.callsign_info.update_info(self.callsign_input.get_callsign())
         self.update_header()
         self.retranslate_ui()
 
