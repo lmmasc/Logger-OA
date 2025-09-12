@@ -179,3 +179,36 @@ def validate_contact_for_log(
     if "other" in error_map:
         translated_errors.append(error_map["other"])
     return {"errors": translated_errors, "focus_field": focus_field}
+
+
+def get_oa_block_from_utc(timestamp_utc):
+    """
+    Calcula el bloque horario OA (1 o 2) a partir de un timestamp UTC.
+    Retorna (bloque, hora_oa_str)
+    """
+    import datetime
+
+    dt_utc = datetime.datetime.utcfromtimestamp(timestamp_utc)
+    dt_oa = dt_utc - datetime.timedelta(hours=4)
+    minute = dt_oa.minute
+    block = 1 if 0 <= minute < 30 else 2
+    hora_oa_str = dt_oa.strftime("%H:%M")
+    return block, hora_oa_str
+
+
+def find_duplicate_in_block(callsign, timestamp, contacts):
+    """
+    Busca si el indicativo ya existe en el mismo bloque OA.
+    Retorna dict con info del contacto duplicado si existe, None si no.
+    """
+    block, _ = get_oa_block_from_utc(timestamp)
+    for c in contacts:
+        if c.get("callsign") == callsign:
+            prev_block, prev_hora_oa = get_oa_block_from_utc(c.get("timestamp"))
+            if prev_block == block:
+                return {
+                    "callsign": c.get("callsign"),
+                    "name": c.get("name", "-"),
+                    "hora_oa": prev_hora_oa,
+                }
+    return None

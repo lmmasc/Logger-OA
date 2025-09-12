@@ -372,38 +372,7 @@ class LogFormWidget(QWidget):
         data = self.get_data(callsign_val)
         if callsign_val:
             data["callsign"] = callsign_val
-        main_window = self._find_main_window()
-        db_path = getattr(main_window.current_log, "db_path", None)
-        log_id = getattr(main_window.current_log, "id", None)
-        contact_type = "operativo" if self.log_type == "ops" else "concurso"
-        # Obtener contactos existentes para validación
-        from domain.repositories.contact_log_repository import ContactLogRepository
-
-        repo_log = ContactLogRepository(db_path)
-        contacts = repo_log.get_contacts(log_id)
-        # Validar antes de agregar
-        validation = validate_contact_for_log(
-            data, contacts, contact_type, translation_service
-        )
-        if validation["errors"]:
-            error_msg = translation_service.tr("contact_validation_error").format(
-                error="; ".join(validation["errors"])
-            )
-            QMessageBox.critical(
-                self,
-                translation_service.tr("main_window_title"),
-                error_msg,
-            )
-            # Asignar foco al campo correspondiente
-            focus_field = None
-            field = validation["focus_field"]
-            if field == "callsign_input" and hasattr(self.parent(), "callsign_input"):
-                focus_field = self.parent().callsign_input.input
-            elif hasattr(self, field):
-                focus_field = getattr(self, field)
-            if focus_field:
-                focus_field.setFocus()
-            return False
+        # Validación de campos y control de foco (restaurado)
         operator = get_operator_by_callsign(callsign_val)
         main_window = self._find_main_window()
         db_path = getattr(main_window.current_log, "db_path", None)
@@ -437,6 +406,31 @@ class LogFormWidget(QWidget):
             if focus_field:
                 focus_field.setFocus()
             return False
+        # Validación de bloque OA solo si no hay errores y es concurso
+        if contact_type == "concurso":
+            from application.use_cases.contact_management import find_duplicate_in_block
+
+            duplicate = find_duplicate_in_block(
+                data["callsign"], data["timestamp"], contacts
+            )
+            if duplicate:
+                msg = (
+                    f"El indicativo {duplicate['callsign']} ({duplicate['name']}) ya fue registrado en este bloque horario OA a las {duplicate['hora_oa']}.\n"
+                    "¿Desea registrar de todas formas este contacto?"
+                )
+                reply = QMessageBox.question(
+                    self,
+                    translation_service.tr("main_window_title"),
+                    msg,
+                    QMessageBox.Yes | QMessageBox.No,
+                    QMessageBox.No,
+                )
+                if reply != QMessageBox.Yes:
+                    # Borrar campo de ingreso indicativo y dar foco
+                    if hasattr(self.parent(), "callsign_input"):
+                        self.parent().callsign_input.input.clear()
+                        self.parent().callsign_input.input.setFocus()
+                    return False
         # Si el operador existe, agregar contacto directamente
         if operator:
             try:
