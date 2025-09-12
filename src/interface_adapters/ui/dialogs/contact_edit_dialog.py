@@ -41,6 +41,10 @@ class ContactEditDialog(QDialog):
             self.inputs["country"].setText(contact.get("country", ""))
             layout.addWidget(QLabel(translation_service.tr("country")))
             layout.addWidget(self.inputs["country"])
+            self.inputs["region"] = QLineEdit(self)
+            self.inputs["region"].setText(contact.get("region", ""))
+            layout.addWidget(QLabel(translation_service.tr("region")))
+            layout.addWidget(self.inputs["region"])
             self.inputs["station"] = QComboBox(self)
             station_keys = [
                 "no_data",
