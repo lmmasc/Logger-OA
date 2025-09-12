@@ -92,6 +92,9 @@ class ContactTableWidget(QWidget):
                 translation_service.tr("table_header_callsign"),
                 translation_service.tr("name"),
                 translation_service.tr("country"),
+                translation_service.tr(
+                    "region"
+                ),  # Mover columna region después de country
                 translation_service.tr("station"),
                 translation_service.tr("energy"),
                 translation_service.tr("power"),
@@ -121,6 +124,7 @@ class ContactTableWidget(QWidget):
                 "callsign",
                 "name",
                 "country",
+                "region",  # Mover clave region después de country
                 "station",
                 "energy",
                 "power",

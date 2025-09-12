@@ -18,6 +18,7 @@ UI_TRANSLATIONS = {
     # "log_ops": "Operations View",  # migrated to log_ops.py
     "db_table": "Database Table",
     # Table header keys migrated to table_headers.py
+    "region": "Region",  # Key added for compatibility with the UI
     "yes": "YES",
     "no": "NO",
     "yes_button": "Yes",

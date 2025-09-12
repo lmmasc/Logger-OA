@@ -16,6 +16,7 @@ class SqliteRadioOperatorRepository(RadioOperatorRepository):
             operator.name,
             operator.category,
             operator.type_,
+            operator.region,  # Campo region agregado
             operator.district,
             operator.province,
             operator.department,
@@ -34,6 +35,7 @@ class SqliteRadioOperatorRepository(RadioOperatorRepository):
             operator.name,
             operator.category,
             operator.type_,
+            operator.region,  # Campo region agregado
             operator.district,
             operator.province,
             operator.department,

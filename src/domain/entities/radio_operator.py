@@ -8,6 +8,7 @@ class RadioOperator:
     name: str
     category: str
     type_: str
+    region: str  # Nuevo campo movido después de type_
     district: str
     province: str
     department: str

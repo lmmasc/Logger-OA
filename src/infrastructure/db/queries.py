@@ -62,6 +62,7 @@ def add_radio_operator(
     name,
     category,
     type_,
+    region,
     district,
     province,
     department,
@@ -79,9 +80,9 @@ def add_radio_operator(
     db_path = get_database_path()
     conn = get_connection(db_path)
     sql = (
-        "INSERT INTO radio_operators (callsign, name, category, type, district, province, department, "
+        "INSERT INTO radio_operators (callsign, name, category, type, region, district, province, department, "
         "license, resolution, expiration_date, cutoff_date, enabled, country, updated_at) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     )
     cursor = conn.cursor()
     cursor.execute(
@@ -91,6 +92,7 @@ def add_radio_operator(
             name,
             category,
             type_,
+            region,
             district,
             province,
             department,
@@ -114,7 +116,7 @@ def get_radio_operators():
     db_path = get_database_path()
     conn = get_connection(db_path)
     sql = (
-        "SELECT callsign, name, category, type, district, province, department, "
+        "SELECT callsign, name, category, type, region, district, province, department, "
         "license, resolution, expiration_date, cutoff_date, enabled, country, updated_at "
         "FROM radio_operators"
     )
@@ -130,6 +132,7 @@ def update_radio_operator(
     name,
     category,
     type_,
+    region,
     district,
     province,
     department,
@@ -147,7 +150,7 @@ def update_radio_operator(
     db_path = get_database_path()
     conn = get_connection(db_path)
     sql = (
-        "UPDATE radio_operators SET name=?, category=?, type=?, district=?, province=?, department=?, "
+        "UPDATE radio_operators SET name=?, category=?, type=?, region=?, district=?, province=?, department=?, "
         "license=?, resolution=?, expiration_date=?, cutoff_date=?, enabled=?, country=?, updated_at=? "
         "WHERE callsign=?"
     )
@@ -158,6 +161,7 @@ def update_radio_operator(
             name,
             category,
             type_,
+            region,
             district,
             province,
             department,
@@ -202,7 +206,7 @@ def get_radio_operator_by_callsign(callsign: str):
     db_path = get_database_path()
     conn = get_connection(db_path)
     sql = (
-        "SELECT callsign, name, category, type, district, province, department, "
+        "SELECT callsign, name, category, type, region, district, province, department, "
         "license, resolution, expiration_date, cutoff_date, enabled, country, updated_at "
         "FROM radio_operators WHERE callsign = ?"
     )

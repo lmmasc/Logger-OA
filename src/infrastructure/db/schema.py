@@ -8,6 +8,7 @@ def init_radioamateur_table(conn):
         name TEXT,
         category TEXT,
         type TEXT,
+        region TEXT DEFAULT '', -- Nuevo campo agregado después de type
         district TEXT,
         province TEXT,
         department TEXT,

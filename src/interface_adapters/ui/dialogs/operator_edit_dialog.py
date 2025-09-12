@@ -53,6 +53,7 @@ class OperatorEditDialog(QDialog):
             ("name", QLineEdit),
             ("category", QComboBox),
             ("type", QComboBox),
+            ("region", QLineEdit),  # Campo agregado para región
             ("district", QLineEdit),
             ("province", QLineEdit),
             ("department", QLineEdit),
@@ -167,6 +168,9 @@ class OperatorEditDialog(QDialog):
         type_val = getattr(op, "type_", "OPERADOR")
         idx_type = self.inputs["type"].findText(type_val)
         self.inputs["type"].setCurrentIndex(idx_type if idx_type >= 0 else 0)
+        self.inputs["region"].setText(
+            getattr(op, "region", "").upper()
+        )  # Cargar región
         self.inputs["district"].setText(getattr(op, "district", "").upper())
         self.inputs["province"].setText(getattr(op, "province", "").upper())
         self.inputs["department"].setText(getattr(op, "department", "").upper())

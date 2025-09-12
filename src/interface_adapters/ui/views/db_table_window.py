@@ -29,6 +29,7 @@ class DBTableWindow(QWidget):
         "name",
         "category",
         "type",
+        "region",  # Agregado campo region
         "district",
         "province",
         "department",

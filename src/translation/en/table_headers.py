@@ -4,6 +4,7 @@ TABLE_HEADERS_TRANSLATIONS = {
     "table_header_name": "Name",
     "table_header_category": "Category",
     "table_header_type": "Type",
+    "table_header_region": "Region",  # New key added
     "table_header_district": "District",
     "table_header_province": "Province",
     "table_header_department": "Department",

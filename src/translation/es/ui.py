@@ -18,6 +18,7 @@ UI_TRANSLATIONS = {
     # "log_ops": "Vista Operativo",  # migrado a log_ops.py
     "db_table": "Tabla de Base de Datos",
     # Claves de headers de tabla migradas a table_headers.py
+    "region": "Región",  # Clave agregada para compatibilidad con la UI
     "yes": "SI",
     "no": "NO",
     "yes_button": "Sí",
