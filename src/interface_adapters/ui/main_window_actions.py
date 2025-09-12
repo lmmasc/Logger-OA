@@ -20,35 +20,19 @@ from config.paths import get_database_path, get_log_dir
 from config.defaults import OPERATIONS_DIR, CONTESTS_DIR
 from translation.translation_service import translation_service
 from application.use_cases.update_operators_from_pdf import update_operators_from_pdf
+from interface_adapters.ui.dialogs.select_log_type_dialog import SelectLogTypeDialog
 
 
 def action_log_new(self):
-    # ...migrated code from MainWindow._action_log_new...
-    dialog = QDialog(self)
-    dialog.setWindowTitle(translation_service.tr("select_log_type"))
-    dialog.setMinimumWidth(400)
-    layout = QVBoxLayout(dialog)
-    label = QLabel(translation_service.tr("select_log_type_label_create"))
-    layout.addWidget(label)
-    btn_ops = QPushButton(translation_service.tr("log_type_ops"), dialog)
-    btn_contest = QPushButton(translation_service.tr("log_type_contest"), dialog)
-    btn_ops.setFixedWidth(200)
-    btn_contest.setFixedWidth(200)
-    layout.addWidget(btn_ops, alignment=Qt.AlignHCenter)
-    layout.addWidget(btn_contest, alignment=Qt.AlignHCenter)
-    selected = {"type": None}
-
-    def select_ops():
-        selected["type"] = "operation_log"
-        dialog.accept()
-
-    def select_contest():
-        selected["type"] = "contest_log"
-        dialog.accept()
-
-    btn_ops.clicked.connect(select_ops)
-    btn_contest.clicked.connect(select_contest)
-    dialog.exec()
+    # Diálogo modularizado para seleccionar tipo de log
+    dialog = SelectLogTypeDialog(self)
+    if not dialog.exec():
+        self.current_log = None
+        self.current_log_type = None
+        self.show_view("welcome")
+        self.update_menu_state()
+        return
+    selected = {"type": dialog.selected_type}
     contest_name = None
     if selected["type"] == "contest_log":
         # Diálogo para seleccionar concurso
