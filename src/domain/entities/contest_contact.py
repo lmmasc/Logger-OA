@@ -14,5 +14,4 @@ class ContestContact:
     observations: str = ""
     block: int = 1
     points: int = 0
-    time_oa: str = ""
-    time_utc: str = ""
+    timestamp: int = 0

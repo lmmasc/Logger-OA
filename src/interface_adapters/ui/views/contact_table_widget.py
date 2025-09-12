@@ -84,11 +84,14 @@ class ContactTableWidget(QWidget):
         if self.log_type == "contest":
             headers = [
                 translation_service.tr("table_header_callsign"),
-                translation_service.tr("time"),
-                translation_service.tr("exchange_received"),
-                translation_service.tr("exchange_sent"),
+                translation_service.tr("name"),
+                translation_service.tr("region"),
+                "QTR",
                 translation_service.tr("rs_rx"),
+                translation_service.tr("exchange_received"),
                 translation_service.tr("rs_tx"),
+                translation_service.tr("exchange_sent"),
+                translation_service.tr("observations"),
             ]
         else:
             headers = [
@@ -116,11 +119,14 @@ class ContactTableWidget(QWidget):
         if self.log_type == "contest":
             keys = [
                 "callsign",
-                "qtr_utc",
-                "exchange_received",
-                "exchange_sent",
+                "name",
+                "region",
+                "qtr_oa",
                 "rs_rx",
+                "exchange_received",
                 "rs_tx",
+                "exchange_sent",
+                "observations",
             ]
         else:
             keys = [
@@ -157,7 +163,7 @@ class ContactTableWidget(QWidget):
                             int(ts), tz=datetime.timezone.utc
                         )
                         dt_oa = dt_utc - datetime.timedelta(hours=5)
-                        value = dt_oa.strftime(f"%H:%M {date_fmt}")
+                        value = dt_oa.strftime("%H:%M")
                 elif key == "qtr_utc":
                     ts = contact.get("timestamp", None)
                     value = ""

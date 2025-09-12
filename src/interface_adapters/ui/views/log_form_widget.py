@@ -261,10 +261,26 @@ class LogFormWidget(QWidget):
             import uuid
 
             contact_id = str(uuid.uuid4())
-            data["id"] = contact_id
-            data["exchange_received"] = self.exchange_received_input.text()
-            data["exchange_sent"] = self.exchange_sent_input.text()
-            data["observations"] = self.observations_input.text()
+            timestamp = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
+            repo = SqliteRadioOperatorRepository()
+            operator = repo.get_operator_by_callsign(callsign_val)
+            name = operator.name if operator else "-"
+            region = operator.region if operator else "-"
+            data.update(
+                {
+                    "id": contact_id,
+                    "name": name,
+                    "region": region,
+                    "exchange_received": self.exchange_received_input.text(),
+                    "exchange_sent": self.exchange_sent_input.text(),
+                    "rs_rx": self.rs_rx_input.text(),
+                    "rs_tx": self.rs_tx_input.text(),
+                    "observations": self.observations_input.text(),
+                    "block": 1,
+                    "points": 0,
+                    "timestamp": timestamp,
+                }
+            )
         elif self.log_type == "ops":
             repo = SqliteRadioOperatorRepository()
             operator = repo.get_operator_by_callsign(callsign_val)
