@@ -95,6 +95,8 @@ class LogContestView(QWidget):
         # Evitar foco en cola y tabla
         self.queue_widget.setFocusPolicy(Qt.NoFocus)
         self.table_widget.setFocusPolicy(Qt.NoFocus)
+        self.callsign_info.setFocusPolicy(Qt.NoFocus)
+        self.callsign_input.setFocusPolicy(Qt.StrongFocus)
 
     def _on_suggestion_selected(self, callsign):
         self.callsign_input.set_callsign(callsign)
