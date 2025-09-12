@@ -161,7 +161,10 @@ class ContactTableWidget(QWidget):
                             int(ts), tz=datetime.timezone.utc
                         )
                         dt_oa = dt_utc - datetime.timedelta(hours=5)
-                        value = dt_oa.strftime("%H:%M")
+                        if self.log_type == "contest":
+                            value = dt_oa.strftime("%H:%M")
+                        else:
+                            value = dt_oa.strftime(f"%H:%M {date_fmt}")
                 elif key == "qtr_utc":
                     ts = contact.get("timestamp", None)
                     value = ""
