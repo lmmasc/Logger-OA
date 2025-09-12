@@ -120,6 +120,33 @@ class LogOpsView(QWidget):
         self.table_widget.setFocusPolicy(Qt.NoFocus)
         self.callsign_info.setFocusPolicy(Qt.NoFocus)
         self.callsign_input.setFocusPolicy(Qt.StrongFocus)
+        self.queue_widget.setFocusPolicy(Qt.NoFocus)
+        self.table_widget.setFocusPolicy(Qt.NoFocus)
+        # También para hijos internos
+        if hasattr(self.queue_widget, "queue_list"):
+            self.queue_widget.queue_list.setFocusPolicy(Qt.NoFocus)
+        if hasattr(self.table_widget, "table"):
+            self.table_widget.table.setFocusPolicy(Qt.NoFocus)
+        # Orden de tabulación: input de indicativo -> primer campo del formulario
+        if hasattr(self.form_widget, "station_input"):
+            QWidget.setTabOrder(
+                self.callsign_input.input, self.form_widget.station_input
+            )
+            QWidget.setTabOrder(
+                self.form_widget.station_input, self.form_widget.energy_input
+            )
+            QWidget.setTabOrder(
+                self.form_widget.energy_input, self.form_widget.power_input
+            )
+            QWidget.setTabOrder(
+                self.form_widget.power_input, self.form_widget.rs_rx_input
+            )
+            QWidget.setTabOrder(
+                self.form_widget.rs_rx_input, self.form_widget.rs_tx_input
+            )
+            QWidget.setTabOrder(
+                self.form_widget.rs_tx_input, self.form_widget.observations_input
+            )
 
     def _on_suggestion_selected(self, callsign):
         self.callsign_input.set_callsign(callsign)
