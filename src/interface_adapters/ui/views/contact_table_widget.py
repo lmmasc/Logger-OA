@@ -7,6 +7,7 @@ from PySide6.QtWidgets import (
 )
 from translation.translation_service import translation_service
 from config.settings_service import settings_service
+from PySide6.QtCore import Qt
 
 
 class ContactTableWidget(QWidget):
@@ -31,6 +32,8 @@ class ContactTableWidget(QWidget):
         self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         # Conectar doble clic a método personalizado
         self.table.itemDoubleClicked.connect(self._on_item_double_clicked)
+        # Evitar que la tabla reciba el foco por tabulación si no es interactiva
+        self.table.setFocusPolicy(Qt.NoFocus)
 
     def _on_item_double_clicked(self, item):
         """

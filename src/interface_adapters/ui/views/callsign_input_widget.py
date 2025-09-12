@@ -50,6 +50,9 @@ class CallsignInputWidget(QWidget):
         self.input.textChanged.connect(self._normalize_upper)
         self.input.returnPressed.connect(self._on_return_pressed)
         translation_service.signal.language_changed.connect(self.retranslate_ui)
+        # Refuerzo de tabulación: solo el campo input debe recibir el foco
+        self.setFocusPolicy(Qt.NoFocus)
+        self.input.setFocusPolicy(Qt.StrongFocus)
         self.retranslate_ui()
 
     def _normalize_upper(self, text):

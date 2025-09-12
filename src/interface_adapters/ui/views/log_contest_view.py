@@ -5,7 +5,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QSizePolicy,
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from translation.translation_service import translation_service
 from .callsign_input_widget import CallsignInputWidget
 from .callsign_info_widget import CallsignInfoWidget
@@ -96,14 +96,17 @@ class LogContestView(QWidget):
         self.queue_widget.setFocusPolicy(Qt.NoFocus)
         self.table_widget.setFocusPolicy(Qt.NoFocus)
         self.callsign_info.setFocusPolicy(Qt.NoFocus)
-        self.callsign_input.setFocusPolicy(Qt.StrongFocus)
-        self.queue_widget.setFocusPolicy(Qt.NoFocus)
-        self.table_widget.setFocusPolicy(Qt.NoFocus)
-        # También para hijos internos
+        self.callsign_input.setFocusPolicy(Qt.NoFocus)
+        self.header_widget.setFocusPolicy(Qt.NoFocus)
+        self.form_widget.setFocusPolicy(Qt.NoFocus)
+        # Refuerzo en hijos internos
         if hasattr(self.queue_widget, "queue_list"):
             self.queue_widget.queue_list.setFocusPolicy(Qt.NoFocus)
         if hasattr(self.table_widget, "table"):
             self.table_widget.table.setFocusPolicy(Qt.NoFocus)
+        # Refuerzo en botones
+        self.add_contact_btn.setFocusPolicy(Qt.StrongFocus)
+        self.delete_contact_btn.setFocusPolicy(Qt.StrongFocus)
         # Orden de tabulación: input de indicativo -> primer campo del formulario de concurso
         if hasattr(self.form_widget, "exchange_received_input"):
             QWidget.setTabOrder(

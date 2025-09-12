@@ -228,6 +228,20 @@ class LogFormWidget(QWidget):
 
         # Asignar layout principal
         self.setLayout(main_layout)
+        self.setFocusPolicy(Qt.NoFocus)
+
+        # Refuerzo de tabulación solo entre campos internos
+        if self.log_type == "contest":
+            QWidget.setTabOrder(self.rs_rx_input, self.exchange_received_input)
+            QWidget.setTabOrder(self.exchange_received_input, self.rs_tx_input)
+            QWidget.setTabOrder(self.rs_tx_input, self.exchange_sent_input)
+            QWidget.setTabOrder(self.exchange_sent_input, self.observations_input)
+        else:
+            QWidget.setTabOrder(self.station_input, self.energy_input)
+            QWidget.setTabOrder(self.energy_input, self.power_input)
+            QWidget.setTabOrder(self.power_input, self.rs_rx_input)
+            QWidget.setTabOrder(self.rs_rx_input, self.rs_tx_input)
+            QWidget.setTabOrder(self.rs_tx_input, self.observations_input)
 
     def get_data(self, callsign=None):
         """

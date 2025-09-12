@@ -4,7 +4,7 @@ Incluye formulario, cola de contactos, tabla y área de información de indicati
 """
 
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QSizePolicy, QHBoxLayout
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from translation.translation_service import translation_service
 from .log_form_widget import LogFormWidget
 from .contact_table_widget import ContactTableWidget
@@ -119,14 +119,17 @@ class LogOpsView(QWidget):
         self.queue_widget.setFocusPolicy(Qt.NoFocus)
         self.table_widget.setFocusPolicy(Qt.NoFocus)
         self.callsign_info.setFocusPolicy(Qt.NoFocus)
-        self.callsign_input.setFocusPolicy(Qt.StrongFocus)
-        self.queue_widget.setFocusPolicy(Qt.NoFocus)
-        self.table_widget.setFocusPolicy(Qt.NoFocus)
-        # También para hijos internos
+        self.callsign_input.setFocusPolicy(Qt.NoFocus)
+        self.header_widget.setFocusPolicy(Qt.NoFocus)
+        self.form_widget.setFocusPolicy(Qt.NoFocus)
+        # Refuerzo en hijos internos
         if hasattr(self.queue_widget, "queue_list"):
             self.queue_widget.queue_list.setFocusPolicy(Qt.NoFocus)
         if hasattr(self.table_widget, "table"):
             self.table_widget.table.setFocusPolicy(Qt.NoFocus)
+        # Refuerzo en botones
+        self.add_contact_btn.setFocusPolicy(Qt.StrongFocus)
+        self.delete_contact_btn.setFocusPolicy(Qt.StrongFocus)
         # Orden de tabulación: input de indicativo -> primer campo del formulario
         if hasattr(self.form_widget, "station_input"):
             QWidget.setTabOrder(

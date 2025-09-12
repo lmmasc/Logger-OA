@@ -47,6 +47,11 @@ class WelcomeView(QWidget):
 
         self.setLayout(layout)
 
+        # Evitar que los labels y el logo reciban foco por tabulación
+        self.label.setFocusPolicy(Qt.NoFocus)
+        self.logo_label.setFocusPolicy(Qt.NoFocus)
+        self.credits_label.setFocusPolicy(Qt.NoFocus)
+
         translation_service.signal.language_changed.connect(self.retranslate_ui)
 
     def retranslate_ui(self):

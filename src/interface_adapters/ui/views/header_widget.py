@@ -25,6 +25,7 @@ class HeaderWidget(QWidget):
         font.setPointSize(22)
         font.setBold(True)
         self.label.setFont(font)
+        self.label.setFocusPolicy(Qt.NoFocus)
         layout.addWidget(self.label)
         self.setLayout(layout)
 
