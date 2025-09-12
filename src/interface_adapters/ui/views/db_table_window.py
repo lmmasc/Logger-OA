@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QDialog,
     QSizePolicy,
+    QGridLayout,  # <-- Agregado para grid de checkboxes
 )
 from PySide6.QtCore import Qt
 from interface_adapters.controllers.radio_operator_controller import (
@@ -82,7 +83,7 @@ class DBTableWindow(QWidget):
         self.setLayout(main_layout)
         self._ignore_item_changed = False
         self._updating_ui = False
-        self.checkbox_layout = QHBoxLayout()
+        self.checkbox_layout = QGridLayout()  # Cambiado de QHBoxLayout a QGridLayout
         self.column_checkboxes = []
         self.headers = self.get_translated_headers()
         col_visible = settings_service.get_value("db_table_column_visible_dict", None)
@@ -90,18 +91,21 @@ class DBTableWindow(QWidget):
             col_visible = {k: True for k in self.COLUMN_KEYS}
         col_visible["callsign"] = True
         col_visible["name"] = True
+        # --- Distribuir los checkboxes en dos filas ---
+        num_cols = len(self.COLUMN_KEYS)
+        split = num_cols // 2 + num_cols % 2  # Primera fila más si es impar
         for idx, key in enumerate(self.COLUMN_KEYS):
             cb = QCheckBox(self.headers[idx])
             cb.setObjectName(key)
-            if idx in (0, 1):
-                cb.setChecked(True)
-                cb.setEnabled(False)
-            else:
-                cb.setChecked(bool(col_visible.get(key, True)))
-                cb.stateChanged.connect(partial(self.toggle_column, idx))
+            # Eliminar la lógica que los deshabilita y los deja siempre activos
+            cb.setChecked(bool(col_visible.get(key, True)))
+            cb.stateChanged.connect(partial(self.toggle_column, idx))
             self.column_checkboxes.append(cb)
-            self.checkbox_layout.addWidget(cb)
-        self.checkbox_layout.addStretch()
+            row = 0 if idx < split else 1
+            col = idx if row == 0 else idx - split
+            self.checkbox_layout.addWidget(cb, row, col)
+        self.checkbox_layout.setRowStretch(0, 1)
+        self.checkbox_layout.setRowStretch(1, 1)
         main_layout.insertLayout(1, self.checkbox_layout)
         self.load_data()
         self.filter_edit.textChanged.connect(self.apply_filter)
