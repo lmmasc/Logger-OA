@@ -13,7 +13,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QUrl, QTimer
 from PySide6.QtGui import QDesktopServices
 import os
-from config.paths import get_database_path
+from config.paths import get_database_path, BASE_PATH
 from .menu_bar import MainMenuBar
 from .themes.theme_manager import ThemeManager
 from translation.translation_service import translation_service
@@ -45,6 +45,7 @@ from .main_window_config import (
 )
 from .main_window_view_management import show_view as mw_show_view
 from .main_window_db_window import show_db_window, on_db_table_window_closed
+from interface_adapters.controllers.database_controller import DatabaseController
 
 """
 Módulo de la ventana principal de la aplicación.
@@ -194,6 +195,55 @@ class MainWindow(QMainWindow):
         self.menu_bar.db_export_requested.connect(lambda: action_db_export(self))
         self.menu_bar.db_delete_requested.connect(lambda: action_db_delete(self))
         self.menu_bar.db_show_requested.connect(self._show_db_window)
+        # --- NUEVAS ACCIONES DE BASE DE DATOS ---
+        self.menu_bar.db_backup_action.triggered.connect(self._on_db_backup)
+        self.menu_bar.db_restore_action.triggered.connect(self._on_db_restore)
+        self.menu_bar.db_import_db_action.triggered.connect(self._on_db_import_db)
+
+    def _on_db_backup(self):
+        try:
+            backup_path = DatabaseController.backup_database()
+            QMessageBox.information(self, "Backup", f"Backup creado en: {backup_path}")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"No se pudo crear el backup: {e}")
+
+    def _on_db_restore(self):
+        from PySide6.QtWidgets import QFileDialog
+        import os
+
+        backup_dir = os.path.join(BASE_PATH, "backups")
+        file_dialog = QFileDialog(self)
+        file_dialog.setWindowTitle("Seleccionar backup para restaurar")
+        file_dialog.setDirectory(backup_dir)
+        file_dialog.setFileMode(QFileDialog.ExistingFile)
+        file_dialog.setNameFilter("Backups (*.db)")
+        if file_dialog.exec():
+            selected_files = file_dialog.selectedFiles()
+            if selected_files:
+                backup_file = os.path.basename(selected_files[0])
+                try:
+                    DatabaseController.restore_database(backup_file)
+                    QMessageBox.information(
+                        self, "Restaurar", f"Base restaurada desde: {backup_file}"
+                    )
+                except Exception as e:
+                    QMessageBox.critical(self, "Error", f"No se pudo restaurar: {e}")
+
+    def _on_db_import_db(self):
+        file_dialog = QFileDialog(self)
+        file_dialog.setFileMode(QFileDialog.ExistingFile)
+        file_dialog.setNameFilter("Bases de datos (*.db)")
+        if file_dialog.exec():
+            selected_files = file_dialog.selectedFiles()
+            if selected_files:
+                external_db_path = selected_files[0]
+                try:
+                    imported = DatabaseController.import_database(external_db_path)
+                    QMessageBox.information(
+                        self, "Importar", f"Operadores importados: {imported}"
+                    )
+                except Exception as e:
+                    QMessageBox.critical(self, "Error", f"No se pudo importar: {e}")
 
     def _open_data_folder(self) -> None:
         """
