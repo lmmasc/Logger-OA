@@ -9,4 +9,8 @@ MESSAGES_TRANSLATIONS = {
     "wait_message": "Procesando, por favor espere...",
     "credits_message": "Desarrollado por Miguel OA4BAU y Raquel OA4EHN",
     "about_message": "Logger OA\nHerramienta de registro de radioaficionados para concursos y operaciones especiales.\nDesarrollado por Miguel OA4BAU y Raquel OA4EHN.",
+    "contact_add_failed": "No se pudo agregar el contacto.",
+    "contact_missing_fields": "Faltan campos obligatorios.",
+    "contact_validation_error": "Error de validación de contacto: {error}",
+    "no_log_open": "No hay un log abierto actualmente.",
 }

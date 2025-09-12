@@ -430,10 +430,13 @@ class LogFormWidget(QWidget):
                                 break
                             parent = parent.parent()
             except Exception as e:
+                error_msg = translation_service.tr("contact_validation_error").format(
+                    error=str(e)
+                )
                 QMessageBox.critical(
                     self,
                     translation_service.tr("main_window_title"),
-                    f"{translation_service.tr('contact_add_failed')}: {e}",
+                    error_msg,
                 )
             return
         # Si no existe, preguntar si desea agregarlo a la base de datos
@@ -516,10 +519,13 @@ class LogFormWidget(QWidget):
                             break
                         parent = parent.parent()
         except Exception as e:
+            error_msg = translation_service.tr("contact_validation_error").format(
+                error=str(e)
+            )
             QMessageBox.critical(
                 self,
                 translation_service.tr("main_window_title"),
-                f"{translation_service.tr('contact_add_failed')}: {e}",
+                error_msg,
             )
 
     def retranslate_ui(self):
