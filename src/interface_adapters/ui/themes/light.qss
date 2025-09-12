@@ -264,6 +264,33 @@ QHeaderView::section {
     padding: 6px 8px;
 }
 
+/* --- Scrollbars personalizados para tema claro --- */
+QScrollBar:vertical, QScrollBar:horizontal {
+    background: #f0f0f0;
+    border: none;
+    width: 12px;
+    height: 12px;
+}
+QScrollBar::handle:vertical, QScrollBar::handle:horizontal {
+    background: #c0c0c0;
+    border-radius: 6px;
+    min-height: 20px;
+    min-width: 20px;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical,
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    background: none;
+    border: none;
+}
+QScrollBar::up-arrow, QScrollBar::down-arrow,
+QScrollBar::left-arrow, QScrollBar::right-arrow {
+    background: none;
+}
+QScrollBar::handle:pressed {
+    background: #a0a0a0;
+}
+/* Fin scrollbars personalizados */
+
 /* Fin de estilos para tema claro */
 
 
