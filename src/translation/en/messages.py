@@ -23,4 +23,5 @@ MESSAGES_TRANSLATIONS = {
     "validation_missing_rs_rx": "Missing RS_RX.",
     "validation_missing_rs_tx": "Missing RS_TX.",
     "validation_missing_power": "Missing power.",
+    "table_header_power": "Pwr",
 }

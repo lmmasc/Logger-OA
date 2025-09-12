@@ -98,17 +98,15 @@ class ContactTableWidget(QWidget):
                 translation_service.tr("table_header_callsign"),
                 translation_service.tr("name"),
                 translation_service.tr("country"),
-                translation_service.tr(
-                    "region"
-                ),  # Mover columna region después de country
+                translation_service.tr("region"),
                 translation_service.tr("station"),
                 translation_service.tr("energy"),
-                translation_service.tr("power"),
+                translation_service.tr("table_header_power"),
                 translation_service.tr("rs_rx"),
                 translation_service.tr("rs_tx"),
                 translation_service.tr("clock_oa_label"),
                 translation_service.tr("clock_utc_label"),
-                translation_service.tr("observations"),  # Observaciones al final
+                translation_service.tr("observations"),
             ]
         self.table.setColumnCount(len(headers))
         self.table.setHorizontalHeaderLabels(headers)
@@ -133,7 +131,7 @@ class ContactTableWidget(QWidget):
                 "callsign",
                 "name",
                 "country",
-                "region",  # Mover clave region después de country
+                "region",
                 "station",
                 "energy",
                 "power",
@@ -141,7 +139,7 @@ class ContactTableWidget(QWidget):
                 "rs_tx",
                 "qtr_oa",
                 "qtr_utc",
-                "obs",  # Observaciones al final
+                "obs",
             ]
         self.table.setRowCount(len(contacts))
         self.table.setColumnCount(len(keys))
@@ -173,6 +171,9 @@ class ContactTableWidget(QWidget):
                         ).strftime(f"%H:%M {date_fmt}")
                 elif key in ("station", "energy"):
                     value = translation_service.tr(contact.get(key, ""))
+                elif key == "power":
+                    val = contact.get(key, "")
+                    value = f"{val} W" if val else ""
                 else:
                     value = contact.get(key, "")
                 self.table.setItem(row, col, QTableWidgetItem(str(value)))

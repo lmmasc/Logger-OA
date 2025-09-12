@@ -19,4 +19,5 @@ TABLE_HEADERS_TRANSLATIONS = {
     "table_header_exchange_tx": "Ex. (TX)",
     "table_header_interchange_rx": "Int. (RX)",
     "table_header_interchange_tx": "Int. (TX)",
+    "table_header_power": "Pot.",
 }
