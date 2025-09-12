@@ -22,4 +22,5 @@ MESSAGES_TRANSLATIONS = {
     "validation_invalid_power_value": "Invalid power value: {power}",
     "validation_missing_rs_rx": "Missing RS_RX.",
     "validation_missing_rs_tx": "Missing RS_TX.",
+    "validation_missing_power": "Missing power.",
 }

@@ -21,7 +21,9 @@ class OperationRules:
     def validate_power(contact) -> list:
         errors = []
         power = getattr(contact, "power", None)
-        if power and not power.isdigit():
+        if not power or power.strip() == "":
+            errors.append("Missing power.")
+        elif not power.isdigit():
             errors.append(f"Invalid power value: {power}")
         return errors
 

@@ -130,6 +130,10 @@ def validate_contact_for_log(
             error_map["station_input"] = translation_service.tr(
                 "validation_missing_station"
             )
+        elif err == "Missing power.":
+            error_map["power_input"] = translation_service.tr(
+                "validation_missing_power"
+            )
         elif err.startswith("Invalid power value"):
             power = err.split(":", 1)[-1].strip()
             error_map["power_input"] = translation_service.tr(
