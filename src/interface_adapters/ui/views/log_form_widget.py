@@ -228,7 +228,6 @@ class LogFormWidget(QWidget):
 
         # Asignar layout principal
         self.setLayout(main_layout)
-        self.setFocusPolicy(Qt.NoFocus)
 
         # Refuerzo de tabulación solo entre campos internos
         if self.log_type == "contest":
