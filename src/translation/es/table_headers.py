@@ -15,4 +15,8 @@ TABLE_HEADERS_TRANSLATIONS = {
     "table_header_enabled": "Habilitado",
     "table_header_country": "País",
     "table_header_updated_at": "Actualizado",
+    "table_header_exchange_rx": "Ex. (RX)",
+    "table_header_exchange_tx": "Ex. (TX)",
+    "table_header_interchange_rx": "Int. (RX)",
+    "table_header_interchange_tx": "Int. (TX)",
 }

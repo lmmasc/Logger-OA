@@ -88,9 +88,9 @@ class ContactTableWidget(QWidget):
                 translation_service.tr("region"),
                 "QTR",
                 translation_service.tr("rs_rx"),
-                translation_service.tr("exchange_received"),
+                translation_service.tr("table_header_exchange_rx"),
                 translation_service.tr("rs_tx"),
-                translation_service.tr("exchange_sent"),
+                translation_service.tr("table_header_exchange_tx"),
                 translation_service.tr("observations"),
             ]
         else:
