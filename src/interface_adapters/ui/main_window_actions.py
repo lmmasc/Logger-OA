@@ -36,16 +36,6 @@ def action_log_new(self):
         return
     selected = {"type": dialog.selected_type}
     contest_name = None
-    if selected["type"] == "contest_log":
-        # Diálogo modularizado para seleccionar concurso
-        contest_dialog = SelectContestDialog(self)
-        if not contest_dialog.exec():
-            self.current_log = None
-            self.current_log_type = None
-            self.show_view("welcome")
-            self.update_menu_state()
-            return
-        contest_name = contest_dialog.selected_contest
     if selected["type"]:
         # Diálogo modularizado para ingresar indicativo
         indicativo_dialog = EnterCallsignDialog(self)
@@ -56,6 +46,17 @@ def action_log_new(self):
             self.update_menu_state()
             return
         indicativo = {"callsign": indicativo_dialog.callsign}
+
+        if selected["type"] == "contest_log":
+            # Diálogo modularizado para seleccionar concurso
+            contest_dialog = SelectContestDialog(self)
+            if not contest_dialog.exec():
+                self.current_log = None
+                self.current_log_type = None
+                self.show_view("welcome")
+                self.update_menu_state()
+                return
+            contest_name = contest_dialog.selected_contest
 
         if indicativo["callsign"]:
             from application.use_cases.create_log import create_log
