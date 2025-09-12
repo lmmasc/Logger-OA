@@ -22,12 +22,6 @@ from interface_adapters.controllers.radio_operator_controller import (
 from translation.translation_service import translation_service
 from config.settings_service import settings_service
 from utils.text import filter_text_match
-from infrastructure.db.backup_restore import (
-    create_backup,
-    list_backups,
-    restore_backup,
-    import_from_external_db,
-)
 
 
 class DBTableWindow(QWidget):
@@ -412,34 +406,3 @@ class DBTableWindow(QWidget):
             self.filter_edit.setText(upper_text)
             self.filter_edit.setCursorPosition(cursor_pos)
             self.filter_edit.blockSignals(False)
-
-    def backup_database(self):
-        try:
-            backup_path = create_backup()
-            QMessageBox.information(self, "Backup", f"Backup creado en: {backup_path}")
-        except Exception as e:
-            QMessageBox.critical(self, "Error", f"No se pudo crear el backup: {e}")
-
-    def restore_database(self):
-        backups = list_backups()
-        if not backups:
-            QMessageBox.warning(self, "Restaurar", "No hay backups disponibles.")
-            return
-        # Selección simple: restaurar el más reciente
-        backup_file = sorted(backups)[-1]
-        try:
-            restore_backup(backup_file)
-            QMessageBox.information(
-                self, "Restaurar", f"Base restaurada desde: {backup_file}"
-            )
-        except Exception as e:
-            QMessageBox.critical(self, "Error", f"No se pudo restaurar: {e}")
-
-    def import_database(self, external_db_path):
-        try:
-            imported = import_from_external_db(external_db_path)
-            QMessageBox.information(
-                self, "Importar", f"Operadores importados: {imported}"
-            )
-        except Exception as e:
-            QMessageBox.critical(self, "Error", f"No se pudo importar: {e}")
