@@ -7,6 +7,7 @@ class OperationContact:
     id: str = ""
     name: str = "-"
     country: str = "-"
+    region: str = "-"
     station: str = "-"
     energy: str = "-"
     power: str = "-"

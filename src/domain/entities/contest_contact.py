@@ -5,6 +5,7 @@ from dataclasses import dataclass
 class ContestContact:
     callsign: str
     name: str = "-"
+    region: str = "-"
     exchange_received: str = "-"
     exchange_sent: str = "-"
     block: int = 1

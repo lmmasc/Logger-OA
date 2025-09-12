@@ -82,7 +82,7 @@ def add_radio_operator(
     sql = (
         "INSERT INTO radio_operators (callsign, name, category, type, region, district, province, department, "
         "license, resolution, expiration_date, cutoff_date, enabled, country, updated_at) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     )
     cursor = conn.cursor()
     cursor.execute(

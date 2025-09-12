@@ -172,6 +172,7 @@ class LogFormWidget(QWidget):
             "callsign": callsign_val,
             "rs_rx": self.rs_rx_input.text(),
             "rs_tx": self.rs_tx_input.text(),
+            "region": "-",
         }
         if self.log_type == "contest":
             data["exchange_received"] = self.exchange_received_input.text()
@@ -182,6 +183,7 @@ class LogFormWidget(QWidget):
             operator = repo.get_operator_by_callsign(callsign_val)
             name = operator.name if operator else ""
             country = operator.country if operator else ""
+            region = operator.region if operator else "-"
             timestamp = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
             # Definir las keys en el mismo orden que los textos
             station_keys = [
@@ -214,6 +216,7 @@ class LogFormWidget(QWidget):
                     "id": contact_id,
                     "name": name,
                     "country": country,
+                    "region": region,
                     "station": station_key,
                     "energy": energy_key,
                     "power": self.power_input.text(),
@@ -221,6 +224,7 @@ class LogFormWidget(QWidget):
                     "obs": self.observations_input.text(),
                 }
             )
+
         return data
 
     def _find_main_window(self):
@@ -362,6 +366,7 @@ class LogFormWidget(QWidget):
                 operator = repo.get_operator_by_callsign(callsign)
                 data["name"] = operator.name
                 data["country"] = operator.country
+                data["region"] = operator.region
         # Agregar contacto con los datos actuales (faltantes en blanco si no existe operador)
         try:
             from application.use_cases.contact_management import add_contact_to_log
