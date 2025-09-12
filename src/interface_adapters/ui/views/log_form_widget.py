@@ -53,99 +53,169 @@ class LogFormWidget(QWidget):
         form_row.setContentsMargins(0, 0, 0, 0)
         form_row.setAlignment(Qt.AlignLeft)
 
-        # Station
-        self.station_input = QComboBox(self)
-        self.station_input.addItems(
-            [
-                translation_service.tr("no_data"),
-                translation_service.tr("station_base"),
-                translation_service.tr("station_mobile"),
-                translation_service.tr("station_portable"),
-            ]
-        )
-        self.station_input.setCurrentIndex(0)
-        self.station_input.setFixedWidth(120)
-        self.station_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        station_label = QLabel(translation_service.tr("station"))
-        station_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        station_label.setFixedWidth(60)
-        station_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        form_row.addWidget(station_label)
-        form_row.addWidget(self.station_input)
-        self.station_label = station_label
+        if self.log_type == "contest":
+            # RS_RX
+            self.rs_rx_input = QLineEdit(self)
+            self.rs_rx_input.setText("59")
+            self.rs_rx_input.setFixedWidth(50)
+            self.rs_rx_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            rs_rx_label = QLabel(translation_service.tr("rs_rx"))
+            rs_rx_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            rs_rx_label.setFixedWidth(50)
+            rs_rx_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            form_row.addWidget(rs_rx_label)
+            form_row.addWidget(self.rs_rx_input)
+            self.rs_rx_label = rs_rx_label
 
-        # Energy
-        self.energy_input = QComboBox(self)
-        self.energy_input.addItems(
-            [
-                translation_service.tr("no_data"),
-                translation_service.tr("energy_autonomous"),
-                translation_service.tr("energy_battery"),
-                translation_service.tr("energy_commercial"),
-            ]
-        )
-        self.energy_input.setCurrentIndex(0)
-        self.energy_input.setFixedWidth(120)
-        self.energy_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        energy_label = QLabel(translation_service.tr("energy"))
-        energy_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        energy_label.setFixedWidth(60)
-        energy_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        form_row.addWidget(energy_label)
-        form_row.addWidget(self.energy_input)
-        self.energy_label = energy_label
+            # Intercambio recibido
+            self.exchange_received_input = QLineEdit(self)
+            self.exchange_received_input.setFixedWidth(80)
+            self.exchange_received_input.setSizePolicy(
+                QSizePolicy.Fixed, QSizePolicy.Fixed
+            )
+            exchange_received_label = QLabel(
+                translation_service.tr("exchange_received")
+            )
+            exchange_received_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            exchange_received_label.setFixedWidth(140)
+            exchange_received_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            form_row.addWidget(exchange_received_label)
+            form_row.addWidget(self.exchange_received_input)
+            self.exchange_received_label = exchange_received_label
 
-        # Power
-        self.power_input = QLineEdit(self)
-        self.power_input.setText("1")
-        self.power_input.setFixedWidth(60)
-        self.power_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        power_label = QLabel(f"{translation_service.tr('power')} (W)")
-        power_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        power_label.setFixedWidth(90)
-        power_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        form_row.addWidget(power_label)
-        form_row.addWidget(self.power_input)
-        self.power_label = power_label
+            # RS_TX
+            self.rs_tx_input = QLineEdit(self)
+            self.rs_tx_input.setText("59")
+            self.rs_tx_input.setFixedWidth(50)
+            self.rs_tx_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            rs_tx_label = QLabel(translation_service.tr("rs_tx"))
+            rs_tx_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            rs_tx_label.setFixedWidth(50)
+            rs_tx_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            form_row.addWidget(rs_tx_label)
+            form_row.addWidget(self.rs_tx_input)
+            self.rs_tx_label = rs_tx_label
 
-        # RS_RX
-        self.rs_rx_input = QLineEdit(self)
-        self.rs_rx_input.setText("59")
-        self.rs_rx_input.setFixedWidth(50)
-        self.rs_rx_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        rs_rx_label = QLabel(translation_service.tr("rs_rx"))
-        rs_rx_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        rs_rx_label.setFixedWidth(50)
-        rs_rx_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        form_row.addWidget(rs_rx_label)
-        form_row.addWidget(self.rs_rx_input)
-        self.rs_rx_label = rs_rx_label
+            # Intercambio enviado
+            self.exchange_sent_input = QLineEdit(self)
+            self.exchange_sent_input.setFixedWidth(80)
+            self.exchange_sent_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            exchange_sent_label = QLabel(translation_service.tr("exchange_sent"))
+            exchange_sent_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            exchange_sent_label.setFixedWidth(140)
+            exchange_sent_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            form_row.addWidget(exchange_sent_label)
+            form_row.addWidget(self.exchange_sent_input)
+            self.exchange_sent_label = exchange_sent_label
 
-        # RS_TX
-        self.rs_tx_input = QLineEdit(self)
-        self.rs_tx_input.setText("59")
-        self.rs_tx_input.setFixedWidth(50)
-        self.rs_tx_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        rs_tx_label = QLabel(translation_service.tr("rs_tx"))
-        rs_tx_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        rs_tx_label.setFixedWidth(50)
-        rs_tx_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        form_row.addWidget(rs_tx_label)
-        form_row.addWidget(self.rs_tx_input)
-        self.rs_tx_label = rs_tx_label
+            # Observaciones (expansivo)
+            self.observations_input = QLineEdit(self)
+            self.observations_input.setSizePolicy(
+                QSizePolicy.Expanding, QSizePolicy.Fixed
+            )
+            obs_label = QLabel(translation_service.tr("observations"))
+            obs_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            obs_label.setFixedWidth(40)
+            obs_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            form_row.addWidget(obs_label)
+            form_row.addWidget(self.observations_input, 1)
+            self.observations_label = obs_label
+        else:
+            # Station
+            self.station_input = QComboBox(self)
+            self.station_input.addItems(
+                [
+                    translation_service.tr("no_data"),
+                    translation_service.tr("station_base"),
+                    translation_service.tr("station_mobile"),
+                    translation_service.tr("station_portable"),
+                ]
+            )
+            self.station_input.setCurrentIndex(0)
+            self.station_input.setFixedWidth(120)
+            self.station_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            station_label = QLabel(translation_service.tr("station"))
+            station_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            station_label.setFixedWidth(60)
+            station_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            form_row.addWidget(station_label)
+            form_row.addWidget(self.station_input)
+            self.station_label = station_label
 
-        # Observaciones (expansivo)
-        self.observations_input = QLineEdit(self)
-        self.observations_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        obs_label = QLabel(translation_service.tr("observations"))
-        obs_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-        obs_label.setFixedWidth(40)
-        obs_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        form_row.addWidget(obs_label)
-        form_row.addWidget(
-            self.observations_input, 1
-        )  # stretch factor 1 para ocupar espacio restante
-        self.observations_label = obs_label
+            # Energy
+            self.energy_input = QComboBox(self)
+            self.energy_input.addItems(
+                [
+                    translation_service.tr("no_data"),
+                    translation_service.tr("energy_autonomous"),
+                    translation_service.tr("energy_battery"),
+                    translation_service.tr("energy_commercial"),
+                ]
+            )
+            self.energy_input.setCurrentIndex(0)
+            self.energy_input.setFixedWidth(120)
+            self.energy_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            energy_label = QLabel(translation_service.tr("energy"))
+            energy_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            energy_label.setFixedWidth(60)
+            energy_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            form_row.addWidget(energy_label)
+            form_row.addWidget(self.energy_input)
+            self.energy_label = energy_label
+
+            # Power
+            self.power_input = QLineEdit(self)
+            self.power_input.setText("1")
+            self.power_input.setFixedWidth(60)
+            self.power_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            power_label = QLabel(f"{translation_service.tr('power')} (W)")
+            power_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            power_label.setFixedWidth(90)
+            power_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            form_row.addWidget(power_label)
+            form_row.addWidget(self.power_input)
+            self.power_label = power_label
+
+            # RS_RX
+            self.rs_rx_input = QLineEdit(self)
+            self.rs_rx_input.setText("59")
+            self.rs_rx_input.setFixedWidth(50)
+            self.rs_rx_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            rs_rx_label = QLabel(translation_service.tr("rs_rx"))
+            rs_rx_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            rs_rx_label.setFixedWidth(50)
+            rs_rx_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            form_row.addWidget(rs_rx_label)
+            form_row.addWidget(self.rs_rx_input)
+            self.rs_rx_label = rs_rx_label
+
+            # RS_TX
+            self.rs_tx_input = QLineEdit(self)
+            self.rs_tx_input.setText("59")
+            self.rs_tx_input.setFixedWidth(50)
+            self.rs_tx_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            rs_tx_label = QLabel(translation_service.tr("rs_tx"))
+            rs_tx_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            rs_tx_label.setFixedWidth(50)
+            rs_tx_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            form_row.addWidget(rs_tx_label)
+            form_row.addWidget(self.rs_tx_input)
+            self.rs_tx_label = rs_tx_label
+
+            # Observaciones (expansivo)
+            self.observations_input = QLineEdit(self)
+            self.observations_input.setSizePolicy(
+                QSizePolicy.Expanding, QSizePolicy.Fixed
+            )
+            obs_label = QLabel(translation_service.tr("observations"))
+            obs_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            obs_label.setFixedWidth(40)
+            obs_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            form_row.addWidget(obs_label)
+            form_row.addWidget(
+                self.observations_input, 1
+            )  # stretch factor 1 para ocupar espacio restante
+            self.observations_label = obs_label
 
         # Widget del formulario
         form_row_widget = QWidget(self)
