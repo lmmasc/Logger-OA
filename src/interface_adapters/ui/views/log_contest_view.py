@@ -133,9 +133,9 @@ class LogContestView(QWidget):
     def _on_suggestion_selected(self, callsign):
         self.callsign_input.set_callsign(callsign)
         self.callsign_info.update_info(callsign)
-        # Foco al primer campo del formulario de concurso
-        if hasattr(self.form_widget, "exchange_received_input"):
-            self.form_widget.exchange_received_input.setFocus()
+        # Foco al campo RS_RX del formulario de concurso
+        if hasattr(self.form_widget, "rs_rx_input"):
+            self.form_widget.rs_rx_input.setFocus()
 
     def set_log_data(self, log):
         # Actualiza los datos del log y refresca la cabecera
