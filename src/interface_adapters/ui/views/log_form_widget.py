@@ -440,84 +440,86 @@ class LogFormWidget(QWidget):
                 return True
             except Exception as e:
                 raw_errors = str(e).split(";")
-                translated_errors = []
-                focus_field = None
+                error_map = {}
                 for err in raw_errors:
                     err = err.strip()
                     if err == "Missing received exchange.":
-                        translated_errors.append(
-                            translation_service.tr(
-                                "validation_missing_received_exchange"
-                            )
+                        error_map["exchange_received_input"] = translation_service.tr(
+                            "validation_missing_received_exchange"
                         )
-                        if focus_field is None:
-                            focus_field = self.exchange_received_input
                     elif err == "Missing sent exchange.":
-                        translated_errors.append(
-                            translation_service.tr("validation_missing_sent_exchange")
+                        error_map["exchange_sent_input"] = translation_service.tr(
+                            "validation_missing_sent_exchange"
                         )
-                        if focus_field is None:
-                            focus_field = self.exchange_sent_input
                     elif err.startswith("Duplicate contact"):
-                        translated_errors.append(
-                            translation_service.tr("validation_duplicate_contact")
+                        error_map["callsign_input"] = translation_service.tr(
+                            "validation_duplicate_contact"
                         )
-                        if focus_field is None:
-                            focus_field = (
-                                self.parent().callsign_input.input
-                                if hasattr(self.parent(), "callsign_input")
-                                else None
-                            )
                     elif err.startswith("Invalid callsign"):
                         callsign = err.split(":", 1)[-1].strip()
-                        translated_errors.append(
-                            translation_service.tr(
-                                "validation_invalid_callsign"
-                            ).format(callsign=callsign)
-                        )
-                        if focus_field is None:
-                            focus_field = (
-                                self.parent().callsign_input.input
-                                if hasattr(self.parent(), "callsign_input")
-                                else None
-                            )
+                        error_map["callsign_input"] = translation_service.tr(
+                            "validation_invalid_callsign"
+                        ).format(callsign=callsign)
                     elif err.startswith("Invalid time format"):
                         time = err.split(":", 1)[-1].strip()
-                        translated_errors.append(
-                            translation_service.tr(
-                                "validation_invalid_time_format"
-                            ).format(time=time)
-                        )
-                        # No hay campo específico, mantener foco
+                        error_map["time_input"] = translation_service.tr(
+                            "validation_invalid_time_format"
+                        ).format(time=time)
                     elif err == "Missing station.":
-                        translated_errors.append(
-                            translation_service.tr("validation_missing_station")
+                        error_map["station_input"] = translation_service.tr(
+                            "validation_missing_station"
                         )
-                        if focus_field is None and hasattr(self, "station_input"):
-                            focus_field = self.station_input
                     elif err.startswith("Invalid power value"):
                         power = err.split(":", 1)[-1].strip()
-                        translated_errors.append(
-                            translation_service.tr(
-                                "validation_invalid_power_value"
-                            ).format(power=power)
-                        )
-                        if focus_field is None and hasattr(self, "power_input"):
-                            focus_field = self.power_input
+                        error_map["power_input"] = translation_service.tr(
+                            "validation_invalid_power_value"
+                        ).format(power=power)
                     elif err == "Missing RS_RX.":
-                        translated_errors.append(
-                            translation_service.tr("validation_missing_rs_rx")
+                        error_map["rs_rx_input"] = translation_service.tr(
+                            "validation_missing_rs_rx"
                         )
-                        if focus_field is None:
-                            focus_field = self.rs_rx_input
                     elif err == "Missing RS_TX.":
-                        translated_errors.append(
-                            translation_service.tr("validation_missing_rs_tx")
+                        error_map["rs_tx_input"] = translation_service.tr(
+                            "validation_missing_rs_tx"
                         )
-                        if focus_field is None:
-                            focus_field = self.rs_tx_input
                     else:
-                        translated_errors.append(err)
+                        error_map["other"] = err
+                # Orden de campos visuales
+                if self.log_type == "contest":
+                    field_order = [
+                        "callsign_input",
+                        "rs_rx_input",
+                        "exchange_received_input",
+                        "rs_tx_input",
+                        "exchange_sent_input",
+                        "observations_input",
+                    ]
+                else:
+                    field_order = [
+                        "callsign_input",
+                        "station_input",
+                        "energy_input",
+                        "power_input",
+                        "rs_rx_input",
+                        "rs_tx_input",
+                        "observations_input",
+                    ]
+                translated_errors = []
+                focus_field = None
+                for field in field_order:
+                    if field in error_map:
+                        translated_errors.append(error_map[field])
+                        if focus_field is None:
+                            # Obtener el widget correspondiente
+                            if field == "callsign_input" and hasattr(
+                                self.parent(), "callsign_input"
+                            ):
+                                focus_field = self.parent().callsign_input.input
+                            elif hasattr(self, field):
+                                focus_field = getattr(self, field)
+                # Agregar otros errores no mapeados
+                if "other" in error_map:
+                    translated_errors.append(error_map["other"])
                 error_msg = translation_service.tr("contact_validation_error").format(
                     error="; ".join(translated_errors)
                 )
@@ -526,7 +528,6 @@ class LogFormWidget(QWidget):
                     translation_service.tr("main_window_title"),
                     error_msg,
                 )
-                # Si se identificó el campo, mover el foco SOLO al primero
                 if focus_field:
                     focus_field.setFocus()
                 return False
@@ -617,82 +618,83 @@ class LogFormWidget(QWidget):
             return True
         except Exception as e:
             raw_errors = str(e).split(";")
-            translated_errors = []
-            focus_field = None
+            error_map = {}
             for err in raw_errors:
                 err = err.strip()
                 if err == "Missing received exchange.":
-                    translated_errors.append(
-                        translation_service.tr("validation_missing_received_exchange")
+                    error_map["exchange_received_input"] = translation_service.tr(
+                        "validation_missing_received_exchange"
                     )
-                    if focus_field is None:
-                        focus_field = self.exchange_received_input
                 elif err == "Missing sent exchange.":
-                    translated_errors.append(
-                        translation_service.tr("validation_missing_sent_exchange")
+                    error_map["exchange_sent_input"] = translation_service.tr(
+                        "validation_missing_sent_exchange"
                     )
-                    if focus_field is None:
-                        focus_field = self.exchange_sent_input
                 elif err.startswith("Duplicate contact"):
-                    translated_errors.append(
-                        translation_service.tr("validation_duplicate_contact")
+                    error_map["callsign_input"] = translation_service.tr(
+                        "validation_duplicate_contact"
                     )
-                    if focus_field is None:
-                        focus_field = (
-                            self.parent().callsign_input.input
-                            if hasattr(self.parent(), "callsign_input")
-                            else None
-                        )
                 elif err.startswith("Invalid callsign"):
                     callsign = err.split(":", 1)[-1].strip()
-                    translated_errors.append(
-                        translation_service.tr("validation_invalid_callsign").format(
-                            callsign=callsign
-                        )
-                    )
-                    if focus_field is None:
-                        focus_field = (
-                            self.parent().callsign_input.input
-                            if hasattr(self.parent(), "callsign_input")
-                            else None
-                        )
+                    error_map["callsign_input"] = translation_service.tr(
+                        "validation_invalid_callsign"
+                    ).format(callsign=callsign)
                 elif err.startswith("Invalid time format"):
                     time = err.split(":", 1)[-1].strip()
-                    translated_errors.append(
-                        translation_service.tr("validation_invalid_time_format").format(
-                            time=time
-                        )
-                    )
-                    # No hay campo específico, mantener foco
+                    error_map["time_input"] = translation_service.tr(
+                        "validation_invalid_time_format"
+                    ).format(time=time)
                 elif err == "Missing station.":
-                    translated_errors.append(
-                        translation_service.tr("validation_missing_station")
+                    error_map["station_input"] = translation_service.tr(
+                        "validation_missing_station"
                     )
-                    if focus_field is None and hasattr(self, "station_input"):
-                        focus_field = self.station_input
                 elif err.startswith("Invalid power value"):
                     power = err.split(":", 1)[-1].strip()
-                    translated_errors.append(
-                        translation_service.tr("validation_invalid_power_value").format(
-                            power=power
-                        )
-                    )
-                    if focus_field is None and hasattr(self, "power_input"):
-                        focus_field = self.power_input
+                    error_map["power_input"] = translation_service.tr(
+                        "validation_invalid_power_value"
+                    ).format(power=power)
                 elif err == "Missing RS_RX.":
-                    translated_errors.append(
-                        translation_service.tr("validation_missing_rs_rx")
+                    error_map["rs_rx_input"] = translation_service.tr(
+                        "validation_missing_rs_rx"
                     )
-                    if focus_field is None:
-                        focus_field = self.rs_rx_input
                 elif err == "Missing RS_TX.":
-                    translated_errors.append(
-                        translation_service.tr("validation_missing_rs_tx")
+                    error_map["rs_tx_input"] = translation_service.tr(
+                        "validation_missing_rs_tx"
                     )
-                    if focus_field is None:
-                        focus_field = self.rs_tx_input
                 else:
-                    translated_errors.append(err)
+                    error_map["other"] = err
+            if self.log_type == "contest":
+                field_order = [
+                    "callsign_input",
+                    "rs_rx_input",
+                    "exchange_received_input",
+                    "rs_tx_input",
+                    "exchange_sent_input",
+                    "observations_input",
+                ]
+            else:
+                field_order = [
+                    "callsign_input",
+                    "station_input",
+                    "energy_input",
+                    "power_input",
+                    "rs_rx_input",
+                    "rs_tx_input",
+                    "observations_input",
+                ]
+            translated_errors = []
+            focus_field = None
+            for field in field_order:
+                if field in error_map:
+                    translated_errors.append(error_map[field])
+                    if focus_field is None:
+                        if field == "callsign_input" and hasattr(
+                            self.parent(), "callsign_input"
+                        ):
+                            focus_field = self.parent().callsign_input.input
+                        elif hasattr(self, field):
+                            focus_field = getattr(self, field)
+            if "other" in error_map:
+                translated_errors.append(error_map["other"])
             error_msg = translation_service.tr("contact_validation_error").format(
                 error="; ".join(translated_errors)
             )
@@ -701,7 +703,6 @@ class LogFormWidget(QWidget):
                 translation_service.tr("main_window_title"),
                 error_msg,
             )
-            # Si se identificó el campo, mover el foco SOLO al primero
             if focus_field:
                 focus_field.setFocus()
             return False
