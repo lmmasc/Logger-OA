@@ -22,6 +22,7 @@ def integrate_operators_to_db(operators):
 			name TEXT,
 			category TEXT,
 			type TEXT,
+            region TEXT,
 			district TEXT,
 			province TEXT,
 			department TEXT,
@@ -36,13 +37,14 @@ def integrate_operators_to_db(operators):
     )
     upsert_sql = """
 			INSERT INTO radio_operators (
-				callsign, name, category, type, district, province, department,
+				callsign, name, category, type, region, district, province, department,
 				license, resolution, expiration_date, cutoff_date, enabled, country, updated_at
-			) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			ON CONFLICT(callsign) DO UPDATE SET
 				name=excluded.name,
 				category=excluded.category,
 				type=excluded.type,
+                region=excluded.region,
 				district=excluded.district,
 				province=excluded.province,
 				department=excluded.department,
@@ -63,6 +65,7 @@ def integrate_operators_to_db(operators):
                 op["name"],
                 op["category"],
                 op["type"],
+                op.get("region", ""),
                 op["district"],
                 op["province"],
                 op["department"],
@@ -72,7 +75,7 @@ def integrate_operators_to_db(operators):
                 op.get("cutoff_date", ""),
                 op.get("enabled", 1),
                 op.get("country", ""),
-                now,
+                op.get("updated_at", now),
             ),
         )
     conn.commit()
