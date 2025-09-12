@@ -258,6 +258,10 @@ class LogFormWidget(QWidget):
             "region": "-",
         }
         if self.log_type == "contest":
+            import uuid
+
+            contact_id = str(uuid.uuid4())
+            data["id"] = contact_id
             data["exchange_received"] = self.exchange_received_input.text()
             data["exchange_sent"] = self.exchange_sent_input.text()
             data["observations"] = self.observations_input.text()

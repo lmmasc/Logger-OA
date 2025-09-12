@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class ContestContact:
+    id: str
     callsign: str
     name: str = "-"
     region: str = "-"

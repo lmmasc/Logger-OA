@@ -127,7 +127,8 @@ class LogContestView(QWidget):
                 self.form_widget.observations_input, self.add_contact_btn
             )
             QWidget.setTabOrder(self.add_contact_btn, self.delete_contact_btn)
-        # ...existing code...
+        # Habilitar el botón de eliminar solo si hay una fila seleccionada
+        self.table_widget.table.itemSelectionChanged.connect(self._on_selection_changed)
 
     def _on_suggestion_selected(self, callsign):
         self.callsign_input.set_callsign(callsign)
