@@ -1,104 +1,58 @@
 # Logger OA v2
 
+![PySide6](https://img.shields.io/badge/UI-PySide6-blue)
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![License: MIT](https://img.shields.io/badge/License-MIT-green)
+![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey)
+
 Aplicación de escritorio multiplataforma para la gestión de concursos y operaciones de radioaficionados OA (Perú), con arquitectura desacoplada, interfaz moderna y soporte para importación de datos desde PDF.
 
 ---
 
 ## Tabla de Contenidos
-- [Descripción General](#descripción-general)
-- [Características Principales](#características-principales)
-- [Arquitectura y Estructura](#arquitectura-y-estructura)
-- [Dependencias](#dependencias)
-- [Instalación y Ejecución](#instalación-y-ejecución)
-- [Guía de Uso](#guía-de-uso)
+- [Características principales](#características-principales)
+- [Requisitos previos](#requisitos-previos)
+- [Instalación](#instalación)
+- [Uso](#uso)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Contribución](#contribución)
+- [Testing](#testing)
 - [Licencia](#licencia)
+- [Créditos / Autoría](#créditos--autoría)
 
 ---
 
-## Descripción General
-Logger OA v2 es una aplicación de escritorio para registrar, consultar y gestionar concursos y operaciones de radioaficionados OA (Perú). Permite llevar un control detallado de contactos, concursos, operadores y actividades, con soporte para temas claro/oscuro, persistencia en SQLite, importación de operadores desde PDF y una interfaz moderna basada en PySide6 (Qt).
+## Características principales
+- Gestión de concursos y operaciones de radioaficionados OA.
+- Base de datos local SQLite, sin dependencias externas.
+- Importación automática de operadores OA desde listados oficiales en PDF.
+- Feedback visual en importación: diálogo de espera traducido y resumen detallado (total, nuevos, actualizados, deshabilitados, rehabilitados).
+- Interfaz gráfica moderna con PySide6 (Qt), temas claro/oscuro y cambio de idioma.
+- Arquitectura desacoplada basada en Clean Architecture.
+- Scripts de build para Linux, Windows y macOS.
+- Internacionalización modular y extensible.
+- Pruebas unitarias y de integración con pytest.
 
 ---
 
-## Características Principales
-- **Gestión de concursos y operaciones**: Registro, consulta y exportación de logs.
-- **Base de datos local**: Persistencia en SQLite, sin dependencias externas.
-- **Importación desde PDF**: Extracción automática de operadores OA desde listados oficiales en PDF.
-- **Feedback visual en importación**: Durante la importación desde PDF se muestra un diálogo de espera traducido y, al finalizar, un resumen detallado (total, nuevos, actualizados, deshabilitados, rehabilitados).
-- **Interfaz moderna**: UI con PySide6, soporte para temas claro/oscuro y cambio de idioma (internacionalización).
-- **Arquitectura desacoplada**: Basada en Clean Architecture para facilitar mantenimiento y escalabilidad.
-- **Soporte multiplataforma**: Funciona en Linux, Windows y macOS.
+## Requisitos previos
+- **Python** >= 3.10
+- **pip**
+- **Linux, Windows o macOS**
+- Recomendado: entorno virtual (`venv`)
+
+### Dependencias principales
+- `PySide6>=6.9.2`
+- `pdfplumber`
+- `reportlab`
+- `sqlite3` (incluida en Python)
+
+### Dependencias de desarrollo
+- `pyinstaller` (para generar ejecutables)
 
 ---
 
-## Arquitectura y Estructura
-El proyecto sigue los principios de Clean Architecture, separando responsabilidades en capas bien definidas:
-
-```
-src/
-  main.py                  # Punto de entrada de la aplicación
-  domain/                  # Entidades y lógica de negocio pura
-    entities/              # Modelos de dominio (Operador, Concurso, Contacto, etc.)
-    repositories/          # Interfaces de repositorios
-    use_cases/             # Casos de uso del dominio
-  application/             # Casos de uso y lógica de aplicación
-    use_cases/             # Casos de uso específicos (gestión, actualización, importación desde PDF, etc.)
-  infrastructure/          # Implementaciones técnicas
-    db/                    # Acceso y gestión de base de datos SQLite
-    pdf/                   # Extracción y procesamiento de PDF
-    repositories/          # Repositorios concretos
-  interface_adapters/      # Adaptadores de interfaz
-    ui/                    # Interfaz gráfica (PySide6)
-      views/               # Vistas principales (Welcome, LogOps, LogContest, DBTableWindow, etc.)
-      dialogs/             # Diálogos y ventanas auxiliares (incl. feedback visual)
-      themes/              # Temas visuales (claro/oscuro)
-    controllers/           # Controladores de UI
-  config/                  # Configuración, rutas y settings
-  translation/             # Internacionalización y traducciones
-  utils/                   # Utilidades puras
-assets/                    # Recursos gráficos (iconos, GIFs de feedback, etc.)
-tests/                     # Pruebas unitarias y de integración
-```
-
-### Diagrama de Capas (Clean Architecture)
-
-```
-[ UI / Interface Adapters ] <--> [ Application ] <--> [ Domain ] <--> [ Infrastructure ]
-```
-
----
-
-## Modularización y Arquitectura de la UI
-
-La interfaz gráfica principal (`MainWindow`) está dividida en módulos temáticos para facilitar el mantenimiento y la escalabilidad. Los archivos con prefijo `main_window_` agrupan la lógica de acciones, diálogos, configuración, gestión de vistas y ventanas secundarias:
-
-```
-interface_adapters/ui/
-  main_window.py                  # Clase principal de la ventana
-  main_window_actions.py          # Handlers de acciones del menú
-  main_window_dialogs.py          # Diálogos personalizados
-  main_window_config.py           # Configuración y actualización de UI
-  main_window_view_management.py  # Gestión de vistas y navegación
-  main_window_db_window.py        # Gestión de ventana de base de datos
-```
-
----
-
-## Dependencias
-
-**Principales:**
-- [PySide6](https://doc.qt.io/qtforpython/) (>=6.9.2): Interfaz gráfica Qt para Python.
-- [pdfplumber](https://github.com/jsvine/pdfplumber): Extracción de datos desde PDF.
-- [sqlite3](https://docs.python.org/3/library/sqlite3.html): Base de datos embebida (incluida en Python).
-
-**Desarrollo:**
-- pyinstaller: Generación de ejecutables standalone.
-
-Instalación automática desde `requirements.txt` y `requirements-dev.txt`.
-
----
-
-## Instalación y Ejecución
+## Instalación
 
 1. Clona el repositorio y accede a la carpeta del proyecto:
    ```bash
@@ -108,7 +62,8 @@ Instalación automática desde `requirements.txt` y `requirements-dev.txt`.
 2. Crea y activa un entorno virtual:
    ```bash
    python3 -m venv .venv
-   source .venv/bin/activate
+   source .venv/bin/activate  # Linux/macOS
+   .venv\Scripts\activate   # Windows
    ```
 3. Instala las dependencias:
    ```bash
@@ -123,23 +78,66 @@ Instalación automática desde `requirements.txt` y `requirements-dev.txt`.
 
 ---
 
-## Guía de Uso
+## Uso
 
-1. **Inicio**: Al abrir la aplicación, se muestra la pantalla de bienvenida.
-2. **Gestión de Operadores**: Importa operadores OA desde PDF oficiales (menú: Importar PDF), consulta y edita la base de datos local. Al finalizar la importación, se muestra un resumen detallado de la operación.
-3. **Gestión de Concursos y Operaciones**: Crea, edita y exporta logs de concursos y operaciones.
-4. **Temas e Idioma**: Cambia entre tema claro/oscuro y selecciona idioma desde el menú principal.
-5. **Persistencia**: Todos los datos se guardan automáticamente en la base SQLite local.
+### Ejecución desde consola
+```bash
+python src/main.py
+```
+
+### Ejemplo de uso como módulo
+```python
+from src.application.use_cases.update_operators_from_pdf import update_operators_from_pdf
+resultado = update_operators_from_pdf('BaseDocs/396528-radioaficionados_autorizados_al_13ago2025.pdf')
+print(resultado)
+```
+
+### Ejemplo práctico: Importar operadores OA desde PDF
+1. Abre la aplicación.
+2. Ve al menú "Importar PDF" y selecciona el archivo oficial.
+3. Al finalizar, se muestra un resumen detallado (total, nuevos, actualizados, deshabilitados, rehabilitados).
 
 ---
 
-## Pruebas
+## Estructura del proyecto
 
-Las pruebas unitarias y de integración se encuentran en la carpeta `tests/` y utilizan `pytest`.
+El proyecto sigue los principios de Clean Architecture, separando responsabilidades en capas bien definidas:
 
-Para ejecutar todas las pruebas:
-```bash
-pytest
+```text
+src/
+  main.py                  # Punto de entrada de la aplicación
+  domain/                  # Entidades y lógica de negocio pura
+    entities/              # Modelos de dominio (Operador, Concurso, Contacto, etc.)
+    repositories/          # Interfaces de repositorios
+    use_cases/             # Casos de uso del dominio
+  application/             # Casos de uso y lógica de aplicación
+    use_cases/             # Gestión, importación desde PDF, etc.
+  infrastructure/          # Implementaciones técnicas
+    db/                    # Acceso y gestión de base de datos SQLite
+    pdf/                   # Extracción y procesamiento de PDF
+    repositories/          # Repositorios concretos
+  interface_adapters/      # Adaptadores de interfaz
+    ui/                    # Interfaz gráfica (PySide6)
+      views/               # Vistas principales (Welcome, LogOps, LogContest, DBTableWindow, etc.)
+      dialogs/             # Diálogos y ventanas auxiliares (incl. feedback visual)
+      themes/              # Temas visuales (claro/oscuro)
+    controllers/           # Controladores de UI
+  config/                  # Configuración, rutas y settings
+  translation/             # Internacionalización y traducciones
+  utils/                   # Utilidades puras
+assets/                    # Recursos gráficos (iconos, GIFs, etc.)
+BaseDocs/                  # Documentos oficiales OA (PDF)
+scripts/                   # Scripts de build multiplataforma
+  build-linux.sh           # Build para Linux
+  build-mac.sh             # Build para macOS
+  build-windows.bat        # Build para Windows
+tests/                     # Pruebas unitarias y de integración
+```
+
+### Diagrama de Capas (Clean Architecture)
+
+```
+[ UI / Interface Adapters ] <--> [ Application ] <--> [ Domain ] <--> [ Infrastructure ]
 ```
 
 ---
@@ -168,21 +166,33 @@ Ejecuta el script correspondiente para generar el ejecutable standalone.
 
 ## Contribución
 
-¡Contribuciones son bienvenidas! Para colaborar:
+Las contribuciones son bienvenidas. Para colaborar:
 - Sigue la arquitectura y estilo modular del proyecto.
 - Usa `pytest` para pruebas.
-- Reporta bugs o solicita mejoras vía issues en el repositorio.
+- Reporta bugs o solicita mejoras vía issues.
 - Antes de hacer un pull request, asegúrate de que las pruebas pasen y la documentación esté actualizada.
 
 ---
 
-## Requisitos del Sistema
-- Python >= 3.10
-- Linux, Windows o macOS
-- Recomendado: entorno virtual para aislar dependencias
+## Testing
+
+Las pruebas unitarias y de integración se encuentran en la carpeta `tests/` y utilizan `pytest`.
+
+Para ejecutar todas las pruebas:
+```bash
+pytest
+```
 
 ---
 
 ## Licencia
 
-MIT
+Este proyecto está bajo la licencia MIT. Puedes modificar, distribuir y usar libremente el código.
+
+---
+
+## Créditos / Autoría
+
+Desarrollado por la comunidad OA Perú y colaboradores.
+
+Si usas este software, por favor cita el repositorio y contribuye con mejoras.
