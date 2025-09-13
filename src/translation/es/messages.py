@@ -24,6 +24,6 @@ MESSAGES_TRANSLATIONS = {
     "validation_missing_rs_tx": "Falta RS_TX.",
     "validation_missing_power": "Falta potencia.",
     "table_header_power": "Pot.",
-    "export_success": "Base de datos exportada correctamente.",
-    "export_failed": "Error al exportar la base de datos.",
+    "export_success": "El log fue exportado correctamente.",
+    "export_failed": "Error al exportar el log.",
 }
