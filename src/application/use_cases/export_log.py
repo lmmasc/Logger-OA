@@ -350,7 +350,9 @@ def export_log_to_adi(db_path: str, export_path: str) -> str:
             pass
     # Generar ADIF
     adif_lines = []
-    adif_lines.append("<ADIF_VER:5>3.1.0 <EOH>")
+    adif_lines.append(
+        f"<ADIF_VER:5>3.1.0 <STATION_CALLSIGN:{len(operator)}>{operator} <EOH>"
+    )
     contest_types = ("concurso", "contest", "contest_log", "contestlog")
     log_type_normalized = str(log_type).lower()
     is_contest = log_type_normalized in contest_types
