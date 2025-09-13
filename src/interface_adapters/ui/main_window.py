@@ -32,7 +32,7 @@ from .main_window_actions import (
     action_db_delete,
     on_menu_action,
 )
-from .main_window_dialogs import show_about_dialog
+from .main_window_dialogs import show_about_dialog, show_manual_dialog
 from .main_window_config import (
     set_language,
     set_light_theme,
@@ -179,6 +179,7 @@ class MainWindow(QMainWindow):
         Conecta las señales personalizadas de la barra de menús a los handlers de MainWindow.
         """
         self.menu_bar.exit_requested.connect(self.close)
+        self.menu_bar.manual_requested.connect(lambda: show_manual_dialog(self))
         self.menu_bar.about_requested.connect(lambda: show_about_dialog(self))
         self.menu_bar.open_folder_requested.connect(self._open_data_folder)
         self.menu_bar.light_theme_requested.connect(self.set_light_theme)

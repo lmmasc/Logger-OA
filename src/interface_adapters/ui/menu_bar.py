@@ -34,6 +34,7 @@ class MainMenuBar(QMenuBar):
     dark_theme_requested = Signal()
     lang_es_requested = Signal()
     lang_en_requested = Signal()
+    manual_requested = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -138,6 +139,8 @@ class MainMenuBar(QMenuBar):
         # Menú Ayuda
         self.help_menu = QMenu(translation_service.tr("menu_help_menu"), self)
         self.about_action = QAction(translation_service.tr("menu_about"), self)
+        self.manual_action = QAction(translation_service.tr("menu_manual"), self)
+        self.help_menu.addAction(self.manual_action)
         self.help_menu.addAction(self.about_action)
         self.addMenu(self.help_menu)
 
@@ -160,6 +163,7 @@ class MainMenuBar(QMenuBar):
         self.dark_theme_action.triggered.connect(self.dark_theme_requested.emit)
         self.lang_es_action.triggered.connect(self.lang_es_requested.emit)
         self.lang_en_action.triggered.connect(self.lang_en_requested.emit)
+        self.manual_action.triggered.connect(self.manual_requested.emit)
 
     def retranslate_ui(self):
         """
@@ -196,3 +200,4 @@ class MainMenuBar(QMenuBar):
 
         self.help_menu.setTitle(translation_service.tr("menu_help_menu"))
         self.about_action.setText(translation_service.tr("menu_about"))
+        self.manual_action.setText(translation_service.tr("menu_manual"))
