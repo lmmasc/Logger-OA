@@ -213,7 +213,6 @@ def action_log_export(self):
     if not dialog.exec() or not dialog.selected_ext:
         return
     selected_ext = dialog.selected_ext
-    # Obtener nombre base del archivo sqlite
     db_path = getattr(self.current_log, "db_path", None)
     if not db_path:
         from PySide6.QtWidgets import QMessageBox
@@ -241,10 +240,37 @@ def action_log_export(self):
     )
     if not export_path:
         return
-    print(
-        f"[EXPORT] Exportar log tipo {log_type} a: {export_path} con extensión: {selected_ext}"
-    )
-    # TODO: Implementar la lógica de exportación real según formato seleccionado
+    # Conectar con la función real de exportación
+    from application.use_cases import export_log
+
+    try:
+        if selected_ext == ".txt":
+            export_log.export_log_to_txt(db_path, export_path)
+        elif selected_ext == ".csv":
+            export_log.export_log_to_csv(db_path, export_path)
+        elif selected_ext == ".adi":
+            export_log.export_log_to_adi(db_path, export_path)
+        elif selected_ext == ".pdf":
+            export_log.export_log_to_pdf(db_path, export_path)
+        else:
+            raise ValueError(f"Formato no soportado: {selected_ext}")
+        print(f"[EXPORT] Exportación completada: {export_path}")
+        from PySide6.QtWidgets import QMessageBox
+
+        QMessageBox.information(
+            self,
+            translation_service.tr("export_log"),
+            translation_service.tr("export_success"),
+        )
+    except Exception as e:
+        print(f"[EXPORT] Error: {e}")
+        from PySide6.QtWidgets import QMessageBox
+
+        QMessageBox.critical(
+            self,
+            translation_service.tr("export_log"),
+            f"{translation_service.tr('export_failed')}: {e}",
+        )
 
 
 def action_log_close(self):

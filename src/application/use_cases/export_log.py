@@ -5,6 +5,15 @@ from config.paths import get_export_dir
 from utils.resources import get_resource_path
 
 
+def export_log_to_txt(db_path: str, export_path: str) -> str:
+    """
+    Exporta el log a un archivo TXT. Implementación pendiente.
+    """
+    # TODO: Implementar exportación a TXT
+    print(f"[EXPORT] TXT: {db_path} -> {export_path}")
+    return export_path
+
+
 def export_log_to_csv(db_path: str, export_filename: str = None) -> str:
     """
     Exporta todos los contactos de un log a un archivo CSV en la carpeta de exportación.
@@ -47,4 +56,22 @@ def export_log_to_csv(db_path: str, export_filename: str = None) -> str:
             writer.writerow(
                 contact.__dict__ if hasattr(contact, "__dict__") else contact
             )
+    return export_path
+
+
+def export_log_to_adi(db_path: str, export_path: str) -> str:
+    """
+    Exporta el log a un archivo ADI. Implementación pendiente.
+    """
+    # TODO: Implementar exportación a ADI
+    print(f"[EXPORT] ADI: {db_path} -> {export_path}")
+    return export_path
+
+
+def export_log_to_pdf(db_path: str, export_path: str) -> str:
+    """
+    Exporta el log a un archivo PDF. Implementación pendiente.
+    """
+    # TODO: Implementar exportación a PDF
+    print(f"[EXPORT] PDF: {db_path} -> {export_path}")
     return export_path
