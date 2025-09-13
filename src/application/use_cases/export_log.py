@@ -295,10 +295,64 @@ def export_log_to_csv(
 
 def export_log_to_adi(db_path: str, export_path: str) -> str:
     """
-    Exporta el log a un archivo ADI. Implementación pendiente.
+    Exporta el log a un archivo ADI (ADIF) usando los campos mínimos recomendados.
     """
-    # TODO: Implementar exportación a ADI
-    print(f"[EXPORT] ADI: {db_path} -> {export_path}")
+    import sqlite3
+    from domain.repositories.contact_log_repository import ContactLogRepository
+    import datetime
+
+    repo = ContactLogRepository(db_path)
+    with sqlite3.connect(db_path) as conn:
+        c = conn.cursor()
+        c.execute(
+            "SELECT id, type, operator, start_time, end_time, metadata FROM logs LIMIT 1"
+        )
+        row = c.fetchone()
+        if not row:
+            raise FileNotFoundError("No se encontró ningún log en la base de datos.")
+        log_id = row[0]
+        log_type = row[1]
+        operator = row[2]
+        start_time = row[3]
+    contacts = repo.get_contacts(log_id)
+    if not contacts:
+        raise ValueError("No hay contactos para exportar.")
+    # Generar ADIF
+    adif_lines = []
+    adif_lines.append("<ADIF_VER:5>3.1.0 <EOH>")
+    for contact in contacts:
+        # Campos mínimos
+        callsign = contact.get("callsign", "")
+        ts = contact.get("timestamp", None)
+        if ts:
+            dt_utc = datetime.datetime.utcfromtimestamp(int(ts))
+            qso_date = dt_utc.strftime("%Y%m%d")
+            time_on = dt_utc.strftime("%H%M%S")
+        else:
+            qso_date = ""
+            time_on = ""
+        # Banda/frecuencia
+        band = (
+            contact.get("band", "")
+            or contact.get("frequency_band", "")
+            or contact.get("freq", "")
+        )
+        mode = contact.get("mode", "")
+        rst_sent = contact.get("rs_tx", "") or contact.get("exchange_sent", "")
+        rst_rcvd = contact.get("rs_rx", "") or contact.get("exchange_received", "")
+        # Construir línea ADIF
+        adif_entry = (
+            f"<CALL:{len(callsign)}>{callsign} "
+            f"<QSO_DATE:{len(qso_date)}>{qso_date} "
+            f"<TIME_ON:{len(time_on)}>{time_on} "
+            f"<BAND:{len(band)}>{band} "
+            f"<MODE:{len(mode)}>{mode} "
+            f"<RST_SENT:{len(rst_sent)}>{rst_sent} "
+            f"<RST_RCVD:{len(rst_rcvd)}>{rst_rcvd} <EOR>"
+        )
+        adif_lines.append(adif_entry)
+    with open(export_path, "w", encoding="utf-8") as adif_file:
+        adif_file.write("\n".join(adif_lines))
     return export_path
 
 
