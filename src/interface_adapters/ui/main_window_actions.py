@@ -213,20 +213,31 @@ def action_log_export(self):
     if not dialog.exec() or not dialog.selected_ext:
         return
     selected_ext = dialog.selected_ext
-    # Definir filtro y nombre por defecto
-    if log_type == "ops":
-        file_types = f"{selected_ext.upper()} (*{selected_ext})"
-        default_filename = f"operativo_export{selected_ext}"
-    else:
-        file_types = f"{selected_ext.upper()} (*{selected_ext})"
-        default_filename = f"concurso_export{selected_ext}"
+    # Obtener nombre base del archivo sqlite
+    db_path = getattr(self.current_log, "db_path", None)
+    if not db_path:
+        from PySide6.QtWidgets import QMessageBox
+
+        QMessageBox.warning(
+            self,
+            translation_service.tr("main_window_title"),
+            translation_service.tr("no_db_path"),
+        )
+        return
+    import os
+
+    base_name = os.path.splitext(os.path.basename(db_path))[0]
+    default_filename = f"{base_name}{selected_ext}"
+    from config.paths import get_export_dir
+
+    export_dir = get_export_dir()
     from PySide6.QtWidgets import QFileDialog
 
     export_path, _ = QFileDialog.getSaveFileName(
         self,
         translation_service.tr("export_log"),
-        default_filename,
-        file_types,
+        os.path.join(export_dir, default_filename),
+        f"{selected_ext.upper()} (*{selected_ext})",
     )
     if not export_path:
         return
