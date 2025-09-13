@@ -37,13 +37,12 @@ def export_log_to_txt(db_path: str, export_path: str, translation_service=None) 
     # Headers y campos como en ContactTableWidget
     print(f"[EXPORT][DEBUG] log_type recibido: {log_type}")
     log_type_normalized = str(log_type).lower()
-    print(f"[EXPORT][DEBUG] log_type_normalized: {log_type_normalized}")
+    # contest_types y operation_types como antes
     contest_types = ("concurso", "contest", "contest_log", "contestlog")
     operation_types = ("operativo", "ops", "operation_log", "operationlog")
     is_contest = log_type_normalized in contest_types
     print(f"[EXPORT][DEBUG] is_contest: {is_contest}")
     if is_contest:
-        print("[EXPORT][DEBUG] Usando headers de concurso")
         headers = [
             translation_service.tr("table_header_callsign"),
             translation_service.tr("name"),
@@ -67,7 +66,6 @@ def export_log_to_txt(db_path: str, export_path: str, translation_service=None) 
             "observations",
         ]
     else:
-        print("[EXPORT][DEBUG] Usando headers de operativo")
         headers = [
             translation_service.tr("table_header_callsign"),
             translation_service.tr("name"),
@@ -181,13 +179,12 @@ def export_log_to_csv(
     # Headers y campos como en ContactTableWidget
     print(f"[EXPORT][DEBUG] log_type recibido: {log_type}")
     log_type_normalized = str(log_type).lower()
-    print(f"[EXPORT][DEBUG] log_type_normalized: {log_type_normalized}")
+    # contest_types y operation_types como antes
     contest_types = ("concurso", "contest", "contest_log", "contestlog")
     operation_types = ("operativo", "ops", "operation_log", "operationlog")
     is_contest = log_type_normalized in contest_types
     print(f"[EXPORT][DEBUG] is_contest: {is_contest}")
     if is_contest:
-        print("[EXPORT][DEBUG] Usando headers de concurso")
         headers = [
             translation_service.tr("table_header_callsign"),
             translation_service.tr("name"),
@@ -211,7 +208,6 @@ def export_log_to_csv(
             "observations",
         ]
     else:
-        print("[EXPORT][DEBUG] Usando headers de operativo")
         headers = [
             translation_service.tr("table_header_callsign"),
             translation_service.tr("name"),
