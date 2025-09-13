@@ -441,10 +441,10 @@ class LogFormWidget(QWidget):
                 if hasattr(main_window, "view_manager"):
                     if (
                         self.log_type == "ops"
-                        and "log_ops" in main_window.view_manager.views
+                        and "log_ops_view" in main_window.view_manager.views
                     ):
                         table_widget = main_window.view_manager.views[
-                            "log_ops"
+                            "log_ops_view"
                         ].table_widget
                         table = table_widget.table
                         table_widget.set_contacts(contacts)
@@ -460,10 +460,10 @@ class LogFormWidget(QWidget):
                             parent = parent.parent()
                     elif (
                         self.log_type == "contest"
-                        and "log_contest" in main_window.view_manager.views
+                        and "log_contest_view" in main_window.view_manager.views
                     ):
                         table_widget = main_window.view_manager.views[
-                            "log_contest"
+                            "log_contest_view"
                         ].table_widget
                         table = table_widget.table
                         table_widget.set_contacts(contacts)
@@ -519,10 +519,10 @@ class LogFormWidget(QWidget):
             if hasattr(main_window, "view_manager"):
                 if (
                     self.log_type == "ops"
-                    and "log_ops" in main_window.view_manager.views
+                    and "log_ops_view" in main_window.view_manager.views
                 ):
                     table_widget = main_window.view_manager.views[
-                        "log_ops"
+                        "log_ops_view"
                     ].table_widget
                     table = table_widget.table
                     table_widget.set_contacts(contacts)
@@ -538,10 +538,10 @@ class LogFormWidget(QWidget):
                         parent = parent.parent()
                 elif (
                     self.log_type == "contest"
-                    and "log_contest" in main_window.view_manager.views
+                    and "log_contest_view" in main_window.view_manager.views
                 ):
                     table_widget = main_window.view_manager.views[
-                        "log_contest"
+                        "log_contest_view"
                     ].table_widget
                     table = table_widget.table
                     table_widget.set_contacts(contacts)

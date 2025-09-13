@@ -104,11 +104,11 @@ class MainWindow(QMainWindow):
         # Instanciar vistas solo una vez
         self.log_ops_view = LogOpsView(self)
         self.log_contest_view = LogContestView(self)
-        self.view_manager.register_view("welcome", WelcomeView(self))
-        self.view_manager.register_view("log_ops", self.log_ops_view)
-        self.view_manager.register_view("log_contest", self.log_contest_view)
+        self.view_manager.register_view("welcome_view", WelcomeView(self))
+        self.view_manager.register_view("log_ops_view", self.log_ops_view)
+        self.view_manager.register_view("log_contest_view", self.log_contest_view)
         self.setCentralWidget(self.view_manager.get_widget())
-        self.view_manager.show_view("welcome")
+        self.view_manager.show_view("welcome_view")
 
         # Conectar acciones del menú de forma explícita
         self._connect_menu_actions()
@@ -130,20 +130,23 @@ class MainWindow(QMainWindow):
         """
         Muestra la vista indicada y actualiza los datos de contactos y cabecera si hay un log abierto.
         """
+        # Refactor: actualizar los nombres internos de las vistas
         mw_show_view(self, view_name)
         # Actualizar la tabla de contactos en la vista activa si hay un log abierto
         if self.current_log is not None:
             contacts = getattr(self.current_log, "contacts", [])
-            if view_name == "log_ops" and hasattr(self.log_ops_view, "table_widget"):
+            if view_name == "log_ops_view" and hasattr(
+                self.log_ops_view, "table_widget"
+            ):
                 self.log_ops_view.table_widget.set_contacts(contacts)
-            elif view_name == "log_contest" and hasattr(
+            elif view_name == "log_contest_view" and hasattr(
                 self.log_contest_view, "table_widget"
             ):
                 self.log_contest_view.table_widget.set_contacts(contacts)
         # Actualizar cabecera de la vista activa
-        if view_name == "log_contest" and self.current_log:
+        if view_name == "log_contest_view" and self.current_log:
             self.log_contest_view.set_log_data(self.current_log)
-        elif view_name == "log_ops" and self.current_log:
+        elif view_name == "log_ops_view" and self.current_log:
             self.log_ops_view.set_log_data(self.current_log)
 
     # =====================

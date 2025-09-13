@@ -31,7 +31,7 @@ def action_log_new(self):
     if not dialog.exec():
         self.current_log = None
         self.current_log_type = None
-        self.show_view("welcome")
+        self.show_view("welcome_view")
         self.update_menu_state()
         return
     selected = {"type": dialog.selected_type}
@@ -42,7 +42,7 @@ def action_log_new(self):
         if not indicativo_dialog.exec() or not indicativo_dialog.callsign:
             self.current_log = None
             self.current_log_type = None
-            self.show_view("welcome")
+            self.show_view("welcome_view")
             self.update_menu_state()
             return
         indicativo = {"callsign": indicativo_dialog.callsign}
@@ -53,7 +53,7 @@ def action_log_new(self):
             if not contest_dialog.exec():
                 self.current_log = None
                 self.current_log_type = None
-                self.show_view("welcome")
+                self.show_view("welcome_view")
                 self.update_menu_state()
                 return
             contest_name = contest_dialog.selected_contest
@@ -106,15 +106,15 @@ def action_log_new(self):
                 self.setWindowTitle(cabecera)
             else:
                 self.setWindowTitle(f"{log.operator} - Operativo - {log.start_time}")
-            self.show_view(f"log_{self.current_log_type}")
+            self.show_view(f"log_{self.current_log_type}_view")
         else:
             self.current_log = None
             self.current_log_type = None
-            self.show_view("welcome")
+            self.show_view("welcome_view")
     else:
         self.current_log = None
         self.current_log_type = None
-        self.show_view("welcome")
+        self.show_view("welcome_view")
     self.update_menu_state()
 
 
@@ -174,9 +174,9 @@ def action_log_open(self):
                 else:
                     self.current_log_type = None
                 if self.current_log_type:
-                    self.show_view(f"log_{self.current_log_type}")
+                    self.show_view(f"log_{self.current_log_type}_view")
                 else:
-                    self.show_view("welcome")
+                    self.show_view("welcome_view")
                     self.current_log = None
             except Exception as e:
                 QMessageBox.critical(
@@ -186,15 +186,15 @@ def action_log_open(self):
                 )
                 self.current_log = None
                 self.current_log_type = None
-                self.show_view("welcome")
+                self.show_view("welcome_view")
         else:
             self.current_log = None
             self.current_log_type = None
-            self.show_view("welcome")
+            self.show_view("welcome_view")
     else:
         self.current_log = None
         self.current_log_type = None
-        self.show_view("welcome")
+        self.show_view("welcome_view")
     self.update_menu_state()
 
 
@@ -276,7 +276,7 @@ def action_log_export(self):
 def action_log_close(self):
     self.current_log = None
     self.current_log_type = None
-    self.show_view("welcome")
+    self.show_view("welcome_view")
     self.update_menu_state()
 
 
