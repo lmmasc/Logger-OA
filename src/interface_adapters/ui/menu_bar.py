@@ -78,7 +78,9 @@ class MainMenuBar(QMenuBar):
         self.db_restore_action = QAction(
             translation_service.tr("menu_restore_backup"), self
         )
-        self.db_export_action = QAction(translation_service.tr("menu_export"), self)
+        self.db_export_action = QAction(
+            translation_service.tr("menu_export_db_csv"), self
+        )
         self.db_show_action = QAction(
             translation_service.tr("menu_show_database"), self
         )
@@ -101,7 +103,7 @@ class MainMenuBar(QMenuBar):
         self.database_menu.addAction(self.db_backup_action)
         self.database_menu.addAction(self.db_restore_action)
         # Sección de exportación
-        self.database_menu.addSection(translation_service.tr("menu_export"))
+        self.database_menu.addSection(translation_service.tr("menu_export_db_csv"))
         self.database_menu.addAction(self.db_export_action)
         # Espacio en blanco antes del separador y la opción de borrar
         self.database_menu.addAction(QAction(" ", self))
@@ -180,7 +182,7 @@ class MainMenuBar(QMenuBar):
         self.db_import_db_action.setText(translation_service.tr("menu_import_from_db"))
         self.db_backup_action.setText(translation_service.tr("menu_create_backup"))
         self.db_restore_action.setText(translation_service.tr("menu_restore_backup"))
-        self.db_export_action.setText(translation_service.tr("menu_export"))
+        self.db_export_action.setText(translation_service.tr("menu_export_db_csv"))
         self.db_show_action.setText(translation_service.tr("menu_show_database"))
         self.db_delete_action.setText(translation_service.tr("menu_delete_database"))
 

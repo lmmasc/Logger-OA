@@ -348,11 +348,16 @@ def action_db_export(self):
     from PySide6.QtWidgets import QFileDialog, QMessageBox
     import os
 
-    default_filename = "operadores_export.csv"
+    from config.paths import get_export_dir
+
+    from datetime import datetime
+
+    now_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    default_filename = f"operadores_export_{now_str}.csv"
     export_path, _ = QFileDialog.getSaveFileName(
         self,
         translation_service.tr("export_db"),
-        os.path.expanduser(f"~/Desktop/{default_filename}"),
+        get_export_dir(default_filename),
         "CSV Files (*.csv);;All Files (*)",
     )
     if not export_path:

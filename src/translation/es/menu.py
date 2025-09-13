@@ -26,4 +26,5 @@ MENU_TRANSLATIONS = {
     "menu_database_section_backup": "Operaciones de respaldo",
     "menu_database_section_import": "Operaciones de importación",
     "menu_database_section_delete": "Operaciones avanzadas",
+    "menu_export_db_csv": "Exportar .csv",
 }
