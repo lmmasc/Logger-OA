@@ -65,12 +65,6 @@ class OperativoConfigDialog(QDialog):
         layout.addWidget(self.modo_label)
         layout.addWidget(self.modo_combo)
 
-        # Frecuencia
-        self.freq_label = QLabel(translation_service.tr("operation_freq_label"))
-        self.freq_edit = QLineEdit(self)
-        layout.addWidget(self.freq_label)
-        layout.addWidget(self.freq_edit)
-
         # Repetidora (solo VHF)
         self.rep_label = QLabel(translation_service.tr("operation_rep_label"))
         self.rep_combo = QComboBox(self)
@@ -80,6 +74,12 @@ class OperativoConfigDialog(QDialog):
         layout.addWidget(self.rep_combo)
         self.rep_label.hide()
         self.rep_combo.hide()
+
+        # Frecuencia (después de repetidora)
+        self.freq_label = QLabel(translation_service.tr("operation_freq_label"))
+        self.freq_edit = QLineEdit(self)
+        layout.addWidget(self.freq_label)
+        layout.addWidget(self.freq_edit)
 
         # Botón OK
         self.ok_btn = QPushButton(translation_service.tr("ok_button"), self)
@@ -115,12 +115,16 @@ class OperativoConfigDialog(QDialog):
             self.freq_edit.setText("7100")
             self.rep_label.hide()
             self.rep_combo.hide()
+            self.freq_label.show()
+            self.freq_edit.setEnabled(True)
         else:
             self.frequency_band_combo.setEnabled(True)
             if frequency_band == "band_hf":
                 self.modo_combo.setCurrentIndex(0)  # LSB
                 self.rep_label.hide()
                 self.rep_combo.hide()
+                self.freq_label.show()
+                self.freq_edit.setEnabled(True)
                 if operation_type == "rener_operation":
                     self.freq_edit.setText("7100")
                 else:
@@ -129,19 +133,26 @@ class OperativoConfigDialog(QDialog):
                 self.modo_combo.setCurrentIndex(2)  # FM
                 self.rep_label.show()
                 self.rep_combo.show()
+                self.freq_label.show()
                 rep = self.rep_keys[self.rep_combo.currentIndex()]
                 if rep == "rep_r1":
                     self.freq_edit.setText("146960")
+                    self.freq_edit.setEnabled(False)
                 elif rep == "rep_r2":
                     self.freq_edit.setText("147050")
+                    self.freq_edit.setEnabled(False)
                 elif rep == "rep_r3":
                     self.freq_edit.setText("146880")
-                else:
-                    self.freq_edit.setText("")
+                    self.freq_edit.setEnabled(False)
+                else:  # Simplex
+                    self.freq_edit.setText("146520")
+                    self.freq_edit.setEnabled(True)
             else:
                 self.modo_combo.setCurrentIndex(3)  # Otro
                 self.rep_label.hide()
                 self.rep_combo.hide()
+                self.freq_label.show()
+                self.freq_edit.setEnabled(True)
                 self.freq_edit.setText("")
 
     def get_config(self):
