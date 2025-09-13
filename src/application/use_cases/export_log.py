@@ -326,12 +326,26 @@ def export_log_to_adi(db_path: str, export_path: str) -> str:
     if metadata:
         try:
             meta_dict = json.loads(metadata)
-            band_meta = (
-                meta_dict.get("band", "")
-                or meta_dict.get("frequency_band", "")
-                or meta_dict.get("freq", "")
-            )
-            mode_meta = meta_dict.get("mode", "")
+            # Mapeo banda
+            band_raw = meta_dict.get("frequency_band", "") or meta_dict.get("band", "")
+            if band_raw == "band_hf":
+                band_meta = "40M"
+            elif band_raw == "band_vhf":
+                band_meta = "2M"
+            elif band_raw == "band_uhf":
+                band_meta = "70CM"
+            else:
+                band_meta = ""
+            # Mapeo modo
+            mode_raw = meta_dict.get("mode_key", "") or meta_dict.get("mode", "")
+            if mode_raw == "mode_lsb":
+                mode_meta = "LSB"
+            elif mode_raw == "mode_usb":
+                mode_meta = "USB"
+            elif mode_raw == "mode_fm":
+                mode_meta = "FM"
+            else:
+                mode_meta = ""
         except Exception:
             pass
     # Generar ADIF
@@ -356,13 +370,8 @@ def export_log_to_adi(db_path: str, export_path: str) -> str:
             band = "40M"
             mode = "SSB"
         else:
-            band = (
-                band_meta
-                or contact.get("band", "")
-                or contact.get("frequency_band", "")
-                or contact.get("freq", "")
-            )
-            mode = mode_meta or contact.get("mode", "")
+            band = band_meta
+            mode = mode_meta
         rst_sent = contact.get("rs_tx", "") or contact.get("exchange_sent", "")
         rst_rcvd = contact.get("rs_rx", "") or contact.get("exchange_received", "")
         # Construir línea ADIF
