@@ -67,6 +67,9 @@ class MainWindow(QMainWindow):
     Permite cambiar el tema y el idioma, y muestra un diálogo de información.
     """
 
+    # =====================
+    # Inicialización y configuración principal
+    # =====================
     def __init__(self):
         """
         Inicializa la ventana principal, configura el título, tamaño, barra de menús,
@@ -121,10 +124,12 @@ class MainWindow(QMainWindow):
         translation_service.signal.language_changed.connect(self._on_language_changed)
 
     # =====================
-    # Métodos públicos principales
+    # Gestión de vistas principales
     # =====================
-
     def show_view(self, view_name: str) -> None:
+        """
+        Muestra la vista indicada y actualiza los datos de contactos y cabecera si hay un log abierto.
+        """
         mw_show_view(self, view_name)
         # Actualizar la tabla de contactos en la vista activa si hay un log abierto
         if self.current_log is not None:
@@ -141,30 +146,60 @@ class MainWindow(QMainWindow):
         elif view_name == "log_ops" and self.current_log:
             self.log_ops_view.set_log_data(self.current_log)
 
+    # =====================
+    # Gestión de temas e idioma
+    # =====================
     def set_language(self, lang: str) -> None:
+        """
+        Cambia el idioma de la interfaz.
+        """
         set_language(self, lang)
 
     def set_light_theme(self) -> None:
+        """
+        Cambia la interfaz al tema claro.
+        """
         set_light_theme(self)
 
     def set_dark_theme(self) -> None:
+        """
+        Cambia la interfaz al tema oscuro.
+        """
         set_dark_theme(self)
 
     def _set_initial_theme_and_language(self) -> None:
+        """
+        Aplica el tema e idioma guardados al iniciar la aplicación.
+        """
         _set_initial_theme_and_language(self)
 
     def _update_theme_menu_checks(self) -> None:
+        """
+        Actualiza los checks del menú de tema según el tema activo.
+        """
         _update_theme_menu_checks(self)
 
     def _update_language_menu_checks(self) -> None:
+        """
+        Actualiza los checks del menú de idioma según el idioma activo.
+        """
         _update_language_menu_checks(self)
 
     def refresh_ui(self) -> None:
+        """
+        Refresca la interfaz gráfica (traducción, colores, etc).
+        """
         refresh_ui(self)
 
     def _retranslate_ui(self) -> None:
+        """
+        Retraduce la interfaz gráfica al cambiar el idioma.
+        """
         _retranslate_ui(self)
 
+    # =====================
+    # Gestión de menú y acciones
+    # =====================
     def update_menu_state(self):
         """
         Habilita/deshabilita las acciones del menú según el estado del log abierto.
@@ -174,10 +209,6 @@ class MainWindow(QMainWindow):
         self.menu_bar.log_open_action.setEnabled(not log_open)
         self.menu_bar.log_export_action.setEnabled(log_open)
         self.menu_bar.log_close_action.setEnabled(log_open)
-
-    # =====================
-    # Métodos de conexión de menús y handlers de acciones
-    # =====================
 
     def _connect_menu_actions(self) -> None:
         """
@@ -206,7 +237,13 @@ class MainWindow(QMainWindow):
         self.menu_bar.db_restore_action.triggered.connect(self._on_db_restore)
         self.menu_bar.db_import_db_action.triggered.connect(self._on_db_import_db)
 
+    # =====================
+    # Gestión de base de datos
+    # =====================
     def _on_db_backup(self):
+        """
+        Crea un respaldo de la base de datos y muestra un mensaje informativo.
+        """
         try:
             backup_path = DatabaseController.backup_database()
             QMessageBox.information(self, "Backup", f"Backup creado en: {backup_path}")
@@ -214,6 +251,9 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, "Error", f"No se pudo crear el backup: {e}")
 
     def _on_db_restore(self):
+        """
+        Restaura la base de datos desde un archivo de respaldo seleccionado por el usuario.
+        """
         from PySide6.QtWidgets import QFileDialog
         import os
 
@@ -236,6 +276,9 @@ class MainWindow(QMainWindow):
                     QMessageBox.critical(self, "Error", f"No se pudo restaurar: {e}")
 
     def _on_db_import_db(self):
+        """
+        Importa operadores desde una base de datos externa seleccionada por el usuario.
+        """
         file_dialog = QFileDialog(self)
         file_dialog.setFileMode(QFileDialog.ExistingFile)
         file_dialog.setNameFilter("Bases de datos (*.db)")
@@ -253,12 +296,30 @@ class MainWindow(QMainWindow):
 
     def _open_data_folder(self) -> None:
         """
-        Abre la carpeta donde se guarda la base de datos.
+        Abre la carpeta donde se guarda la base de datos usando el explorador del sistema.
         """
         db_path = get_database_path()
         folder = os.path.dirname(db_path)
         QDesktopServices.openUrl(QUrl.fromLocalFile(folder))
 
+    # =====================
+    # Gestión de ventanas secundarias
+    # =====================
+    def _show_db_window(self):
+        """
+        Muestra la ventana de gestión de la base de datos.
+        """
+        show_db_window(self)
+
+    def _on_db_table_window_closed(self, *args):
+        """
+        Handler para el cierre de la ventana de tabla de base de datos.
+        """
+        on_db_table_window_closed(self, *args)
+
+    # =====================
+    # Eventos y utilidades
+    # =====================
     def center(self):
         """
         Centra la ventana en la pantalla principal.
@@ -269,26 +330,18 @@ class MainWindow(QMainWindow):
         window_geometry.moveCenter(screen_geometry.center())
         self.move(window_geometry.topLeft())
 
-    # ...existing code...
-
-    # =====================
-    # Métodos de gestión de ventanas secundarias
-    # =====================
-
-    def _show_db_window(self):
-        show_db_window(self)
-
-    def _on_db_table_window_closed(self, *args):
-        on_db_table_window_closed(self, *args)
-
     def closeEvent(self, event):
-        # Cerrar la ventana de tabla de base de datos si está abierta
+        """
+        Evento de cierre de la ventana principal. Cierra la ventana de tabla de base de datos si está abierta.
+        """
         if self.db_table_window is not None:
             self.db_table_window.close()
         super().closeEvent(event)
 
     def _on_language_changed(self):
-        # Llama retranslate_ui en la vista activa
+        """
+        Handler para el cambio de idioma. Actualiza la UI de la vista activa.
+        """
         if self.current_log_type == "contest":
             self.log_contest_view.retranslate_ui()
         elif self.current_log_type == "ops":
