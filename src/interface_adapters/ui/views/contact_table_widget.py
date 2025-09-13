@@ -53,8 +53,6 @@ class ContactTableWidget(QWidget):
             updated_data = dlg.result_contact.copy()
             if "id" in contact:
                 updated_data["id"] = contact["id"]
-            if "timestamp" in contact:
-                updated_data["timestamp"] = contact["timestamp"]
             # Actualizar el contacto usando caso de uso y refrescar tabla
             from application.use_cases.contact_management import update_contact_in_log
             from domain.repositories.contact_log_repository import ContactLogRepository

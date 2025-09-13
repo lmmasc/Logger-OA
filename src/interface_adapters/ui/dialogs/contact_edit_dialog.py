@@ -13,56 +13,47 @@ from translation.translation_service import translation_service
 
 
 class ContactEditDialog(QDialog):
-    """
-    Diálogo para editar un contacto del log, con campos y selectores según tipo de log.
-    Respeta traducción y tipos de datos.
-    """
-
-    def __init__(self, contact, log_type, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle(translation_service.tr("edit_contact_dialog_title"))
-        self.setMinimumWidth(420)
-        self.result_contact = None
-        self.contact = contact.copy()
-        self.log_type = log_type
-        layout = QVBoxLayout(self)
-        self.inputs = {}
-        # Campos comunes
-        self.inputs["callsign"] = QLineEdit(self)
-        self.inputs["callsign"].setText(contact.get("callsign", ""))
-        layout.addWidget(QLabel(translation_service.tr("table_header_callsign")))
-        layout.addWidget(self.inputs["callsign"])
-        if log_type == "ops":
-            self.inputs["name"] = QLineEdit(self)
-            self.inputs["name"].setText(contact.get("name", ""))
-            layout.addWidget(QLabel(translation_service.tr("name")))
-            layout.addWidget(self.inputs["name"])
-            self.inputs["country"] = QLineEdit(self)
-            self.inputs["country"].setText(contact.get("country", ""))
-            layout.addWidget(QLabel(translation_service.tr("country")))
-            layout.addWidget(self.inputs["country"])
-            self.inputs["region"] = QLineEdit(self)
-            self.inputs["region"].setText(contact.get("region", ""))
-            layout.addWidget(QLabel(translation_service.tr("region")))
-            layout.addWidget(self.inputs["region"])
-            self.inputs["station"] = QComboBox(self)
-            station_keys = [
-                "no_data",
-                "station_base",
-                "station_mobile",
-                "station_portable",
-            ]
-            self.inputs["station"].addItems(
-                [translation_service.tr(k) for k in station_keys]
-            )
-            idx = (
-                station_keys.index(contact.get("station", "no_data"))
-                if contact.get("station", "no_data") in station_keys
-                else 0
-            )
-            self.inputs["station"].setCurrentIndex(idx)
-            layout.addWidget(QLabel(translation_service.tr("station")))
-            layout.addWidget(self.inputs["station"])
+    def accept(self):
+        result = self.contact.copy()
+        for k, widget in self.inputs.items():
+            if isinstance(widget, QLineEdit):
+                result[k] = widget.text().strip()
+            elif isinstance(widget, QComboBox):
+                if k == "station":
+                    keys = [
+                        "no_data",
+                        "station_base",
+                        "station_mobile",
+                        "station_portable",
+                    ]
+                    result[k] = keys[widget.currentIndex()]
+                elif k == "energy":
+                    keys = [
+                        "no_data",
+                        "energy_autonomous",
+                        "energy_battery",
+                        "energy_commercial",
+                    ]
+                    result[k] = keys[widget.currentIndex()]
+            elif (
+                k == "datetime_oa"
+                and self.log_type == "contest"
+                and isinstance(widget, QDateTimeEdit)
+            ):
+                import datetime
+                dt_oa = widget.dateTime().toPython()
+                dt_utc = dt_oa + datetime.timedelta(hours=5)
+                ts = int(dt_utc.replace(tzinfo=datetime.timezone.utc).timestamp())
+                result["timestamp"] = ts
+            elif (
+                k == "datetime_utc"
+                and self.log_type == "ops"
+                and isinstance(widget, QDateTimeEdit)
+            ):
+                ts = widget.dateTime().toSecsSinceEpoch()
+                result["timestamp"] = ts
+        self.result_contact = result
+        super().accept()
             self.inputs["energy"] = QComboBox(self)
             energy_keys = [
                 "no_data",
@@ -117,24 +108,54 @@ class ContactEditDialog(QDialog):
             self.inputs["exchange_sent"].setText(contact.get("exchange_sent", ""))
             layout.addWidget(QLabel(translation_service.tr("exchange_sent")))
             layout.addWidget(self.inputs["exchange_sent"])
-        # Campo de edición de fecha/hora UTC con formato según idioma
+        # Campo de edición de fecha/hora OA para concursos, UTC para operativos
         ts = contact.get("timestamp", None)
-        if ts:
-            dt_utc = QDateTime.fromSecsSinceEpoch(int(ts), Qt.UTC)
-        else:
-            dt_utc = QDateTime.currentDateTimeUtc()
         lang = translation_service.get_language()
-        if lang == "es":
-            date_fmt = "HH:mm dd/MM/yyyy 'UTC'"
-            label = translation_service.tr("edit_contact_datetime_utc_es")
+        if self.log_type == "contest":
+            # Mostrar hora OA (UTC-5)
+            if ts:
+                import datetime
+
+                dt_utc = datetime.datetime.utcfromtimestamp(int(ts))
+                dt_oa = dt_utc - datetime.timedelta(hours=5)
+                dt_qt = QDateTime(
+                    dt_oa.year,
+                    dt_oa.month,
+                    dt_oa.day,
+                    dt_oa.hour,
+                    dt_oa.minute,
+                    dt_oa.second,
+                )
+            else:
+                dt_qt = QDateTime.currentDateTime()
+            if lang == "es":
+                date_fmt = "HH:mm dd/MM/yyyy 'OA'"
+                label = "Hora OA (UTC-5)"
+            else:
+                date_fmt = "HH:mm MM/dd/yyyy 'OA'"
+                label = "OA Time (UTC-5)"
+            self.inputs["datetime_oa"] = QDateTimeEdit(dt_qt, self)
+            self.inputs["datetime_oa"].setDisplayFormat(date_fmt)
+            self.inputs["datetime_oa"].setTimeSpec(Qt.LocalTime)
+            layout.addWidget(QLabel(label))
+            layout.addWidget(self.inputs["datetime_oa"])
         else:
-            date_fmt = "HH:mm MM/dd/yyyy 'UTC'"
-            label = translation_service.tr("edit_contact_datetime_utc_en")
-        self.inputs["datetime_utc"] = QDateTimeEdit(dt_utc, self)
-        self.inputs["datetime_utc"].setDisplayFormat(date_fmt)
-        self.inputs["datetime_utc"].setTimeSpec(Qt.UTC)
-        layout.addWidget(QLabel(label))
-        layout.addWidget(self.inputs["datetime_utc"])
+            # Operativos: mantener UTC
+            if ts:
+                dt_utc = QDateTime.fromSecsSinceEpoch(int(ts), Qt.UTC)
+            else:
+                dt_utc = QDateTime.currentDateTimeUtc()
+            if lang == "es":
+                date_fmt = "HH:mm dd/MM/yyyy 'UTC'"
+                label = translation_service.tr("edit_contact_datetime_utc_es")
+            else:
+                date_fmt = "HH:mm MM/dd/yyyy 'UTC'"
+                label = translation_service.tr("edit_contact_datetime_utc_en")
+            self.inputs["datetime_utc"] = QDateTimeEdit(dt_utc, self)
+            self.inputs["datetime_utc"].setDisplayFormat(date_fmt)
+            self.inputs["datetime_utc"].setTimeSpec(Qt.UTC)
+            layout.addWidget(QLabel(label))
+            layout.addWidget(self.inputs["datetime_utc"])
         # Botones
         btns = QHBoxLayout()
         btn_ok = QPushButton(translation_service.tr("ok_button"), self)
@@ -147,13 +168,14 @@ class ContactEditDialog(QDialog):
         self.setLayout(layout)
 
     def accept(self):
-        # Validar y construir el resultado
-        result = {}
+        print("[DEBUG] Registro original:", self.contact)
+        result = self.contact.copy()
         for k, widget in self.inputs.items():
+            print(f"[DEBUG] Procesando campo: {k}, valor antes: {result.get(k)}")
             if isinstance(widget, QLineEdit):
                 result[k] = widget.text().strip()
+                print(f"[DEBUG] Nuevo valor QLineEdit: {result[k]}")
             elif isinstance(widget, QComboBox):
-                # Guardar la key, no el texto traducido
                 if k == "station":
                     keys = [
                         "no_data",
@@ -162,6 +184,7 @@ class ContactEditDialog(QDialog):
                         "station_portable",
                     ]
                     result[k] = keys[widget.currentIndex()]
+                    print(f"[DEBUG] Nuevo valor station: {result[k]}")
                 elif k == "energy":
                     keys = [
                         "no_data",
@@ -170,8 +193,28 @@ class ContactEditDialog(QDialog):
                         "energy_commercial",
                     ]
                     result[k] = keys[widget.currentIndex()]
-            elif k == "datetime_utc" and isinstance(widget, QDateTimeEdit):
-                # Guardar como timestamp UTC
-                result["timestamp"] = widget.dateTime().toSecsSinceEpoch()
+                    print(f"[DEBUG] Nuevo valor energy: {result[k]}")
+            elif (
+                k == "datetime_oa"
+                and self.log_type == "contest"
+                and isinstance(widget, QDateTimeEdit)
+            ):
+                import datetime
+
+                dt_oa = widget.dateTime().toPython()
+                print(f"[DEBUG] Valor datetime_oa editado: {dt_oa}")
+                dt_utc = dt_oa + datetime.timedelta(hours=5)
+                ts = int(dt_utc.replace(tzinfo=datetime.timezone.utc).timestamp())
+                result["timestamp"] = ts
+                print(f"[DEBUG] Nuevo timestamp (contest): {ts}")
+            elif (
+                k == "datetime_utc"
+                and self.log_type == "ops"
+                and isinstance(widget, QDateTimeEdit)
+            ):
+                ts = widget.dateTime().toSecsSinceEpoch()
+                result["timestamp"] = ts
+                print(f"[DEBUG] Nuevo timestamp (ops): {ts}")
+        print("[DEBUG] Registro final para guardar:", result)
         self.result_contact = result
         super().accept()
