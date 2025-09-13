@@ -343,7 +343,33 @@ def action_db_import_pdf(self):
 
 
 def action_db_export(self):
-    pass
+    from interface_adapters.controllers.database_controller import DatabaseController
+    from translation.translation_service import translation_service
+    from PySide6.QtWidgets import QFileDialog, QMessageBox
+    import os
+
+    default_filename = "operadores_export.csv"
+    export_path, _ = QFileDialog.getSaveFileName(
+        self,
+        translation_service.tr("export_db"),
+        os.path.expanduser(f"~/Desktop/{default_filename}"),
+        "CSV Files (*.csv);;All Files (*)",
+    )
+    if not export_path:
+        return
+    try:
+        DatabaseController.export_database_to_csv(export_path, translation_service)
+        QMessageBox.information(
+            self,
+            translation_service.tr("main_window_title"),
+            translation_service.tr("export_success"),
+        )
+    except Exception as e:
+        QMessageBox.critical(
+            self,
+            translation_service.tr("main_window_title"),
+            f"{translation_service.tr('export_failed')}: {e}",
+        )
 
 
 def action_db_delete(self):
