@@ -447,12 +447,13 @@ def export_log_to_pdf(db_path: str, export_path: str) -> str:
         except Exception:
             pass
 
-    # Formatear fecha
+    # Formatear fecha (solo año, mes, día)
     try:
         dt = datetime.datetime.fromisoformat(start_time)
-        fecha = dt.strftime("%d/%m/%Y")
+        fecha = dt.strftime("%Y-%m-%d")
     except Exception:
-        fecha = start_time
+        # Si no es ISO, intentar extraer solo fecha
+        fecha = start_time.split()[0] if " " in start_time else start_time
 
     # Construir cabecera
     cabecera = [
@@ -476,13 +477,21 @@ def export_log_to_pdf(db_path: str, export_path: str) -> str:
             )
             dt_oa = dt_utc - datetime.timedelta(hours=5)
             qtr = dt_oa.strftime("%H:%M")
-        estacion = operator
+        estacion = contact.get("callsign", operator)
         # Enviado y recibido
+        try:
+            exchange_tx_num = int(contact.get("exchange_sent", 0))
+        except Exception:
+            exchange_tx_num = 0
         rs_tx = str(contact.get("rs_tx", "")).zfill(2)
-        exchange_tx = str(contact.get("exchange_sent", "")).zfill(3)
+        exchange_tx = str(exchange_tx_num).zfill(3)
         enviado = rs_tx + exchange_tx
+        try:
+            exchange_rx_num = int(contact.get("exchange_received", 0))
+        except Exception:
+            exchange_rx_num = 0
         rs_rx = str(contact.get("rs_rx", "")).zfill(2)
-        exchange_rx = str(contact.get("exchange_received", "")).zfill(3)
+        exchange_rx = str(exchange_rx_num).zfill(3)
         recibido = rs_rx + exchange_rx
         observaciones = contact.get("observations", "")
         tabla.append([str(idx), qtr, estacion, enviado, recibido, observaciones])
