@@ -462,14 +462,32 @@ def export_log_to_pdf(db_path: str, export_path: str) -> str:
         else:
             fecha = start_time.split()[0] if " " in start_time else start_time
 
-    # Construir cabecera
-    cabecera = [
-        ["CONCURSO:", contest_name],
-        ["Fecha:", fecha],
-        ["Indicativo:", operator],
-        ["Categoría:", op_category],
-        ["Nombre:", op_name],
-        ["QTH:", op_region],
+    # Construir cabecera con cuadricula y ancho total
+    cabecera_labels = [
+        "CONCURSO:",
+        "Fecha:",
+        "Indicativo:",
+        "Categoría:",
+        "Nombre:",
+        "QTH:",
+    ]
+    cabecera_values = [contest_name, fecha, operator, op_category, op_name, op_region]
+    cabecera_table = [
+        [label, value] for label, value in zip(cabecera_labels, cabecera_values)
+    ]
+
+    # Ajustar ancho de cabecera y tabla
+    from reportlab.lib.units import mm
+
+    page_width = A4[0] - 2 * 20 * mm  # 20mm margen
+    col_widths_cabecera = [page_width * 0.25, page_width * 0.75]
+    col_widths_tabla = [
+        page_width * 0.07,
+        page_width * 0.15,
+        page_width * 0.18,
+        page_width * 0.18,
+        page_width * 0.18,
+        page_width * 0.24,
     ]
 
     # Construir tabla de contactos
@@ -504,15 +522,33 @@ def export_log_to_pdf(db_path: str, export_path: str) -> str:
         tabla.append([str(idx), qtr, estacion, enviado, recibido, observaciones])
 
     # Crear PDF
-    doc = SimpleDocTemplate(export_path, pagesize=A4)
+    doc = SimpleDocTemplate(
+        export_path,
+        pagesize=A4,
+        leftMargin=20 * mm,
+        rightMargin=20 * mm,
+        topMargin=20 * mm,
+        bottomMargin=20 * mm,
+    )
     styles = getSampleStyleSheet()
     elements = []
-    # Cabecera
-    for row in cabecera:
-        elements.append(Paragraph(f"<b>{row[0]}</b> {row[1]}", styles["Normal"]))
+    # Cabecera con cuadricula
+    t_cabecera = Table(cabecera_table, colWidths=col_widths_cabecera)
+    t_cabecera.setStyle(
+        TableStyle(
+            [
+                ("GRID", (0, 0), (-1, -1), 1, colors.black),
+                ("ALIGN", (0, 0), (-1, -1), "LEFT"),
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                ("FONTNAME", (0, 0), (-1, -1), "Helvetica"),
+                ("FONTSIZE", (0, 0), (-1, -1), 11),
+            ]
+        )
+    )
+    elements.append(t_cabecera)
     elements.append(Spacer(1, 12))
-    # Tabla
-    t = Table(tabla, repeatRows=1)
+    # Tabla de contactos con ancho total
+    t = Table(tabla, colWidths=col_widths_tabla, repeatRows=1)
     t.setStyle(
         TableStyle(
             [
@@ -520,6 +556,8 @@ def export_log_to_pdf(db_path: str, export_path: str) -> str:
                 ("GRID", (0, 0), (-1, -1), 1, colors.black),
                 ("ALIGN", (0, 0), (-1, -1), "CENTER"),
                 ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
+                ("FONTSIZE", (0, 0), (-1, -1), 10),
             ]
         )
     )
