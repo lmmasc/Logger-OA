@@ -394,8 +394,119 @@ def export_log_to_adi(db_path: str, export_path: str) -> str:
 
 def export_log_to_pdf(db_path: str, export_path: str) -> str:
     """
-    Exporta el log a un archivo PDF. Implementación pendiente.
+    Exporta el log a un archivo PDF con formato de planilla de concursos OA-HF.
     """
-    # TODO: Implementar exportación a PDF
-    print(f"[EXPORT] PDF: {db_path} -> {export_path}")
+    import sqlite3
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors
+    from reportlab.platypus import (
+        SimpleDocTemplate,
+        Table,
+        TableStyle,
+        Paragraph,
+        Spacer,
+    )
+    from reportlab.lib.styles import getSampleStyleSheet
+    from infrastructure.db.queries import get_radio_operator_by_callsign
+    from translation.translation_service import translation_service as ts
+    import datetime
+
+    repo = ContactLogRepository(db_path)
+    with sqlite3.connect(db_path) as conn:
+        c = conn.cursor()
+        c.execute(
+            "SELECT id, type, operator, start_time, end_time, metadata FROM logs LIMIT 1"
+        )
+        row = c.fetchone()
+        if not row:
+            raise FileNotFoundError("No se encontró ningún log en la base de datos.")
+        log_id = row[0]
+        log_type = row[1]
+        operator = row[2]
+        start_time = row[3]
+        metadata = row[5]
+    contacts = repo.get_contacts(log_id)
+    if not contacts:
+        raise ValueError("No hay contactos para exportar.")
+
+    # Obtener datos del operador
+    op_data = get_radio_operator_by_callsign(operator)
+    op_name = op_data[1] if op_data else ""
+    op_category = op_data[2] if op_data else ""
+    op_region = op_data[4] if op_data else ""
+
+    # Obtener nombre de concurso traducido
+    contest_name = ""
+    if metadata:
+        import json
+
+        try:
+            meta_dict = json.loads(metadata)
+            contest_key = meta_dict.get("contest_name_key", "")
+            contest_name = ts.tr(contest_key) if contest_key else ""
+        except Exception:
+            pass
+
+    # Formatear fecha
+    try:
+        dt = datetime.datetime.fromisoformat(start_time)
+        fecha = dt.strftime("%d/%m/%Y")
+    except Exception:
+        fecha = start_time
+
+    # Construir cabecera
+    cabecera = [
+        ["CONCURSO:", contest_name],
+        ["Fecha:", fecha],
+        ["Indicativo:", operator],
+        ["Categoría:", op_category],
+        ["Nombre:", op_name],
+        ["QTH:", op_region],
+    ]
+
+    # Construir tabla de contactos
+    tabla = [["Nº", "QTR", "ESTACIÓN", "ENVIADO", "RECIBIDO", "OBSERVACIONES"]]
+    for idx, contact in enumerate(contacts, 1):
+        # QTR OA
+        ts_contact = contact.get("timestamp", None)
+        qtr = ""
+        if ts_contact:
+            dt_utc = datetime.datetime.fromtimestamp(
+                int(ts_contact), tz=datetime.timezone.utc
+            )
+            dt_oa = dt_utc - datetime.timedelta(hours=5)
+            qtr = dt_oa.strftime("%H:%M")
+        estacion = operator
+        # Enviado y recibido
+        rs_tx = str(contact.get("rs_tx", "")).zfill(2)
+        exchange_tx = str(contact.get("exchange_sent", "")).zfill(3)
+        enviado = rs_tx + exchange_tx
+        rs_rx = str(contact.get("rs_rx", "")).zfill(2)
+        exchange_rx = str(contact.get("exchange_received", "")).zfill(3)
+        recibido = rs_rx + exchange_rx
+        observaciones = contact.get("observations", "")
+        tabla.append([str(idx), qtr, estacion, enviado, recibido, observaciones])
+
+    # Crear PDF
+    doc = SimpleDocTemplate(export_path, pagesize=A4)
+    styles = getSampleStyleSheet()
+    elements = []
+    # Cabecera
+    for row in cabecera:
+        elements.append(Paragraph(f"<b>{row[0]}</b> {row[1]}", styles["Normal"]))
+    elements.append(Spacer(1, 12))
+    # Tabla
+    t = Table(tabla, repeatRows=1)
+    t.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+                ("GRID", (0, 0), (-1, -1), 1, colors.black),
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ]
+        )
+    )
+    elements.append(t)
+    doc.build(elements)
     return export_path
