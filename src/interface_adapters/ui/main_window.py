@@ -1,27 +1,34 @@
-from config.settings_service import settings_service
+# --- Imports estándar ---
+import os
+
+# --- Imports externos ---
 from PySide6.QtWidgets import (
     QMainWindow,
     QApplication,
     QMessageBox,
-    QStackedWidget,
     QFileDialog,
-    QPushButton,
-    QDialog,
-    QVBoxLayout,
-    QLabel,
 )
-from PySide6.QtCore import Qt, QUrl, QTimer
+from PySide6.QtCore import QUrl
 from PySide6.QtGui import QDesktopServices
-import os
+
+# --- Imports de configuración y utilidades ---
+from config.settings_service import settings_service
 from config.paths import get_database_path, BASE_PATH
-from .menu_bar import MainMenuBar
-from .themes.theme_manager import ThemeManager
+
+# --- Imports de traducción y temas ---
 from translation.translation_service import translation_service
+from .themes.theme_manager import ThemeManager
+
+# --- Imports de UI y vistas ---
+from .menu_bar import MainMenuBar
 from .views.welcome_view import WelcomeView
 from .views.log_ops_view import LogOpsView
 from .views.log_contest_view import LogContestView
 from .view_manager import ViewManager
-from application.use_cases.update_operators_from_pdf import update_operators_from_pdf
+
+from interface_adapters.controllers.database_controller import DatabaseController
+
+# --- Imports de acciones, diálogos y gestión de ventana ---
 from .main_window_actions import (
     action_log_new,
     action_log_open,
@@ -30,7 +37,6 @@ from .main_window_actions import (
     action_db_import_pdf,
     action_db_export,
     action_db_delete,
-    on_menu_action,
 )
 from .main_window_dialogs import show_about_dialog, show_manual_dialog
 from .main_window_config import (
@@ -45,7 +51,6 @@ from .main_window_config import (
 )
 from .main_window_view_management import show_view as mw_show_view
 from .main_window_db_window import show_db_window, on_db_table_window_closed
-from interface_adapters.controllers.database_controller import DatabaseController
 
 """
 Módulo de la ventana principal de la aplicación.
@@ -264,8 +269,7 @@ class MainWindow(QMainWindow):
         window_geometry.moveCenter(screen_geometry.center())
         self.move(window_geometry.topLeft())
 
-    def _on_menu_action(self, action: str):
-        on_menu_action(self, action)
+    # ...existing code...
 
     # =====================
     # Métodos de gestión de ventanas secundarias
