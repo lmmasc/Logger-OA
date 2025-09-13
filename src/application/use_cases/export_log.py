@@ -447,13 +447,20 @@ def export_log_to_pdf(db_path: str, export_path: str) -> str:
         except Exception:
             pass
 
-    # Formatear fecha (solo año, mes, día)
+    # Formatear fecha (solo año, mes, día, sin hora)
+    fecha = ""
     try:
         dt = datetime.datetime.fromisoformat(start_time)
         fecha = dt.strftime("%Y-%m-%d")
     except Exception:
-        # Si no es ISO, intentar extraer solo fecha
-        fecha = start_time.split()[0] if " " in start_time else start_time
+        # Si no es ISO, buscar patrón de fecha en el string
+        import re
+
+        match = re.search(r"(\d{4}-\d{2}-\d{2})", start_time)
+        if match:
+            fecha = match.group(1)
+        else:
+            fecha = start_time.split()[0] if " " in start_time else start_time
 
     # Construir cabecera
     cabecera = [
