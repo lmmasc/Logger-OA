@@ -301,6 +301,8 @@ def export_log_to_adi(db_path: str, export_path: str) -> str:
     from domain.repositories.contact_log_repository import ContactLogRepository
     import datetime
 
+    import json
+
     repo = ContactLogRepository(db_path)
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
@@ -314,12 +316,30 @@ def export_log_to_adi(db_path: str, export_path: str) -> str:
         log_type = row[1]
         operator = row[2]
         start_time = row[3]
+        metadata = row[5]
     contacts = repo.get_contacts(log_id)
     if not contacts:
         raise ValueError("No hay contactos para exportar.")
+    # Parse metadata for band/mode (operativos)
+    band_meta = ""
+    mode_meta = ""
+    if metadata:
+        try:
+            meta_dict = json.loads(metadata)
+            band_meta = (
+                meta_dict.get("band", "")
+                or meta_dict.get("frequency_band", "")
+                or meta_dict.get("freq", "")
+            )
+            mode_meta = meta_dict.get("mode", "")
+        except Exception:
+            pass
     # Generar ADIF
     adif_lines = []
     adif_lines.append("<ADIF_VER:5>3.1.0 <EOH>")
+    contest_types = ("concurso", "contest", "contest_log", "contestlog")
+    log_type_normalized = str(log_type).lower()
+    is_contest = log_type_normalized in contest_types
     for contact in contacts:
         # Campos mínimos
         callsign = contact.get("callsign", "")
@@ -331,13 +351,18 @@ def export_log_to_adi(db_path: str, export_path: str) -> str:
         else:
             qso_date = ""
             time_on = ""
-        # Banda/frecuencia
-        band = (
-            contact.get("band", "")
-            or contact.get("frequency_band", "")
-            or contact.get("freq", "")
-        )
-        mode = contact.get("mode", "")
+        # Banda y modo
+        if is_contest:
+            band = "40M"
+            mode = "SSB"
+        else:
+            band = (
+                band_meta
+                or contact.get("band", "")
+                or contact.get("frequency_band", "")
+                or contact.get("freq", "")
+            )
+            mode = mode_meta or contact.get("mode", "")
         rst_sent = contact.get("rs_tx", "") or contact.get("exchange_sent", "")
         rst_rcvd = contact.get("rs_rx", "") or contact.get("exchange_received", "")
         # Construir línea ADIF
