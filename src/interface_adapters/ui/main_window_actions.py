@@ -200,58 +200,40 @@ def action_log_open(self):
 
 def action_log_export(self):
     if not hasattr(self, "current_log") or self.current_log is None:
+        from PySide6.QtWidgets import QMessageBox
+
         QMessageBox.warning(
             self,
             translation_service.tr("main_window_title"),
             translation_service.tr("no_log_open"),
         )
         return
-
-    from application.use_cases.export_log import export_log_to_csv
-    from config.paths import get_export_dir
-
     log_type = getattr(self, "current_log_type", None)
-    if log_type not in ("ops", "contest"):
-        QMessageBox.warning(
-            self,
-            translation_service.tr("main_window_title"),
-            translation_service.tr("no_log_type"),
-        )
+    dialog = ExportFormatDialog(log_type, self)
+    if not dialog.exec() or not dialog.selected_ext:
         return
+    selected_ext = dialog.selected_ext
+    # Definir filtro y nombre por defecto
+    if log_type == "ops":
+        file_types = f"{selected_ext.upper()} (*{selected_ext})"
+        default_filename = f"operativo_export{selected_ext}"
+    else:
+        file_types = f"{selected_ext.upper()} (*{selected_ext})"
+        default_filename = f"concurso_export{selected_ext}"
+    from PySide6.QtWidgets import QFileDialog
 
-    default_filename = (
-        f"{getattr(self.current_log, 'operator', 'log')}_{log_type}_export.csv"
-    )
     export_path, _ = QFileDialog.getSaveFileName(
         self,
         translation_service.tr("export_log"),
-        get_export_dir(default_filename),
-        "CSV Files (*.csv);;All Files (*)",
+        default_filename,
+        file_types,
     )
     if not export_path:
         return
-
-    try:
-        db_path = getattr(self.current_log, "db_path", None)
-        if not db_path:
-            QMessageBox.warning(
-                self,
-                translation_service.tr("main_window_title"),
-                translation_service.tr("no_db_path"),
-            )
-            return
-        export_log_to_csv(db_path, export_path)
-        QMessageBox.information(
-            self,
-            translation_service.tr("main_window_title"),
-            translation_service.tr("export_success"),
-        )
-    except Exception as e:
-        QMessageBox.critical(
-            self,
-            translation_service.tr("main_window_title"),
-            f"{translation_service.tr('export_failed')}: {e}",
-        )
+    print(
+        f"[EXPORT] Exportar log tipo {log_type} a: {export_path} con extensión: {selected_ext}"
+    )
+    # TODO: Implementar la lógica de exportación real según formato seleccionado
 
 
 def action_log_close(self):
@@ -426,3 +408,39 @@ def on_menu_action(self, action: str):
         handler()
     else:
         QMessageBox.warning(self, "Acción no implementada", f"No handler for {action}")
+
+
+from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QComboBox, QPushButton
+
+
+class ExportFormatDialog(QDialog):
+    def __init__(self, log_type, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(translation_service.tr("export_log"))
+        layout = QVBoxLayout(self)
+        label = QLabel(translation_service.tr("select_export_format"))
+        layout.addWidget(label)
+        self.combo = QComboBox(self)
+        if log_type == "ops":
+            self.formats = [
+                ("TXT", ".txt"),
+                ("CSV", ".csv"),
+                ("ADI", ".adi"),
+            ]
+        else:
+            self.formats = [
+                ("PDF", ".pdf"),
+                ("CSV", ".csv"),
+                ("ADI", ".adi"),
+            ]
+        self.combo.addItems([f[0] for f in self.formats])
+        layout.addWidget(self.combo)
+        btn_ok = QPushButton(translation_service.tr("ok_button"), self)
+        btn_ok.clicked.connect(self.accept)
+        layout.addWidget(btn_ok)
+        self.selected_ext = None
+
+    def accept(self):
+        idx = self.combo.currentIndex()
+        self.selected_ext = self.formats[idx][1]
+        super().accept()
