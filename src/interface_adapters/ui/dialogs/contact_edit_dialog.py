@@ -13,47 +13,56 @@ from translation.translation_service import translation_service
 
 
 class ContactEditDialog(QDialog):
-    def accept(self):
-        result = self.contact.copy()
-        for k, widget in self.inputs.items():
-            if isinstance(widget, QLineEdit):
-                result[k] = widget.text().strip()
-            elif isinstance(widget, QComboBox):
-                if k == "station":
-                    keys = [
-                        "no_data",
-                        "station_base",
-                        "station_mobile",
-                        "station_portable",
-                    ]
-                    result[k] = keys[widget.currentIndex()]
-                elif k == "energy":
-                    keys = [
-                        "no_data",
-                        "energy_autonomous",
-                        "energy_battery",
-                        "energy_commercial",
-                    ]
-                    result[k] = keys[widget.currentIndex()]
-            elif (
-                k == "datetime_oa"
-                and self.log_type == "contest"
-                and isinstance(widget, QDateTimeEdit)
-            ):
-                import datetime
-                dt_oa = widget.dateTime().toPython()
-                dt_utc = dt_oa + datetime.timedelta(hours=5)
-                ts = int(dt_utc.replace(tzinfo=datetime.timezone.utc).timestamp())
-                result["timestamp"] = ts
-            elif (
-                k == "datetime_utc"
-                and self.log_type == "ops"
-                and isinstance(widget, QDateTimeEdit)
-            ):
-                ts = widget.dateTime().toSecsSinceEpoch()
-                result["timestamp"] = ts
-        self.result_contact = result
-        super().accept()
+    """
+    Diálogo para editar un contacto del log, con campos y selectores según tipo de log.
+    Respeta traducción y tipos de datos.
+    """
+
+    def __init__(self, contact, log_type, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(translation_service.tr("edit_contact_dialog_title"))
+        self.setMinimumWidth(420)
+        self.result_contact = None
+        self.contact = contact.copy()
+        self.log_type = log_type
+        layout = QVBoxLayout(self)
+        self.inputs = {}
+        # Campos comunes
+        self.inputs["callsign"] = QLineEdit(self)
+        self.inputs["callsign"].setText(contact.get("callsign", ""))
+        layout.addWidget(QLabel(translation_service.tr("table_header_callsign")))
+        layout.addWidget(self.inputs["callsign"])
+        if log_type == "ops":
+            self.inputs["name"] = QLineEdit(self)
+            self.inputs["name"].setText(contact.get("name", ""))
+            layout.addWidget(QLabel(translation_service.tr("name")))
+            layout.addWidget(self.inputs["name"])
+            self.inputs["country"] = QLineEdit(self)
+            self.inputs["country"].setText(contact.get("country", ""))
+            layout.addWidget(QLabel(translation_service.tr("country")))
+            layout.addWidget(self.inputs["country"])
+            self.inputs["region"] = QLineEdit(self)
+            self.inputs["region"].setText(contact.get("region", ""))
+            layout.addWidget(QLabel(translation_service.tr("region")))
+            layout.addWidget(self.inputs["region"])
+            self.inputs["station"] = QComboBox(self)
+            station_keys = [
+                "no_data",
+                "station_base",
+                "station_mobile",
+                "station_portable",
+            ]
+            self.inputs["station"].addItems(
+                [translation_service.tr(k) for k in station_keys]
+            )
+            idx = (
+                station_keys.index(contact.get("station", "no_data"))
+                if contact.get("station", "no_data") in station_keys
+                else 0
+            )
+            self.inputs["station"].setCurrentIndex(idx)
+            layout.addWidget(QLabel(translation_service.tr("station")))
+            layout.addWidget(self.inputs["station"])
             self.inputs["energy"] = QComboBox(self)
             energy_keys = [
                 "no_data",
@@ -168,13 +177,10 @@ class ContactEditDialog(QDialog):
         self.setLayout(layout)
 
     def accept(self):
-        print("[DEBUG] Registro original:", self.contact)
         result = self.contact.copy()
         for k, widget in self.inputs.items():
-            print(f"[DEBUG] Procesando campo: {k}, valor antes: {result.get(k)}")
             if isinstance(widget, QLineEdit):
                 result[k] = widget.text().strip()
-                print(f"[DEBUG] Nuevo valor QLineEdit: {result[k]}")
             elif isinstance(widget, QComboBox):
                 if k == "station":
                     keys = [
@@ -184,7 +190,6 @@ class ContactEditDialog(QDialog):
                         "station_portable",
                     ]
                     result[k] = keys[widget.currentIndex()]
-                    print(f"[DEBUG] Nuevo valor station: {result[k]}")
                 elif k == "energy":
                     keys = [
                         "no_data",
@@ -193,7 +198,6 @@ class ContactEditDialog(QDialog):
                         "energy_commercial",
                     ]
                     result[k] = keys[widget.currentIndex()]
-                    print(f"[DEBUG] Nuevo valor energy: {result[k]}")
             elif (
                 k == "datetime_oa"
                 and self.log_type == "contest"
@@ -202,11 +206,9 @@ class ContactEditDialog(QDialog):
                 import datetime
 
                 dt_oa = widget.dateTime().toPython()
-                print(f"[DEBUG] Valor datetime_oa editado: {dt_oa}")
                 dt_utc = dt_oa + datetime.timedelta(hours=5)
                 ts = int(dt_utc.replace(tzinfo=datetime.timezone.utc).timestamp())
                 result["timestamp"] = ts
-                print(f"[DEBUG] Nuevo timestamp (contest): {ts}")
             elif (
                 k == "datetime_utc"
                 and self.log_type == "ops"
@@ -214,7 +216,5 @@ class ContactEditDialog(QDialog):
             ):
                 ts = widget.dateTime().toSecsSinceEpoch()
                 result["timestamp"] = ts
-                print(f"[DEBUG] Nuevo timestamp (ops): {ts}")
-        print("[DEBUG] Registro final para guardar:", result)
         self.result_contact = result
         super().accept()
