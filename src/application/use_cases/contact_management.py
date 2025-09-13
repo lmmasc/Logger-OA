@@ -189,7 +189,7 @@ def get_oa_block_from_utc(timestamp_utc):
     import datetime
 
     dt_utc = datetime.datetime.utcfromtimestamp(timestamp_utc)
-    dt_oa = dt_utc - datetime.timedelta(hours=4)
+    dt_oa = dt_utc - datetime.timedelta(hours=5)
     minute = dt_oa.minute
     block = 1 if 0 <= minute < 30 else 2
     hora_oa_str = dt_oa.strftime("%H:%M")
