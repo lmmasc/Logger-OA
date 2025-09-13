@@ -91,4 +91,6 @@ UI_TRANSLATIONS = {
     "edit_contact_datetime_utc": "Fecha y hora (UTC)",
     "edit_contact_datetime_utc_es": "Hora y fecha (UTC) en formato HH:MM DD/MM/AAAA",
     "export_db": "Exportar base de datos",
+    "export_log": "Exportar log",
+    "select_export_format": "Selecciona el formato de exportación:",
 }
