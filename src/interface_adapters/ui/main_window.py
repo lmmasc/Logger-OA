@@ -49,7 +49,7 @@ from .main_window_config import (
     refresh_ui,
     _retranslate_ui,
 )
-from .main_window_view_management import show_view as mw_show_view
+
 from .main_window_db_window import show_db_window, on_db_table_window_closed
 
 """
@@ -131,7 +131,7 @@ class MainWindow(QMainWindow):
         Muestra la vista indicada y actualiza los datos de contactos y cabecera si hay un log abierto.
         """
         # Refactor: actualizar los nombres internos de las vistas
-        mw_show_view(self, view_name)
+        self.view_manager.show_view(view_name)
         # Actualizar la tabla de contactos en la vista activa si hay un log abierto
         if self.current_log is not None:
             contacts = getattr(self.current_log, "contacts", [])

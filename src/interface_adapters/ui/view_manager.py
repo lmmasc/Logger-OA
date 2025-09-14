@@ -1,4 +1,12 @@
+from enum import Enum
 from PySide6.QtWidgets import QStackedWidget
+
+
+class ViewID(Enum):
+    WELCOME_VIEW = "welcome_view"
+    LOG_OPS_VIEW = "log_ops_view"
+    LOG_CONTEST_VIEW = "log_contest_view"
+    # Agrega aquí otros identificadores de vistas según sea necesario
 
 
 class ViewManager:
