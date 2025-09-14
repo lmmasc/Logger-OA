@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from translation.translation_service import translation_service
+from interface_adapters.ui.view_manager import LogType
 import datetime
 from infrastructure.repositories.sqlite_radio_operator_repository import (
     SqliteRadioOperatorRepository,
@@ -25,19 +26,13 @@ class LogFormWidget(QWidget):
     def __init__(
         self,
         parent=None,
-        log_type="ops",
-        callsign="",
-        log_type_name="",
-        log_date="",
+        log_type=LogType.OPERATION_LOG,
     ):
         """
         Inicializa el formulario de log/contacto.
         Args:
             parent: QWidget padre.
-            log_type: Tipo de log ('ops' o 'contest').
-            callsign: Indicativo de llamada.
-            log_type_name: Nombre del tipo de log.
-            log_date: Fecha del log.
+            log_type: Tipo de log (Enum LogType).
         """
         super().__init__(parent)
 
@@ -53,7 +48,7 @@ class LogFormWidget(QWidget):
         form_row.setContentsMargins(0, 0, 0, 0)
         form_row.setAlignment(Qt.AlignLeft)
 
-        if self.log_type == "contest":
+        if self.log_type == LogType.CONTEST_LOG:
             # RS_RX
             self.rs_rx_input = QLineEdit(self)
             self.rs_rx_input.setText("59")
@@ -230,7 +225,7 @@ class LogFormWidget(QWidget):
         self.setLayout(main_layout)
 
         # Refuerzo de tabulación solo entre campos internos
-        if self.log_type == "contest":
+        if self.log_type == LogType.CONTEST_LOG:
             QWidget.setTabOrder(self.rs_rx_input, self.exchange_received_input)
             QWidget.setTabOrder(self.exchange_received_input, self.rs_tx_input)
             QWidget.setTabOrder(self.rs_tx_input, self.exchange_sent_input)
@@ -259,7 +254,7 @@ class LogFormWidget(QWidget):
             "rs_tx": self.rs_tx_input.text(),
             "region": "-",
         }
-        if self.log_type == "contest":
+        if self.log_type == LogType.CONTEST_LOG:
             import uuid
 
             contact_id = str(uuid.uuid4())
@@ -282,7 +277,7 @@ class LogFormWidget(QWidget):
                     "timestamp": timestamp,
                 }
             )
-        elif self.log_type == "ops":
+        elif self.log_type == LogType.OPERATION_LOG:
             operator = get_operator_by_callsign(callsign_val)
             name = operator.name if operator else ""
             country = operator.country if operator else ""
@@ -377,7 +372,9 @@ class LogFormWidget(QWidget):
         main_window = self._find_main_window()
         db_path = getattr(main_window.current_log, "db_path", None)
         log_id = getattr(main_window.current_log, "id", None)
-        contact_type = "operativo" if self.log_type == "ops" else "concurso"
+        contact_type = (
+            "operativo" if self.log_type == LogType.OPERATION_LOG else "concurso"
+        )
         # Obtener contactos existentes para validación
         from domain.repositories.contact_log_repository import ContactLogRepository
 
@@ -440,7 +437,7 @@ class LogFormWidget(QWidget):
                 # Actualiza la tabla y mueve el scroll
                 if hasattr(main_window, "view_manager"):
                     if (
-                        self.log_type == "ops"
+                        self.log_type == LogType.OPERATION_LOG
                         and "log_ops_view" in main_window.view_manager.views
                     ):
                         table_widget = main_window.view_manager.views[
@@ -459,7 +456,7 @@ class LogFormWidget(QWidget):
                                 break
                             parent = parent.parent()
                     elif (
-                        self.log_type == "contest"
+                        self.log_type == LogType.CONTEST_LOG
                         and "log_contest_view" in main_window.view_manager.views
                     ):
                         table_widget = main_window.view_manager.views[
@@ -518,7 +515,7 @@ class LogFormWidget(QWidget):
             # Actualiza la tabla y mueve el scroll
             if hasattr(main_window, "view_manager"):
                 if (
-                    self.log_type == "ops"
+                    self.log_type == LogType.OPERATION_LOG
                     and "log_ops_view" in main_window.view_manager.views
                 ):
                     table_widget = main_window.view_manager.views[
@@ -537,7 +534,7 @@ class LogFormWidget(QWidget):
                             break
                         parent = parent.parent()
                 elif (
-                    self.log_type == "contest"
+                    self.log_type == LogType.CONTEST_LOG
                     and "log_contest_view" in main_window.view_manager.views
                 ):
                     table_widget = main_window.view_manager.views[

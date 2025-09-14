@@ -55,8 +55,8 @@ class LogContestView(QWidget):
         self.form_widget = LogFormWidget(
             self,
             log_type=LogType.CONTEST_LOG,
-            callsign=callsign,
-            log_date=log_date,
+            #    callsign=callsign,
+            #    log_date=log_date,
         )
         self.form_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         layout.addWidget(self.form_widget)

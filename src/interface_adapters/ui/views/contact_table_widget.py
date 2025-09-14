@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (
 from translation.translation_service import translation_service
 from config.settings_service import settings_service
 from PySide6.QtCore import Qt
+from interface_adapters.ui.view_manager import LogType
 
 
 class ContactTableWidget(QWidget):
@@ -16,7 +17,7 @@ class ContactTableWidget(QWidget):
     Adaptable para operativos y concursos.
     """
 
-    def __init__(self, parent=None, log_type="ops"):
+    def __init__(self, parent=None, log_type=LogType.OPERATION_LOG):
         super().__init__(parent)
         self.log_type = log_type
         self.layout = QVBoxLayout(self)
@@ -25,7 +26,7 @@ class ContactTableWidget(QWidget):
         self.setLayout(self.layout)
         self.set_columns()
         # Persistencia de anchos de columna diferenciada por tipo de log
-        self._column_widths_key = f"contact_table_column_widths_{self.log_type}"
+        self._column_widths_key = f"contact_table_column_widths_{self.log_type.name}"
         self.table.horizontalHeader().sectionResized.connect(self.save_column_widths)
         self.load_column_widths()
         # Deshabilitar edición directa
@@ -69,7 +70,9 @@ class ContactTableWidget(QWidget):
             db_path = getattr(main_window.current_log, "db_path", None)
             log_id = getattr(main_window.current_log, "id", None)
             contact_id = contact.get("id", None)
-            contact_type = "operativo" if self.log_type == "ops" else "concurso"
+            contact_type = (
+                "operativo" if self.log_type == LogType.OPERATION_LOG else "concurso"
+            )
             update_contact_in_log(
                 db_path, log_id, contact_id, updated_data, contact_type
             )
@@ -79,7 +82,7 @@ class ContactTableWidget(QWidget):
             self.set_contacts(contacts)
 
     def set_columns(self):
-        if self.log_type == "contest":
+        if self.log_type == LogType.CONTEST_LOG:
             headers = [
                 translation_service.tr("table_header_callsign"),
                 translation_service.tr("name"),
@@ -112,7 +115,7 @@ class ContactTableWidget(QWidget):
     def set_contacts(self, contacts):
         self._last_contacts = contacts
         # Define las claves esperadas según el tipo de log
-        if self.log_type == "contest":
+        if self.log_type == LogType.CONTEST_LOG:
             keys = [
                 "callsign",
                 "name",
@@ -159,7 +162,7 @@ class ContactTableWidget(QWidget):
                             int(ts), tz=datetime.timezone.utc
                         )
                         dt_oa = dt_utc - datetime.timedelta(hours=5)
-                        if self.log_type == "contest":
+                        if self.log_type == LogType.CONTEST_LOG:
                             value = dt_oa.strftime("%H:%M")
                         else:
                             value = dt_oa.strftime(f"%H:%M {date_fmt}")
@@ -175,7 +178,7 @@ class ContactTableWidget(QWidget):
                 elif key == "power":
                     val = contact.get(key, "")
                     value = f"{val} W" if val else ""
-                elif self.log_type == "contest" and key in (
+                elif self.log_type == LogType.CONTEST_LOG and key in (
                     "exchange_received",
                     "exchange_sent",
                 ):
