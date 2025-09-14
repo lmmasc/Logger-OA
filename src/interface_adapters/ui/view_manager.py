@@ -9,6 +9,11 @@ class ViewID(Enum):
     # Agrega aquí otros identificadores de vistas según sea necesario
 
 
+class LogType(Enum):
+    OPERATION_LOG = "operation_log"
+    CONTEST_LOG = "contest_log"
+
+
 class ViewManager:
     """
     Gestor centralizado de vistas para la aplicación.

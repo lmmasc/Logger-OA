@@ -24,7 +24,7 @@ from .menu_bar import MainMenuBar
 from .views.welcome_view import WelcomeView
 from .views.log_ops_view import LogOpsView
 from .views.log_contest_view import LogContestView
-from .view_manager import ViewManager, ViewID
+from .view_manager import ViewManager, ViewID, LogType
 
 from interface_adapters.controllers.database_controller import DatabaseController
 
@@ -77,7 +77,7 @@ class MainWindow(QMainWindow):
         """
         super().__init__()
         self.current_log = None  # Estado del log abierto (None si no hay log)
-        self.current_log_type = None  # "ops" o "contest"
+        self.current_log_type = None  # LogType.OPERATION_LOG o LogType.CONTEST_LOG
 
         # Leer idioma guardado o usar por defecto
         lang = settings_service.get_value("language", "es")
@@ -344,7 +344,7 @@ class MainWindow(QMainWindow):
         """
         Handler para el cambio de idioma. Actualiza la UI de la vista activa.
         """
-        if self.current_log_type == "contest":
+        if self.current_log_type == LogType.CONTEST_LOG:
             self.log_contest_view.retranslate_ui()
-        elif self.current_log_type == "ops":
+        elif self.current_log_type == LogType.OPERATION_LOG:
             self.log_ops_view.retranslate_ui()

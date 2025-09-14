@@ -7,6 +7,7 @@ Funciones utilitarias para obtener rutas relevantes según el entorno.
 import os
 from .defaults import DATA_DIR, EXPORT_DIR, LOG_DIR
 from pathlib import Path
+from interface_adapters.ui.view_manager import LogType
 
 # BASE_PATH apunta a la carpeta de usuario (~) para almacenar archivos generados por la app
 BASE_PATH = str(Path.home() / "LoggerOA")
@@ -78,7 +79,7 @@ def normalize_filename_text(text):
 
 
 def get_log_file_path(
-    operator_callsign: str, log_type: str, timestamp: str, **kwargs
+    operator_callsign: str, log_type: LogType, timestamp: str, **kwargs
 ) -> str:
     """
     Genera el path absoluto para un archivo de log SQLite según el tipo (operativo/concurso),
@@ -89,37 +90,38 @@ def get_log_file_path(
     from .defaults import OPERATIONS_DIR, CONTESTS_DIR
     from translation.translation_service import translation_service
 
-    log_type_folder = {
-        "operation_log": OPERATIONS_DIR,
-        "contest_log": CONTESTS_DIR,
-    }.get(log_type.lower(), "others")
-    folder = os.path.join(BASE_PATH, LOG_DIR, log_type_folder)
+    # Usar Enum LogType directamente y mapear carpeta
+    LOG_TYPE_FOLDER_MAP = {
+        LogType.OPERATION_LOG: OPERATIONS_DIR,
+        LogType.CONTEST_LOG: CONTESTS_DIR,
+    }
+    folder = os.path.join(
+        BASE_PATH, LOG_DIR, LOG_TYPE_FOLDER_MAP.get(log_type, "others")
+    )
     os.makedirs(folder, exist_ok=True)
-    # Nuevo formato de nombre de archivo
-    if log_type.lower() == "operation_log":
+    # Formato de nombre de archivo según tipo de log
+    if log_type == LogType.OPERATION_LOG:
         operation_type_key = kwargs.get("operation_type", "type")
         frequency_band_key = kwargs.get("frequency_band", "band")
         repeater_key = kwargs.get("repeater_key")
-        operation_type = translation_service.tr(operation_type_key)
-        frequency_band = translation_service.tr(frequency_band_key)
-        operation_type = normalize_filename_text(operation_type)
-        frequency_band = normalize_filename_text(frequency_band)
+        operation_type = normalize_filename_text(
+            translation_service.tr(operation_type_key)
+        )
+        frequency_band = normalize_filename_text(
+            translation_service.tr(frequency_band_key)
+        )
         filename_parts = [operator_callsign.upper(), operation_type, frequency_band]
         if repeater_key:
-            repeater = translation_service.tr(repeater_key)
-            repeater = normalize_filename_text(repeater)
+            repeater = normalize_filename_text(translation_service.tr(repeater_key))
             filename_parts.append(repeater)
         filename_parts.append(timestamp.lower())
         filename = "_".join(filename_parts) + ".sqlite"
-    elif log_type.lower() == "contest_log":
+    elif log_type == LogType.CONTEST_LOG:
         contest_key = kwargs.get("contest_key", "contest")
-        contest_name = translation_service.tr(contest_key)
-        contest_name = normalize_filename_text(contest_name)
+        contest_name = normalize_filename_text(translation_service.tr(contest_key))
         filename = (
             f"{operator_callsign.upper()}_{contest_name}_{timestamp.lower()}.sqlite"
         )
     else:
-        filename = (
-            f"{operator_callsign.upper()}_{log_type.lower()}_{timestamp.lower()}.sqlite"
-        )
+        raise ValueError(f"Tipo de log no soportado: {log_type}")
     return os.path.join(folder, filename)

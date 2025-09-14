@@ -23,7 +23,7 @@ from application.use_cases.update_operators_from_pdf import update_operators_fro
 from interface_adapters.ui.dialogs.select_log_type_dialog import SelectLogTypeDialog
 from interface_adapters.ui.dialogs.select_contest_dialog import SelectContestDialog
 from interface_adapters.ui.dialogs.enter_callsign_dialog import EnterCallsignDialog
-from .view_manager import ViewID
+from .view_manager import ViewID, LogType
 
 
 def action_log_new(self):
@@ -35,10 +35,9 @@ def action_log_new(self):
         self.show_view(ViewID.WELCOME_VIEW)
         self.update_menu_state()
         return
-    selected = {"type": dialog.selected_type}
+    selected = {"type": dialog.selected_type}  # dialog.selected_type ya es LogType Enum
     contest_name = None
     if selected["type"]:
-        # Diálogo modularizado para ingresar indicativo
         indicativo_dialog = EnterCallsignDialog(self)
         if not indicativo_dialog.exec() or not indicativo_dialog.callsign:
             self.current_log = None
@@ -48,8 +47,7 @@ def action_log_new(self):
             return
         indicativo = {"callsign": indicativo_dialog.callsign}
 
-        if selected["type"] == "contest_log":
-            # Diálogo modularizado para seleccionar concurso
+        if selected["type"] == LogType.CONTEST_LOG:
             contest_dialog = SelectContestDialog(self)
             if not contest_dialog.exec():
                 self.current_log = None
@@ -63,7 +61,7 @@ def action_log_new(self):
             from application.use_cases.create_log import create_log
 
             extra_kwargs = {}
-            if selected["type"] == "contest_log":
+            if selected["type"] == LogType.CONTEST_LOG:
                 contest_keys = [
                     "contest_world_radio_day",
                     "contest_independence_peru",
@@ -74,7 +72,7 @@ def action_log_new(self):
                 extra_kwargs["contest_key"] = contest_key
                 extra_kwargs["name"] = translation_service.tr(contest_key)
                 extra_kwargs["metadata"] = {"contest_name_key": contest_key}
-            elif selected["type"] == "operation_log":
+            elif selected["type"] == LogType.OPERATION_LOG:
                 from interface_adapters.ui.dialogs.operativo_config_dialog import (
                     OperativoConfigDialog,
                 )
@@ -83,7 +81,6 @@ def action_log_new(self):
                 if not op_dialog.exec():
                     return  # Cancelado
                 operativo_config = op_dialog.get_config()
-                # Pasar tipo y banda para el nombre de archivo
                 extra_kwargs["operation_type"] = operativo_config.get(
                     "operation_type", "type"
                 )
@@ -98,18 +95,15 @@ def action_log_new(self):
                 selected["type"], indicativo["callsign"], **extra_kwargs
             )
             self.current_log = log
-            self.current_log_type = (
-                "ops" if selected["type"] == "operation_log" else "contest"
-            )
-            # Mostrar en cabecera: Indicativo - nombre del concurso - fecha
-            if selected["type"] == "contest_log":
+            self.current_log_type = selected["type"]
+            if self.current_log_type == LogType.CONTEST_LOG:
                 cabecera = f"{log.operator} - {contest_name} - {log.start_time}"
                 self.setWindowTitle(cabecera)
             else:
                 self.setWindowTitle(f"{log.operator} - Operativo - {log.start_time}")
-            if self.current_log_type == "ops":
+            if self.current_log_type == LogType.OPERATION_LOG:
                 self.show_view(ViewID.LOG_OPS_VIEW)
-            elif self.current_log_type == "contest":
+            elif self.current_log_type == LogType.CONTEST_LOG:
                 self.show_view(ViewID.LOG_CONTEST_VIEW)
             else:
                 self.show_view(ViewID.WELCOME_VIEW)
@@ -141,11 +135,11 @@ def action_log_open(self):
     selected = {"type": None}
 
     def select_ops():
-        selected["type"] = "operation_log"
+        selected["type"] = LogType.OPERATION_LOG
         dialog.accept()
 
     def select_contest():
-        selected["type"] = "contest_log"
+        selected["type"] = LogType.CONTEST_LOG
         dialog.accept()
 
     btn_ops.clicked.connect(select_ops)
@@ -154,7 +148,11 @@ def action_log_open(self):
     if selected["type"]:
         log_folder = os.path.join(
             get_log_dir(),
-            OPERATIONS_DIR if selected["type"] == "operation_log" else CONTESTS_DIR,
+            (
+                OPERATIONS_DIR
+                if selected["type"] == LogType.OPERATION_LOG
+                else CONTESTS_DIR
+            ),
         )
         os.makedirs(log_folder, exist_ok=True)
         file_path, _ = QFileDialog.getOpenFileName(
@@ -172,16 +170,16 @@ def action_log_open(self):
                 if hasattr(
                     log, "__class__"
                 ) and log.__class__.__name__.lower().startswith("operation"):
-                    self.current_log_type = "ops"
+                    self.current_log_type = LogType.OPERATION_LOG
                 elif hasattr(
                     log, "__class__"
                 ) and log.__class__.__name__.lower().startswith("contest"):
-                    self.current_log_type = "contest"
+                    self.current_log_type = LogType.CONTEST_LOG
                 else:
                     self.current_log_type = None
-                if self.current_log_type == "ops":
+                if self.current_log_type == LogType.OPERATION_LOG:
                     self.show_view(ViewID.LOG_OPS_VIEW)
-                elif self.current_log_type == "contest":
+                elif self.current_log_type == LogType.CONTEST_LOG:
                     self.show_view(ViewID.LOG_CONTEST_VIEW)
                 else:
                     self.show_view(ViewID.WELCOME_VIEW)
@@ -466,18 +464,21 @@ class ExportFormatDialog(QDialog):
         label = QLabel(translation_service.tr("select_export_format"))
         layout.addWidget(label)
         self.combo = QComboBox(self)
-        if log_type == "ops":
+        # Usar Enum LogType para decidir los formatos
+        if log_type == LogType.OPERATION_LOG:
             self.formats = [
                 ("TXT", ".txt"),
                 ("CSV", ".csv"),
                 ("ADI", ".adi"),
             ]
-        else:
+        elif log_type == LogType.CONTEST_LOG:
             self.formats = [
                 ("PDF", ".pdf"),
                 ("CSV", ".csv"),
                 ("ADI", ".adi"),
             ]
+        else:
+            raise ValueError(f"Tipo de log no soportado: {log_type}")
         self.combo.addItems([f[0] for f in self.formats])
         layout.addWidget(self.combo)
         btn_ok = QPushButton(translation_service.tr("ok_button"), self)
