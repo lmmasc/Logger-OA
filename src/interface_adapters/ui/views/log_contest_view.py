@@ -145,6 +145,10 @@ class LogContestView(QWidget):
     def retranslate_ui(self):
         from datetime import datetime
 
+        # Actualizar relojes OA y UTC
+        self.oa_clock.update_clock()
+        self.utc_clock.update_clock()
+
         lang = translation_service.get_language()
         log = getattr(self, "_current_log", None)
         callsign = log.operator if log else ""
@@ -228,11 +232,6 @@ class LogContestView(QWidget):
                     )
         else:
             self.callsign_info.show_suggestions("")
-
-    def _retranslate_clocks(self):
-        # Refresca el formato de fecha/hora de los relojes al cambiar idioma
-        self.oa_clock.update_clock()
-        self.utc_clock.update_clock()
 
     def _on_add_contact(self):
         callsign = self.callsign_input.get_callsign().strip()

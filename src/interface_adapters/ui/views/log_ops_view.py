@@ -113,7 +113,6 @@ class LogOpsView(QWidget):
         self.setLayout(layout)
         # Conexión de señales para refresco de UI y relojes al cambiar idioma
         translation_service.signal.language_changed.connect(self.retranslate_ui)
-        translation_service.signal.language_changed.connect(self._retranslate_clocks)
         self.update_header()
         # Evitar foco en cola y tabla
         self.queue_widget.setFocusPolicy(Qt.NoFocus)
@@ -158,14 +157,6 @@ class LogOpsView(QWidget):
         if hasattr(self.form_widget, "station_input"):
             self.form_widget.station_input.setFocus()
 
-    def _retranslate_clocks(self):
-        """
-        Refresca el formato de fecha/hora de los relojes OA y UTC al cambiar idioma.
-        """
-        self.oa_clock.update_clock()
-        self.utc_clock.update_clock()
-        self.update_header()
-
     def update_header(self):
         """
         Actualiza el texto del encabezado principal de la vista.
@@ -184,9 +175,13 @@ class LogOpsView(QWidget):
 
     def retranslate_ui(self):
         """
-        Actualiza los textos de la UI según el idioma seleccionado y los datos del log.
+        Actualiza los textos de la UI según el idioma seleccionado y los datos del log, y refresca relojes.
         """
         from datetime import datetime
+
+        # Actualizar relojes OA y UTC
+        self.oa_clock.update_clock()
+        self.utc_clock.update_clock()
 
         lang = translation_service.get_language()
         log_type_name = translation_service.tr("log_type_ops")
