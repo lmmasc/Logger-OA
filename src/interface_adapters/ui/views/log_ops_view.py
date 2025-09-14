@@ -21,20 +21,16 @@ class LogOpsView(QWidget):
     Permite visualizar y editar contactos, gestionar la cola y mostrar información de indicativos.
     """
 
-    def __init__(
-        self, parent=None, callsign="", log_type_name="Operativo", log_date=""
-    ):
+    def __init__(self, parent=None, callsign="", log_date=""):
         """
         Inicializa la vista de log operativo, configurando todos los componentes visuales y sus conexiones.
         Args:
             parent: QWidget padre.
             callsign: Indicativo inicial.
-            log_type_name: Nombre del tipo de log.
             log_date: Fecha del log.
         """
         super().__init__(parent)
         self.callsign = callsign
-        self.log_type_name = log_type_name
         self.log_date = log_date
         layout = QVBoxLayout()
         layout.setContentsMargins(10, 4, 10, 10)
@@ -67,7 +63,6 @@ class LogOpsView(QWidget):
             self,
             log_type="ops",
             callsign=callsign,
-            log_type_name=log_type_name,
             log_date=log_date,
         )
         self.form_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -159,9 +154,37 @@ class LogOpsView(QWidget):
 
     def update_header(self):
         """
-        Actualiza el texto del encabezado principal de la vista.
+        Actualiza el texto del encabezado principal de la vista usando la misma lógica que retranslate_ui.
         """
-        header_text = f"{self.log_type_name} - {self.callsign} - {self.log_date}"
+        log = getattr(self, "_current_log", None)
+        callsign = log.operator if log else ""
+        meta = getattr(log, "metadata", {}) if log else {}
+        operation_type = (
+            translation_service.tr(meta.get("operation_type", "")) if meta else ""
+        )
+        frequency_band = (
+            translation_service.tr(meta.get("frequency_band", "")) if meta else ""
+        )
+        mode = translation_service.tr(meta.get("mode_key", "")) if meta else ""
+        freq = meta.get("frequency", "") if meta else ""
+        repeater = (
+            translation_service.tr(meta.get("repeater_key", ""))
+            if meta and meta.get("repeater_key")
+            else ""
+        )
+        log_date = meta.get("log_date", "") if meta else ""
+        show_freq = True
+        if frequency_band.lower() == translation_service.tr("vhf").lower():
+            repeater_key = meta.get("repeater_key", "")
+            if repeater_key and repeater_key != "rep_simplex":
+                show_freq = False
+        header_parts = [callsign, operation_type, frequency_band, mode]
+        if show_freq and freq:
+            header_parts.append(freq)
+        if repeater:
+            header_parts.append(repeater)
+        header_parts.append(log_date)
+        header_text = " | ".join([str(p) for p in header_parts if p])
         self.header_widget.update_text(header_text)
 
     def set_log_data(self, log):

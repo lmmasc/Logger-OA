@@ -17,10 +17,9 @@ from .contact_queue_widget import ContactQueueWidget
 
 
 class LogContestView(QWidget):
-    def __init__(self, parent=None, callsign="", log_type_name="Concurso", log_date=""):
+    def __init__(self, parent=None, callsign="", log_date=""):
         super().__init__(parent)
         self.callsign = callsign
-        self.log_type_name = log_type_name
         self.log_date = log_date
         layout = QVBoxLayout()
         layout.setContentsMargins(10, 4, 10, 10)
@@ -55,7 +54,6 @@ class LogContestView(QWidget):
             self,
             log_type="contest",
             callsign=callsign,
-            log_type_name=log_type_name,
             log_date=log_date,
         )
         self.form_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -208,7 +206,7 @@ class LogContestView(QWidget):
                 log_date = date_obj.strftime("%m/%d/%Y")
         except Exception:
             log_date = dt
-        header_text = f"{self.log_type_name} - {callsign} - {log_date}"
+        header_text = f"{callsign} | {contest_name} | {log_date}"
         self.header_widget.update_text(header_text)
 
     def _update_callsign_info(self):
