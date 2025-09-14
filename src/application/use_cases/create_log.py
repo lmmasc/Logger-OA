@@ -52,5 +52,5 @@ def create_log(log_type: LogType, operator_callsign: str, **kwargs):
 
     log.db_path = db_path
     repo = ContactLogRepository(db_path)
-    repo.save_log(log)
+    repo.save_log(log, log_type.value)
     return db_path, log

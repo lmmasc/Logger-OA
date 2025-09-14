@@ -35,7 +35,7 @@ class ContactLogRepository:
             )
             conn.commit()
 
-    def save_log(self, log: ContactLog):
+    def save_log(self, log: ContactLog, log_type_str: str):
         import json
 
         with sqlite3.connect(self.db_path) as conn:
@@ -47,7 +47,7 @@ class ContactLogRepository:
             """,
                 (
                     log.id,
-                    log.__class__.__name__,
+                    log_type_str,  # Guarda el string del tipo de log
                     log.operator,
                     log.start_time,
                     log.end_time,

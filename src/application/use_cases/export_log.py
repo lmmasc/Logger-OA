@@ -3,6 +3,7 @@ import os
 from domain.repositories.contact_log_repository import ContactLogRepository
 from config.paths import get_export_dir
 from utils.resources import get_resource_path
+from interface_adapters.ui.view_manager import LogType
 
 
 def export_log_to_txt(db_path: str, export_path: str, translation_service=None) -> str:
@@ -36,13 +37,8 @@ def export_log_to_txt(db_path: str, export_path: str, translation_service=None) 
     lang = translation_service.get_language()
     # Headers y campos como en ContactTableWidget
     print(f"[EXPORT][DEBUG] log_type recibido: {log_type}")
-    log_type_normalized = str(log_type).lower()
-    # contest_types y operation_types como antes
-    contest_types = ("concurso", "contest", "contest_log", "contestlog")
-    operation_types = ("operativo", "ops", "operation_log", "operationlog")
-    is_contest = log_type_normalized in contest_types
-    print(f"[EXPORT][DEBUG] is_contest: {is_contest}")
-    if is_contest:
+    # Comparar directamente con Enum
+    if log_type == LogType.CONTEST_LOG.value:
         headers = [
             translation_service.tr("table_header_callsign"),
             translation_service.tr("name"),
@@ -65,7 +61,7 @@ def export_log_to_txt(db_path: str, export_path: str, translation_service=None) 
             "exchange_sent",
             "observations",
         ]
-    else:
+    elif log_type == LogType.OPERATION_LOG.value:
         headers = [
             translation_service.tr("table_header_callsign"),
             translation_service.tr("name"),
@@ -94,6 +90,8 @@ def export_log_to_txt(db_path: str, export_path: str, translation_service=None) 
             "qtr_utc",
             "obs",
         ]
+    else:
+        raise ValueError(f"Tipo de log no soportado para exportación: {log_type}")
     print(f"[EXPORT][DEBUG] headers: {headers}")
     # Procesar filas como en la UI
     import datetime
@@ -115,7 +113,7 @@ def export_log_to_txt(db_path: str, export_path: str, translation_service=None) 
                             int(ts), tz=datetime.timezone.utc
                         )
                         dt_oa = dt_utc - datetime.timedelta(hours=5)
-                        if log_type == "contest":
+                        if log_type == LogType.CONTEST_LOG.value:
                             value = dt_oa.strftime("%H:%M")
                         else:
                             value = dt_oa.strftime(f"%H:%M {date_fmt}")
@@ -133,7 +131,7 @@ def export_log_to_txt(db_path: str, export_path: str, translation_service=None) 
                 elif key == "power":
                     val = contact.get(key, "")
                     row.append(f"{val} W" if val else "")
-                elif log_type == "contest" and key in (
+                elif log_type == LogType.CONTEST_LOG.value and key in (
                     "exchange_received",
                     "exchange_sent",
                 ):
@@ -178,13 +176,8 @@ def export_log_to_csv(
     lang = translation_service.get_language()
     # Headers y campos como en ContactTableWidget
     print(f"[EXPORT][DEBUG] log_type recibido: {log_type}")
-    log_type_normalized = str(log_type).lower()
-    # contest_types y operation_types como antes
-    contest_types = ("concurso", "contest", "contest_log", "contestlog")
-    operation_types = ("operativo", "ops", "operation_log", "operationlog")
-    is_contest = log_type_normalized in contest_types
-    print(f"[EXPORT][DEBUG] is_contest: {is_contest}")
-    if is_contest:
+    # Comparar directamente con Enum
+    if log_type == LogType.CONTEST_LOG.value:
         headers = [
             translation_service.tr("table_header_callsign"),
             translation_service.tr("name"),
@@ -207,7 +200,7 @@ def export_log_to_csv(
             "exchange_sent",
             "observations",
         ]
-    else:
+    elif log_type == LogType.OPERATION_LOG.value:
         headers = [
             translation_service.tr("table_header_callsign"),
             translation_service.tr("name"),
@@ -236,6 +229,8 @@ def export_log_to_csv(
             "qtr_utc",
             "obs",
         ]
+    else:
+        raise ValueError(f"Tipo de log no soportado para exportación: {log_type}")
     print(f"[EXPORT][DEBUG] headers: {headers}")
     # Procesar filas como en la UI
     import datetime
@@ -353,9 +348,6 @@ def export_log_to_adi(db_path: str, export_path: str) -> str:
     adif_lines.append(
         f"<ADIF_VER:5>3.1.0 <STATION_CALLSIGN:{len(operator)}>{operator} <EOH>"
     )
-    contest_types = ("concurso", "contest", "contest_log", "contestlog")
-    log_type_normalized = str(log_type).lower()
-    is_contest = log_type_normalized in contest_types
     for contact in contacts:
         # Campos mínimos
         callsign = contact.get("callsign", "")
@@ -368,7 +360,7 @@ def export_log_to_adi(db_path: str, export_path: str) -> str:
             qso_date = ""
             time_on = ""
         # Banda y modo
-        if is_contest:
+        if log_type == LogType.CONTEST_LOG.value:
             band = "40M"
             mode = "SSB"
         else:
