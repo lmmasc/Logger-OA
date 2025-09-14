@@ -19,13 +19,19 @@ class ViewManager:
         self.stacked_widget = QStackedWidget(parent)
         self.views = {}
 
-    def register_view(self, name, view_instance):
-        self.views[name] = view_instance
+    def register_view(self, view_id: ViewID, view_instance):
+        """
+        Registra una vista usando un identificador del Enum ViewID.
+        """
+        self.views[view_id] = view_instance
         self.stacked_widget.addWidget(view_instance)
 
-    def show_view(self, name):
-        if name in self.views:
-            self.stacked_widget.setCurrentWidget(self.views[name])
+    def show_view(self, view_id: ViewID):
+        """
+        Muestra la vista correspondiente al identificador ViewID.
+        """
+        if view_id in self.views:
+            self.stacked_widget.setCurrentWidget(self.views[view_id])
 
     def get_widget(self):
         return self.stacked_widget

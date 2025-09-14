@@ -24,7 +24,7 @@ from .menu_bar import MainMenuBar
 from .views.welcome_view import WelcomeView
 from .views.log_ops_view import LogOpsView
 from .views.log_contest_view import LogContestView
-from .view_manager import ViewManager
+from .view_manager import ViewManager, ViewID
 
 from interface_adapters.controllers.database_controller import DatabaseController
 
@@ -104,11 +104,11 @@ class MainWindow(QMainWindow):
         # Instanciar vistas solo una vez
         self.log_ops_view = LogOpsView(self)
         self.log_contest_view = LogContestView(self)
-        self.view_manager.register_view("welcome_view", WelcomeView(self))
-        self.view_manager.register_view("log_ops_view", self.log_ops_view)
-        self.view_manager.register_view("log_contest_view", self.log_contest_view)
+        self.view_manager.register_view(ViewID.WELCOME_VIEW, WelcomeView(self))
+        self.view_manager.register_view(ViewID.LOG_OPS_VIEW, self.log_ops_view)
+        self.view_manager.register_view(ViewID.LOG_CONTEST_VIEW, self.log_contest_view)
         self.setCentralWidget(self.view_manager.get_widget())
-        self.view_manager.show_view("welcome_view")
+        self.view_manager.show_view(ViewID.WELCOME_VIEW)
 
         # Conectar acciones del menú de forma explícita
         self._connect_menu_actions()
@@ -126,27 +126,26 @@ class MainWindow(QMainWindow):
     # =====================
     # Gestión de vistas principales
     # =====================
-    def show_view(self, view_name: str) -> None:
+    def show_view(self, view_id: ViewID) -> None:
         """
         Muestra la vista indicada y actualiza los datos de contactos y cabecera si hay un log abierto.
         """
-        # Refactor: actualizar los nombres internos de las vistas
-        self.view_manager.show_view(view_name)
+        self.view_manager.show_view(view_id)
         # Actualizar la tabla de contactos en la vista activa si hay un log abierto
         if self.current_log is not None:
             contacts = getattr(self.current_log, "contacts", [])
-            if view_name == "log_ops_view" and hasattr(
+            if view_id == ViewID.LOG_OPS_VIEW and hasattr(
                 self.log_ops_view, "table_widget"
             ):
                 self.log_ops_view.table_widget.set_contacts(contacts)
-            elif view_name == "log_contest_view" and hasattr(
+            elif view_id == ViewID.LOG_CONTEST_VIEW and hasattr(
                 self.log_contest_view, "table_widget"
             ):
                 self.log_contest_view.table_widget.set_contacts(contacts)
         # Actualizar cabecera de la vista activa
-        if view_name == "log_contest_view" and self.current_log:
+        if view_id == ViewID.LOG_CONTEST_VIEW and self.current_log:
             self.log_contest_view.set_log_data(self.current_log)
-        elif view_name == "log_ops_view" and self.current_log:
+        elif view_id == ViewID.LOG_OPS_VIEW and self.current_log:
             self.log_ops_view.set_log_data(self.current_log)
 
     # =====================

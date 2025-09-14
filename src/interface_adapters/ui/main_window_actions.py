@@ -23,6 +23,7 @@ from application.use_cases.update_operators_from_pdf import update_operators_fro
 from interface_adapters.ui.dialogs.select_log_type_dialog import SelectLogTypeDialog
 from interface_adapters.ui.dialogs.select_contest_dialog import SelectContestDialog
 from interface_adapters.ui.dialogs.enter_callsign_dialog import EnterCallsignDialog
+from .view_manager import ViewID
 
 
 def action_log_new(self):
@@ -31,7 +32,7 @@ def action_log_new(self):
     if not dialog.exec():
         self.current_log = None
         self.current_log_type = None
-        self.show_view("welcome_view")
+        self.show_view(ViewID.WELCOME_VIEW)
         self.update_menu_state()
         return
     selected = {"type": dialog.selected_type}
@@ -42,7 +43,7 @@ def action_log_new(self):
         if not indicativo_dialog.exec() or not indicativo_dialog.callsign:
             self.current_log = None
             self.current_log_type = None
-            self.show_view("welcome_view")
+            self.show_view(ViewID.WELCOME_VIEW)
             self.update_menu_state()
             return
         indicativo = {"callsign": indicativo_dialog.callsign}
@@ -53,7 +54,7 @@ def action_log_new(self):
             if not contest_dialog.exec():
                 self.current_log = None
                 self.current_log_type = None
-                self.show_view("welcome_view")
+                self.show_view(ViewID.WELCOME_VIEW)
                 self.update_menu_state()
                 return
             contest_name = contest_dialog.selected_contest
@@ -106,15 +107,20 @@ def action_log_new(self):
                 self.setWindowTitle(cabecera)
             else:
                 self.setWindowTitle(f"{log.operator} - Operativo - {log.start_time}")
-            self.show_view(f"log_{self.current_log_type}_view")
+            if self.current_log_type == "ops":
+                self.show_view(ViewID.LOG_OPS_VIEW)
+            elif self.current_log_type == "contest":
+                self.show_view(ViewID.LOG_CONTEST_VIEW)
+            else:
+                self.show_view(ViewID.WELCOME_VIEW)
         else:
             self.current_log = None
             self.current_log_type = None
-            self.show_view("welcome_view")
+            self.show_view(ViewID.WELCOME_VIEW)
     else:
         self.current_log = None
         self.current_log_type = None
-        self.show_view("welcome_view")
+        self.show_view(ViewID.WELCOME_VIEW)
     self.update_menu_state()
 
 
@@ -173,10 +179,12 @@ def action_log_open(self):
                     self.current_log_type = "contest"
                 else:
                     self.current_log_type = None
-                if self.current_log_type:
-                    self.show_view(f"log_{self.current_log_type}_view")
+                if self.current_log_type == "ops":
+                    self.show_view(ViewID.LOG_OPS_VIEW)
+                elif self.current_log_type == "contest":
+                    self.show_view(ViewID.LOG_CONTEST_VIEW)
                 else:
-                    self.show_view("welcome_view")
+                    self.show_view(ViewID.WELCOME_VIEW)
                     self.current_log = None
             except Exception as e:
                 QMessageBox.critical(
@@ -186,15 +194,15 @@ def action_log_open(self):
                 )
                 self.current_log = None
                 self.current_log_type = None
-                self.show_view("welcome_view")
+                self.show_view(ViewID.WELCOME_VIEW)
         else:
             self.current_log = None
             self.current_log_type = None
-            self.show_view("welcome_view")
+            self.show_view(ViewID.WELCOME_VIEW)
     else:
         self.current_log = None
         self.current_log_type = None
-        self.show_view("welcome_view")
+        self.show_view(ViewID.WELCOME_VIEW)
     self.update_menu_state()
 
 
@@ -276,7 +284,7 @@ def action_log_export(self):
 def action_log_close(self):
     self.current_log = None
     self.current_log_type = None
-    self.show_view("welcome_view")
+    self.show_view(ViewID.WELCOME_VIEW)
     self.update_menu_state()
 
 
