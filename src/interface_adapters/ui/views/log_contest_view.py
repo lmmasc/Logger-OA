@@ -12,8 +12,10 @@ from .callsign_info_widget import CallsignInfoWidget
 from .clock_widget import ClockWidget
 from .log_form_widget import LogFormWidget
 from .contact_table_widget import ContactTableWidget
+
 from .header_widget import HeaderWidget
 from .contact_queue_widget import ContactQueueWidget
+from interface_adapters.ui.view_manager import LogType
 
 
 class LogContestView(QWidget):
@@ -52,7 +54,7 @@ class LogContestView(QWidget):
         # Formulario de log de concurso
         self.form_widget = LogFormWidget(
             self,
-            log_type="contest",
+            log_type=LogType.CONTEST_LOG,
             callsign=callsign,
             log_date=log_date,
         )
@@ -81,7 +83,7 @@ class LogContestView(QWidget):
         clock_row.setLayout(clock_layout)
         layout.addWidget(clock_row)
         # Tabla de contactos
-        self.table_widget = ContactTableWidget(self, log_type="contest")
+        self.table_widget = ContactTableWidget(self, log_type=LogType.CONTEST_LOG)
         layout.addWidget(self.table_widget)
         self.setLayout(layout)
         # Conexiones y traducción

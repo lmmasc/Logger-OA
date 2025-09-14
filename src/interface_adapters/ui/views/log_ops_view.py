@@ -6,6 +6,7 @@ Incluye formulario, cola de contactos, tabla y área de información de indicati
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QSizePolicy, QHBoxLayout
 from PySide6.QtCore import Qt, QTimer
 from translation.translation_service import translation_service
+
 from .log_form_widget import LogFormWidget
 from .contact_table_widget import ContactTableWidget
 from .header_widget import HeaderWidget
@@ -13,6 +14,7 @@ from .contact_queue_widget import ContactQueueWidget
 from .callsign_input_widget import CallsignInputWidget
 from .callsign_info_widget import CallsignInfoWidget
 from .clock_widget import ClockWidget
+from interface_adapters.ui.view_manager import LogType
 
 
 class LogOpsView(QWidget):
@@ -61,7 +63,7 @@ class LogOpsView(QWidget):
         # Formulario sin botón
         self.form_widget = LogFormWidget(
             self,
-            log_type="ops",
+            log_type=LogType.OPERATION_LOG,
             callsign=callsign,
             log_date=log_date,
         )
@@ -94,7 +96,7 @@ class LogOpsView(QWidget):
         clock_row.setLayout(clock_layout)
         layout.addWidget(clock_row)
         self.table_widget = ContactTableWidget(
-            self, log_type="ops"
+            self, log_type=LogType.OPERATION_LOG
         )  # Persistencia diferenciada por log_type
         self.table_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         layout.addWidget(self.table_widget)
