@@ -183,11 +183,8 @@ class LogOpsView(QWidget):
         self.oa_clock.update_clock()
         self.utc_clock.update_clock()
 
-        lang = translation_service.get_language()
-        log_type_name = translation_service.tr("log_type_ops")
         log = getattr(self, "_current_log", None)
         callsign = log.operator if log else ""
-        dt = log.start_time if log else ""
         meta = getattr(log, "metadata", {}) if log else {}
         operation_type = (
             translation_service.tr(meta.get("operation_type", "")) if meta else ""
@@ -205,8 +202,6 @@ class LogOpsView(QWidget):
         log_date = meta.get("log_date", "") if meta else ""
         # Lógica para mostrar frecuencia solo si es simplex (y VHF)
         show_freq = True
-        # Mostrar frecuencia solo si es VHF y la operación es simplex (repeater_key == 'rep_simplex')
-        # Si se usa repetidora (repeater_key != 'rep_simplex'), no mostrar frecuencia
         if frequency_band.lower() == translation_service.tr("vhf").lower():
             repeater_key = meta.get("repeater_key", "")
             if repeater_key and repeater_key != "rep_simplex":
