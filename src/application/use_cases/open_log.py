@@ -1,20 +1,24 @@
 import os
+import json
+import sqlite3
 from domain.repositories.contact_log_repository import ContactLogRepository
 from domain.entities.operation import OperationLog
 from domain.entities.contest import ContestLog
-import json
 from config.defaults import OPERATIONS_DIR, CONTESTS_DIR
+from config.paths import BASE_PATH
+from interface_adapters.ui.view_manager import LogType
 
 
-def list_log_files(log_type: str) -> list:
+def list_log_files(log_type: LogType) -> list:
     """
-    Lista los archivos de logs disponibles para el tipo dado (operativo/concurso).
+    Lista los archivos de logs disponibles para el tipo dado (LogType Enum).
     """
-    from config.paths import BASE_PATH
-
-    folder = os.path.join(
-        BASE_PATH, OPERATIONS_DIR if log_type == "operativo" else CONTESTS_DIR
-    )
+    if log_type == LogType.OPERATION_LOG:
+        folder = os.path.join(BASE_PATH, OPERATIONS_DIR)
+    elif log_type == LogType.CONTEST_LOG:
+        folder = os.path.join(BASE_PATH, CONTESTS_DIR)
+    else:
+        raise ValueError(f"Tipo de log no soportado: {log_type}")
     if not os.path.exists(folder):
         return []
     return [
@@ -28,8 +32,6 @@ def open_log(db_path: str):
     Devuelve una instancia de OperationLog o ContestLog según corresponda.
     """
     repo = ContactLogRepository(db_path)
-    import sqlite3
-
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
         c.execute(
@@ -40,7 +42,7 @@ def open_log(db_path: str):
             raise FileNotFoundError("No se encontró ningún log en la base de datos.")
         log_type = row[1]
         metadata = json.loads(row[5]) if row[5] else {}
-        if log_type == "OperationLog":
+        if log_type == LogType.OPERATION_LOG.value:
             log = OperationLog(
                 id=row[0],
                 operator=row[2],
@@ -48,7 +50,7 @@ def open_log(db_path: str):
                 end_time=row[4],
                 metadata=metadata,
             )
-        elif log_type == "ContestLog":
+        elif log_type == LogType.CONTEST_LOG.value:
             log = ContestLog(
                 id=row[0],
                 operator=row[2],
@@ -57,7 +59,7 @@ def open_log(db_path: str):
                 metadata=metadata,
             )
         else:
-            raise ValueError("Tipo de log no soportado")
+            raise ValueError(f"Tipo de log no soportado: {log_type}")
     # Obtener contactos
     contacts = repo.get_contacts(log.id)
     log.contacts = contacts

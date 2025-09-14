@@ -353,7 +353,7 @@ def export_log_to_adi(db_path: str, export_path: str) -> str:
         callsign = contact.get("callsign", "")
         ts = contact.get("timestamp", None)
         if ts:
-            dt_utc = datetime.datetime.utcfromtimestamp(int(ts))
+            dt_utc = datetime.datetime.fromtimestamp(int(ts), tz=datetime.timezone.utc)
             qso_date = dt_utc.strftime("%Y%m%d")
             time_on = dt_utc.strftime("%H%M%S")
         else:
