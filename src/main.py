@@ -1,33 +1,54 @@
 """
-Archivo principal de la aplicación.
+Archivo principal de la aplicación Logger OA v2.
 
-Este script crea y muestra la ventana principal usando PySide6.
+Este script inicializa la base de datos y lanza la ventana principal usando PySide6.
 
-- Se importa sys para pasar los argumentos de línea de comandos a QApplication.
-- Se importa MainWindow desde app.ui.main_window.
+Flujo principal:
+1. Inicializa la base de datos de radioaficionados.
+2. Crea la instancia QApplication.
+3. Muestra la ventana principal.
+4. Maneja cualquier excepción global mostrando un mensaje crítico.
 """
 
-import sys  # Para acceder a los argumentos de línea de comandos
-from PySide6.QtWidgets import QApplication
-from interface_adapters.ui.main_window import MainWindow
+import sys
+import traceback
+
+# Terceros
+from PySide6.QtWidgets import QApplication, QMessageBox
+
+# Locales
+from config.paths import get_database_path
 from infrastructure.db.connection import get_connection
 from infrastructure.db.schema import init_radioamateur_table
-from config.paths import get_database_path
+from interface_adapters.ui.main_window import MainWindow
 
 
 def main():
-    """Punto de entrada de la aplicación."""
-    # Inicializar la tabla de radioaficionados
-    conn = get_connection(get_database_path())
-    init_radioamateur_table(conn)
-    conn.close()
+    """
+    Punto de entrada de la aplicación.
 
-    app = QApplication(
-        sys.argv
-    )  # QApplication procesa los argumentos de línea de comandos
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec())  # Ejecuta el bucle principal de la aplicación
+    Inicializa la base de datos y lanza la ventana principal.
+    Si ocurre una excepción no capturada, muestra un mensaje crítico al usuario.
+    """
+    try:
+        # Inicializar la tabla de radioaficionados en la base de datos
+        conn = get_connection(get_database_path())
+        init_radioamateur_table(conn)
+        conn.close()
+
+        # Crear la aplicación Qt y mostrar la ventana principal
+        app = QApplication(sys.argv)
+        window = MainWindow()
+        window.show()
+        sys.exit(app.exec())
+    except Exception as e:
+        # Manejo global de excepciones: muestra mensaje crítico y termina
+        app = QApplication.instance() or QApplication(sys.argv)
+        error_msg = (
+            f"Ocurrió un error inesperado:\n{str(e)}\n\n{traceback.format_exc()}"
+        )
+        QMessageBox.critical(None, "Error crítico", error_msg)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
