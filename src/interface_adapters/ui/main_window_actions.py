@@ -6,13 +6,8 @@ Cada función recibe la instancia de MainWindow como primer argumento.
 
 # Imports externos
 from PySide6.QtWidgets import (
-    QDialog,
-    QVBoxLayout,
-    QLabel,
-    QPushButton,
     QMessageBox,
     QFileDialog,
-    QComboBox,
     QApplication,
 )
 from PySide6.QtCore import Qt, QTimer, QUrl
