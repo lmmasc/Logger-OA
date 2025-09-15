@@ -1,4 +1,15 @@
-# Logger OA v2
+
+## Licencia y condiciones de uso
+
+Este software se distribuye bajo la licencia MIT. Puedes copiarlo, modificarlo y crear tus propias versiones, siempre y cuando **menciones a los desarrolladores originales** en los créditos:
+
+- Miguel OA4BAU
+- Raquel OA4EHN
+
+No se aceptan sugerencias ni mejoras en este repositorio oficial. Eres libre de crear y distribuir tus propias versiones, respetando la mención a los autores.
+
+**Disclaimer:** Este software se proporciona "tal cual", sin garantías de ningún tipo, expresas o implícitas. Los autores no se hacen responsables por daños, pérdidas o cualquier consecuencia derivada del uso del software. Úsalo bajo tu propio riesgo.
+# Logger OA
 
 ![PySide6](https://img.shields.io/badge/UI-PySide6-blue)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
@@ -185,14 +196,3 @@ pytest
 
 ---
 
-## Licencia
-
-Este proyecto está bajo la licencia MIT. Puedes modificar, distribuir y usar libremente el código.
-
----
-
-## Créditos / Autoría
-
-Desarrollado por la comunidad OA Perú y colaboradores.
-
-Si usas este software, por favor cita el repositorio y contribuye con mejoras.

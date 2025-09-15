@@ -1,3 +1,5 @@
+# Archivos personales
+sugerencias_moi.md
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -57,3 +59,6 @@ coverage.xml
 
 # Windows
 Thumbs.db
+
+# Documentos locales
+BaseDocs/
