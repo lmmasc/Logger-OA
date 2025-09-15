@@ -1,34 +1,24 @@
-# --- Imports estándar ---
+"""
+main_window.py
+Ventana principal de Logger OA v2 (PySide6).
+Gestiona la UI, menús, vistas, temas, idioma y delega acciones a main_window_actions.
+"""
+
+# Imports estándar
 import os
 
-# --- Imports externos ---
-from PySide6.QtWidgets import (
-    QMainWindow,
-    QApplication,
-    QMessageBox,
-    QFileDialog,
-)
-from PySide6.QtCore import QUrl
-from PySide6.QtGui import QDesktopServices
+# Imports externos
+from PySide6.QtWidgets import QMainWindow, QApplication
 
-# --- Imports de configuración y utilidades ---
+# Imports internos: configuración, traducción, UI, acciones
 from config.settings_service import settings_service
-from config.paths import get_database_path, BASE_PATH
-
-# --- Imports de traducción y temas ---
 from translation.translation_service import translation_service
 from .themes.theme_manager import ThemeManager
-
-# --- Imports de UI y vistas ---
 from .menu_bar import MainMenuBar
 from .views.welcome_view import WelcomeView
 from .views.log_ops_view import LogOpsView
 from .views.log_contest_view import LogContestView
 from .view_manager import ViewManager, ViewID, LogType
-
-from interface_adapters.controllers.database_controller import DatabaseController
-
-# --- Imports de acciones, diálogos y gestión de ventana ---
 from .main_window_actions import (
     action_log_new,
     action_log_open,
@@ -37,6 +27,12 @@ from .main_window_actions import (
     action_db_import_pdf,
     action_db_export,
     action_db_delete,
+    action_db_backup,
+    action_db_restore,
+    action_db_import_db,
+    action_open_data_folder,
+    action_show_db_window,
+    action_on_db_table_window_closed,
 )
 from .main_window_dialogs import show_about_dialog, show_manual_dialog
 from .main_window_config import (
@@ -50,48 +46,32 @@ from .main_window_config import (
     _retranslate_ui,
 )
 
-from .main_window_db_window import show_db_window, on_db_table_window_closed
-
-"""
-Módulo de la ventana principal de la aplicación.
-
-Contiene la clase MainWindow, que define la ventana principal usando PySide6.
-"""
-
 
 class MainWindow(QMainWindow):
     """
-    Ventana principal de la aplicación.
-
-    Hereda de QMainWindow y configura el título, tamaño inicial y la barra de menús.
-    Permite cambiar el tema y el idioma, y muestra un diálogo de información.
+    Ventana principal de la aplicación Logger OA v2.
+    Gestiona la UI, menús, vistas, temas, idioma y delega acciones a main_window_actions.
     """
 
-    # =====================
-    # Inicialización y configuración principal
-    # =====================
     def __init__(self):
         """
-        Inicializa la ventana principal, configura el título, tamaño, barra de menús,
-        gestor de temas y conecta las acciones del menú.
+        Inicializa la ventana principal, configura título, tamaño, menús, temas, vistas y conecta señales.
         """
         super().__init__()
-        self.current_log = None  # Estado del log abierto (None si no hay log)
+        self.current_log = None  # Log abierto (None si no hay log)
         self.current_log_type = None  # LogType.OPERATION_LOG o LogType.CONTEST_LOG
+        self.db_table_window = (
+            None  # Instancia única de ventana de tabla de base de datos
+        )
 
-        # Leer idioma guardado o usar por defecto
+        # Configuración de idioma y título
         lang = settings_service.get_value("language", "es")
         translation_service.set_language(lang)
-        self.setWindowTitle(
-            translation_service.tr("main_window_title")
-        )  # Título de la ventana
-        self.resize(1200, 700)  # Solo tamaño inicial
+        self.setWindowTitle(translation_service.tr("main_window_title"))
+        self.resize(1200, 700)
         self.center()
 
-        # Instancia única de la ventana de tabla de base de datos
-        self.db_table_window = None
-
-        # Crear y asignar la barra de menús
+        # Barra de menús
         self.menu_bar = MainMenuBar(self)
         self.setMenuBar(self.menu_bar)
 
@@ -99,9 +79,8 @@ class MainWindow(QMainWindow):
         self.theme_manager = ThemeManager()
         self.theme_manager.load_last_theme()
 
-        # --- Gestor de vistas ---
+        # Gestor de vistas
         self.view_manager = ViewManager(self)
-        # Instanciar vistas solo una vez
         self.log_ops_view = LogOpsView(self)
         self.log_contest_view = LogContestView(self)
         self.view_manager.register_view(ViewID.WELCOME_VIEW, WelcomeView(self))
@@ -110,28 +89,22 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.view_manager.get_widget())
         self.view_manager.show_view(ViewID.WELCOME_VIEW)
 
-        # Conectar acciones del menú de forma explícita
+        # Conexión de acciones del menú
         self._connect_menu_actions()
 
-        # --- CORRECCIONES Y MEJORAS ---
-        # 1. show_view debe ser método de instancia (faltaba tras refactor)
-        # 2. Al iniciar, actualizar checks de tema e idioma según configuración guardada
-        # Llama este método al final del __init__
+        # Aplicar tema e idioma guardados
         _set_initial_theme_and_language(self)
-        self.update_menu_state()  # Estado inicial del menú
+        self.update_menu_state()
 
-        # Conectar actualización de cabecera al cambiar idioma
+        # Actualizar cabecera al cambiar idioma
         translation_service.signal.language_changed.connect(self._on_language_changed)
 
-    # =====================
-    # Gestión de vistas principales
-    # =====================
+    # --- Gestión de vistas principales ---
     def show_view(self, view_id: ViewID) -> None:
         """
-        Muestra la vista indicada y actualiza los datos de contactos y cabecera si hay un log abierto.
+        Muestra la vista indicada y actualiza datos de contactos y cabecera si hay log abierto.
         """
         self.view_manager.show_view(view_id)
-        # Actualizar la tabla de contactos en la vista activa si hay un log abierto
         if self.current_log is not None:
             contacts = getattr(self.current_log, "contacts", [])
             if view_id == ViewID.LOG_OPS_VIEW and hasattr(
@@ -142,15 +115,12 @@ class MainWindow(QMainWindow):
                 self.log_contest_view, "table_widget"
             ):
                 self.log_contest_view.table_widget.set_contacts(contacts)
-        # Actualizar cabecera de la vista activa
         if view_id == ViewID.LOG_CONTEST_VIEW and self.current_log:
             self.log_contest_view.set_log_data(self.current_log)
         elif view_id == ViewID.LOG_OPS_VIEW and self.current_log:
             self.log_ops_view.set_log_data(self.current_log)
 
-    # =====================
-    # Gestión de temas e idioma
-    # =====================
+    # --- Gestión de temas e idioma ---
     def set_language(self, lang: str) -> None:
         """
         Cambia el idioma de la interfaz.
@@ -199,9 +169,7 @@ class MainWindow(QMainWindow):
         """
         _retranslate_ui(self)
 
-    # =====================
-    # Gestión de menú y acciones
-    # =====================
+    # --- Gestión de menú y acciones ---
     def update_menu_state(self):
         """
         Habilita/deshabilita las acciones del menú según el estado del log abierto.
@@ -234,47 +202,30 @@ class MainWindow(QMainWindow):
         self.menu_bar.db_export_requested.connect(lambda: action_db_export(self))
         self.menu_bar.db_delete_requested.connect(lambda: action_db_delete(self))
         self.menu_bar.db_show_requested.connect(self._show_db_window)
-        # --- NUEVAS ACCIONES DE BASE DE DATOS ---
         self.menu_bar.db_backup_action.triggered.connect(self._on_db_backup)
         self.menu_bar.db_restore_action.triggered.connect(self._on_db_restore)
         self.menu_bar.db_import_db_action.triggered.connect(self._on_db_import_db)
 
-    # =====================
-    # Gestión de base de datos
-    # =====================
+    # --- Gestión de base de datos (delegación a acciones) ---
     def _on_db_backup(self):
-        from .main_window_actions import action_db_backup
-
         action_db_backup(self)
 
     def _on_db_restore(self):
-        from .main_window_actions import action_db_restore
-
         action_db_restore(self)
 
     def _on_db_import_db(self):
-        from .main_window_actions import action_db_import_db
-
         action_db_import_db(self)
 
     def _open_data_folder(self) -> None:
-        from .main_window_actions import action_open_data_folder
-
         action_open_data_folder(self)
 
     def _show_db_window(self):
-        from .main_window_actions import action_show_db_window
-
         action_show_db_window(self)
 
     def _on_db_table_window_closed(self, *args):
-        from .main_window_actions import action_on_db_table_window_closed
-
         action_on_db_table_window_closed(self, *args)
 
-    # =====================
-    # Eventos y utilidades
-    # =====================
+    # --- Eventos y utilidades ---
     def center(self):
         """
         Centra la ventana en la pantalla principal.
@@ -301,3 +252,6 @@ class MainWindow(QMainWindow):
             self.log_contest_view.retranslate_ui()
         elif self.current_log_type == LogType.OPERATION_LOG:
             self.log_ops_view.retranslate_ui()
+
+
+# Fin de main_window.py
