@@ -51,8 +51,7 @@ def execute_query(db_path: str, query: str, params: Tuple = ()) -> bool:
         conn.commit()
         return True
     except Exception as e:
-        print(f"Error ejecutando query: {e}")
-        return False
+        raise RuntimeError(f"Error ejecutando query: {e}")
     finally:
         conn.close()
 

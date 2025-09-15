@@ -190,15 +190,13 @@ class LogOpsView(QWidget):
         self.header_widget.update_text(header_text)
 
     def set_log_data(self, log):
-        """
-        Asigna un log actual y actualiza la UI con los datos correspondientes.
-        Args:
-            log: Objeto de log operativo.
-        """
+        # ...existing code...
         self._current_log = log
         self.retranslate_ui()
 
     def retranslate_ui(self):
+        log = getattr(self, "_current_log", None)
+        # ...existing code...
         """
         Actualiza los textos de la UI según el idioma seleccionado y los datos del log, y refresca relojes.
         """

@@ -21,5 +21,4 @@ def get_connection(db_path: str) -> Optional[sqlite3.Connection]:
         conn = sqlite3.connect(db_path)
         return conn
     except sqlite3.Error as e:
-        print(f"Error al conectar a la base de datos {db_path}: {e}")
-        return None
+        raise RuntimeError(f"Error al conectar a la base de datos {db_path}: {e}")

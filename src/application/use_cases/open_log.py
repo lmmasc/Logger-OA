@@ -50,6 +50,7 @@ def open_log(db_path: str):
                 end_time=row[4],
                 metadata=metadata,
             )
+            log.log_type = LogType.OPERATION_LOG
         elif log_type == LogType.CONTEST_LOG.value:
             log = ContestLog(
                 id=row[0],
@@ -58,6 +59,7 @@ def open_log(db_path: str):
                 end_time=row[4],
                 metadata=metadata,
             )
+            log.log_type = LogType.CONTEST_LOG
         else:
             raise ValueError(f"Tipo de log no soportado: {log_type}")
     # Obtener contactos

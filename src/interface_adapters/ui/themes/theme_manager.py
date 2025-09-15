@@ -40,7 +40,7 @@ class ThemeManager:
                 self.settings.set_value("theme", theme_name)
             self.current_theme = theme_name
         except Exception as e:
-            print(f"Error aplicando tema: {e}")
+            raise RuntimeError(f"Error aplicando tema: {e}")
 
     def load_last_theme(self):
         """

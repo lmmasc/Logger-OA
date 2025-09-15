@@ -260,7 +260,7 @@ def action_log_export(self):
             export_log.export_log_to_pdf(db_path, export_path)
         else:
             raise ValueError(f"Formato no soportado: {selected_ext}")
-        print(f"[EXPORT] Exportación completada: {export_path}")
+        # ...existing code...
         from PySide6.QtWidgets import QMessageBox
 
         QMessageBox.information(
@@ -269,7 +269,7 @@ def action_log_export(self):
             translation_service.tr("export_success"),
         )
     except Exception as e:
-        print(f"[EXPORT] Error: {e}")
+        # ...existing code...
         from PySide6.QtWidgets import QMessageBox
 
         QMessageBox.critical(

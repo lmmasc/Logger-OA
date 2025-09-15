@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from translation.translation_service import translation_service
-from interface_adapters.ui.view_manager import LogType
+from interface_adapters.ui.view_manager import LogType, ViewID
 import datetime
 from infrastructure.repositories.sqlite_radio_operator_repository import (
     SqliteRadioOperatorRepository,
@@ -340,6 +340,7 @@ class LogFormWidget(QWidget):
         return None
 
     def _on_add_contact(self, callsign=None):
+        # ...existing code...
         from application.use_cases.operator_management import (
             get_operator_by_callsign,
             create_operator,
@@ -433,18 +434,21 @@ class LogFormWidget(QWidget):
             try:
                 contact = add_contact_to_log(db_path, log_id, data, contact_type)
                 contacts = repo_log.get_contacts(log_id)
+                # ...existing code...
                 main_window.current_log.contacts = contacts
                 # Actualiza la tabla y mueve el scroll
                 if hasattr(main_window, "view_manager"):
                     if (
                         self.log_type == LogType.OPERATION_LOG
-                        and "log_ops_view" in main_window.view_manager.views
+                        and ViewID.LOG_OPS_VIEW in main_window.view_manager.views
                     ):
                         table_widget = main_window.view_manager.views[
-                            "log_ops_view"
+                            ViewID.LOG_OPS_VIEW
                         ].table_widget
-                        table = table_widget.table
+                        # ...existing code...
                         table_widget.set_contacts(contacts)
+                        # ...existing code...
+                        table = table_widget.table
                         table.scrollToBottom()
                         table.setFocus()
                         parent = self.parent()
@@ -457,10 +461,10 @@ class LogFormWidget(QWidget):
                             parent = parent.parent()
                     elif (
                         self.log_type == LogType.CONTEST_LOG
-                        and "log_contest_view" in main_window.view_manager.views
+                        and ViewID.LOG_CONTEST_VIEW in main_window.view_manager.views
                     ):
                         table_widget = main_window.view_manager.views[
-                            "log_contest_view"
+                            ViewID.LOG_CONTEST_VIEW
                         ].table_widget
                         table = table_widget.table
                         table_widget.set_contacts(contacts)
@@ -516,13 +520,14 @@ class LogFormWidget(QWidget):
             if hasattr(main_window, "view_manager"):
                 if (
                     self.log_type == LogType.OPERATION_LOG
-                    and "log_ops_view" in main_window.view_manager.views
+                    and ViewID.LOG_OPS_VIEW in main_window.view_manager.views
                 ):
                     table_widget = main_window.view_manager.views[
-                        "log_ops_view"
+                        ViewID.LOG_OPS_VIEW
                     ].table_widget
                     table = table_widget.table
                     table_widget.set_contacts(contacts)
+                    table = table_widget.table
                     table.scrollToBottom()
                     table.setFocus()
                     parent = self.parent()
@@ -535,10 +540,10 @@ class LogFormWidget(QWidget):
                         parent = parent.parent()
                 elif (
                     self.log_type == LogType.CONTEST_LOG
-                    and "log_contest_view" in main_window.view_manager.views
+                    and ViewID.LOG_CONTEST_VIEW in main_window.view_manager.views
                 ):
                     table_widget = main_window.view_manager.views[
-                        "log_contest_view"
+                        ViewID.LOG_CONTEST_VIEW
                     ].table_widget
                     table = table_widget.table
                     table_widget.set_contacts(contacts)

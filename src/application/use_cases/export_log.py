@@ -36,7 +36,7 @@ def export_log_to_txt(db_path: str, export_path: str, translation_service=None) 
         translation_service = ts
     lang = translation_service.get_language()
     # Headers y campos como en ContactTableWidget
-    print(f"[EXPORT][DEBUG] log_type recibido: {log_type}")
+    # ...existing code...
     # Comparar directamente con Enum
     if log_type == LogType.CONTEST_LOG.value:
         headers = [
@@ -92,7 +92,7 @@ def export_log_to_txt(db_path: str, export_path: str, translation_service=None) 
         ]
     else:
         raise ValueError(f"Tipo de log no soportado para exportación: {log_type}")
-    print(f"[EXPORT][DEBUG] headers: {headers}")
+    # ...existing code...
     # Procesar filas como en la UI
     import datetime
 
@@ -175,7 +175,7 @@ def export_log_to_csv(
         translation_service = ts
     lang = translation_service.get_language()
     # Headers y campos como en ContactTableWidget
-    print(f"[EXPORT][DEBUG] log_type recibido: {log_type}")
+    # ...existing code...
     # Comparar directamente con Enum
     if log_type == LogType.CONTEST_LOG.value:
         headers = [
@@ -231,7 +231,7 @@ def export_log_to_csv(
         ]
     else:
         raise ValueError(f"Tipo de log no soportado para exportación: {log_type}")
-    print(f"[EXPORT][DEBUG] headers: {headers}")
+    # ...existing code...
     # Procesar filas como en la UI
     import datetime
 

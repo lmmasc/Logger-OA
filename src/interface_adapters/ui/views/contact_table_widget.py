@@ -113,6 +113,7 @@ class ContactTableWidget(QWidget):
         self.table.setHorizontalHeaderLabels(headers)
 
     def set_contacts(self, contacts):
+        # ...existing code...
         self._last_contacts = contacts
         # Define las claves esperadas según el tipo de log
         if self.log_type == LogType.CONTEST_LOG:
@@ -153,7 +154,9 @@ class ContactTableWidget(QWidget):
             date_fmt = "%m/%d/%Y"
 
         for row, contact in enumerate(contacts):
+            # ...existing code...
             for col, key in enumerate(keys):
+                value = None
                 if key == "qtr_oa":
                     ts = contact.get("timestamp", None)
                     value = ""
@@ -186,13 +189,19 @@ class ContactTableWidget(QWidget):
                     value = str(val).zfill(3) if val else ""
                 else:
                     value = contact.get(key, "")
+                # ...existing code...
                 self.table.setItem(row, col, QTableWidgetItem(str(value)))
+        # ...existing code...
         self.table.viewport().update()
+        self.table.repaint()
+        self.table.hide()
+        self.table.show()
 
     def retranslate_ui(self):
         self.set_columns()
-        # Recarga los datos si existen
-        if hasattr(self, "_last_contacts"):
+        # El refresco de datos debe hacerse solo si se requiere por cambio de idioma,
+        # y siempre con la lista actual de contactos.
+        if hasattr(self, "_last_contacts") and self._last_contacts:
             self.set_contacts(self._last_contacts)
 
     def save_column_widths(self, *args):
