@@ -31,10 +31,9 @@ def main():
     Si ocurre una excepción no capturada, muestra un mensaje crítico al usuario.
     """
     try:
-        # Inicializar la tabla de radioaficionados en la base de datos
-        conn = get_connection(get_database_path())
-        init_radioamateur_table(conn)
-        conn.close()
+        # Inicializar la tabla de radioaficionados en la base de datos usando context manager
+        with get_connection(get_database_path()) as conn:
+            init_radioamateur_table(conn)
 
         # Crear la aplicación Qt y mostrar la ventana principal
         app = QApplication(sys.argv)

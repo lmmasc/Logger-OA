@@ -9,7 +9,7 @@ import sqlite3
 from typing import Optional
 
 
-def get_connection(db_path: str) -> Optional[sqlite3.Connection]:
+def get_connection(db_path: str) -> sqlite3.Connection:
     """
     Abre una conexión a la base de datos SQLite especificada.
     Args:
