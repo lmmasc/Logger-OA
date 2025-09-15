@@ -43,7 +43,8 @@ class LogFormWidget(QWidget):
 
     def __init__(self, parent=None, log_type=LogType.OPERATION_LOG):
         """
-        Inicializa el formulario de log/contacto.
+        Constructor principal del widget de formulario de log/contacto.
+        Inicializa la instancia y configura la interfaz gráfica y el orden de tabulación.
         Args:
             parent: QWidget padre.
             log_type: Tipo de log (Enum LogType).
@@ -56,6 +57,7 @@ class LogFormWidget(QWidget):
     def _setup_ui(self):
         """
         Configura y construye la interfaz gráfica del formulario de log/contacto.
+        Se definen los campos y etiquetas según el tipo de log (operativo o concurso).
         """
         main_layout = QVBoxLayout()
         main_layout.setSpacing(4)
@@ -63,8 +65,9 @@ class LogFormWidget(QWidget):
         form_row.setSpacing(8)
         form_row.setContentsMargins(0, 0, 0, 0)
         form_row.setAlignment(Qt.AlignLeft)
+        # --- Bloque de campos para concursos ---
         if self.log_type == LogType.CONTEST_LOG:
-            # Campos para concursos
+            # RS_RX, intercambio recibido/enviado, RS_TX, observaciones
             self.rs_rx_input = QLineEdit(self)
             self.rs_rx_input.setText("59")
             self.rs_rx_input.setFixedWidth(50)
@@ -122,8 +125,9 @@ class LogFormWidget(QWidget):
             form_row.addWidget(obs_label)
             form_row.addWidget(self.observations_input, 1)
             self.observations_label = obs_label
+        # --- Bloque de campos para operativos ---
         else:
-            # Campos para operativos
+            # estación, energía, potencia, RS_RX, RS_TX, observaciones
             self.station_input = QComboBox(self)
             self.station_input.addItems(
                 [
@@ -206,6 +210,7 @@ class LogFormWidget(QWidget):
             form_row.addWidget(obs_label)
             form_row.addWidget(self.observations_input, 1)
             self.observations_label = obs_label
+        # --- Fin de definición de campos ---
         form_row_widget = QWidget(self)
         form_row_widget.setLayout(form_row)
         form_row_widget.setMinimumWidth(700)
@@ -216,6 +221,7 @@ class LogFormWidget(QWidget):
     def _setup_tab_order(self):
         """
         Configura el orden de tabulación entre los campos del formulario.
+        Se adapta según el tipo de log para mejorar la experiencia de usuario.
         """
         if self.log_type == LogType.CONTEST_LOG:
             QWidget.setTabOrder(self.rs_rx_input, self.exchange_received_input)
@@ -232,6 +238,7 @@ class LogFormWidget(QWidget):
     def get_data(self, callsign=None):
         """
         Obtiene los datos ingresados en el formulario y los retorna como diccionario.
+        Extrae y adapta los datos según el tipo de log (operativo o concurso).
         Args:
             callsign (str, opcional): Indicativo de llamada.
         Returns:
@@ -245,6 +252,7 @@ class LogFormWidget(QWidget):
             "region": "-",
         }
         if self.log_type == LogType.CONTEST_LOG:
+            # --- Bloque de extracción de datos para concurso ---
             contact_id = str(uuid.uuid4())
             timestamp = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
             operator = get_operator_by_callsign(callsign_val)
@@ -266,6 +274,7 @@ class LogFormWidget(QWidget):
                 }
             )
         elif self.log_type == LogType.OPERATION_LOG:
+            # --- Bloque de extracción de datos para operativo ---
             operator = get_operator_by_callsign(callsign_val)
             name = operator.name if operator else ""
             country = operator.country if operator else ""
@@ -312,6 +321,7 @@ class LogFormWidget(QWidget):
     def _find_main_window(self):
         """
         Busca la instancia de MainWindow en la jerarquía de padres.
+        Permite acceder a la ventana principal para operaciones de actualización de UI y base de datos.
         Returns:
             MainWindow instance o None si no se encuentra.
         """
@@ -324,7 +334,8 @@ class LogFormWidget(QWidget):
 
     def _on_add_contact(self, callsign=None):
         """
-        Lógica para agregar un contacto al log actual, validando datos y mostrando mensajes de error o confirmación.
+        Lógica principal para agregar un contacto al log actual.
+        Incluye validación de datos, control de duplicados, actualización de la base de datos y UI, y manejo de diálogos de confirmación.
         Args:
             callsign (str, opcional): Indicativo de llamada a agregar.
         Returns:
