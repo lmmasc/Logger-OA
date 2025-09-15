@@ -5,10 +5,14 @@ from domain.entities.contact_log import ContactLog
 from domain.validators import LogValidator
 from domain.contest_rules import ContestRules
 from domain.operation_rules import OperationRules
+from domain.contact_type import ContactType
 
 
 def add_contact_to_log(
-    db_path: str, log_id: str, contact_data: dict, contact_type: str = "operativo"
+    db_path: str,
+    log_id: str,
+    contact_data: dict,
+    contact_type: ContactType = ContactType.OPERATION,
 ):
     """
     Agrega un contacto a un log existente (operativo o concurso) con validaciones de dominio.
@@ -18,18 +22,18 @@ def add_contact_to_log(
     repo = ContactLogRepository(db_path)
     # Cargar contactos existentes para validación
     contacts = repo.get_contacts(log_id)
-    if contact_type == "operativo":
+    if contact_type == ContactType.OPERATION:
         contact = OperationContact(**contact_data)
-    elif contact_type == "concurso":
+    elif contact_type == ContactType.CONTEST:
         contact = ContestContact(**contact_data)
     else:
         raise ValueError("Tipo de contacto no soportado")
     # Validaciones genéricas
     errors = LogValidator.validate_contact(contact, contacts)
     # Validaciones específicas
-    if contact_type == "operativo":
+    if contact_type == ContactType.OPERATION:
         errors += OperationRules.validate(contact, contacts)
-    elif contact_type == "concurso":
+    elif contact_type == ContactType.CONTEST:
         errors += ContestRules.validate(contact, contacts)
     if errors:
         raise ValueError("; ".join(errors))
@@ -51,7 +55,7 @@ def update_contact_in_log(
     log_id: str,
     contact_id: str,
     updated_data: dict,
-    contact_type: str = "operativo",
+    contact_type: ContactType = ContactType.OPERATION,
 ):
     """
     Actualiza un contacto existente en un log, validando antes de guardar.
@@ -59,18 +63,18 @@ def update_contact_in_log(
     repo = ContactLogRepository(db_path)
     contacts = repo.get_contacts(log_id)
     # Crear y validar el nuevo contacto actualizado
-    if contact_type == "operativo":
+    if contact_type == ContactType.OPERATION:
         contact = OperationContact(**updated_data)
-    elif contact_type == "concurso":
+    elif contact_type == ContactType.CONTEST:
         contact = ContestContact(**updated_data)
     else:
         raise ValueError("Tipo de contacto no soportado")
     # Validaciones genéricas
     errors = LogValidator.validate_contact(contact, contacts)
     # Validaciones específicas
-    if contact_type == "operativo":
+    if contact_type == ContactType.OPERATION:
         errors += OperationRules.validate(contact, contacts)
-    elif contact_type == "concurso":
+    elif contact_type == ContactType.CONTEST:
         errors += ContestRules.validate(contact, contacts)
     if errors:
         raise ValueError("; ".join(errors))
@@ -80,15 +84,15 @@ def update_contact_in_log(
 
 
 def validate_contact_for_log(
-    contact_data: dict, contacts: list, contact_type: str, translation_service
+    contact_data: dict, contacts: list, contact_type: ContactType, translation_service
 ) -> dict:
     """
     Valida el contacto, traduce y ordena los errores según el tipo de log y el orden visual del formulario.
     Devuelve dict con 'errors' (lista de mensajes) y 'focus_field' (str).
     """
-    if contact_type == "operativo":
+    if contact_type == ContactType.OPERATION:
         contact = OperationContact(**contact_data)
-    elif contact_type == "concurso":
+    elif contact_type == ContactType.CONTEST:
         contact = ContestContact(**contact_data)
     else:
         return {
@@ -96,9 +100,9 @@ def validate_contact_for_log(
             "focus_field": None,
         }
     errors = LogValidator.validate_contact(contact, contacts)
-    if contact_type == "operativo":
+    if contact_type == ContactType.OPERATION:
         errors += OperationRules.validate(contact, contacts)
-    elif contact_type == "concurso":
+    elif contact_type == ContactType.CONTEST:
         errors += ContestRules.validate(contact, contacts)
     # Mapear errores a campos y traducir
     error_map = {}
@@ -150,7 +154,7 @@ def validate_contact_for_log(
         else:
             error_map["other"] = err
     # Orden de campos visuales
-    if contact_type == "concurso":
+    if contact_type == ContactType.CONTEST:
         field_order = [
             "callsign_input",
             "rs_rx_input",

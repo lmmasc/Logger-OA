@@ -1,6 +1,7 @@
 # Standard library imports
 import uuid
 import datetime
+from domain.contact_type import ContactType
 
 # Third-party imports
 from PySide6.QtCore import Qt
@@ -32,6 +33,9 @@ from application.use_cases.contact_management import (
 )
 from interface_adapters.ui.dialogs.operator_edit_dialog import OperatorEditDialog
 from domain.repositories.contact_log_repository import ContactLogRepository
+
+
+# Eliminado: ahora se importa desde domain.contact_type
 
 
 class LogFormWidget(QWidget):
@@ -360,7 +364,9 @@ class LogFormWidget(QWidget):
         db_path = getattr(main_window.current_log, "db_path", None)
         log_id = getattr(main_window.current_log, "id", None)
         contact_type = (
-            "operativo" if self.log_type == LogType.OPERATION_LOG else "concurso"
+            ContactType.OPERATION
+            if self.log_type == LogType.OPERATION_LOG
+            else ContactType.CONTEST
         )
         repo_log = ContactLogRepository(db_path)
         contacts = repo_log.get_contacts(log_id)
@@ -387,7 +393,7 @@ class LogFormWidget(QWidget):
                 focus_field.setFocus()
             return False
         # Validación de duplicados en bloque OA para concursos
-        if contact_type == "concurso":
+        if contact_type == ContactType.CONTEST:
             duplicate = find_duplicate_in_block(
                 data["callsign"], data["timestamp"], contacts
             )
@@ -412,9 +418,7 @@ class LogFormWidget(QWidget):
         # Si el operador existe, agregar contacto directamente
         if operator:
             try:
-                add_contact_to_log(
-                    db_path, log_id, data, contact_type
-                )  # Eliminada variable contact
+                add_contact_to_log(db_path, log_id, data, contact_type)
                 contacts = repo_log.get_contacts(log_id)
                 main_window.current_log.contacts = contacts
                 # Actualiza la tabla y mueve el scroll en la vista correspondiente
@@ -488,9 +492,7 @@ class LogFormWidget(QWidget):
                 data["region"] = operator.region
         # Agregar contacto con los datos actuales (faltantes en blanco si no existe operador)
         try:
-            add_contact_to_log(
-                db_path, log_id, data, contact_type
-            )  # Eliminada variable contact
+            add_contact_to_log(db_path, log_id, data, contact_type)
             contacts = repo_log.get_contacts(log_id)
             main_window.current_log.contacts = contacts
             if hasattr(main_window, "view_manager"):
