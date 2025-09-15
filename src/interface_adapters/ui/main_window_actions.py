@@ -29,6 +29,9 @@ from application.use_cases.create_log import create_log
 from application.use_cases.open_log import open_log
 from application.use_cases import export_log
 from interface_adapters.ui.dialogs.select_log_type_dialog import SelectLogTypeDialog
+from interface_adapters.ui.dialogs.select_log_type_dialog_open import (
+    SelectLogTypeDialogOpen,
+)
 from interface_adapters.ui.dialogs.select_contest_dialog import SelectContestDialog
 from interface_adapters.ui.dialogs.enter_callsign_dialog import EnterCallsignDialog
 from interface_adapters.ui.dialogs.operativo_config_dialog import OperativoConfigDialog
@@ -127,79 +130,53 @@ def action_log_open(self):
     """
     Abre un log existente, seleccionando tipo y archivo.
     """
-    # ...migrated code from MainWindow._action_log_open...
-    dialog = QDialog(self)
-    dialog.setWindowTitle(translation_service.tr("select_log_type"))
-    dialog.setMinimumWidth(400)
-    layout = QVBoxLayout(dialog)
-    label = QLabel(translation_service.tr("select_log_type_label_open"))
-    layout.addWidget(label)
-    btn_ops = QPushButton(translation_service.tr("log_type_ops"), dialog)
-    btn_contest = QPushButton(translation_service.tr("log_type_contest"), dialog)
-    btn_ops.setFixedWidth(200)
-    btn_contest.setFixedWidth(200)
-    layout.addWidget(btn_ops, alignment=Qt.AlignHCenter)
-    layout.addWidget(btn_contest, alignment=Qt.AlignHCenter)
-    selected = {"type": None}
-
-    def select_ops():
-        selected["type"] = LogType.OPERATION_LOG
-        dialog.accept()
-
-    def select_contest():
-        selected["type"] = LogType.CONTEST_LOG
-        dialog.accept()
-
-    btn_ops.clicked.connect(select_ops)
-    btn_contest.clicked.connect(select_contest)
-    dialog.exec()
-    if selected["type"]:
-        log_folder = os.path.join(
-            get_log_dir(),
-            (
-                OPERATIONS_DIR
-                if selected["type"] == LogType.OPERATION_LOG
-                else CONTESTS_DIR
-            ),
-        )
-        os.makedirs(log_folder, exist_ok=True)
-        file_path, _ = QFileDialog.getOpenFileName(
-            self,
-            translation_service.tr("open_log"),
-            log_folder,
-            "SQLite Files (*.sqlite);;All Files (*)",
-        )
-        if file_path:
-            try:
-                log = open_log(file_path)
-                self.current_log = log
-                if hasattr(
-                    log, "__class__"
-                ) and log.__class__.__name__.lower().startswith("operation"):
-                    self.current_log_type = LogType.OPERATION_LOG
-                elif hasattr(
-                    log, "__class__"
-                ) and log.__class__.__name__.lower().startswith("contest"):
-                    self.current_log_type = LogType.CONTEST_LOG
-                else:
-                    self.current_log_type = None
-                if self.current_log_type == LogType.OPERATION_LOG:
-                    self.show_view(ViewID.LOG_OPS_VIEW)
-                elif self.current_log_type == LogType.CONTEST_LOG:
-                    self.show_view(ViewID.LOG_CONTEST_VIEW)
-                else:
-                    self.show_view(ViewID.WELCOME_VIEW)
-                    self.current_log = None
-            except Exception as e:
-                QMessageBox.critical(
-                    self,
-                    translation_service.tr("main_window_title"),
-                    f"{translation_service.tr('open_failed')}: {e}",
-                )
-                self.current_log = None
+    # Usar diálogo modularizado para seleccionar tipo de log
+    dialog = SelectLogTypeDialogOpen(self)
+    if not dialog.exec() or not dialog.selected_type:
+        self.current_log = None
+        self.current_log_type = None
+        self.show_view(ViewID.WELCOME_VIEW)
+        self.update_menu_state()
+        return
+    selected_type = dialog.selected_type
+    log_folder = os.path.join(
+        get_log_dir(),
+        OPERATIONS_DIR if selected_type == LogType.OPERATION_LOG else CONTESTS_DIR,
+    )
+    os.makedirs(log_folder, exist_ok=True)
+    file_path, _ = QFileDialog.getOpenFileName(
+        self,
+        translation_service.tr("open_log"),
+        log_folder,
+        "SQLite Files (*.sqlite);;All Files (*)",
+    )
+    if file_path:
+        try:
+            log = open_log(file_path)
+            self.current_log = log
+            if hasattr(log, "__class__") and log.__class__.__name__.lower().startswith(
+                "operation"
+            ):
+                self.current_log_type = LogType.OPERATION_LOG
+            elif hasattr(
+                log, "__class__"
+            ) and log.__class__.__name__.lower().startswith("contest"):
+                self.current_log_type = LogType.CONTEST_LOG
+            else:
                 self.current_log_type = None
+            if self.current_log_type == LogType.OPERATION_LOG:
+                self.show_view(ViewID.LOG_OPS_VIEW)
+            elif self.current_log_type == LogType.CONTEST_LOG:
+                self.show_view(ViewID.LOG_CONTEST_VIEW)
+            else:
                 self.show_view(ViewID.WELCOME_VIEW)
-        else:
+                self.current_log = None
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                translation_service.tr("main_window_title"),
+                f"{translation_service.tr('open_failed')}: {e}",
+            )
             self.current_log = None
             self.current_log_type = None
             self.show_view(ViewID.WELCOME_VIEW)
