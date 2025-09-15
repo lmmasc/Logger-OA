@@ -28,4 +28,5 @@ MENU_TRANSLATIONS = {
     "menu_database_section_delete": "Operaciones avanzadas",
     "menu_export_db_csv": "Exportar .csv",
     "menu_manual": "Manual de uso",
+    "menu_preferences_menu": "Preferencias",
 }

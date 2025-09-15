@@ -112,8 +112,14 @@ class MainMenuBar(QMenuBar):
         self.database_menu.addAction(self.db_delete_action)
         self.addMenu(self.database_menu)
 
-        # Menú Aspecto
-        self.aspect_menu = QMenu(translation_service.tr("menu_aspect_menu"), self)
+        # Menú Preferencias con submenús Aspecto e Idioma
+        self.preferences_menu = QMenu(
+            translation_service.tr("menu_preferences_menu"), self
+        )
+        # Submenú Aspecto
+        self.aspect_submenu = QMenu(
+            translation_service.tr("menu_aspect_menu"), self.preferences_menu
+        )
         self.light_theme_action = QAction(
             translation_service.tr("menu_light_theme"), self
         )
@@ -122,19 +128,21 @@ class MainMenuBar(QMenuBar):
         )
         self.light_theme_action.setCheckable(True)
         self.dark_theme_action.setCheckable(True)
-        self.aspect_menu.addAction(self.light_theme_action)
-        self.aspect_menu.addAction(self.dark_theme_action)
-        self.addMenu(self.aspect_menu)
-
-        # Menú Idioma
-        self.language_menu = QMenu(translation_service.tr("menu_language_menu"), self)
+        self.aspect_submenu.addAction(self.light_theme_action)
+        self.aspect_submenu.addAction(self.dark_theme_action)
+        self.preferences_menu.addMenu(self.aspect_submenu)
+        # Submenú Idioma
+        self.language_submenu = QMenu(
+            translation_service.tr("menu_language_menu"), self.preferences_menu
+        )
         self.lang_es_action = QAction(translation_service.tr("menu_spanish"), self)
         self.lang_en_action = QAction(translation_service.tr("menu_english"), self)
         self.lang_es_action.setCheckable(True)
         self.lang_en_action.setCheckable(True)
-        self.language_menu.addAction(self.lang_es_action)
-        self.language_menu.addAction(self.lang_en_action)
-        self.addMenu(self.language_menu)
+        self.language_submenu.addAction(self.lang_es_action)
+        self.language_submenu.addAction(self.lang_en_action)
+        self.preferences_menu.addMenu(self.language_submenu)
+        self.addMenu(self.preferences_menu)
 
         # Menú Ayuda
         self.help_menu = QMenu(translation_service.tr("menu_help_menu"), self)
@@ -159,6 +167,7 @@ class MainMenuBar(QMenuBar):
         self.open_folder_action.triggered.connect(self.open_folder_requested.emit)
         self.about_action.triggered.connect(self.about_requested.emit)
         self.exit_action.triggered.connect(self.exit_requested.emit)
+        # Preferencias (Aspecto e Idioma)
         self.light_theme_action.triggered.connect(self.light_theme_requested.emit)
         self.dark_theme_action.triggered.connect(self.dark_theme_requested.emit)
         self.lang_es_action.triggered.connect(self.lang_es_requested.emit)
@@ -169,7 +178,6 @@ class MainMenuBar(QMenuBar):
         """
         Actualiza los textos de todos los menús y acciones según el idioma actual.
         """
-
         self.file_menu.setTitle(translation_service.tr("menu_file_menu"))
         self.open_folder_action.setText(translation_service.tr("menu_open_folder"))
         self.exit_action.setText(translation_service.tr("menu_exit"))
@@ -190,11 +198,11 @@ class MainMenuBar(QMenuBar):
         self.db_show_action.setText(translation_service.tr("menu_show_database"))
         self.db_delete_action.setText(translation_service.tr("menu_delete_database"))
 
-        self.aspect_menu.setTitle(translation_service.tr("menu_aspect_menu"))
+        self.preferences_menu.setTitle(translation_service.tr("menu_preferences_menu"))
+        self.aspect_submenu.setTitle(translation_service.tr("menu_aspect_menu"))
         self.light_theme_action.setText(translation_service.tr("menu_light_theme"))
         self.dark_theme_action.setText(translation_service.tr("menu_dark_theme"))
-
-        self.language_menu.setTitle(translation_service.tr("menu_language_menu"))
+        self.language_submenu.setTitle(translation_service.tr("menu_language_menu"))
         self.lang_es_action.setText(translation_service.tr("menu_spanish"))
         self.lang_en_action.setText(translation_service.tr("menu_english"))
 
