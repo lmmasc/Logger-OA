@@ -341,7 +341,6 @@ class LogFormWidget(QWidget):
         Returns:
             bool: True si el contacto fue agregado correctamente, False si hubo errores o cancelación.
         """
-        repo = SqliteRadioOperatorRepository()
         # Obtener el valor de callsign directamente del campo si no se pasa como argumento
         callsign_val = (
             callsign
@@ -413,7 +412,9 @@ class LogFormWidget(QWidget):
         # Si el operador existe, agregar contacto directamente
         if operator:
             try:
-                contact = add_contact_to_log(db_path, log_id, data, contact_type)
+                add_contact_to_log(
+                    db_path, log_id, data, contact_type
+                )  # Eliminada variable contact
                 contacts = repo_log.get_contacts(log_id)
                 main_window.current_log.contacts = contacts
                 # Actualiza la tabla y mueve el scroll en la vista correspondiente
@@ -487,7 +488,9 @@ class LogFormWidget(QWidget):
                 data["region"] = operator.region
         # Agregar contacto con los datos actuales (faltantes en blanco si no existe operador)
         try:
-            contact = add_contact_to_log(db_path, log_id, data, contact_type)
+            add_contact_to_log(
+                db_path, log_id, data, contact_type
+            )  # Eliminada variable contact
             contacts = repo_log.get_contacts(log_id)
             main_window.current_log.contacts = contacts
             if hasattr(main_window, "view_manager"):
