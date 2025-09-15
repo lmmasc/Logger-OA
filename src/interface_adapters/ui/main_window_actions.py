@@ -29,6 +29,7 @@ from application.use_cases.create_log import create_log
 from application.use_cases.open_log import open_log
 from application.use_cases import export_log
 from interface_adapters.ui.dialogs.select_log_type_dialog import SelectLogTypeDialog
+from interface_adapters.ui.dialogs.wait_dialog import WaitDialog
 from interface_adapters.ui.dialogs.select_log_type_dialog_open import (
     SelectLogTypeDialogOpen,
 )
@@ -285,14 +286,7 @@ def action_db_import_pdf(self):
         "PDF Files (*.pdf)",
     )
     if file_path:
-        wait_dialog = QDialog(self)
-        wait_dialog.setWindowTitle(translation_service.tr("main_window_title"))
-        wait_dialog.setModal(True)
-        layout = QVBoxLayout(wait_dialog)
-        label = QLabel(translation_service.tr("wait_message"))
-        label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(label)
-        wait_dialog.setFixedSize(300, 100)
+        wait_dialog = WaitDialog(self)
         wait_dialog.show()
         QApplication.processEvents()
 
