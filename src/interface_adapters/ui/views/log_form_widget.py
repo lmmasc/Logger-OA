@@ -15,6 +15,18 @@ import datetime
 from infrastructure.repositories.sqlite_radio_operator_repository import (
     SqliteRadioOperatorRepository,
 )
+from application.use_cases.operator_management import (
+    get_operator_by_callsign,
+    create_operator,
+)
+from application.use_cases.contact_management import (
+    validate_contact_for_log,
+    add_contact_to_log,
+    find_duplicate_in_block,
+)
+from interface_adapters.ui.dialogs.operator_edit_dialog import OperatorEditDialog
+from domain.repositories.contact_log_repository import ContactLogRepository
+import uuid
 
 
 class LogFormWidget(QWidget):
@@ -230,8 +242,6 @@ class LogFormWidget(QWidget):
         Returns:
             dict: Datos del formulario, adaptados según el tipo de log.
         """
-        from application.use_cases.operator_management import get_operator_by_callsign
-
         callsign_val = callsign if callsign is not None else ""
         data = {
             "callsign": callsign_val,
@@ -240,8 +250,6 @@ class LogFormWidget(QWidget):
             "region": "-",
         }
         if self.log_type == LogType.CONTEST_LOG:
-            import uuid
-
             contact_id = str(uuid.uuid4())
             timestamp = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
             operator = get_operator_by_callsign(callsign_val)
@@ -290,8 +298,6 @@ class LogFormWidget(QWidget):
                 if self.energy_input
                 else ""
             )
-            import uuid
-
             contact_id = str(uuid.uuid4())
             data.update(
                 {
@@ -329,19 +335,6 @@ class LogFormWidget(QWidget):
         Returns:
             bool: True si el contacto fue agregado correctamente, False si hubo errores o cancelación.
         """
-        from application.use_cases.operator_management import (
-            get_operator_by_callsign,
-            create_operator,
-        )
-        from application.use_cases.contact_management import (
-            validate_contact_for_log,
-            add_contact_to_log,
-        )
-        from PySide6.QtWidgets import QMessageBox
-        from interface_adapters.ui.dialogs.operator_edit_dialog import (
-            OperatorEditDialog,
-        )
-
         repo = SqliteRadioOperatorRepository()
         # Obtener el valor de callsign directamente del campo si no se pasa como argumento
         callsign_val = (
@@ -364,8 +357,6 @@ class LogFormWidget(QWidget):
         contact_type = (
             "operativo" if self.log_type == LogType.OPERATION_LOG else "concurso"
         )
-        from domain.repositories.contact_log_repository import ContactLogRepository
-
         repo_log = ContactLogRepository(db_path)
         contacts = repo_log.get_contacts(log_id)
         validation = validate_contact_for_log(
@@ -392,8 +383,6 @@ class LogFormWidget(QWidget):
             return False
         # Validación de duplicados en bloque OA para concursos
         if contact_type == "concurso":
-            from application.use_cases.contact_management import find_duplicate_in_block
-
             duplicate = find_duplicate_in_block(
                 data["callsign"], data["timestamp"], contacts
             )
