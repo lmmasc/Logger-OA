@@ -19,6 +19,7 @@ from PySide6.QtCore import Qt, QTimer
 
 # Imports estándar
 import os
+from datetime import datetime
 
 # Imports internos
 from config.paths import get_database_path, get_log_dir, BASE_PATH, get_export_dir
@@ -193,8 +194,6 @@ def action_log_export(self):
     Exporta el log abierto en el formato seleccionado por el usuario.
     """
     if not hasattr(self, "current_log") or self.current_log is None:
-        from PySide6.QtWidgets import QMessageBox
-
         QMessageBox.warning(
             self,
             translation_service.tr("main_window_title"),
@@ -208,23 +207,15 @@ def action_log_export(self):
     selected_ext = dialog.selected_ext
     db_path = getattr(self.current_log, "db_path", None)
     if not db_path:
-        from PySide6.QtWidgets import QMessageBox
-
         QMessageBox.warning(
             self,
             translation_service.tr("main_window_title"),
             translation_service.tr("no_db_path"),
         )
         return
-    import os
-
     base_name = os.path.splitext(os.path.basename(db_path))[0]
     default_filename = f"{base_name}{selected_ext}"
-    from config.paths import get_export_dir
-
     export_dir = get_export_dir()
-    from PySide6.QtWidgets import QFileDialog
-
     export_path, _ = QFileDialog.getSaveFileName(
         self,
         translation_service.tr("export_log"),
@@ -234,8 +225,6 @@ def action_log_export(self):
     if not export_path:
         return
     # Conectar con la función real de exportación
-    from application.use_cases import export_log
-
     try:
         if selected_ext == ".txt":
             export_log.export_log_to_txt(db_path, export_path)
@@ -247,16 +236,12 @@ def action_log_export(self):
             export_log.export_log_to_pdf(db_path, export_path)
         else:
             raise ValueError(f"Formato no soportado: {selected_ext}")
-        from PySide6.QtWidgets import QMessageBox
-
         QMessageBox.information(
             self,
             translation_service.tr("export_log"),
             translation_service.tr("export_success"),
         )
     except Exception as e:
-        from PySide6.QtWidgets import QMessageBox
-
         QMessageBox.critical(
             self,
             translation_service.tr("export_log"),
@@ -356,15 +341,6 @@ def action_db_export(self):
     """
     Exporta la base de datos de operadores a CSV.
     """
-    from interface_adapters.controllers.database_controller import DatabaseController
-    from translation.translation_service import translation_service
-    from PySide6.QtWidgets import QFileDialog, QMessageBox
-    import os
-
-    from config.paths import get_export_dir
-
-    from datetime import datetime
-
     now_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     default_filename = f"operadores_export_{now_str}.csv"
     export_path, _ = QFileDialog.getSaveFileName(
@@ -450,10 +426,6 @@ def action_db_restore(self):
     """
     Restaura la base de datos desde un archivo de respaldo seleccionado por el usuario.
     """
-    from PySide6.QtWidgets import QFileDialog, QMessageBox
-    import os
-    from config.paths import BASE_PATH
-
     backup_dir = os.path.join(BASE_PATH, "backups")
     file_dialog = QFileDialog(self)
     file_dialog.setWindowTitle("Seleccionar backup para restaurar")
@@ -465,10 +437,6 @@ def action_db_restore(self):
         if selected_files:
             backup_file = os.path.basename(selected_files[0])
             try:
-                from interface_adapters.controllers.database_controller import (
-                    DatabaseController,
-                )
-
                 DatabaseController.restore_database(backup_file)
                 QMessageBox.information(
                     self, "Restaurar", f"Base restaurada desde: {backup_file}"
@@ -481,8 +449,6 @@ def action_db_import_db(self):
     """
     Importa operadores desde una base de datos externa seleccionada por el usuario.
     """
-    from PySide6.QtWidgets import QFileDialog, QMessageBox
-
     file_dialog = QFileDialog(self)
     file_dialog.setFileMode(QFileDialog.ExistingFile)
     file_dialog.setNameFilter("Bases de datos (*.db)")
@@ -491,10 +457,6 @@ def action_db_import_db(self):
         if selected_files:
             external_db_path = selected_files[0]
             try:
-                from interface_adapters.controllers.database_controller import (
-                    DatabaseController,
-                )
-
                 imported = DatabaseController.import_database(external_db_path)
                 QMessageBox.information(
                     self, "Importar", f"Operadores importados: {imported}"
