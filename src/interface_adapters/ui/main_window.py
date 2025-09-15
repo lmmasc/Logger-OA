@@ -65,7 +65,7 @@ class MainWindow(QMainWindow):
         )
 
         # Configuración de idioma y título
-        lang = settings_service.get_value("language", "es")
+        lang = str(settings_service.get_value("language", "es"))
         translation_service.set_language(lang)
         self.setWindowTitle(translation_service.tr("main_window_title"))
         self.resize(1200, 700)
