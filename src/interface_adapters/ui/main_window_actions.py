@@ -1,8 +1,10 @@
 """
-Handlers de acciones del menú y lógica asociada para MainWindow.
+main_window_actions.py
+Acciones y handlers para MainWindow de Logger OA v2.
 Cada función recibe la instancia de MainWindow como primer argumento.
 """
 
+# Imports externos
 from PySide6.QtWidgets import (
     QDialog,
     QVBoxLayout,
@@ -10,23 +12,37 @@ from PySide6.QtWidgets import (
     QPushButton,
     QMessageBox,
     QFileDialog,
-    QLineEdit,
-    QApplication,
     QComboBox,
+    QApplication,
 )
-from PySide6.QtCore import Qt, QUrl, QTimer
+from PySide6.QtCore import Qt, QTimer
+
+# Imports estándar
 import os
-from config.paths import get_database_path, get_log_dir
+
+# Imports internos
+from config.paths import get_database_path, get_log_dir, BASE_PATH, get_export_dir
 from config.defaults import OPERATIONS_DIR, CONTESTS_DIR
 from translation.translation_service import translation_service
 from application.use_cases.update_operators_from_pdf import update_operators_from_pdf
+from application.use_cases.create_log import create_log
+from application.use_cases.open_log import open_log
+from application.use_cases import export_log
 from interface_adapters.ui.dialogs.select_log_type_dialog import SelectLogTypeDialog
 from interface_adapters.ui.dialogs.select_contest_dialog import SelectContestDialog
 from interface_adapters.ui.dialogs.enter_callsign_dialog import EnterCallsignDialog
+from interface_adapters.ui.dialogs.operativo_config_dialog import OperativoConfigDialog
+from interface_adapters.controllers.database_controller import DatabaseController
+from infrastructure.db.reset import reset_database
 from .view_manager import ViewID, LogType
+from .main_window_db_window import show_db_window, on_db_table_window_closed
 
 
+# --- Acciones de Log ---
 def action_log_new(self):
+    """
+    Crea un nuevo log (operativo o concurso) mediante diálogos.
+    """
     # Diálogo modularizado para seleccionar tipo de log
     dialog = SelectLogTypeDialog(self)
     if not dialog.exec():
@@ -57,59 +73,46 @@ def action_log_new(self):
                 return
             contest_name = contest_dialog.selected_contest
 
-        if indicativo["callsign"]:
-            from application.use_cases.create_log import create_log
-
-            extra_kwargs = {}
-            if selected["type"] == LogType.CONTEST_LOG:
-                contest_keys = [
-                    "contest_world_radio_day",
-                    "contest_independence_peru",
-                    "contest_peruvian_ham_day",
-                ]
-                contest_index = contest_dialog.contest_box.currentIndex()
-                contest_key = contest_keys[contest_index]
-                extra_kwargs["contest_key"] = contest_key
-                extra_kwargs["name"] = translation_service.tr(contest_key)
-                extra_kwargs["metadata"] = {"contest_name_key": contest_key}
-            elif selected["type"] == LogType.OPERATION_LOG:
-                from interface_adapters.ui.dialogs.operativo_config_dialog import (
-                    OperativoConfigDialog,
-                )
-
-                op_dialog = OperativoConfigDialog(self)
-                if not op_dialog.exec():
-                    return  # Cancelado
-                operativo_config = op_dialog.get_config()
-                extra_kwargs["operation_type"] = operativo_config.get(
-                    "operation_type", "type"
-                )
-                extra_kwargs["frequency_band"] = operativo_config.get(
-                    "frequency_band", "band"
-                )
-                extra_kwargs["repeater_key"] = operativo_config.get(
-                    "repeater_key", None
-                )
-                extra_kwargs["metadata"] = operativo_config
-            db_path, log = create_log(
-                selected["type"], indicativo["callsign"], **extra_kwargs
+        extra_kwargs = {}
+        if selected["type"] == LogType.CONTEST_LOG:
+            contest_keys = [
+                "contest_world_radio_day",
+                "contest_independence_peru",
+                "contest_peruvian_ham_day",
+            ]
+            contest_index = contest_dialog.contest_box.currentIndex()
+            contest_key = contest_keys[contest_index]
+            extra_kwargs["contest_key"] = contest_key
+            extra_kwargs["name"] = translation_service.tr(contest_key)
+            extra_kwargs["metadata"] = {"contest_name_key": contest_key}
+        elif selected["type"] == LogType.OPERATION_LOG:
+            op_dialog = OperativoConfigDialog(self)
+            if not op_dialog.exec():
+                return  # Cancelado
+            operativo_config = op_dialog.get_config()
+            extra_kwargs["operation_type"] = operativo_config.get(
+                "operation_type", "type"
             )
-            self.current_log = log
-            self.current_log_type = selected["type"]
-            if self.current_log_type == LogType.CONTEST_LOG:
-                cabecera = f"{log.operator} - {contest_name} - {log.start_time}"
-                self.setWindowTitle(cabecera)
-            else:
-                self.setWindowTitle(f"{log.operator} - Operativo - {log.start_time}")
-            if self.current_log_type == LogType.OPERATION_LOG:
-                self.show_view(ViewID.LOG_OPS_VIEW)
-            elif self.current_log_type == LogType.CONTEST_LOG:
-                self.show_view(ViewID.LOG_CONTEST_VIEW)
-            else:
-                self.show_view(ViewID.WELCOME_VIEW)
+            extra_kwargs["frequency_band"] = operativo_config.get(
+                "frequency_band", "band"
+            )
+            extra_kwargs["repeater_key"] = operativo_config.get("repeater_key", None)
+            extra_kwargs["metadata"] = operativo_config
+        db_path, log = create_log(
+            selected["type"], indicativo["callsign"], **extra_kwargs
+        )
+        self.current_log = log
+        self.current_log_type = selected["type"]
+        if self.current_log_type == LogType.CONTEST_LOG:
+            cabecera = f"{log.operator} - {contest_name} - {log.start_time}"
+            self.setWindowTitle(cabecera)
         else:
-            self.current_log = None
-            self.current_log_type = None
+            self.setWindowTitle(f"{log.operator} - Operativo - {log.start_time}")
+        if self.current_log_type == LogType.OPERATION_LOG:
+            self.show_view(ViewID.LOG_OPS_VIEW)
+        elif self.current_log_type == LogType.CONTEST_LOG:
+            self.show_view(ViewID.LOG_CONTEST_VIEW)
+        else:
             self.show_view(ViewID.WELCOME_VIEW)
     else:
         self.current_log = None
@@ -119,6 +122,9 @@ def action_log_new(self):
 
 
 def action_log_open(self):
+    """
+    Abre un log existente, seleccionando tipo y archivo.
+    """
     # ...migrated code from MainWindow._action_log_open...
     dialog = QDialog(self)
     dialog.setWindowTitle(translation_service.tr("select_log_type"))
@@ -163,8 +169,6 @@ def action_log_open(self):
         )
         if file_path:
             try:
-                from application.use_cases.open_log import open_log
-
                 log = open_log(file_path)
                 self.current_log = log
                 if hasattr(
@@ -205,6 +209,9 @@ def action_log_open(self):
 
 
 def action_log_export(self):
+    """
+    Exporta el log abierto en el formato seleccionado por el usuario.
+    """
     if not hasattr(self, "current_log") or self.current_log is None:
         from PySide6.QtWidgets import QMessageBox
 
@@ -260,7 +267,6 @@ def action_log_export(self):
             export_log.export_log_to_pdf(db_path, export_path)
         else:
             raise ValueError(f"Formato no soportado: {selected_ext}")
-        # ...existing code...
         from PySide6.QtWidgets import QMessageBox
 
         QMessageBox.information(
@@ -269,7 +275,6 @@ def action_log_export(self):
             translation_service.tr("export_success"),
         )
     except Exception as e:
-        # ...existing code...
         from PySide6.QtWidgets import QMessageBox
 
         QMessageBox.critical(
@@ -280,13 +285,20 @@ def action_log_export(self):
 
 
 def action_log_close(self):
+    """
+    Cierra el log actual y vuelve a la vista de bienvenida.
+    """
     self.current_log = None
     self.current_log_type = None
     self.show_view(ViewID.WELCOME_VIEW)
     self.update_menu_state()
 
 
+# --- Acciones de Base de Datos ---
 def action_db_import_pdf(self):
+    """
+    Importa operadores OA desde un PDF oficial, mostrando resumen visual.
+    """
     file_path, _ = QFileDialog.getOpenFileName(
         self,
         translation_service.tr("import_from_pdf"),
@@ -368,6 +380,9 @@ def action_db_import_pdf(self):
 
 
 def action_db_export(self):
+    """
+    Exporta la base de datos de operadores a CSV.
+    """
     from interface_adapters.controllers.database_controller import DatabaseController
     from translation.translation_service import translation_service
     from PySide6.QtWidgets import QFileDialog, QMessageBox
@@ -403,6 +418,9 @@ def action_db_export(self):
 
 
 def action_db_delete(self):
+    """
+    Elimina la base de datos local tras confirmación del usuario.
+    """
     from infrastructure.db.reset import reset_database
 
     yes_text = translation_service.tr("yes_button")
@@ -512,6 +530,7 @@ def action_db_import_db(self):
                 QMessageBox.critical(self, "Error", f"No se pudo importar: {e}")
 
 
+# --- Acciones de UI y ventanas secundarias ---
 def action_open_data_folder(self):
     """
     Abre la carpeta donde se guarda la base de datos usando el explorador del sistema.
@@ -544,7 +563,11 @@ def action_on_db_table_window_closed(self, *args):
     on_db_table_window_closed(self, *args)
 
 
+# --- Utilidades y helpers ---
 def on_menu_action(self, action: str):
+    """
+    Ejecuta la acción correspondiente según el string recibido.
+    """
     action_map = {
         "log_new": self.action_log_new,
         "log_open": self.action_log_open,
@@ -566,10 +589,11 @@ def on_menu_action(self, action: str):
         QMessageBox.warning(self, "Acción no implementada", f"No handler for {action}")
 
 
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QComboBox, QPushButton
-
-
 class ExportFormatDialog(QDialog):
+    """
+    Diálogo para seleccionar el formato de exportación de log.
+    """
+
     def __init__(self, log_type, parent=None):
         super().__init__(parent)
         self.setWindowTitle(translation_service.tr("export_log"))
@@ -600,6 +624,9 @@ class ExportFormatDialog(QDialog):
         self.selected_ext = None
 
     def accept(self):
+        """
+        Obtiene la extensión seleccionada y cierra el diálogo.
+        """
         idx = self.combo.currentIndex()
         self.selected_ext = self.formats[idx][1]
         super().accept()
