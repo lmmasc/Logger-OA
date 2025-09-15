@@ -195,8 +195,6 @@ class LogOpsView(QWidget):
         self.retranslate_ui()
 
     def retranslate_ui(self):
-        log = getattr(self, "_current_log", None)
-        # ...existing code...
         """
         Actualiza los textos de la UI según el idioma seleccionado y los datos del log, y refresca relojes.
         """
@@ -206,37 +204,9 @@ class LogOpsView(QWidget):
         self.oa_clock.update_clock()
         self.utc_clock.update_clock()
 
-        log = getattr(self, "_current_log", None)
-        callsign = log.operator if log else ""
-        meta = getattr(log, "metadata", {}) if log else {}
-        operation_type = (
-            translation_service.tr(meta.get("operation_type", "")) if meta else ""
-        )
-        frequency_band = (
-            translation_service.tr(meta.get("frequency_band", "")) if meta else ""
-        )
-        mode = translation_service.tr(meta.get("mode_key", "")) if meta else ""
-        freq = meta.get("frequency", "") if meta else ""
-        repeater = (
-            translation_service.tr(meta.get("repeater_key", ""))
-            if meta and meta.get("repeater_key")
-            else ""
-        )
-        log_date = meta.get("log_date", "") if meta else ""
-        # Lógica para mostrar frecuencia solo si es simplex (y VHF)
-        show_freq = True
-        if frequency_band.lower() == translation_service.tr("vhf").lower():
-            repeater_key = meta.get("repeater_key", "")
-            if repeater_key and repeater_key != "rep_simplex":
-                show_freq = False
-        header_parts = [callsign, operation_type, frequency_band, mode]
-        if show_freq and freq:
-            header_parts.append(freq)
-        if repeater:
-            header_parts.append(repeater)
-        header_parts.append(log_date)
-        header_text = " | ".join([str(p) for p in header_parts if p])
-        self.header_widget.update_text(header_text)
+        # Actualizar encabezado usando la lógica centralizada
+        self.update_header()
+
         self.form_widget.retranslate_ui()
         self.table_widget.retranslate_ui()
         self.queue_widget.retranslate_ui()

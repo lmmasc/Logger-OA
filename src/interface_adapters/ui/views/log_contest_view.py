@@ -149,30 +149,9 @@ class LogContestView(QWidget):
         self.oa_clock.update_clock()
         self.utc_clock.update_clock()
 
-        lang = translation_service.get_language()
-        log = getattr(self, "_current_log", None)
-        callsign = log.operator if log else ""
-        contest_key = (
-            log.metadata.get("contest_name_key", None)
-            if log and hasattr(log, "metadata")
-            else None
-        )
-        contest_name = (
-            translation_service.tr(contest_key)
-            if contest_key
-            else translation_service.tr("log_type_contest")
-        )
-        dt = log.start_time if log else ""
-        try:
-            date_obj = datetime.strptime(dt[:8], "%Y%m%d")
-            if lang == "es":
-                log_date = date_obj.strftime("%d/%m/%Y")
-            else:
-                log_date = date_obj.strftime("%m/%d/%Y")
-        except Exception:
-            log_date = dt
-        header_text = f"{callsign} | {contest_name} | {log_date}"
-        self.header_widget.update_text(header_text)
+        # Actualizar encabezado usando la lógica centralizada
+        self.update_header()
+
         self.form_widget.retranslate_ui()
         self.table_widget.retranslate_ui()
         self.queue_widget.retranslate_ui()
