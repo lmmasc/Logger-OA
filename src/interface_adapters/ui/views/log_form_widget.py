@@ -1,3 +1,9 @@
+# Standard library imports
+import uuid
+import datetime
+
+# Third-party imports
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QWidget,
     QLineEdit,
@@ -8,10 +14,10 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QSizePolicy,
 )
-from PySide6.QtCore import Qt
+
+# Local application imports
 from translation.translation_service import translation_service
 from interface_adapters.ui.view_manager import LogType, ViewID
-import datetime
 from infrastructure.repositories.sqlite_radio_operator_repository import (
     SqliteRadioOperatorRepository,
 )
@@ -26,7 +32,6 @@ from application.use_cases.contact_management import (
 )
 from interface_adapters.ui.dialogs.operator_edit_dialog import OperatorEditDialog
 from domain.repositories.contact_log_repository import ContactLogRepository
-import uuid
 
 
 class LogFormWidget(QWidget):
@@ -36,11 +41,7 @@ class LogFormWidget(QWidget):
     Reutilizable en operativos y concursos.
     """
 
-    def __init__(
-        self,
-        parent=None,
-        log_type=LogType.OPERATION_LOG,
-    ):
+    def __init__(self, parent=None, log_type=LogType.OPERATION_LOG):
         """
         Inicializa el formulario de log/contacto.
         Args:
@@ -48,19 +49,22 @@ class LogFormWidget(QWidget):
             log_type: Tipo de log (Enum LogType).
         """
         super().__init__(parent)
-
         self.log_type = log_type
+        self._setup_ui()
+        self._setup_tab_order()
+
+    def _setup_ui(self):
+        """
+        Configura y construye la interfaz gráfica del formulario de log/contacto.
+        """
         main_layout = QVBoxLayout()
         main_layout.setSpacing(4)
-
-        # Layout horizontal para los campos del formulario
         form_row = QHBoxLayout()
         form_row.setSpacing(8)
         form_row.setContentsMargins(0, 0, 0, 0)
         form_row.setAlignment(Qt.AlignLeft)
-
         if self.log_type == LogType.CONTEST_LOG:
-            # Campos para concursos: RS_RX, intercambio recibido/enviado, RS_TX, observaciones
+            # Campos para concursos
             self.rs_rx_input = QLineEdit(self)
             self.rs_rx_input.setText("59")
             self.rs_rx_input.setFixedWidth(50)
@@ -72,7 +76,6 @@ class LogFormWidget(QWidget):
             form_row.addWidget(rs_rx_label)
             form_row.addWidget(self.rs_rx_input)
             self.rs_rx_label = rs_rx_label
-
             self.exchange_received_input = QLineEdit(self)
             self.exchange_received_input.setFixedWidth(80)
             self.exchange_received_input.setSizePolicy(
@@ -87,7 +90,6 @@ class LogFormWidget(QWidget):
             form_row.addWidget(exchange_received_label)
             form_row.addWidget(self.exchange_received_input)
             self.exchange_received_label = exchange_received_label
-
             self.rs_tx_input = QLineEdit(self)
             self.rs_tx_input.setText("59")
             self.rs_tx_input.setFixedWidth(50)
@@ -99,7 +101,6 @@ class LogFormWidget(QWidget):
             form_row.addWidget(rs_tx_label)
             form_row.addWidget(self.rs_tx_input)
             self.rs_tx_label = rs_tx_label
-
             self.exchange_sent_input = QLineEdit(self)
             self.exchange_sent_input.setFixedWidth(80)
             self.exchange_sent_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -110,7 +111,6 @@ class LogFormWidget(QWidget):
             form_row.addWidget(exchange_sent_label)
             form_row.addWidget(self.exchange_sent_input)
             self.exchange_sent_label = exchange_sent_label
-
             self.observations_input = QLineEdit(self)
             self.observations_input.setSizePolicy(
                 QSizePolicy.Expanding, QSizePolicy.Fixed
@@ -123,7 +123,7 @@ class LogFormWidget(QWidget):
             form_row.addWidget(self.observations_input, 1)
             self.observations_label = obs_label
         else:
-            # Campos para operativos: estación, energía, potencia, RS_RX, RS_TX, observaciones
+            # Campos para operativos
             self.station_input = QComboBox(self)
             self.station_input.addItems(
                 [
@@ -143,7 +143,6 @@ class LogFormWidget(QWidget):
             form_row.addWidget(station_label)
             form_row.addWidget(self.station_input)
             self.station_label = station_label
-
             self.energy_input = QComboBox(self)
             self.energy_input.addItems(
                 [
@@ -163,7 +162,6 @@ class LogFormWidget(QWidget):
             form_row.addWidget(energy_label)
             form_row.addWidget(self.energy_input)
             self.energy_label = energy_label
-
             self.power_input = QLineEdit(self)
             self.power_input.setText("1")
             self.power_input.setFixedWidth(60)
@@ -175,7 +173,6 @@ class LogFormWidget(QWidget):
             form_row.addWidget(power_label)
             form_row.addWidget(self.power_input)
             self.power_label = power_label
-
             self.rs_rx_input = QLineEdit(self)
             self.rs_rx_input.setText("59")
             self.rs_rx_input.setFixedWidth(50)
@@ -187,7 +184,6 @@ class LogFormWidget(QWidget):
             form_row.addWidget(rs_rx_label)
             form_row.addWidget(self.rs_rx_input)
             self.rs_rx_label = rs_rx_label
-
             self.rs_tx_input = QLineEdit(self)
             self.rs_tx_input.setText("59")
             self.rs_tx_input.setFixedWidth(50)
@@ -199,7 +195,6 @@ class LogFormWidget(QWidget):
             form_row.addWidget(rs_tx_label)
             form_row.addWidget(self.rs_tx_input)
             self.rs_tx_label = rs_tx_label
-
             self.observations_input = QLineEdit(self)
             self.observations_input.setSizePolicy(
                 QSizePolicy.Expanding, QSizePolicy.Fixed
@@ -211,17 +206,17 @@ class LogFormWidget(QWidget):
             form_row.addWidget(obs_label)
             form_row.addWidget(self.observations_input, 1)
             self.observations_label = obs_label
-
-        # Widget contenedor del formulario
         form_row_widget = QWidget(self)
         form_row_widget.setLayout(form_row)
         form_row_widget.setMinimumWidth(700)
         form_row_widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         main_layout.addWidget(form_row_widget)
-
         self.setLayout(main_layout)
 
-        # Configuración de tabulación entre campos internos
+    def _setup_tab_order(self):
+        """
+        Configura el orden de tabulación entre los campos del formulario.
+        """
         if self.log_type == LogType.CONTEST_LOG:
             QWidget.setTabOrder(self.rs_rx_input, self.exchange_received_input)
             QWidget.setTabOrder(self.exchange_received_input, self.rs_tx_input)
