@@ -19,8 +19,9 @@ from infrastructure.repositories.sqlite_radio_operator_repository import (
 
 class LogFormWidget(QWidget):
     """
-    Widget base para formularios de contacto/log. Reutilizable en operativos y concursos.
+    Widget base para formularios de contacto/log.
     Permite ingresar y gestionar datos de contacto para logs de operativos y concursos, con soporte multilenguaje.
+    Reutilizable en operativos y concursos.
     """
 
     def __init__(
@@ -36,20 +37,18 @@ class LogFormWidget(QWidget):
         """
         super().__init__(parent)
 
-        # Anchos fijos para los labels (ajustar manualmente si es necesario)
         self.log_type = log_type
-        # Layout principal
         main_layout = QVBoxLayout()
         main_layout.setSpacing(4)
 
-        # --- Formulario horizontal ---
+        # Layout horizontal para los campos del formulario
         form_row = QHBoxLayout()
         form_row.setSpacing(8)
         form_row.setContentsMargins(0, 0, 0, 0)
         form_row.setAlignment(Qt.AlignLeft)
 
         if self.log_type == LogType.CONTEST_LOG:
-            # RS_RX
+            # Campos para concursos: RS_RX, intercambio recibido/enviado, RS_TX, observaciones
             self.rs_rx_input = QLineEdit(self)
             self.rs_rx_input.setText("59")
             self.rs_rx_input.setFixedWidth(50)
@@ -62,7 +61,6 @@ class LogFormWidget(QWidget):
             form_row.addWidget(self.rs_rx_input)
             self.rs_rx_label = rs_rx_label
 
-            # Intercambio recibido
             self.exchange_received_input = QLineEdit(self)
             self.exchange_received_input.setFixedWidth(80)
             self.exchange_received_input.setSizePolicy(
@@ -78,7 +76,6 @@ class LogFormWidget(QWidget):
             form_row.addWidget(self.exchange_received_input)
             self.exchange_received_label = exchange_received_label
 
-            # RS_TX
             self.rs_tx_input = QLineEdit(self)
             self.rs_tx_input.setText("59")
             self.rs_tx_input.setFixedWidth(50)
@@ -91,7 +88,6 @@ class LogFormWidget(QWidget):
             form_row.addWidget(self.rs_tx_input)
             self.rs_tx_label = rs_tx_label
 
-            # Intercambio enviado
             self.exchange_sent_input = QLineEdit(self)
             self.exchange_sent_input.setFixedWidth(80)
             self.exchange_sent_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -103,7 +99,6 @@ class LogFormWidget(QWidget):
             form_row.addWidget(self.exchange_sent_input)
             self.exchange_sent_label = exchange_sent_label
 
-            # Observaciones (expansivo)
             self.observations_input = QLineEdit(self)
             self.observations_input.setSizePolicy(
                 QSizePolicy.Expanding, QSizePolicy.Fixed
@@ -116,7 +111,7 @@ class LogFormWidget(QWidget):
             form_row.addWidget(self.observations_input, 1)
             self.observations_label = obs_label
         else:
-            # Station
+            # Campos para operativos: estación, energía, potencia, RS_RX, RS_TX, observaciones
             self.station_input = QComboBox(self)
             self.station_input.addItems(
                 [
@@ -137,7 +132,6 @@ class LogFormWidget(QWidget):
             form_row.addWidget(self.station_input)
             self.station_label = station_label
 
-            # Energy
             self.energy_input = QComboBox(self)
             self.energy_input.addItems(
                 [
@@ -158,7 +152,6 @@ class LogFormWidget(QWidget):
             form_row.addWidget(self.energy_input)
             self.energy_label = energy_label
 
-            # Power
             self.power_input = QLineEdit(self)
             self.power_input.setText("1")
             self.power_input.setFixedWidth(60)
@@ -171,7 +164,6 @@ class LogFormWidget(QWidget):
             form_row.addWidget(self.power_input)
             self.power_label = power_label
 
-            # RS_RX
             self.rs_rx_input = QLineEdit(self)
             self.rs_rx_input.setText("59")
             self.rs_rx_input.setFixedWidth(50)
@@ -184,7 +176,6 @@ class LogFormWidget(QWidget):
             form_row.addWidget(self.rs_rx_input)
             self.rs_rx_label = rs_rx_label
 
-            # RS_TX
             self.rs_tx_input = QLineEdit(self)
             self.rs_tx_input.setText("59")
             self.rs_tx_input.setFixedWidth(50)
@@ -197,7 +188,6 @@ class LogFormWidget(QWidget):
             form_row.addWidget(self.rs_tx_input)
             self.rs_tx_label = rs_tx_label
 
-            # Observaciones (expansivo)
             self.observations_input = QLineEdit(self)
             self.observations_input.setSizePolicy(
                 QSizePolicy.Expanding, QSizePolicy.Fixed
@@ -207,24 +197,19 @@ class LogFormWidget(QWidget):
             obs_label.setFixedWidth(40)
             obs_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
             form_row.addWidget(obs_label)
-            form_row.addWidget(
-                self.observations_input, 1
-            )  # stretch factor 1 para ocupar espacio restante
+            form_row.addWidget(self.observations_input, 1)
             self.observations_label = obs_label
 
-        # Widget del formulario
+        # Widget contenedor del formulario
         form_row_widget = QWidget(self)
         form_row_widget.setLayout(form_row)
         form_row_widget.setMinimumWidth(700)
-        form_row_widget.setSizePolicy(
-            QSizePolicy.Preferred, QSizePolicy.Fixed
-        )  # No expansivo, solo lo necesario
+        form_row_widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         main_layout.addWidget(form_row_widget)
 
-        # Asignar layout principal
         self.setLayout(main_layout)
 
-        # Refuerzo de tabulación solo entre campos internos
+        # Configuración de tabulación entre campos internos
         if self.log_type == LogType.CONTEST_LOG:
             QWidget.setTabOrder(self.rs_rx_input, self.exchange_received_input)
             QWidget.setTabOrder(self.exchange_received_input, self.rs_tx_input)
@@ -239,11 +224,11 @@ class LogFormWidget(QWidget):
 
     def get_data(self, callsign=None):
         """
-        Devuelve los datos del formulario como diccionario.
+        Obtiene los datos ingresados en el formulario y los retorna como diccionario.
         Args:
             callsign (str, opcional): Indicativo de llamada.
         Returns:
-            dict: Datos del formulario.
+            dict: Datos del formulario, adaptados según el tipo de log.
         """
         from application.use_cases.operator_management import get_operator_by_callsign
 
@@ -283,7 +268,6 @@ class LogFormWidget(QWidget):
             country = operator.country if operator else ""
             region = operator.region if operator else "-"
             timestamp = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
-            # Definir las keys en el mismo orden que los textos
             station_keys = [
                 "no_data",
                 "station_base",
@@ -322,16 +306,14 @@ class LogFormWidget(QWidget):
                     "obs": self.observations_input.text(),
                 }
             )
-
         return data
 
     def _find_main_window(self):
         """
         Busca la instancia de MainWindow en la jerarquía de padres.
         Returns:
-            MainWindow instance o None
+            MainWindow instance o None si no se encuentra.
         """
-        # Busca la instancia de MainWindow en la jerarquía de padres
         parent = self.parent()
         while parent:
             if parent.__class__.__name__ == "MainWindow":
@@ -340,7 +322,13 @@ class LogFormWidget(QWidget):
         return None
 
     def _on_add_contact(self, callsign=None):
-        # ...existing code...
+        """
+        Lógica para agregar un contacto al log actual, validando datos y mostrando mensajes de error o confirmación.
+        Args:
+            callsign (str, opcional): Indicativo de llamada a agregar.
+        Returns:
+            bool: True si el contacto fue agregado correctamente, False si hubo errores o cancelación.
+        """
         from application.use_cases.operator_management import (
             get_operator_by_callsign,
             create_operator,
@@ -368,7 +356,7 @@ class LogFormWidget(QWidget):
         data = self.get_data(callsign_val)
         if callsign_val:
             data["callsign"] = callsign_val
-        # Validación de campos y control de foco (restaurado)
+        # Validación de campos y control de foco
         operator = get_operator_by_callsign(callsign_val)
         main_window = self._find_main_window()
         db_path = getattr(main_window.current_log, "db_path", None)
@@ -376,12 +364,10 @@ class LogFormWidget(QWidget):
         contact_type = (
             "operativo" if self.log_type == LogType.OPERATION_LOG else "concurso"
         )
-        # Obtener contactos existentes para validación
         from domain.repositories.contact_log_repository import ContactLogRepository
 
         repo_log = ContactLogRepository(db_path)
         contacts = repo_log.get_contacts(log_id)
-        # Validar antes de agregar
         validation = validate_contact_for_log(
             data, contacts, contact_type, translation_service
         )
@@ -394,7 +380,7 @@ class LogFormWidget(QWidget):
                 translation_service.tr("main_window_title"),
                 error_msg,
             )
-            # Asignar foco al campo correspondiente
+            # Asignar foco al campo correspondiente según el error
             focus_field = None
             field = validation["focus_field"]
             if field == "callsign_input" and hasattr(self.parent(), "callsign_input"):
@@ -404,7 +390,7 @@ class LogFormWidget(QWidget):
             if focus_field:
                 focus_field.setFocus()
             return False
-        # Validación de bloque OA solo si no hay errores y es concurso
+        # Validación de duplicados en bloque OA para concursos
         if contact_type == "concurso":
             from application.use_cases.contact_management import find_duplicate_in_block
 
@@ -413,7 +399,7 @@ class LogFormWidget(QWidget):
             )
             if duplicate:
                 msg = (
-                    f"El indicativo {duplicate['callsign']} ({duplicate['name']}) ya fue registrado en este bloque horario OA a las {duplicate['hora_oa']}.\n"
+                    f"El indicativo {duplicate['callsign']} ({duplicate['name']}) ya fue registrado en este bloque horario OA a las {duplicate['hora_oa']}. "
                     "¿Desea registrar de todas formas este contacto?"
                 )
                 reply = QMessageBox.question(
@@ -434,9 +420,8 @@ class LogFormWidget(QWidget):
             try:
                 contact = add_contact_to_log(db_path, log_id, data, contact_type)
                 contacts = repo_log.get_contacts(log_id)
-                # ...existing code...
                 main_window.current_log.contacts = contacts
-                # Actualiza la tabla y mueve el scroll
+                # Actualiza la tabla y mueve el scroll en la vista correspondiente
                 if hasattr(main_window, "view_manager"):
                     if (
                         self.log_type == LogType.OPERATION_LOG
@@ -445,16 +430,13 @@ class LogFormWidget(QWidget):
                         table_widget = main_window.view_manager.views[
                             ViewID.LOG_OPS_VIEW
                         ].table_widget
-                        # ...existing code...
                         table_widget.set_contacts(contacts)
-                        # ...existing code...
                         table = table_widget.table
                         table.scrollToBottom()
                         table.setFocus()
                         parent = self.parent()
                         while parent:
                             if hasattr(parent, "callsign_input"):
-                                # Limpiar campo y mover foco solo si se agregó correctamente
                                 parent.callsign_input.input.clear()
                                 parent.callsign_input.input.setFocus()
                                 break
@@ -466,22 +448,19 @@ class LogFormWidget(QWidget):
                         table_widget = main_window.view_manager.views[
                             ViewID.LOG_CONTEST_VIEW
                         ].table_widget
-                        table = table_widget.table
                         table_widget.set_contacts(contacts)
+                        table = table_widget.table
                         table.scrollToBottom()
                         table.setFocus()
                         parent = self.parent()
                         while parent:
                             if hasattr(parent, "callsign_input"):
-                                # Limpiar campo y mover foco solo si se agregó correctamente
                                 parent.callsign_input.input.clear()
                                 parent.callsign_input.input.setFocus()
                                 break
                             parent = parent.parent()
-                # Si todo fue exitoso
                 return True
             except Exception as e:
-                # Si ocurre error inesperado, mostrarlo
                 QMessageBox.critical(
                     self,
                     translation_service.tr("main_window_title"),
@@ -516,7 +495,6 @@ class LogFormWidget(QWidget):
             contact = add_contact_to_log(db_path, log_id, data, contact_type)
             contacts = repo_log.get_contacts(log_id)
             main_window.current_log.contacts = contacts
-            # Actualiza la tabla y mueve el scroll
             if hasattr(main_window, "view_manager"):
                 if (
                     self.log_type == LogType.OPERATION_LOG
@@ -525,7 +503,6 @@ class LogFormWidget(QWidget):
                     table_widget = main_window.view_manager.views[
                         ViewID.LOG_OPS_VIEW
                     ].table_widget
-                    table = table_widget.table
                     table_widget.set_contacts(contacts)
                     table = table_widget.table
                     table.scrollToBottom()
@@ -533,7 +510,6 @@ class LogFormWidget(QWidget):
                     parent = self.parent()
                     while parent:
                         if hasattr(parent, "callsign_input"):
-                            # Limpiar campo y mover foco solo si se agregó correctamente
                             parent.callsign_input.input.clear()
                             parent.callsign_input.input.setFocus()
                             break
@@ -545,19 +521,17 @@ class LogFormWidget(QWidget):
                     table_widget = main_window.view_manager.views[
                         ViewID.LOG_CONTEST_VIEW
                     ].table_widget
-                    table = table_widget.table
                     table_widget.set_contacts(contacts)
+                    table = table_widget.table
                     table.scrollToBottom()
                     table.setFocus()
                     parent = self.parent()
                     while parent:
                         if hasattr(parent, "callsign_input"):
-                            # Limpiar campo y mover foco solo si se agregó correctamente
                             parent.callsign_input.input.clear()
                             parent.callsign_input.input.setFocus()
                             break
                         parent = parent.parent()
-            # Si todo fue exitoso
             return True
         except Exception as e:
             QMessageBox.critical(
@@ -570,8 +544,8 @@ class LogFormWidget(QWidget):
     def retranslate_ui(self):
         """
         Actualiza los textos de la interfaz según el idioma seleccionado.
+        Reasigna los textos de los labels y opciones de los selectores para reflejar el idioma actual.
         """
-        # Actualizar todos los labels manualmente por el nuevo layout
         if hasattr(self, "station_label"):
             self.station_label.setText(translation_service.tr("station"))
         if hasattr(self, "energy_label"):
