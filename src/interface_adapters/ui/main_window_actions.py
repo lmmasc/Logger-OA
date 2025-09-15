@@ -15,7 +15,8 @@ from PySide6.QtWidgets import (
     QComboBox,
     QApplication,
 )
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import Qt, QTimer, QUrl
+from PySide6.QtGui import QDesktopServices
 
 # Imports estándar
 import os
@@ -370,7 +371,6 @@ def action_db_delete(self):
     """
     Elimina la base de datos local tras confirmación del usuario.
     """
-    from infrastructure.db.reset import reset_database
 
     yes_text = translation_service.tr("yes_button")
     no_text = translation_service.tr("no_button")
@@ -408,17 +408,9 @@ def action_db_backup(self):
     Crea un respaldo de la base de datos y muestra un mensaje informativo.
     """
     try:
-        from interface_adapters.controllers.database_controller import (
-            DatabaseController,
-        )
-
         backup_path = DatabaseController.backup_database()
-        from PySide6.QtWidgets import QMessageBox
-
         QMessageBox.information(self, "Backup", f"Backup creado en: {backup_path}")
     except Exception as e:
-        from PySide6.QtWidgets import QMessageBox
-
         QMessageBox.critical(self, "Error", f"No se pudo crear el backup: {e}")
 
 
@@ -470,11 +462,6 @@ def action_open_data_folder(self):
     """
     Abre la carpeta donde se guarda la base de datos usando el explorador del sistema.
     """
-    from config.paths import get_database_path
-    from PySide6.QtGui import QDesktopServices
-    from PySide6.QtCore import QUrl
-    import os
-
     db_path = get_database_path()
     folder = os.path.dirname(db_path)
     QDesktopServices.openUrl(QUrl.fromLocalFile(folder))
@@ -484,8 +471,6 @@ def action_show_db_window(self):
     """
     Muestra la ventana de gestión de la base de datos.
     """
-    from .main_window_db_window import show_db_window
-
     show_db_window(self)
 
 
@@ -493,8 +478,6 @@ def action_on_db_table_window_closed(self, *args):
     """
     Handler para el cierre de la ventana de tabla de base de datos.
     """
-    from .main_window_db_window import on_db_table_window_closed
-
     on_db_table_window_closed(self, *args)
 
 
