@@ -436,6 +436,114 @@ def action_db_delete(self):
         )
 
 
+def action_db_backup(self):
+    """
+    Crea un respaldo de la base de datos y muestra un mensaje informativo.
+    """
+    try:
+        from interface_adapters.controllers.database_controller import (
+            DatabaseController,
+        )
+
+        backup_path = DatabaseController.backup_database()
+        from PySide6.QtWidgets import QMessageBox
+
+        QMessageBox.information(self, "Backup", f"Backup creado en: {backup_path}")
+    except Exception as e:
+        from PySide6.QtWidgets import QMessageBox
+
+        QMessageBox.critical(self, "Error", f"No se pudo crear el backup: {e}")
+
+
+def action_db_restore(self):
+    """
+    Restaura la base de datos desde un archivo de respaldo seleccionado por el usuario.
+    """
+    from PySide6.QtWidgets import QFileDialog, QMessageBox
+    import os
+    from config.paths import BASE_PATH
+
+    backup_dir = os.path.join(BASE_PATH, "backups")
+    file_dialog = QFileDialog(self)
+    file_dialog.setWindowTitle("Seleccionar backup para restaurar")
+    file_dialog.setDirectory(backup_dir)
+    file_dialog.setFileMode(QFileDialog.ExistingFile)
+    file_dialog.setNameFilter("Backups (*.db)")
+    if file_dialog.exec():
+        selected_files = file_dialog.selectedFiles()
+        if selected_files:
+            backup_file = os.path.basename(selected_files[0])
+            try:
+                from interface_adapters.controllers.database_controller import (
+                    DatabaseController,
+                )
+
+                DatabaseController.restore_database(backup_file)
+                QMessageBox.information(
+                    self, "Restaurar", f"Base restaurada desde: {backup_file}"
+                )
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"No se pudo restaurar: {e}")
+
+
+def action_db_import_db(self):
+    """
+    Importa operadores desde una base de datos externa seleccionada por el usuario.
+    """
+    from PySide6.QtWidgets import QFileDialog, QMessageBox
+
+    file_dialog = QFileDialog(self)
+    file_dialog.setFileMode(QFileDialog.ExistingFile)
+    file_dialog.setNameFilter("Bases de datos (*.db)")
+    if file_dialog.exec():
+        selected_files = file_dialog.selectedFiles()
+        if selected_files:
+            external_db_path = selected_files[0]
+            try:
+                from interface_adapters.controllers.database_controller import (
+                    DatabaseController,
+                )
+
+                imported = DatabaseController.import_database(external_db_path)
+                QMessageBox.information(
+                    self, "Importar", f"Operadores importados: {imported}"
+                )
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"No se pudo importar: {e}")
+
+
+def action_open_data_folder(self):
+    """
+    Abre la carpeta donde se guarda la base de datos usando el explorador del sistema.
+    """
+    from config.paths import get_database_path
+    from PySide6.QtGui import QDesktopServices
+    from PySide6.QtCore import QUrl
+    import os
+
+    db_path = get_database_path()
+    folder = os.path.dirname(db_path)
+    QDesktopServices.openUrl(QUrl.fromLocalFile(folder))
+
+
+def action_show_db_window(self):
+    """
+    Muestra la ventana de gestión de la base de datos.
+    """
+    from .main_window_db_window import show_db_window
+
+    show_db_window(self)
+
+
+def action_on_db_table_window_closed(self, *args):
+    """
+    Handler para el cierre de la ventana de tabla de base de datos.
+    """
+    from .main_window_db_window import on_db_table_window_closed
+
+    on_db_table_window_closed(self, *args)
+
+
 def on_menu_action(self, action: str):
     action_map = {
         "log_new": self.action_log_new,
@@ -445,6 +553,11 @@ def on_menu_action(self, action: str):
         "db_import_pdf": self.action_db_import_pdf,
         "db_export": self.action_db_export,
         "db_delete": self.action_db_delete,
+        "db_backup": self.action_db_backup,
+        "db_restore": self.action_db_restore,
+        "db_import_db": self.action_db_import_db,
+        "open_data_folder": self.action_open_data_folder,
+        "show_db_window": self.action_show_db_window,
     }
     handler = action_map.get(action)
     if handler:

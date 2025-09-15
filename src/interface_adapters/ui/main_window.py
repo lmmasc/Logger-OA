@@ -243,81 +243,34 @@ class MainWindow(QMainWindow):
     # Gestión de base de datos
     # =====================
     def _on_db_backup(self):
-        """
-        Crea un respaldo de la base de datos y muestra un mensaje informativo.
-        """
-        try:
-            backup_path = DatabaseController.backup_database()
-            QMessageBox.information(self, "Backup", f"Backup creado en: {backup_path}")
-        except Exception as e:
-            QMessageBox.critical(self, "Error", f"No se pudo crear el backup: {e}")
+        from .main_window_actions import action_db_backup
+
+        action_db_backup(self)
 
     def _on_db_restore(self):
-        """
-        Restaura la base de datos desde un archivo de respaldo seleccionado por el usuario.
-        """
-        from PySide6.QtWidgets import QFileDialog
-        import os
+        from .main_window_actions import action_db_restore
 
-        backup_dir = os.path.join(BASE_PATH, "backups")
-        file_dialog = QFileDialog(self)
-        file_dialog.setWindowTitle("Seleccionar backup para restaurar")
-        file_dialog.setDirectory(backup_dir)
-        file_dialog.setFileMode(QFileDialog.ExistingFile)
-        file_dialog.setNameFilter("Backups (*.db)")
-        if file_dialog.exec():
-            selected_files = file_dialog.selectedFiles()
-            if selected_files:
-                backup_file = os.path.basename(selected_files[0])
-                try:
-                    DatabaseController.restore_database(backup_file)
-                    QMessageBox.information(
-                        self, "Restaurar", f"Base restaurada desde: {backup_file}"
-                    )
-                except Exception as e:
-                    QMessageBox.critical(self, "Error", f"No se pudo restaurar: {e}")
+        action_db_restore(self)
 
     def _on_db_import_db(self):
-        """
-        Importa operadores desde una base de datos externa seleccionada por el usuario.
-        """
-        file_dialog = QFileDialog(self)
-        file_dialog.setFileMode(QFileDialog.ExistingFile)
-        file_dialog.setNameFilter("Bases de datos (*.db)")
-        if file_dialog.exec():
-            selected_files = file_dialog.selectedFiles()
-            if selected_files:
-                external_db_path = selected_files[0]
-                try:
-                    imported = DatabaseController.import_database(external_db_path)
-                    QMessageBox.information(
-                        self, "Importar", f"Operadores importados: {imported}"
-                    )
-                except Exception as e:
-                    QMessageBox.critical(self, "Error", f"No se pudo importar: {e}")
+        from .main_window_actions import action_db_import_db
+
+        action_db_import_db(self)
 
     def _open_data_folder(self) -> None:
-        """
-        Abre la carpeta donde se guarda la base de datos usando el explorador del sistema.
-        """
-        db_path = get_database_path()
-        folder = os.path.dirname(db_path)
-        QDesktopServices.openUrl(QUrl.fromLocalFile(folder))
+        from .main_window_actions import action_open_data_folder
 
-    # =====================
-    # Gestión de ventanas secundarias
-    # =====================
+        action_open_data_folder(self)
+
     def _show_db_window(self):
-        """
-        Muestra la ventana de gestión de la base de datos.
-        """
-        show_db_window(self)
+        from .main_window_actions import action_show_db_window
+
+        action_show_db_window(self)
 
     def _on_db_table_window_closed(self, *args):
-        """
-        Handler para el cierre de la ventana de tabla de base de datos.
-        """
-        on_db_table_window_closed(self, *args)
+        from .main_window_actions import action_on_db_table_window_closed
+
+        action_on_db_table_window_closed(self, *args)
 
     # =====================
     # Eventos y utilidades
