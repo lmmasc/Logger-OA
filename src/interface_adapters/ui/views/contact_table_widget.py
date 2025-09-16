@@ -21,21 +21,21 @@ class ContactTableWidget(QWidget):
     def __init__(self, parent=None, log_type=LogType.OPERATION_LOG):
         super().__init__(parent)
         self.log_type = log_type
-        self.layout = QVBoxLayout(self)
+        main_layout = QVBoxLayout(self)
         self.table = QTableWidget(self)
-        self.layout.addWidget(self.table)
-        self.setLayout(self.layout)
+        main_layout.addWidget(self.table)
+        self.setLayout(main_layout)
         self.set_columns()
         # Persistencia de anchos de columna diferenciada por tipo de log
         self._column_widths_key = f"contact_table_column_widths_{self.log_type.name}"
         self.table.horizontalHeader().sectionResized.connect(self.save_column_widths)
         self.load_column_widths()
         # Deshabilitar edición directa
-        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         # Conectar doble clic a método personalizado
         self.table.itemDoubleClicked.connect(self._on_item_double_clicked)
         # Evitar que la tabla reciba el foco por tabulación si no es interactiva
-        self.table.setFocusPolicy(Qt.NoFocus)
+        self.table.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
     def _on_item_double_clicked(self, item):
         """
@@ -48,9 +48,10 @@ class ContactTableWidget(QWidget):
         # Importar y mostrar el diálogo de edición de contacto
         from interface_adapters.ui.dialogs.contact_edit_dialog import ContactEditDialog
         from PySide6.QtWidgets import QDialog
+        from domain.contact_type import ContactType
 
         dlg = ContactEditDialog(contact, self.log_type, self)
-        if dlg.exec() == QDialog.Accepted and dlg.result_contact:
+        if dlg.exec() == QDialog.DialogCode.Accepted and dlg.result_contact:
             # Conservar id y timestamp originales
             updated_data = dlg.result_contact.copy()
             if "id" in contact:
@@ -62,24 +63,28 @@ class ContactTableWidget(QWidget):
             main_window = self.parent()
             while main_window and main_window.__class__.__name__ != "MainWindow":
                 main_window = main_window.parent()
-            if (
-                not main_window
-                or not hasattr(main_window, "current_log")
-                or not main_window.current_log
-            ):
+            if not main_window or not hasattr(main_window, "current_log"):
                 return
-            db_path = getattr(main_window.current_log, "db_path", None)
-            log_id = getattr(main_window.current_log, "id", None)
+            current_log = getattr(main_window, "current_log", None)
+            if not current_log:
+                return
+            db_path = getattr(current_log, "db_path", None)
+            log_id = getattr(current_log, "id", None)
             contact_id = contact.get("id", None)
             contact_type = (
-                "operativo" if self.log_type == LogType.OPERATION_LOG else "concurso"
+                ContactType.OPERATION
+                if self.log_type == LogType.OPERATION_LOG
+                else ContactType.CONTEST
             )
+            if not db_path or not log_id:
+                return
             update_contact_in_log(
                 db_path, log_id, contact_id, updated_data, contact_type
             )
             repo = ContactLogRepository(db_path)
             contacts = repo.get_contacts(log_id)
-            main_window.current_log.contacts = contacts
+            if hasattr(current_log, "contacts"):
+                current_log.contacts = contacts
             self.set_contacts(contacts)
 
     def set_columns(self):
@@ -210,7 +215,7 @@ class ContactTableWidget(QWidget):
         Guarda los anchos de columna, evitando sobrescribir con 0 y manteniendo el último valor válido.
         """
         prev_widths = settings_service.get_value(self._column_widths_key, None)
-        if prev_widths is None:
+        if not isinstance(prev_widths, list):
             prev_widths = [100] * self.table.columnCount()
         widths = []
         for i in range(self.table.columnCount()):
@@ -229,7 +234,7 @@ class ContactTableWidget(QWidget):
         Carga los anchos de columna guardados y aplica protección de valores mínimos.
         """
         widths = settings_service.get_value(self._column_widths_key, None)
-        if widths:
+        if isinstance(widths, list):
             for i, w in enumerate(widths):
                 if int(w) == 0:
                     w = 100
