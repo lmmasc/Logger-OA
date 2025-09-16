@@ -7,7 +7,7 @@ Utiliza settings_service para guardar y recuperar la preferencia del usuario.
 
 import os
 from PySide6.QtWidgets import QApplication
-from config.settings_service import settings_service
+from config.settings_service import settings_service, SettingsKey, ThemeValue
 from utils.resources import get_resource_path
 
 
@@ -20,25 +20,31 @@ class ThemeManager:
     def __init__(self):
         self.settings = settings_service
         self.theme_dir = os.path.dirname(__file__)
-        self.current_theme = self.settings.get_value("theme", "light")
+        theme_str = self.settings.get_value(
+            SettingsKey.THEME.value, ThemeValue.LIGHT.value
+        )
+        self.current_theme = ThemeValue(theme_str)
 
-    def apply_theme(self, theme_name: str):
+    def apply_theme(self, theme: ThemeValue):
         """
         Carga y aplica el archivo QSS correspondiente al tema.
         Guarda la preferencia del usuario solo si realmente cambió.
         Args:
-            theme_name (str): "light" o "dark"
+            theme (ThemeValue): ThemeValue.LIGHT o ThemeValue.DARK
         """
-        qss_rel_path = f"src/interface_adapters/ui/themes/{theme_name}.qss"
+        qss_rel_path = f"src/interface_adapters/ui/themes/{theme.value}.qss"
         qss_path = get_resource_path(qss_rel_path)
         try:
             with open(qss_path, "r") as f:
                 qss = f.read()
-                QApplication.instance().setStyleSheet(qss)
+                app_instance = QApplication.instance()
+                # Verificar que la instancia sea de tipo QApplication
+                if isinstance(app_instance, QApplication):
+                    app_instance.setStyleSheet(qss)
             # Solo guardar si el valor cambió
-            if self.current_theme != theme_name:
-                self.settings.set_value("theme", theme_name)
-            self.current_theme = theme_name
+            if self.current_theme != theme:
+                self.settings.set_value(SettingsKey.THEME.value, theme.value)
+            self.current_theme = theme
         except Exception as e:
             raise RuntimeError(f"Error aplicando tema: {e}")
 
