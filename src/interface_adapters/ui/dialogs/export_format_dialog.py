@@ -3,7 +3,10 @@ ExportFormatDialog
 Diálogo para seleccionar el formato de exportación de log.
 """
 
+# --- Imports de terceros ---
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QComboBox, QPushButton
+
+# --- Imports de la aplicación ---
 from translation.translation_service import translation_service
 from interface_adapters.ui.view_manager import LogType
 
@@ -14,6 +17,13 @@ class ExportFormatDialog(QDialog):
     """
 
     def __init__(self, log_type, parent=None):
+        """
+        Inicializa el diálogo de selección de formato de exportación.
+
+        Args:
+            log_type (LogType): Tipo de log (operativo o concurso).
+            parent (QWidget, opcional): Widget padre.
+        """
         super().__init__(parent)
         self.setWindowTitle(translation_service.tr("export_log"))
         layout = QVBoxLayout(self)

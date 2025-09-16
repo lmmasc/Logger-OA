@@ -1,8 +1,11 @@
-# Dialogo de configuración de log operativo
-# Permite seleccionar tipo de operativo, banda, modo, frecuencia y repetidora
-# Autor: (tu nombre o equipo)
-# Fecha: 2025-09-11
+"""
+OperativoConfigDialog
+Diálogo para configurar los parámetros de un log operativo.
+Permite seleccionar tipo de operativo, banda, modo, frecuencia y repetidora.
+La lógica dinámica ajusta los campos según la selección del usuario.
+"""
 
+# --- Imports de terceros ---
 from PySide6.QtWidgets import (
     QDialog,
     QVBoxLayout,
@@ -12,6 +15,8 @@ from PySide6.QtWidgets import (
     QPushButton,
 )
 from PySide6.QtCore import Qt
+
+# --- Imports de la aplicación ---
 from translation.translation_service import translation_service
 
 
@@ -23,6 +28,11 @@ class OperativoConfigDialog(QDialog):
     """
 
     def __init__(self, parent=None):
+        """
+        Inicializa el diálogo de configuración de log operativo.
+        Args:
+            parent (QWidget, opcional): Widget padre.
+        """
         super().__init__(parent)
         self.setWindowTitle(translation_service.tr("operation_config_title"))
         self.setMinimumWidth(420)
@@ -164,6 +174,8 @@ class OperativoConfigDialog(QDialog):
             - mode_key: modo de operación
             - frequency: frecuencia
             - repeater_key: repetidora (si aplica)
+        Returns:
+            dict: Configuración seleccionada.
         """
         return {
             "operation_type": self.operation_type_keys[

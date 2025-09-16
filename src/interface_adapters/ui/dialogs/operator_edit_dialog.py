@@ -1,3 +1,10 @@
+"""
+OperatorEditDialog
+Diálogo para editar o agregar operadores de radio.
+Permite ingresar y validar los datos de un operador, incluyendo campos específicos para Perú y otros países.
+"""
+
+# --- Imports de terceros ---
 from PySide6.QtWidgets import (
     QDialog,
     QVBoxLayout,
@@ -10,12 +17,25 @@ from PySide6.QtWidgets import (
     QMessageBox,
 )
 from PySide6.QtCore import Qt, QDate
+
+# --- Imports de la aplicación ---
 from translation.translation_service import translation_service
 import datetime
 
 
 class OperatorEditDialog(QDialog):
+    """
+    Diálogo para editar o agregar operadores de radio.
+    Permite ingresar y validar los datos de un operador, incluyendo campos específicos para Perú y otros países.
+    """
+
     def __init__(self, operator=None, parent=None):
+        """
+        Inicializa el diálogo de edición/agregado de operador.
+        Args:
+            operator (obj, opcional): Operador a editar. Si es None, se crea uno nuevo.
+            parent (QWidget, opcional): Widget padre.
+        """
         super().__init__(parent)
         self.setWindowTitle(
             translation_service.tr("edit_operator")
@@ -33,6 +53,9 @@ class OperatorEditDialog(QDialog):
             self._load_operator(operator)
 
     def _setup_ui(self):
+        """
+        Configura la interfaz de usuario y los campos del formulario.
+        """
         layout = QVBoxLayout(self)
         self.inputs = {}
         self._peru_fields = [
@@ -132,6 +155,10 @@ class OperatorEditDialog(QDialog):
             self._on_country_changed(self.country_combo.currentIndex())
 
     def _on_country_changed(self, idx):
+        """
+        Habilita o deshabilita campos según el país seleccionado.
+        Si es Perú, habilita todos los campos; si es OTROS, deshabilita y limpia los campos específicos de Perú.
+        """
         is_peru = self.country_combo.currentText() == "PERU"
         for key in self._peru_fields:
             widget = self.inputs[key]
@@ -159,6 +186,11 @@ class OperatorEditDialog(QDialog):
             self.country_other.clear()
 
     def _load_operator(self, op):
+        """
+        Carga los datos de un operador existente en el formulario.
+        Args:
+            op (obj): Operador a cargar.
+        """
         self.inputs["callsign"].setText(getattr(op, "callsign", "").upper())
         self.inputs["name"].setText(getattr(op, "name", "").upper())
         cat = getattr(op, "category", "NOVICIO")
@@ -201,7 +233,11 @@ class OperatorEditDialog(QDialog):
         self._on_country_changed(self.country_combo.currentIndex())
 
     def get_operator_data(self):
-        # Devuelve un dict con los datos ingresados/validados
+        """
+        Devuelve un dict con los datos ingresados/validados del operador.
+        Returns:
+            dict: Datos del operador.
+        """
         data = {}
         for key, widget in self.inputs.items():
             if key == "country":
@@ -225,7 +261,10 @@ class OperatorEditDialog(QDialog):
         return data
 
     def accept(self):
-        # Validar campos obligatorios y formato
+        """
+        Valida los campos obligatorios y formato antes de aceptar el diálogo.
+        Si la validación es exitosa, guarda los datos y cierra el diálogo.
+        """
         callsign = self.inputs["callsign"].text().strip()
         name = self.inputs["name"].text().strip()
         if not callsign:
