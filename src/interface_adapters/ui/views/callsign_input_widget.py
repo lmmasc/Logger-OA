@@ -28,7 +28,7 @@ class CallsignInputWidget(QWidget):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
-        layout.setAlignment(Qt.AlignTop)
+        layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         # Label descriptivo
         self.label = QLabel("", self)
         label_font = QFont()
@@ -51,8 +51,8 @@ class CallsignInputWidget(QWidget):
         self.input.returnPressed.connect(self._on_return_pressed)
         translation_service.signal.language_changed.connect(self.retranslate_ui)
         # Refuerzo de tabulación: solo el campo input debe recibir el foco
-        self.setFocusPolicy(Qt.NoFocus)
-        self.input.setFocusPolicy(Qt.StrongFocus)
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.input.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.retranslate_ui()
 
     def _normalize_upper(self, text):
