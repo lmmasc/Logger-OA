@@ -1,5 +1,16 @@
 # Traducciones de la interfaz de usuario (español)
 UI_TRANSLATIONS = {
+    "welcome_message": "Bienvenido a Logger OA",
+    "main_window_title": "Logger OA",
+    "about": "Acerca de",
+    "select_log_type_label": "Selecciona el tipo de log a crear/abrir:",
+    "select_log_type": "Selecciona el tipo de log",
+    "log_type_ops": "Log de operación",
+    "log_type_contest": "Log de concurso",
+    "enter_callsign": "Ingrese indicativo",
+    "ok_button": "OK",
+    "select_contest_title": "Selecciona concurso",
+    "select_contest_label": "Selecciona el concurso:",
     "no_data": "Sin Datos",
     "station_base": "Base",
     "station_mobile": "Móvil",
