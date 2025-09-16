@@ -51,7 +51,7 @@ class DBTableWindow(QWidget):
         """
         super().__init__(parent)
         self.setWindowTitle(translation_service.tr("db_table"))
-        self.setWindowFlag(Qt.Window)
+        self.setWindowFlag(Qt.WindowType.Window)
         self.resize(1200, 700)
         main_layout = QVBoxLayout()
         filter_layout = QHBoxLayout()
@@ -113,20 +113,24 @@ class DBTableWindow(QWidget):
         # Conectar señal para guardar anchos de columnas al redimensionar
         self.table.horizontalHeader().sectionResized.connect(self.save_column_widths)
         self.table.setEditTriggers(
-            QTableWidget.NoEditTriggers
-        )  # Deshabilitar edición directa
+            QTableWidget.EditTrigger.NoEditTriggers
+        )  # Corrige enum para Pylance
         self.table.itemDoubleClicked.connect(self._on_item_double_clicked)
 
         # Botones para agregar y eliminar operador
         btn_add = QPushButton(translation_service.tr("add_operator"))
         btn_add.setObjectName("AddOperatorButton")
-        btn_add.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        btn_add.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred
+        )
         btn_add.clicked.connect(self._on_add_operator)
         self.btn_add = btn_add
 
         btn_delete = QPushButton(translation_service.tr("delete_operator"))
         btn_delete.setObjectName("DeleteOperatorButton")
-        btn_delete.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        btn_delete.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred
+        )
         btn_delete.setEnabled(False)
         btn_delete.clicked.connect(self._on_delete_operator)
         self.btn_delete = btn_delete
@@ -284,8 +288,8 @@ class DBTableWindow(QWidget):
             self.filter_results_count.setText(str(total))
         # --- ANCHOS DE COLUMNA ---
         widths = settings_service.get_value("db_table_column_widths", None)
-        if widths:
-            # Si hay valores en 0, ponerlos en 100
+        # Validación para settings_service.get_value (anchos de columna)
+        if isinstance(widths, list):
             for i, w in enumerate(widths):
                 if int(w) == 0:
                     widths[i] = 100
@@ -299,7 +303,8 @@ class DBTableWindow(QWidget):
         Abre el diálogo de edición para el registro seleccionado.
         """
         row = item.row()
-        callsign = self.table.item(row, 0).text()
+        callsign_item = self.table.item(row, 0)
+        callsign = callsign_item.text() if callsign_item else ""
         operator = next(
             (op for op in self.controller.list_operators() if op.callsign == callsign),
             None,
@@ -310,7 +315,7 @@ class DBTableWindow(QWidget):
             )
 
             dlg = OperatorEditDialog(operator, self)
-            if dlg.exec() == QDialog.Accepted and dlg.result_operator:
+            if dlg.exec() == QDialog.DialogCode.Accepted and dlg.result_operator:
                 # Actualizar el operador en la base de datos
                 for k, v in dlg.result_operator.items():
                     setattr(operator, k if k != "type" else "type_", v)
@@ -327,7 +332,7 @@ class DBTableWindow(QWidget):
         from PySide6.QtWidgets import QDialog
 
         dlg = OperatorEditDialog(parent=self)
-        if dlg.exec() == QDialog.Accepted and dlg.result_operator:
+        if dlg.exec() == QDialog.DialogCode.Accepted and dlg.result_operator:
             # Crear nuevo operador y guardar
             op_data = dlg.result_operator
             Operator = (
@@ -358,21 +363,30 @@ class DBTableWindow(QWidget):
         if not selected:
             return
         row = selected[0].row()
-        callsign = self.table.item(row, 0).text()
-        name = self.table.item(row, 1).text()
+        # Validación para .text() en tabla
+        callsign_item = self.table.item(row, 0)
+        callsign = callsign_item.text() if callsign_item else ""
+        name_item = self.table.item(row, 1)
+        name = name_item.text() if name_item else ""
         msg_box = QMessageBox(self)
-        msg_box.setIcon(QMessageBox.Question)
+        msg_box.setIcon(QMessageBox.Icon.Question)
         msg_box.setWindowTitle(translation_service.tr("delete_operator"))
         msg_box.setText(translation_service.tr("confirm_delete_operator"))
         msg_box.setInformativeText(
             f"{translation_service.tr('table_header_callsign')}: {callsign}\n{translation_service.tr('table_header_name')}: {name}"
         )
-        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        msg_box.setDefaultButton(QMessageBox.No)
-        msg_box.button(QMessageBox.Yes).setText(translation_service.tr("yes_button"))
-        msg_box.button(QMessageBox.No).setText(translation_service.tr("no_button"))
+        msg_box.setStandardButtons(
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        msg_box.setDefaultButton(QMessageBox.StandardButton.No)
+        msg_box.button(QMessageBox.StandardButton.Yes).setText(
+            translation_service.tr("yes_button")
+        )
+        msg_box.button(QMessageBox.StandardButton.No).setText(
+            translation_service.tr("no_button")
+        )
         reply = msg_box.exec()
-        if reply == QMessageBox.Yes:
+        if reply == QMessageBox.StandardButton.Yes:
             self.controller.service.delete_operator_by_callsign(callsign)
             self.load_data()
 
@@ -381,15 +395,14 @@ class DBTableWindow(QWidget):
         """
         Guarda los anchos de columna, evitando sobrescribir con 0 y manteniendo el último valor válido.
         """
-        # Guardar solo si el ancho es >0, si no, mantener el último valor guardado
+        # Validación para settings_service.get_value (save_column_widths)
         prev_widths = settings_service.get_value("db_table_column_widths", None)
-        if prev_widths is None:
+        if not isinstance(prev_widths, list):
             prev_widths = [100] * self.table.columnCount()
         widths = []
         for i in range(self.table.columnCount()):
             w = self.table.columnWidth(i)
             if w == 0:
-                # Mantener el último valor guardado
                 if prev_widths and i < len(prev_widths):
                     widths.append(prev_widths[i])
                 else:
