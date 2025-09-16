@@ -3,7 +3,7 @@ Módulo para la gestión de la ventana de base de datos en MainWindow.
 Cada función recibe la instancia de MainWindow como primer argumento.
 """
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QEvent
 from PySide6.QtWidgets import QMessageBox
 from translation.translation_service import translation_service
 
@@ -20,7 +20,7 @@ def show_db_window(self):
             self.db_table_window.activateWindow()
             return
         self.db_table_window = DBTableWindow(self)
-        self.db_table_window.setAttribute(Qt.WA_DeleteOnClose)
+        self.db_table_window.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         self.db_table_window.destroyed.connect(
             lambda *args: on_db_table_window_closed(self)
         )
