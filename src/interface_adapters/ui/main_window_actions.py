@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QFileDialog,
     QApplication,
+    QDialogButtonBox,
 )
 from PySide6.QtCore import Qt, QTimer, QUrl
 from PySide6.QtGui import QDesktopServices
@@ -372,8 +373,8 @@ def action_db_delete(self):
     box = QMessageBox(self)
     box.setWindowTitle(translation_service.tr("delete_db_confirm"))
     box.setText(translation_service.tr("delete_db_warning"))
-    yes_button = box.addButton(yes_text, QMessageBox.YesRole)
-    no_button = box.addButton(no_text, QMessageBox.NoRole)
+    yes_button = box.addButton(yes_text, QMessageBox.ButtonRole.YesRole)
+    no_button = box.addButton(no_text, QMessageBox.ButtonRole.NoRole)
     box.setDefaultButton(no_button)
     box.exec()
     if box.clickedButton() == yes_button:
@@ -417,7 +418,7 @@ def action_db_restore(self):
     file_dialog = QFileDialog(self)
     file_dialog.setWindowTitle("Seleccionar backup para restaurar")
     file_dialog.setDirectory(backup_dir)
-    file_dialog.setFileMode(QFileDialog.ExistingFile)
+    file_dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
     file_dialog.setNameFilter("Backups (*.db)")
     if file_dialog.exec():
         selected_files = file_dialog.selectedFiles()
@@ -437,7 +438,7 @@ def action_db_import_db(self):
     Importa operadores desde una base de datos externa seleccionada por el usuario.
     """
     file_dialog = QFileDialog(self)
-    file_dialog.setFileMode(QFileDialog.ExistingFile)
+    file_dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
     file_dialog.setNameFilter("Bases de datos (*.db)")
     if file_dialog.exec():
         selected_files = file_dialog.selectedFiles()
