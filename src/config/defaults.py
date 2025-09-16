@@ -4,8 +4,10 @@ defaults.py
 Constantes y valores por defecto globales para la aplicación.
 """
 
-DEFAULT_LANGUAGE = "es"
-DEFAULT_THEME = "light"
+from src.config.settings_service import ThemeValue, LanguageValue
+
+DEFAULT_LANGUAGE = LanguageValue.ES.value
+DEFAULT_THEME = ThemeValue.LIGHT.value
 APP_NAME = "LoggerOA"
 ORG_NAME = "LoggerOAApp"
 DATA_DIR = "data"

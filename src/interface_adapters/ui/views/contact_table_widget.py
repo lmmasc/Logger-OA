@@ -9,6 +9,7 @@ from translation.translation_service import translation_service
 from config.settings_service import settings_service
 from PySide6.QtCore import Qt
 from interface_adapters.ui.view_manager import LogType
+from config.settings_service import LanguageValue
 
 
 class ContactTableWidget(QWidget):
@@ -148,7 +149,7 @@ class ContactTableWidget(QWidget):
         import datetime
 
         lang = translation_service.get_language()
-        if lang == "es":
+        if lang == LanguageValue.ES:
             date_fmt = "%d/%m/%Y"
         else:
             date_fmt = "%m/%d/%Y"

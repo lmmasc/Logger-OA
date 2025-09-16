@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import QDateTime, Qt
 from translation.translation_service import translation_service
+from src.config.settings_service import LanguageValue
 
 
 class ContactEditDialog(QDialog):
@@ -137,7 +138,7 @@ class ContactEditDialog(QDialog):
                 )
             else:
                 dt_qt = QDateTime.currentDateTime()
-            if lang == "es":
+            if lang == LanguageValue.ES:
                 date_fmt = "HH:mm dd/MM/yyyy 'OA'"
                 label = "Hora OA (UTC-5)"
             else:
@@ -154,7 +155,7 @@ class ContactEditDialog(QDialog):
                 dt_utc = QDateTime.fromSecsSinceEpoch(int(ts), Qt.UTC)
             else:
                 dt_utc = QDateTime.currentDateTimeUtc()
-            if lang == "es":
+            if lang == LanguageValue.ES:
                 date_fmt = "HH:mm dd/MM/yyyy 'UTC'"
                 label = translation_service.tr("edit_contact_datetime_utc_es")
             else:

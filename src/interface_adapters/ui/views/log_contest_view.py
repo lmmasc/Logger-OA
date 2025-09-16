@@ -12,6 +12,7 @@ from .callsign_info_widget import CallsignInfoWidget
 from .clock_widget import ClockWidget
 from .log_form_widget import LogFormWidget
 from .contact_table_widget import ContactTableWidget
+from config.settings_service import LanguageValue
 
 from .header_widget import HeaderWidget
 from .contact_queue_widget import ContactQueueWidget
@@ -181,7 +182,7 @@ class LogContestView(QWidget):
         lang = translation_service.get_language()
         try:
             date_obj = datetime.strptime(dt[:8], "%Y%m%d")
-            if lang == "es":
+            if lang == LanguageValue.ES:
                 log_date = date_obj.strftime("%d/%m/%Y")
             else:
                 log_date = date_obj.strftime("%m/%d/%Y")

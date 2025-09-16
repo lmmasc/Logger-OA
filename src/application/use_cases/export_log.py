@@ -4,6 +4,7 @@ from domain.repositories.contact_log_repository import ContactLogRepository
 from config.paths import get_export_dir
 from utils.resources import get_resource_path
 from interface_adapters.ui.view_manager import LogType
+from src.config.settings_service import LanguageValue
 
 
 def export_log_to_txt(db_path: str, export_path: str, translation_service=None) -> str:
@@ -96,7 +97,7 @@ def export_log_to_txt(db_path: str, export_path: str, translation_service=None) 
     # Procesar filas como en la UI
     import datetime
 
-    if lang == "es":
+    if lang == LanguageValue.ES:
         date_fmt = "%d/%m/%Y"
     else:
         date_fmt = "%m/%d/%Y"
@@ -235,7 +236,7 @@ def export_log_to_csv(
     # Procesar filas como en la UI
     import datetime
 
-    if lang == "es":
+    if lang == LanguageValue.ES:
         date_fmt = "%d/%m/%Y"
     else:
         date_fmt = "%m/%d/%Y"
@@ -258,7 +259,7 @@ def export_log_to_csv(
                             int(ts), tz=datetime.timezone.utc
                         )
                         dt_oa = dt_utc - datetime.timedelta(hours=5)
-                        if log_type == "contest":
+                        if log_type == LogType.CONTEST_LOG.value:
                             value = dt_oa.strftime("%H:%M")
                         else:
                             value = dt_oa.strftime(f"%H:%M {date_fmt}")
@@ -276,7 +277,7 @@ def export_log_to_csv(
                 elif key == "power":
                     val = contact.get(key, "")
                     row.append(f"{val} W" if val else "")
-                elif log_type == "contest" and key in (
+                elif log_type == LogType.CONTEST_LOG.value and key in (
                     "exchange_received",
                     "exchange_sent",
                 ):

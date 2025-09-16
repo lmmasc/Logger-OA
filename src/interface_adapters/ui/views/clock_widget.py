@@ -86,11 +86,15 @@ class ClockWidget(QWidget):
         # Obtener idioma para formato de fecha
         try:
             from translation.translation_service import translation_service
+            from config.settings_service import LanguageValue
 
             lang = translation_service.get_language()
         except Exception:
-            lang = "es"
-        date_fmt = "%d/%m/%Y" if lang == "es" else "%m/%d/%Y"
+            lang = LanguageValue.ES
+        if lang == LanguageValue.ES:
+            date_fmt = "%d/%m/%Y"
+        else:
+            date_fmt = "%m/%d/%Y"
         self.time.setText(now.strftime("%H:%M:%S"))
         self.date.setText(now.strftime(date_fmt))
         # El texto del label es fijo: "OA" o "UTC"
