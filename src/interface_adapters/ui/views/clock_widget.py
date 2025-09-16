@@ -1,14 +1,24 @@
 """
-ClockWidget: Widget de reloj digital con soporte OA/UTC y formato de fecha/hora dependiente de idioma.
+ClockWidget
+
+Widget de reloj digital con soporte OA/UTC y formato de fecha/hora dependiente de idioma.
 - Compatible multiplataforma (fuente monoespaciada).
 - Actualiza cada segundo.
 - Colores y estilos configurables vía QSS.
+- Soporte para formato de fecha según idioma y modo OA/UTC.
 """
 
+# --- Imports estándar ---
 import datetime
+
+# --- Imports de terceros ---
 from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QSizePolicy
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QFont
+
+# --- Imports de la aplicación ---
+from translation.translation_service import translation_service
+from config.settings_service import LanguageValue
 
 
 class ClockWidget(QWidget):
@@ -85,9 +95,6 @@ class ClockWidget(QWidget):
             now = datetime.datetime.now().astimezone()
         # Obtener idioma para formato de fecha
         try:
-            from translation.translation_service import translation_service
-            from config.settings_service import LanguageValue
-
             lang = translation_service.get_language()
         except Exception:
             lang = LanguageValue.ES

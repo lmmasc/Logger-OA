@@ -1,9 +1,13 @@
 """
-ContactQueueWidget: Widget para mostrar y gestionar la cola de contactos en espera.
+ContactQueueWidget
+
+Widget para mostrar y gestionar la cola de contactos en espera.
 - Permite copiar indicativo, agregar, eliminar y traducir el label.
-- Elimina el focus rectangle nativo en los items usando un delegate personalizado.
+- Elimina el rectángulo de foco nativo en los items usando un delegate personalizado.
+- Soporte para menú contextual y señal para selección de indicativo.
 """
 
+# --- Imports de terceros ---
 from PySide6.QtCore import Signal, Qt
 from PySide6.QtWidgets import (
     QWidget,
@@ -16,15 +20,25 @@ from PySide6.QtWidgets import (
     QStyledItemDelegate,
     QStyle,
 )
+
+# --- Imports de la aplicación ---
 from translation.translation_service import translation_service
 
 
 class NoFocusDelegate(QStyledItemDelegate):
     """
-    Delegate personalizado para eliminar el focus rectangle nativo en los items de QListWidget.
+    Delegate personalizado para eliminar el rectángulo de foco nativo en los items de QListWidget.
     """
 
     def paint(self, painter, option, index):
+        """
+        Sobrescribe el método paint para eliminar el estado de foco del item.
+
+        Args:
+            painter (QPainter): El pintor utilizado para dibujar el item.
+            option (QStyleOptionViewItem): Las opciones de estilo para el item.
+            index (QModelIndex): El índice del modelo que representa el item.
+        """
         option.state &= ~QStyle.StateFlag.State_HasFocus
         super().paint(painter, option, index)
 
