@@ -4,23 +4,9 @@ Cada función recibe la instancia de MainWindow como primer argumento.
 """
 
 from PySide6.QtWidgets import QMessageBox, QDialog, QVBoxLayout, QTextEdit, QPushButton
+from utils.resources import get_resource_path
 import os, sys
 from translation.translation_service import translation_service
-
-
-def resource_path(relative_path):
-    """
-    Obtiene la ruta absoluta al recurso, compatible con PyInstaller y multiplataforma.
-    Busca el archivo en 'assets/manual_usuario.md' desde la raíz del proyecto.
-    """
-    if hasattr(sys, "_MEIPASS"):
-        # PyInstaller: el archivo se empaqueta en _MEIPASS/assets
-        return os.path.join(sys._MEIPASS, "assets", relative_path)
-    # Desarrollo: busca desde la raíz del proyecto
-    base_dir = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "..", "..", "..")
-    )
-    return os.path.join(base_dir, "assets", relative_path)
 
 
 def show_about_dialog(self):
@@ -38,7 +24,7 @@ def show_manual_dialog(self):
     """
     Muestra el manual de usuario en un cuadro de diálogo de texto largo.
     """
-    manual_path = resource_path("manual_usuario.md")
+    manual_path = get_resource_path("assets/manual_usuario.md")
     manual_text = "Manual de usuario no disponible."
     try:
         with open(manual_path, "r", encoding="utf-8") as f:
