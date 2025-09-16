@@ -18,6 +18,7 @@ from interface_adapters.ui.view_manager import LogType
 from application.use_cases.contact_management import delete_contact_from_log
 from application.use_cases.contact_management import ContactLogRepository
 from typing import TYPE_CHECKING, cast
+from interface_adapters.ui.utils import find_main_window
 
 if TYPE_CHECKING:
     from interface_adapters.ui.main_window import MainWindow
@@ -291,19 +292,6 @@ class LogOpsView(QWidget):
                         self.queue_widget.queue_list.takeItem(i)
                         break
 
-    def _find_main_window(self) -> "MainWindow | None":
-        """
-        Busca la instancia de MainWindow en la jerarquía de padres.
-        Returns:
-            MainWindow instance o None
-        """
-        parent = self.parent()
-        while parent:
-            if parent.__class__.__name__ == "MainWindow":
-                return cast("MainWindow", parent)
-            parent = parent.parent()
-        return None
-
     def _on_delete_contact(self):
         # Eliminar contacto seleccionado de la tabla solo si hay una fila seleccionada
         selected_items = self.table_widget.table.selectedItems()
@@ -341,7 +329,7 @@ class LogOpsView(QWidget):
         if reply != QMessageBox.StandardButton.Yes:
             return
         # Validar existencia de current_log y sus atributos
-        main_window = self._find_main_window()
+        main_window = find_main_window(self)
         if not main_window or not hasattr(main_window, "current_log"):
             return
         current_log = main_window.current_log

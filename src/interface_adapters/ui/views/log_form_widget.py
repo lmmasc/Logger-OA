@@ -33,6 +33,7 @@ from application.use_cases.contact_management import (
 )
 from interface_adapters.ui.dialogs.operator_edit_dialog import OperatorEditDialog
 from domain.repositories.contact_log_repository import ContactLogRepository
+from interface_adapters.ui.utils import find_main_window
 
 
 # Eliminado: ahora se importa desde domain.contact_type
@@ -380,20 +381,6 @@ class LogFormWidget(QWidget):
             )
         return data
 
-    def _find_main_window(self):
-        """
-        Busca la instancia de MainWindow en la jerarquía de padres.
-        Permite acceder a la ventana principal para operaciones de actualización de UI y base de datos.
-        Returns:
-            MainWindow instance o None si no se encuentra.
-        """
-        parent = self.parent()
-        while parent:
-            if parent.__class__.__name__ == "MainWindow":
-                return parent
-            parent = parent.parent()
-        return None
-
     def _on_add_contact(self, callsign=None):
         """
         Lógica principal para agregar un contacto al log actual.
@@ -418,7 +405,7 @@ class LogFormWidget(QWidget):
             data["callsign"] = callsign_val
         # Validación de campos y control de foco
         operator = get_operator_by_callsign(callsign_val)
-        main_window = self._find_main_window()
+        main_window = find_main_window(self)
         db_path = getattr(main_window.current_log, "db_path", None)
         log_id = getattr(main_window.current_log, "id", None)
         contact_type = (
