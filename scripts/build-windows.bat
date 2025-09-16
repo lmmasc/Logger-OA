@@ -9,7 +9,6 @@ cd /d %~dp0\..
   --icon=assets\app_icon.ico ^
   --paths src ^
   --add-data "assets;assets" ^
-  --add-data "BaseDocs;BaseDocs" ^
   --add-data "src/config;src/config" ^
   --add-data "src/domain;src/domain" ^
   --add-data "src/infrastructure;src/infrastructure" ^
