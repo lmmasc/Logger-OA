@@ -1,5 +1,14 @@
 # Mensajes generales (español)
 MESSAGES_TRANSLATIONS = {
+    "export_db": "Exportar base de datos",
+    "export_log": "Exportar log",
+    "select_export_format": "Selecciona el formato de exportación:",
+    "contact_add_failed": "No se pudo agregar el contacto",
+    "invalid_callsign_title": "Indicativo inválido",
+    "invalid_callsign_msg": "El indicativo ingresado no es válido.",
+    "callsign_not_found": "Indicativo no encontrado",
+    "operator_not_found_msg": "El indicativo no existe en la base de datos. ¿Deseas agregarlo como nuevo operador?",
+    "confirm_delete_contact": "¿Seguro que deseas eliminar este contacto?",
     "import_success": "Importación completada: {count} operadores actualizados.",
     "import_failed": "Error al importar operadores desde PDF. Por favor, revise el archivo y vuelva a intentarlo.",
     "delete_db_warning": "¿Está seguro que desea borrar la base de datos? Esta acción no se puede deshacer.",

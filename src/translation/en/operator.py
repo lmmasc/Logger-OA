@@ -1,5 +1,7 @@
 # Operator actions/messages (English)
 OPERATOR_TRANSLATIONS = {
+    "add_contact": "Add contact",
+    "edit_contact_dialog_title": "Edit Contact",
     "edit_operator": "Edit operator",
     "add_operator": "Add operator",
     "delete_operator": "Delete operator",
