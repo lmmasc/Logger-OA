@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QVBoxLayout,
     QSizePolicy,
+    QDialog,
 )
 
 # Local application imports
@@ -391,23 +392,35 @@ class LogFormWidget(QWidget):
             bool: True si el contacto fue agregado correctamente, False si hubo errores o cancelación.
         """
         # Obtener el valor de callsign directamente del campo si no se pasa como argumento
-        callsign_val = (
-            callsign
-            if callsign is not None
-            else (
-                self.parent().callsign_input.get_callsign().strip()
-                if hasattr(self.parent(), "callsign_input")
-                else ""
-            )
-        )
+        parent = self.parent()
+        callsign_val = callsign if callsign is not None else ""
+        # Obtener el callsign dinámicamente si el parent tiene el atributo adecuado
+        if not callsign_val and parent is not None:
+            callsign_input = getattr(parent, "callsign_input", None)
+            if callsign_input and hasattr(callsign_input, "get_callsign"):
+                callsign_val = callsign_input.get_callsign().strip()
         data = self.get_data(callsign_val)
         if callsign_val:
             data["callsign"] = callsign_val
         # Validación de campos y control de foco
         operator = get_operator_by_callsign(callsign_val)
         main_window = find_main_window(self)
-        db_path = getattr(main_window.current_log, "db_path", None)
-        log_id = getattr(main_window.current_log, "id", None)
+        db_path = (
+            getattr(main_window.current_log, "db_path", None)
+            if main_window
+            and hasattr(main_window, "current_log")
+            and main_window.current_log
+            else None
+        )
+        log_id = (
+            getattr(main_window.current_log, "id", None)
+            if main_window
+            and hasattr(main_window, "current_log")
+            and main_window.current_log
+            else None
+        )
+        if not db_path or not log_id:
+            return False
         contact_type = (
             ContactType.OPERATION
             if self.log_type == LogType.OPERATION_LOG
@@ -430,8 +443,11 @@ class LogFormWidget(QWidget):
             # Asignar foco al campo correspondiente según el error
             focus_field = None
             field = validation["focus_field"]
-            if field == "callsign_input" and hasattr(self.parent(), "callsign_input"):
-                focus_field = self.parent().callsign_input.input
+            parent = self.parent()
+            if field == "callsign_input" and parent is not None:
+                callsign_input = getattr(parent, "callsign_input", None)
+                if callsign_input and hasattr(callsign_input, "input"):
+                    focus_field = callsign_input.input
             elif hasattr(self, field):
                 focus_field = getattr(self, field)
             if focus_field:
@@ -456,20 +472,30 @@ class LogFormWidget(QWidget):
                 )
                 if reply != QMessageBox.StandardButton.Yes:
                     # Borrar campo de ingreso indicativo y dar foco
-                    if hasattr(self.parent(), "callsign_input"):
-                        self.parent().callsign_input.input.clear()
-                        self.parent().callsign_input.input.setFocus()
+                    parent = self.parent()
+                    if parent is not None:
+                        callsign_input = getattr(parent, "callsign_input", None)
+                        if callsign_input and hasattr(callsign_input, "input"):
+                            callsign_input.input.clear()
+                            callsign_input.input.setFocus()
                     return False
         # Si el operador existe, agregar contacto directamente
         if operator:
             try:
                 add_contact_to_log(db_path, log_id, data, contact_type)
                 contacts = repo_log.get_contacts(log_id)
-                main_window.current_log.contacts = contacts
+                if (
+                    main_window
+                    and hasattr(main_window, "current_log")
+                    and main_window.current_log
+                    and hasattr(main_window.current_log, "contacts")
+                ):
+                    main_window.current_log.contacts = contacts
                 # Actualiza la tabla y mueve el scroll en la vista correspondiente
-                if hasattr(main_window, "view_manager"):
+                if main_window and hasattr(main_window, "view_manager"):
                     if (
                         self.log_type == LogType.OPERATION_LOG
+                        and hasattr(main_window.view_manager, "views")
                         and ViewID.LOG_OPS_VIEW in main_window.view_manager.views
                     ):
                         table_widget = main_window.view_manager.views[
@@ -481,13 +507,15 @@ class LogFormWidget(QWidget):
                         table.setFocus()
                         parent = self.parent()
                         while parent:
-                            if hasattr(parent, "callsign_input"):
-                                parent.callsign_input.input.clear()
-                                parent.callsign_input.input.setFocus()
+                            callsign_input = getattr(parent, "callsign_input", None)
+                            if callsign_input and hasattr(callsign_input, "input"):
+                                callsign_input.input.clear()
+                                callsign_input.input.setFocus()
                                 break
                             parent = parent.parent()
                     elif (
                         self.log_type == LogType.CONTEST_LOG
+                        and hasattr(main_window.view_manager, "views")
                         and ViewID.LOG_CONTEST_VIEW in main_window.view_manager.views
                     ):
                         table_widget = main_window.view_manager.views[
@@ -499,9 +527,10 @@ class LogFormWidget(QWidget):
                         table.setFocus()
                         parent = self.parent()
                         while parent:
-                            if hasattr(parent, "callsign_input"):
-                                parent.callsign_input.input.clear()
-                                parent.callsign_input.input.setFocus()
+                            callsign_input = getattr(parent, "callsign_input", None)
+                            if callsign_input and hasattr(callsign_input, "input"):
+                                callsign_input.input.clear()
+                                callsign_input.input.setFocus()
                                 break
                             parent = parent.parent()
                 return True
@@ -514,22 +543,28 @@ class LogFormWidget(QWidget):
                 return False
         # Si no existe, preguntar si desea agregarlo a la base de datos
         msg_box = QMessageBox(self)
-        msg_box.setIcon(QMessageBox.Question)
+        msg_box.setIcon(QMessageBox.Icon.Question)
         msg_box.setWindowTitle(translation_service.tr("add_operator"))
         msg_box.setText(translation_service.tr("operator_not_found_msg"))
         msg_box.setInformativeText(
             f"{translation_service.tr('table_header_callsign')}: {callsign}"
         )
-        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        msg_box.setDefaultButton(QMessageBox.No)
-        msg_box.button(QMessageBox.Yes).setText(translation_service.tr("yes_button"))
-        msg_box.button(QMessageBox.No).setText(translation_service.tr("no_button"))
+        msg_box.setStandardButtons(
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        msg_box.setDefaultButton(QMessageBox.StandardButton.No)
+        msg_box.button(QMessageBox.StandardButton.Yes).setText(
+            translation_service.tr("yes_button")
+        )
+        msg_box.button(QMessageBox.StandardButton.No).setText(
+            translation_service.tr("no_button")
+        )
         reply = msg_box.exec()
-        if reply == QMessageBox.Yes:
+        if reply == QMessageBox.StandardButton.Yes:
             # Abrir diálogo para agregar operador
             dlg = OperatorEditDialog(parent=self)
             dlg.inputs["callsign"].setText(callsign)
-            if dlg.exec() == QMessageBox.Accepted and dlg.result_operator:
+            if dlg.exec() == QDialog.DialogCode.Accepted and dlg.result_operator:
                 op_data = dlg.result_operator
                 operator = create_operator(op_data)
                 data["name"] = operator.name
@@ -539,10 +574,17 @@ class LogFormWidget(QWidget):
         try:
             add_contact_to_log(db_path, log_id, data, contact_type)
             contacts = repo_log.get_contacts(log_id)
-            main_window.current_log.contacts = contacts
-            if hasattr(main_window, "view_manager"):
+            if (
+                main_window
+                and hasattr(main_window, "current_log")
+                and main_window.current_log
+                and hasattr(main_window.current_log, "contacts")
+            ):
+                main_window.current_log.contacts = contacts
+            if main_window and hasattr(main_window, "view_manager"):
                 if (
                     self.log_type == LogType.OPERATION_LOG
+                    and hasattr(main_window.view_manager, "views")
                     and ViewID.LOG_OPS_VIEW in main_window.view_manager.views
                 ):
                     table_widget = main_window.view_manager.views[
@@ -554,13 +596,15 @@ class LogFormWidget(QWidget):
                     table.setFocus()
                     parent = self.parent()
                     while parent:
-                        if hasattr(parent, "callsign_input"):
-                            parent.callsign_input.input.clear()
-                            parent.callsign_input.input.setFocus()
+                        callsign_input = getattr(parent, "callsign_input", None)
+                        if callsign_input and hasattr(callsign_input, "input"):
+                            callsign_input.input.clear()
+                            callsign_input.input.setFocus()
                             break
                         parent = parent.parent()
                 elif (
                     self.log_type == LogType.CONTEST_LOG
+                    and hasattr(main_window.view_manager, "views")
                     and ViewID.LOG_CONTEST_VIEW in main_window.view_manager.views
                 ):
                     table_widget = main_window.view_manager.views[
@@ -572,9 +616,10 @@ class LogFormWidget(QWidget):
                     table.setFocus()
                     parent = self.parent()
                     while parent:
-                        if hasattr(parent, "callsign_input"):
-                            parent.callsign_input.input.clear()
-                            parent.callsign_input.input.setFocus()
+                        callsign_input = getattr(parent, "callsign_input", None)
+                        if callsign_input and hasattr(callsign_input, "input"):
+                            callsign_input.input.clear()
+                            callsign_input.input.setFocus()
                             break
                         parent = parent.parent()
             return True
