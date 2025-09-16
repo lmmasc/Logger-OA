@@ -18,7 +18,6 @@ MESSAGES_TRANSLATIONS = {
     "wait_message": "Processing, please wait...",
     "credits_message": "Developed by Miguel OA4BAU and Raquel OA4EHN",
     "about_message": "Logger OA\nLogging tool for amateur radio contests and special operations.\nDeveloped by Miguel OA4BAU and Raquel OA4EHN.",
-    "contact_add_failed": "Failed to add contact.",
     "contact_missing_fields": "Some required fields are missing.",
     "contact_validation_error": "Contact validation error: {error}",
     "no_log_open": "No log is currently open.",

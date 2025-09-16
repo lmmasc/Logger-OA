@@ -14,11 +14,8 @@ UI_TRANSLATIONS = {
     "about": "About",
     "main_window_title": "Logger OA",
     "welcome_message": "Welcome to Logger OA",
-    # "log_contest": "Contest View",  # migrated to log_contest.py
-    # "log_ops": "Operations View",  # migrated to log_ops.py
     "db_table": "Database Table",
-    # Table header keys migrated to table_headers.py
-    "ui_region_label": "Region",  # Etiqueta de región en UI
+    "ui_region_label": "Region",
     "yes": "YES",
     "no": "NO",
     "yes_button": "Yes",
@@ -38,7 +35,6 @@ UI_TRANSLATIONS = {
     "operation_type_label": "Operation type:",
     "operation_band_label": "Band:",
     "operation_mode_label": "Mode:",
-    # Migrated keys removed. Only UI and form keys remain.
     "callsign_summary": "Callsign summary",
     "ui_enabled_status": "Enabled",
     "ui_disabled_status": "Disabled",
