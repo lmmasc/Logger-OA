@@ -37,28 +37,37 @@ class LogOpsView(QWidget):
         layout = QVBoxLayout()
         layout.setContentsMargins(10, 4, 10, 10)
         layout.setSpacing(2)
-        layout.setAlignment(Qt.AlignTop)
+        layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.header_widget = HeaderWidget()
-        self.header_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.header_widget.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
+        )
         layout.addWidget(self.header_widget)
         # Widgets de indicativo en una misma fila
         indicativo_row = QWidget(self)
         indicativo_layout = QHBoxLayout(indicativo_row)
         indicativo_layout.setContentsMargins(0, 0, 0, 0)
         indicativo_layout.setSpacing(8)
-        indicativo_layout.setAlignment(Qt.AlignVCenter)
+        indicativo_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         self.callsign_input = CallsignInputWidget(indicativo_row)
-        self.callsign_input.setFixedWidth(320)
-        self.callsign_input.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.callsign_input.setSizePolicy(
+            QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
+        )
         self.callsign_info = CallsignInfoWidget(indicativo_row)
-        self.callsign_info.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.callsign_info.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
+        )
         indicativo_layout.addWidget(self.callsign_input)
         indicativo_layout.addWidget(self.callsign_info)
         indicativo_row.setLayout(indicativo_layout)
-        indicativo_row.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        indicativo_row.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
+        )
         layout.addWidget(indicativo_row)
         self.queue_widget = ContactQueueWidget(self)
-        self.queue_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.queue_widget.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
+        )
         layout.addWidget(self.queue_widget)
         # Formulario sin botón
         self.form_widget = LogFormWidget(
@@ -67,7 +76,9 @@ class LogOpsView(QWidget):
             # callsign=callsign,
             # log_date=log_date,
         )
-        self.form_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.form_widget.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
+        )
         layout.addWidget(self.form_widget)
 
         # Instanciar relojes sin traducción de label
@@ -98,7 +109,9 @@ class LogOpsView(QWidget):
         self.table_widget = ContactTableWidget(
             self, log_type=LogType.OPERATION_LOG
         )  # Persistencia diferenciada por log_type
-        self.table_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.table_widget.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
+        )
         layout.addWidget(self.table_widget)
         # Habilitar el botón de eliminar solo si hay una fila seleccionada
         self.table_widget.table.itemSelectionChanged.connect(self._on_selection_changed)
@@ -112,20 +125,18 @@ class LogOpsView(QWidget):
         translation_service.signal.language_changed.connect(self.retranslate_ui)
         self.update_header()
         # Evitar foco en cola y tabla
-        self.queue_widget.setFocusPolicy(Qt.NoFocus)
-        self.table_widget.setFocusPolicy(Qt.NoFocus)
-        self.callsign_info.setFocusPolicy(Qt.NoFocus)
-        self.callsign_input.setFocusPolicy(Qt.NoFocus)
-        self.header_widget.setFocusPolicy(Qt.NoFocus)
-        self.form_widget.setFocusPolicy(Qt.NoFocus)
-        # Refuerzo en hijos internos
+        self.queue_widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.table_widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.callsign_info.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.callsign_input.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.header_widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.form_widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         if hasattr(self.queue_widget, "queue_list"):
-            self.queue_widget.queue_list.setFocusPolicy(Qt.NoFocus)
+            self.queue_widget.queue_list.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         if hasattr(self.table_widget, "table"):
-            self.table_widget.table.setFocusPolicy(Qt.NoFocus)
-        # Refuerzo en botones
-        self.add_contact_btn.setFocusPolicy(Qt.StrongFocus)
-        self.delete_contact_btn.setFocusPolicy(Qt.StrongFocus)
+            self.table_widget.table.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.add_contact_btn.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.delete_contact_btn.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         # Orden de tabulación: input de indicativo -> primer campo del formulario
         if hasattr(self.form_widget, "station_input"):
             QWidget.setTabOrder(
@@ -241,7 +252,7 @@ class LogOpsView(QWidget):
                     from PySide6.QtWidgets import QMessageBox
 
                     msg_box = QMessageBox(self)
-                    msg_box.setIcon(QMessageBox.Warning)
+                    msg_box.setIcon(QMessageBox.Icon.Warning)
                     msg_box.setWindowTitle(
                         translation_service.tr("invalid_callsign_title")
                     )
@@ -249,7 +260,7 @@ class LogOpsView(QWidget):
                     msg_box.setInformativeText(
                         f"{translation_service.tr('callsign_not_found')}: {filtro}"
                     )
-                    msg_box.setStandardButtons(QMessageBox.Ok)
+                    msg_box.setStandardButtons(QMessageBox.StandardButton.Ok)
                     msg_box.exec()
                     self.callsign_info.show_summary(
                         translation_service.tr("callsign_not_found")
@@ -308,20 +319,19 @@ class LogOpsView(QWidget):
         from PySide6.QtWidgets import QMessageBox
 
         msg_box = QMessageBox(self)
-        msg_box.setIcon(QMessageBox.Question)
+        msg_box.setIcon(QMessageBox.Icon.Question)
         msg_box.setWindowTitle(translation_service.tr("delete_contact"))
         msg_box.setText(translation_service.tr("confirm_delete_contact"))
         msg_box.setInformativeText(
             f"{translation_service.tr('table_header_callsign')}: {callsign}\n{translation_service.tr('table_header_name')}: {name}"
         )
-        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        msg_box.setDefaultButton(QMessageBox.No)
-        yes_button = msg_box.button(QMessageBox.Yes)
-        no_button = msg_box.button(QMessageBox.No)
-        yes_button.setText(translation_service.tr("yes_button"))
-        no_button.setText(translation_service.tr("no_button"))
-        reply = msg_box.exec()
-        if reply != QMessageBox.Yes:
+        msg_box.setStandardButtons(
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        msg_box.setDefaultButton(QMessageBox.StandardButton.No)
+        yes_button = msg_box.button(QMessageBox.StandardButton.Yes)
+        no_button = msg_box.button(QMessageBox.StandardButton.No)
+        if reply != QMessageBox.StandardButton.Yes:
             return
         # Eliminar usando el caso de uso
         main_window = self._find_main_window()
