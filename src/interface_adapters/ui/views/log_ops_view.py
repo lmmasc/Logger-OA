@@ -15,6 +15,12 @@ from .callsign_input_widget import CallsignInputWidget
 from .callsign_info_widget import CallsignInfoWidget
 from .clock_widget import ClockWidget
 from interface_adapters.ui.view_manager import LogType
+from application.use_cases.contact_management import delete_contact_from_log
+from application.use_cases.contact_management import ContactLogRepository
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    from interface_adapters.ui.main_window import MainWindow
 
 
 class LogOpsView(QWidget):
@@ -285,7 +291,7 @@ class LogOpsView(QWidget):
                         self.queue_widget.queue_list.takeItem(i)
                         break
 
-    def _find_main_window(self):
+    def _find_main_window(self) -> "MainWindow | None":
         """
         Busca la instancia de MainWindow en la jerarquía de padres.
         Returns:
@@ -294,7 +300,7 @@ class LogOpsView(QWidget):
         parent = self.parent()
         while parent:
             if parent.__class__.__name__ == "MainWindow":
-                return parent
+                return cast("MainWindow", parent)
             parent = parent.parent()
         return None
 
@@ -331,27 +337,27 @@ class LogOpsView(QWidget):
         msg_box.setDefaultButton(QMessageBox.StandardButton.No)
         yes_button = msg_box.button(QMessageBox.StandardButton.Yes)
         no_button = msg_box.button(QMessageBox.StandardButton.No)
+        reply = msg_box.exec()
         if reply != QMessageBox.StandardButton.Yes:
             return
-        # Eliminar usando el caso de uso
+        # Validar existencia de current_log y sus atributos
         main_window = self._find_main_window()
-        if (
-            not main_window
-            or not hasattr(main_window, "current_log")
-            or not main_window.current_log
-        ):
+        if not main_window or not hasattr(main_window, "current_log"):
             return
-        db_path = getattr(main_window.current_log, "db_path", None)
-        log_id = getattr(main_window.current_log, "id", None)
-        from application.use_cases.contact_management import delete_contact_from_log
+        current_log = main_window.current_log
+        if not current_log or not hasattr(current_log, "db_path"):
+            return
+        db_path = current_log.db_path
+        log_id = getattr(current_log, "id", None)
+        if db_path is None or log_id is None or contact_id is None:
+            return
 
         delete_contact_from_log(db_path, contact_id)
-        # Actualizar la tabla
-        from domain.repositories.contact_log_repository import ContactLogRepository
-
         repo = ContactLogRepository(db_path)
         contacts = repo.get_contacts(log_id)
-        main_window.current_log.contacts = contacts
+        # Validar que current_log tiene atributo contacts
+        if hasattr(current_log, "contacts"):
+            current_log.contacts = contacts
         self.table_widget.set_contacts(contacts)
 
     def _on_selection_changed(self):
