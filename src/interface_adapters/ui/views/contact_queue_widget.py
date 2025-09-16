@@ -25,7 +25,7 @@ class NoFocusDelegate(QStyledItemDelegate):
     """
 
     def paint(self, painter, option, index):
-        option.state &= ~QStyle.State_HasFocus
+        option.state &= ~QStyle.StateFlag.State_HasFocus
         super().paint(painter, option, index)
 
 
@@ -44,10 +44,10 @@ class ContactQueueWidget(QWidget):
             parent (QWidget): Widget padre.
         """
         super().__init__(parent)
-        self.layout = QHBoxLayout(self)
+        main_layout = QHBoxLayout(self)
         self.label = QLabel(translation_service.tr("contact_queue"), self)
         self.queue_list = QListWidget(self)
-        self.queue_list.setFlow(QListView.LeftToRight)
+        self.queue_list.setFlow(QListView.Flow.LeftToRight)
         self.queue_list.setWrapping(False)
         self.label.setFixedHeight(42)
         self.queue_list.setFixedHeight(68)
@@ -56,13 +56,15 @@ class ContactQueueWidget(QWidget):
         self.queue_list.setFont(font)
         self.queue_list.setObjectName("ContactQueueList")
         self.queue_list.setItemDelegate(NoFocusDelegate())
-        self.queue_list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        self.layout.addWidget(self.label)
-        self.layout.addWidget(self.queue_list)
-        self.setLayout(self.layout)
-        self.queue_list.setSelectionMode(QListWidget.SingleSelection)
+        self.queue_list.setHorizontalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAlwaysOn
+        )
+        main_layout.addWidget(self.label)
+        main_layout.addWidget(self.queue_list)
+        self.setLayout(main_layout)
+        self.queue_list.setSelectionMode(QListWidget.SelectionMode.SingleSelection)
         self.queue_list.itemClicked.connect(self._on_item_clicked)
-        self.queue_list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.queue_list.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.queue_list.customContextMenuRequested.connect(self._on_context_menu)
 
     def set_queue(self, contacts):
