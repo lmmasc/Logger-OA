@@ -5,6 +5,7 @@ Servicio centralizado para la gestión de configuraciones de la aplicación usan
 """
 
 from PySide6.QtCore import QSettings
+from enum import Enum
 
 
 class SettingsService:
@@ -30,5 +31,31 @@ class SettingsService:
         self.settings.remove(key)
 
 
+# Enum para las claves de configuración
+class SettingsKey(Enum):
+    THEME = "theme"
+    LANGUAGE = "language"
+    # Agrega aquí otras claves según sea necesario
+
+
+# Enum para los valores posibles de tema
+class ThemeValue(Enum):
+    LIGHT = "light"
+    DARK = "dark"
+    # Agrega aquí otros valores de tema si existen
+
+
+# Enum para los valores posibles de idioma
+class LanguageValue(Enum):
+    ES = "es"
+    EN = "en"
+    # Agrega aquí otros valores de idioma si existen
+
+
 # Instancia global para acceso centralizado
 settings_service = SettingsService()
+
+# El resto de la lógica y funcionalidad actual se mantiene intacta.
+# Cuando se acceda a una clave o valor, usar SettingsKey.THEME.value o ThemeValue.LIGHT.value según corresponda.
+# Ejemplo:
+# settings[SettingsKey.THEME.value] = ThemeValue.DARK.value
