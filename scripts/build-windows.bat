@@ -2,6 +2,7 @@
 REM Script para generar el ejecutable en Windows
 
 cd /d %~dp0\..
+del /F LoggerOA.spec
 .venv-windows\Scripts\pyinstaller src\main.py ^
   --windowed ^
   --onefile ^

@@ -2,6 +2,7 @@
 # Script para generar el ejecutable en Linux
 
 cd "$(dirname "$0")/.."
+rm -f LoggerOA.spec
 # Incluir recursos y módulos necesarios en el binario
 .venv-linux/bin/pyinstaller src/main.py \
   --onefile \
