@@ -1,3 +1,4 @@
+# --- Imports de terceros ---
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -5,23 +6,38 @@ from PySide6.QtWidgets import (
     QPushButton,
     QSizePolicy,
 )
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import Qt
+
+# --- Imports de la aplicación ---
 from translation.translation_service import translation_service
+from config.settings_service import LanguageValue
+from interface_adapters.ui.utils import find_main_window
+from interface_adapters.ui.view_manager import LogType
+
+# --- Imports de módulos locales (widgets) ---
 from .callsign_input_widget import CallsignInputWidget
 from .callsign_info_widget import CallsignInfoWidget
 from .clock_widget import ClockWidget
 from .log_form_widget import LogFormWidget
 from .contact_table_widget import ContactTableWidget
-from config.settings_service import LanguageValue
-from interface_adapters.ui.utils import find_main_window
-
 from .header_widget import HeaderWidget
 from .contact_queue_widget import ContactQueueWidget
-from interface_adapters.ui.view_manager import LogType
 
 
 class LogContestView(QWidget):
+    """
+    Vista principal para la gestión de logs de concursos.
+    Permite visualizar y editar contactos, gestionar la cola y mostrar información de indicativos, con soporte multilenguaje.
+    """
+
     def __init__(self, parent=None, callsign="", log_date=""):
+        """
+        Inicializa la vista de log de concurso, configurando todos los componentes visuales y sus conexiones.
+        Args:
+            parent: QWidget padre.
+            callsign: Indicativo inicial.
+            log_date: Fecha del log.
+        """
         super().__init__(parent)
         self.callsign = callsign
         self.log_date = log_date
@@ -142,19 +158,20 @@ class LogContestView(QWidget):
         # Habilitar el botón de eliminar solo si hay una fila seleccionada
         self.table_widget.table.itemSelectionChanged.connect(self._on_selection_changed)
 
-    def _on_suggestion_selected(self, callsign):
-        self.callsign_input.set_callsign(callsign)
-        self.callsign_info.update_info(callsign)
-        # Foco al campo RS_RX del formulario de concurso
-        if hasattr(self.form_widget, "rs_rx_input"):
-            self.form_widget.rs_rx_input.setFocus()
-
     def set_log_data(self, log):
+        """
+        Asigna los datos del log actual y refresca la UI.
+        Args:
+            log: Objeto log con los datos a mostrar.
+        """
         # Actualiza los datos del log y refresca la cabecera
         self._current_log = log
         self.retranslate_ui()
 
     def retranslate_ui(self):
+        """
+        Actualiza los textos de la UI según el idioma seleccionado y los datos del log, y refresca relojes.
+        """
         from datetime import datetime
 
         # Actualizar relojes OA y UTC
@@ -175,6 +192,9 @@ class LogContestView(QWidget):
             self.form_widget.exchange_sent_input.setText(str(num_contacts + 1).zfill(3))
 
     def update_header(self):
+        """
+        Actualiza el texto del encabezado principal de la vista usando la lógica de traducción y formato de fecha.
+        """
         log = getattr(self, "_current_log", None)
         callsign = log.operator if log else ""
         contest_key = (
@@ -203,6 +223,10 @@ class LogContestView(QWidget):
         self.header_widget.update_text(header_text)
 
     def _update_callsign_info(self):
+        """
+        Actualiza el área de información de indicativos según el texto ingresado.
+        Muestra sugerencias si el texto es corto, o el resumen si hay coincidencia exacta.
+        """
         filtro = self.callsign_input.get_callsign().strip()
         if filtro:
             if len(filtro) < 3:
@@ -224,7 +248,23 @@ class LogContestView(QWidget):
         else:
             self.callsign_info.show_suggestions("")
 
+    def _on_suggestion_selected(self, callsign):
+        """
+        Maneja la selección de una sugerencia de indicativo.
+        Actualiza el campo de entrada y la información mostrada, y da foco al campo RS_RX del formulario de concurso.
+        Args:
+            callsign: Indicativo seleccionado.
+        """
+        self.callsign_input.set_callsign(callsign)
+        self.callsign_info.update_info(callsign)
+        # Foco al campo RS_RX del formulario de concurso
+        if hasattr(self.form_widget, "rs_rx_input"):
+            self.form_widget.rs_rx_input.setFocus()
+
     def _on_add_contact(self):
+        """
+        Agrega un nuevo contacto al log y actualiza la UI y la cola de contactos.
+        """
         callsign = self.callsign_input.get_callsign().strip()
         result = self.form_widget._on_add_contact(callsign)
         if result:  # Solo si el contacto se agregó correctamente
@@ -250,6 +290,9 @@ class LogContestView(QWidget):
                 )
 
     def _on_delete_contact(self, contact_id=None):
+        """
+        Elimina el contacto seleccionado de la tabla, tras confirmación del usuario y actualización en la base de datos.
+        """
         # Eliminar contacto seleccionado de la tabla solo si hay una fila seleccionada
         selected_items = self.table_widget.table.selectedItems()
         if not selected_items:
@@ -320,5 +363,8 @@ class LogContestView(QWidget):
             self.form_widget.exchange_sent_input.setText(str(num_contacts + 1).zfill(3))
 
     def _on_selection_changed(self):
+        """
+        Habilita o deshabilita el botón de eliminar según si hay una fila seleccionada en la tabla de contactos.
+        """
         selected_rows = self.table_widget.table.selectionModel().selectedRows()
         self.delete_contact_btn.setEnabled(len(selected_rows) == 1)

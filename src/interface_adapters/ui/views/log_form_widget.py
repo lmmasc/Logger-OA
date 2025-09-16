@@ -37,9 +37,6 @@ from domain.repositories.contact_log_repository import ContactLogRepository
 from interface_adapters.ui.utils import find_main_window
 
 
-# Eliminado: ahora se importa desde domain.contact_type
-
-
 class LogFormWidget(QWidget):
     """
     Widget base para formularios de contacto/log.

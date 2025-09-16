@@ -1,4 +1,7 @@
+# --- Imports estándar ---
 from functools import partial
+
+# --- Imports de terceros ---
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -13,9 +16,11 @@ from PySide6.QtWidgets import (
     QPushButton,
     QDialog,
     QSizePolicy,
-    QGridLayout,  # <-- Agregado para grid de checkboxes
+    QGridLayout,  # Para grid de checkboxes
 )
 from PySide6.QtCore import Qt
+
+# --- Imports de la aplicación ---
 from interface_adapters.controllers.radio_operator_controller import (
     RadioOperatorController,
 )
@@ -25,12 +30,17 @@ from utils.text import filter_text_match
 
 
 class DBTableWindow(QWidget):
+    """
+    Ventana principal para la gestión y visualización de la tabla de operadores.
+    Permite filtrar, editar, agregar y eliminar operadores, con persistencia de configuración y soporte multilenguaje.
+    """
+
     COLUMN_KEYS = [
         "callsign",
         "name",
         "category",
         "type",
-        "region",  # Agregado campo region
+        "region",
         "district",
         "province",
         "department",
@@ -143,6 +153,9 @@ class DBTableWindow(QWidget):
 
     # --- Métodos de UI y traducción ---
     def retranslate_ui(self):
+        """
+        Actualiza los textos de la UI y los headers según el idioma actual.
+        """
         # Actualizar label y placeholder del filtro
         if hasattr(self, "filter_label"):
             self.filter_label.setText(translation_service.tr("filter_by"))
@@ -355,10 +368,16 @@ class DBTableWindow(QWidget):
                 self.load_data()
 
     def _on_selection_changed(self):
+        """
+        Habilita o deshabilita el botón de eliminar según si hay una fila seleccionada en la tabla de operadores.
+        """
         selected_rows = self.table.selectionModel().selectedRows()
         self.btn_delete.setEnabled(len(selected_rows) == 1)
 
     def _on_delete_operator(self):
+        """
+        Elimina el operador seleccionado tras confirmación del usuario y actualización en la base de datos.
+        """
         selected = self.table.selectedItems()
         if not selected:
             return
@@ -412,6 +431,9 @@ class DBTableWindow(QWidget):
         settings_service.set_value("db_table_column_widths", widths)
 
     def _normalize_filter_text(self, text):
+        """
+        Normaliza el texto del filtro a mayúsculas y mantiene la posición del cursor.
+        """
         cursor_pos = self.filter_edit.cursorPosition()
         upper_text = text.upper()
         if text != upper_text:

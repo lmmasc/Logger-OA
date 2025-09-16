@@ -1,3 +1,4 @@
+# --- Imports de terceros ---
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -5,9 +6,11 @@ from PySide6.QtWidgets import (
     QTableWidgetItem,
     QAbstractItemView,
 )
+from PySide6.QtCore import Qt
+
+# --- Imports de la aplicación ---
 from translation.translation_service import translation_service
 from config.settings_service import settings_service
-from PySide6.QtCore import Qt
 from interface_adapters.ui.view_manager import LogType
 from config.settings_service import LanguageValue
 
@@ -19,6 +22,12 @@ class ContactTableWidget(QWidget):
     """
 
     def __init__(self, parent=None, log_type=LogType.OPERATION_LOG):
+        """
+        Inicializa el widget de la tabla de contactos, configura la UI y la persistencia de columnas.
+        Args:
+            parent: QWidget padre.
+            log_type: Tipo de log (Enum LogType).
+        """
         super().__init__(parent)
         self.log_type = log_type
         main_layout = QVBoxLayout(self)
@@ -36,6 +45,136 @@ class ContactTableWidget(QWidget):
         self.table.itemDoubleClicked.connect(self._on_item_double_clicked)
         # Evitar que la tabla reciba el foco por tabulación si no es interactiva
         self.table.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
+    def set_columns(self):
+        """
+        Configura los headers de la tabla según el tipo de log (operativo o concurso).
+        """
+        if self.log_type == LogType.CONTEST_LOG:
+            headers = [
+                translation_service.tr("table_header_callsign"),
+                translation_service.tr("name"),
+                translation_service.tr("region"),
+                "QTR",
+                translation_service.tr("rs_rx"),
+                translation_service.tr("table_header_exchange_rx"),
+                translation_service.tr("rs_tx"),
+                translation_service.tr("table_header_exchange_tx"),
+                translation_service.tr("observations"),
+            ]
+        else:
+            headers = [
+                translation_service.tr("table_header_callsign"),
+                translation_service.tr("name"),
+                translation_service.tr("country"),
+                translation_service.tr("region"),
+                translation_service.tr("station"),
+                translation_service.tr("energy"),
+                translation_service.tr("table_header_power"),
+                translation_service.tr("rs_rx"),
+                translation_service.tr("rs_tx"),
+                translation_service.tr("clock_oa_label"),
+                translation_service.tr("clock_utc_label"),
+                translation_service.tr("observations"),
+            ]
+        self.table.setColumnCount(len(headers))
+        self.table.setHorizontalHeaderLabels(headers)
+
+    def set_contacts(self, contacts):
+        """
+        Carga los contactos en la tabla y adapta los valores según el tipo de log y el idioma.
+        Args:
+            contacts: Lista de diccionarios con los datos de los contactos.
+        """
+        self._last_contacts = contacts
+        # Define las claves esperadas según el tipo de log
+        if self.log_type == LogType.CONTEST_LOG:
+            keys = [
+                "callsign",
+                "name",
+                "region",
+                "qtr_oa",
+                "rs_rx",
+                "exchange_received",
+                "rs_tx",
+                "exchange_sent",
+                "observations",
+            ]
+        else:
+            keys = [
+                "callsign",
+                "name",
+                "country",
+                "region",
+                "station",
+                "energy",
+                "power",
+                "rs_rx",
+                "rs_tx",
+                "qtr_oa",
+                "qtr_utc",
+                "obs",
+            ]
+        self.table.setRowCount(len(contacts))
+        self.table.setColumnCount(len(keys))
+        import datetime
+
+        lang = translation_service.get_language()
+        if lang == LanguageValue.ES:
+            date_fmt = "%d/%m/%Y"
+        else:
+            date_fmt = "%m/%d/%Y"
+
+        for row, contact in enumerate(contacts):
+            for col, key in enumerate(keys):
+                value = None
+                if key == "qtr_oa":
+                    ts = contact.get("timestamp", None)
+                    value = ""
+                    if ts:
+                        dt_utc = datetime.datetime.fromtimestamp(
+                            int(ts), tz=datetime.timezone.utc
+                        )
+                        dt_oa = dt_utc - datetime.timedelta(hours=5)
+                        if self.log_type == LogType.CONTEST_LOG:
+                            value = dt_oa.strftime("%H:%M")
+                        else:
+                            value = dt_oa.strftime(f"%H:%M {date_fmt}")
+                elif key == "qtr_utc":
+                    ts = contact.get("timestamp", None)
+                    value = ""
+                    if ts:
+                        value = datetime.datetime.fromtimestamp(
+                            int(ts), tz=datetime.timezone.utc
+                        ).strftime(f"%H:%M {date_fmt}")
+                elif key in ("station", "energy"):
+                    value = translation_service.tr(contact.get(key, ""))
+                elif key == "power":
+                    val = contact.get(key, "")
+                    value = f"{val} W" if val else ""
+                elif self.log_type == LogType.CONTEST_LOG and key in (
+                    "exchange_received",
+                    "exchange_sent",
+                ):
+                    val = contact.get(key, "")
+                    value = str(val).zfill(3) if val else ""
+                else:
+                    value = contact.get(key, "")
+                self.table.setItem(row, col, QTableWidgetItem(str(value)))
+        self.table.viewport().update()
+        self.table.repaint()
+        self.table.hide()
+        self.table.show()
+
+    def retranslate_ui(self):
+        """
+        Actualiza los textos de la UI y refresca los datos de la tabla según el idioma actual.
+        """
+        self.set_columns()
+        # El refresco de datos debe hacerse solo si se requiere por cambio de idioma,
+        # y siempre con la lista actual de contactos.
+        if hasattr(self, "_last_contacts") and self._last_contacts:
+            self.set_contacts(self._last_contacts)
 
     def _on_item_double_clicked(self, item):
         """
@@ -86,129 +225,6 @@ class ContactTableWidget(QWidget):
             if hasattr(current_log, "contacts"):
                 current_log.contacts = contacts
             self.set_contacts(contacts)
-
-    def set_columns(self):
-        if self.log_type == LogType.CONTEST_LOG:
-            headers = [
-                translation_service.tr("table_header_callsign"),
-                translation_service.tr("name"),
-                translation_service.tr("region"),
-                "QTR",
-                translation_service.tr("rs_rx"),
-                translation_service.tr("table_header_exchange_rx"),
-                translation_service.tr("rs_tx"),
-                translation_service.tr("table_header_exchange_tx"),
-                translation_service.tr("observations"),
-            ]
-        else:
-            headers = [
-                translation_service.tr("table_header_callsign"),
-                translation_service.tr("name"),
-                translation_service.tr("country"),
-                translation_service.tr("region"),
-                translation_service.tr("station"),
-                translation_service.tr("energy"),
-                translation_service.tr("table_header_power"),
-                translation_service.tr("rs_rx"),
-                translation_service.tr("rs_tx"),
-                translation_service.tr("clock_oa_label"),
-                translation_service.tr("clock_utc_label"),
-                translation_service.tr("observations"),
-            ]
-        self.table.setColumnCount(len(headers))
-        self.table.setHorizontalHeaderLabels(headers)
-
-    def set_contacts(self, contacts):
-        # ...existing code...
-        self._last_contacts = contacts
-        # Define las claves esperadas según el tipo de log
-        if self.log_type == LogType.CONTEST_LOG:
-            keys = [
-                "callsign",
-                "name",
-                "region",
-                "qtr_oa",
-                "rs_rx",
-                "exchange_received",
-                "rs_tx",
-                "exchange_sent",
-                "observations",
-            ]
-        else:
-            keys = [
-                "callsign",
-                "name",
-                "country",
-                "region",
-                "station",
-                "energy",
-                "power",
-                "rs_rx",
-                "rs_tx",
-                "qtr_oa",
-                "qtr_utc",
-                "obs",
-            ]
-        self.table.setRowCount(len(contacts))
-        self.table.setColumnCount(len(keys))
-        import datetime
-
-        lang = translation_service.get_language()
-        if lang == LanguageValue.ES:
-            date_fmt = "%d/%m/%Y"
-        else:
-            date_fmt = "%m/%d/%Y"
-
-        for row, contact in enumerate(contacts):
-            # ...existing code...
-            for col, key in enumerate(keys):
-                value = None
-                if key == "qtr_oa":
-                    ts = contact.get("timestamp", None)
-                    value = ""
-                    if ts:
-                        dt_utc = datetime.datetime.fromtimestamp(
-                            int(ts), tz=datetime.timezone.utc
-                        )
-                        dt_oa = dt_utc - datetime.timedelta(hours=5)
-                        if self.log_type == LogType.CONTEST_LOG:
-                            value = dt_oa.strftime("%H:%M")
-                        else:
-                            value = dt_oa.strftime(f"%H:%M {date_fmt}")
-                elif key == "qtr_utc":
-                    ts = contact.get("timestamp", None)
-                    value = ""
-                    if ts:
-                        value = datetime.datetime.fromtimestamp(
-                            int(ts), tz=datetime.timezone.utc
-                        ).strftime(f"%H:%M {date_fmt}")
-                elif key in ("station", "energy"):
-                    value = translation_service.tr(contact.get(key, ""))
-                elif key == "power":
-                    val = contact.get(key, "")
-                    value = f"{val} W" if val else ""
-                elif self.log_type == LogType.CONTEST_LOG and key in (
-                    "exchange_received",
-                    "exchange_sent",
-                ):
-                    val = contact.get(key, "")
-                    value = str(val).zfill(3) if val else ""
-                else:
-                    value = contact.get(key, "")
-                # ...existing code...
-                self.table.setItem(row, col, QTableWidgetItem(str(value)))
-        # ...existing code...
-        self.table.viewport().update()
-        self.table.repaint()
-        self.table.hide()
-        self.table.show()
-
-    def retranslate_ui(self):
-        self.set_columns()
-        # El refresco de datos debe hacerse solo si se requiere por cambio de idioma,
-        # y siempre con la lista actual de contactos.
-        if hasattr(self, "_last_contacts") and self._last_contacts:
-            self.set_contacts(self._last_contacts)
 
     def save_column_widths(self, *args):
         """
