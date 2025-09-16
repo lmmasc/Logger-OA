@@ -1,7 +1,0 @@
-{
-    "callsign_info_widget.edit_operator": "Editar operador",
-    "callsign_info_widget.add_operator": "Agregar operador",
-    "callsign_info_widget.delete_operator": "Eliminar operador",
-    "callsign_info_widget.confirm_delete_operator": "¿Está seguro que desea eliminar el operador?",
-    "callsign_info_widget.confirm_update_field": "¿Desea guardar el cambio en el campo '{field}' a '{value}' en la base de datos?"
-}
