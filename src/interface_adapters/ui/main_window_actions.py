@@ -9,9 +9,8 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QFileDialog,
     QApplication,
-    QDialogButtonBox,
 )
-from PySide6.QtCore import Qt, QTimer, QUrl
+from PySide6.QtCore import QTimer, QUrl
 from PySide6.QtGui import QDesktopServices
 
 # Imports estándar

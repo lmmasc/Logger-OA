@@ -3,7 +3,7 @@ Módulo para la gestión de la ventana de base de datos en MainWindow.
 Cada función recibe la instancia de MainWindow como primer argumento.
 """
 
-from PySide6.QtCore import Qt, QEvent
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QMessageBox
 from translation.translation_service import translation_service
 

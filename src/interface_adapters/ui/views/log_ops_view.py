@@ -3,8 +3,15 @@ Vista principal para la gestión de logs operativos (LogOpsView).
 Incluye formulario, cola de contactos, tabla y área de información de indicativos.
 """
 
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QSizePolicy, QHBoxLayout
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
+    QSizePolicy,
+    QHBoxLayout,
+    QPushButton,
+    QMessageBox,
+)
+from PySide6.QtCore import Qt
 from translation.translation_service import translation_service
 
 from .log_form_widget import LogFormWidget
@@ -15,13 +22,15 @@ from .callsign_input_widget import CallsignInputWidget
 from .callsign_info_widget import CallsignInfoWidget
 from .clock_widget import ClockWidget
 from interface_adapters.ui.view_manager import LogType
-from application.use_cases.contact_management import delete_contact_from_log
-from application.use_cases.contact_management import ContactLogRepository
-from typing import TYPE_CHECKING, cast
+from application.use_cases.contact_management import (
+    delete_contact_from_log,
+    ContactLogRepository,
+)
 from interface_adapters.ui.utils import find_main_window
-
-if TYPE_CHECKING:
-    from interface_adapters.ui.main_window import MainWindow
+from infrastructure.repositories.sqlite_radio_operator_repository import (
+    SqliteRadioOperatorRepository,
+)
+from datetime import datetime
 
 
 class LogOpsView(QWidget):
@@ -77,12 +86,7 @@ class LogOpsView(QWidget):
         )
         layout.addWidget(self.queue_widget)
         # Formulario sin botón
-        self.form_widget = LogFormWidget(
-            self,
-            log_type=LogType.OPERATION_LOG,
-            # callsign=callsign,
-            # log_date=log_date,
-        )
+        self.form_widget = LogFormWidget(self, log_type=LogType.OPERATION_LOG)
         self.form_widget.setSizePolicy(
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
         )
@@ -91,7 +95,6 @@ class LogOpsView(QWidget):
         # Instanciar relojes sin traducción de label
         self.oa_clock = ClockWidget("OA", "red", self, utc=False)
         self.utc_clock = ClockWidget("UTC", "green", self, utc=True)
-        from PySide6.QtWidgets import QPushButton
 
         self.add_contact_btn = QPushButton(translation_service.tr("add_contact"), self)
         self.add_contact_btn.setObjectName("AddContactButton")
@@ -165,12 +168,34 @@ class LogOpsView(QWidget):
                 self.form_widget.rs_tx_input, self.form_widget.observations_input
             )
 
-    def _on_suggestion_selected(self, callsign):
-        self.callsign_input.set_callsign(callsign)
-        self.callsign_info.update_info(callsign)
-        # Foco al primer campo del formulario
-        if hasattr(self.form_widget, "station_input"):
-            self.form_widget.station_input.setFocus()
+    def set_log_data(self, log):
+        """
+        Asigna los datos del log actual y refresca la UI.
+        Args:
+            log: Objeto log con los datos a mostrar.
+        """
+        self._current_log = log
+        self.retranslate_ui()
+
+    def retranslate_ui(self):
+        """
+        Actualiza los textos de la UI según el idioma seleccionado y los datos del log, y refresca relojes.
+        """
+        # Actualizar relojes OA y UTC
+        self.oa_clock.update_clock()
+        self.utc_clock.update_clock()
+
+        # Actualizar encabezado usando la lógica centralizada
+        self.update_header()
+
+        self.form_widget.retranslate_ui()
+        self.table_widget.retranslate_ui()
+        self.queue_widget.retranslate_ui()
+        # Actualizar textos de los botones de agregar y eliminar
+        if hasattr(self, "add_contact_btn"):
+            self.add_contact_btn.setText(translation_service.tr("add_contact"))
+        if hasattr(self, "delete_contact_btn"):
+            self.delete_contact_btn.setText(translation_service.tr("delete_contact"))
 
     def update_header(self):
         """
@@ -207,33 +232,6 @@ class LogOpsView(QWidget):
         header_text = " | ".join([str(p) for p in header_parts if p])
         self.header_widget.update_text(header_text)
 
-    def set_log_data(self, log):
-        # ...existing code...
-        self._current_log = log
-        self.retranslate_ui()
-
-    def retranslate_ui(self):
-        """
-        Actualiza los textos de la UI según el idioma seleccionado y los datos del log, y refresca relojes.
-        """
-        from datetime import datetime
-
-        # Actualizar relojes OA y UTC
-        self.oa_clock.update_clock()
-        self.utc_clock.update_clock()
-
-        # Actualizar encabezado usando la lógica centralizada
-        self.update_header()
-
-        self.form_widget.retranslate_ui()
-        self.table_widget.retranslate_ui()
-        self.queue_widget.retranslate_ui()
-        # Actualizar textos de los botones de agregar y eliminar
-        if hasattr(self, "add_contact_btn"):
-            self.add_contact_btn.setText(translation_service.tr("add_contact"))
-        if hasattr(self, "delete_contact_btn"):
-            self.delete_contact_btn.setText(translation_service.tr("delete_contact"))
-
     def _update_callsign_info(self):
         """
         Actualiza el área de información de indicativos según el texto ingresado.
@@ -246,18 +244,12 @@ class LogOpsView(QWidget):
                 self.callsign_info.show_suggestions(filtro)
             else:
                 # Buscar operador y mostrar resumen si existe
-                from infrastructure.repositories.sqlite_radio_operator_repository import (
-                    SqliteRadioOperatorRepository,
-                )
-
                 repo = SqliteRadioOperatorRepository()
                 operator = repo.get_operator_by_callsign(filtro)
                 if operator:
                     resumen = f"{operator.callsign} - {operator.name}"
                     self.callsign_info.show_summary(resumen)
                 else:
-                    from PySide6.QtWidgets import QMessageBox
-
                     msg_box = QMessageBox(self)
                     msg_box.setIcon(QMessageBox.Icon.Warning)
                     msg_box.setWindowTitle(
@@ -275,7 +267,23 @@ class LogOpsView(QWidget):
         else:
             self.callsign_info.show_suggestions("")
 
+    def _on_suggestion_selected(self, callsign):
+        """
+        Maneja la selección de una sugerencia de indicativo.
+        Actualiza el campo de entrada y la información mostrada, y da foco al primer campo del formulario.
+        Args:
+            callsign: Indicativo seleccionado.
+        """
+        self.callsign_input.set_callsign(callsign)
+        self.callsign_info.update_info(callsign)
+        # Foco al primer campo del formulario
+        if hasattr(self.form_widget, "station_input"):
+            self.form_widget.station_input.setFocus()
+
     def _on_add_contact(self):
+        """
+        Agrega un nuevo contacto al log y actualiza la UI y la cola de contactos.
+        """
         callsign = self.callsign_input.get_callsign().strip()
         result = self.form_widget._on_add_contact(callsign)
         if result:  # Solo si el contacto se agregó correctamente
@@ -293,6 +301,9 @@ class LogOpsView(QWidget):
                         break
 
     def _on_delete_contact(self):
+        """
+        Elimina el contacto seleccionado de la tabla, tras confirmación del usuario y actualización en la base de datos.
+        """
         # Eliminar contacto seleccionado de la tabla solo si hay una fila seleccionada
         selected_items = self.table_widget.table.selectedItems()
         if not selected_items:
@@ -310,8 +321,6 @@ class LogOpsView(QWidget):
         callsign = contact.get("callsign", "")
         name = contact.get("name", "")
         # Mostrar diálogo de confirmación
-        from PySide6.QtWidgets import QMessageBox
-
         msg_box = QMessageBox(self)
         msg_box.setIcon(QMessageBox.Icon.Question)
         msg_box.setWindowTitle(translation_service.tr("delete_contact"))
@@ -349,5 +358,8 @@ class LogOpsView(QWidget):
         self.table_widget.set_contacts(contacts)
 
     def _on_selection_changed(self):
+        """
+        Habilita o deshabilita el botón de eliminar según si hay una fila seleccionada en la tabla de contactos.
+        """
         selected_rows = self.table_widget.table.selectionModel().selectedRows()
         self.delete_contact_btn.setEnabled(len(selected_rows) == 1)

@@ -5,7 +5,6 @@ Cada función recibe la instancia de MainWindow como primer argumento.
 
 from PySide6.QtWidgets import QMessageBox, QDialog, QVBoxLayout, QTextEdit, QPushButton
 from utils.resources import get_resource_path
-import os, sys
 from translation.translation_service import translation_service
 
 
