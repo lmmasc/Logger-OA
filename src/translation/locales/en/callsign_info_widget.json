@@ -1,0 +1,7 @@
+{
+    "callsign_info_widget.edit_operator": "Edit operator",
+    "callsign_info_widget.add_operator": "Add operator",
+    "callsign_info_widget.delete_operator": "Delete operator",
+    "callsign_info_widget.confirm_delete_operator": "Are you sure you want to delete the operator?",
+    "callsign_info_widget.confirm_update_field": "Do you want to save the change in field '{field}' to '{value}' in the database?"
+}

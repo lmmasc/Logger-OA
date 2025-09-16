@@ -1,0 +1,8 @@
+{
+    "log_form_widget.filter.placeholder": "Filtrar...",
+    "log_form_widget.filter.by": "Filtrar por columna:",
+    "log_form_widget.validation.callsign_required": "El indicativo es obligatorio.",
+    "log_form_widget.validation.invalid_category": "Categoría inválida. Debe ser NOVICIO, INTERMEDIO, SUPERIOR o NO_APLICA.",
+    "log_form_widget.validation.name_required": "El campo NOMBRE es obligatorio.",
+    "log_form_widget.other_country.placeholder": "Ingrese país (en mayúsculas)"
+}

@@ -1,0 +1,22 @@
+{
+    "contact_table_widget.header.callsign": "Indicativo",
+    "contact_table_widget.header.name": "Nombre",
+    "contact_table_widget.header.category": "Categoría",
+    "contact_table_widget.header.type": "Tipo",
+    "contact_table_widget.header.region": "Región",
+    "contact_table_widget.header.district": "Distrito",
+    "contact_table_widget.header.province": "Provincia",
+    "contact_table_widget.header.department": "Departamento",
+    "contact_table_widget.header.license": "Licencia",
+    "contact_table_widget.header.resolution": "Resolución",
+    "contact_table_widget.header.expiration_date": "Vencimiento",
+    "contact_table_widget.header.cutoff_date": "Fecha corte",
+    "contact_table_widget.header.enabled": "Habilitado",
+    "contact_table_widget.header.country": "País",
+    "contact_table_widget.header.updated_at": "Actualizado",
+    "contact_table_widget.header.exchange_rx": "Ex. (RX)",
+    "contact_table_widget.header.exchange_tx": "Ex. (TX)",
+    "contact_table_widget.header.interchange_rx": "Int. (RX)",
+    "contact_table_widget.header.interchange_tx": "Int. (TX)",
+    "contact_table_widget.header.power": "Pot."
+}

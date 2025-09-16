@@ -1,0 +1,11 @@
+{
+    "contact_queue_widget.import_summary": "Import completed.\nTotal: {total}\nNew: {new}\nUpdated: {updated}\nDisabled: {disabled}\nRe-enabled: {reenabled}",
+    "contact_queue_widget.import_summary_total": "Total: {}",
+    "contact_queue_widget.import_summary_new": "New: {}",
+    "contact_queue_widget.import_summary_updated": "Updated: {}",
+    "contact_queue_widget.import_summary_disabled": "Disabled: {}",
+    "contact_queue_widget.import_summary_reenabled": "Re-enabled: {}",
+    "contact_queue_widget.import_summary_ok": "Operators processed successfully: {}",
+    "contact_queue_widget.import_summary_protected": "Protected (not disabled due to date): {}",
+    "contact_queue_widget.import_summary_unchanged": "Unchanged: {}"
+}

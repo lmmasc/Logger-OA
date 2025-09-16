@@ -1,0 +1,8 @@
+{
+    "log_form_widget.filter.placeholder": "Filter...",
+    "log_form_widget.filter.by": "Filter by column:",
+    "log_form_widget.validation.callsign_required": "Callsign is required.",
+    "log_form_widget.validation.invalid_category": "Invalid category. Must be NOVICIO, INTERMEDIO, SUPERIOR or NO_APLICA.",
+    "log_form_widget.validation.name_required": "The NAME field is required.",
+    "log_form_widget.other_country.placeholder": "Enter country (uppercase)"
+}
