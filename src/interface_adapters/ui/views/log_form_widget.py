@@ -218,7 +218,7 @@ class LogFormWidget(QWidget):
             power_label.setAlignment(
                 Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
             )
-            power_label.setFixedWidth(60)
+            power_label.setFixedWidth(90)
             power_label.setSizePolicy(
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
             )
