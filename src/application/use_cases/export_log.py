@@ -4,7 +4,7 @@ from domain.repositories.contact_log_repository import ContactLogRepository
 from config.paths import get_export_dir
 from utils.resources import get_resource_path
 from interface_adapters.ui.view_manager import LogType
-from src.config.settings_service import LanguageValue
+from config.settings_service import LanguageValue
 
 
 def export_log_to_txt(db_path: str, export_path: str, translation_service=None) -> str:

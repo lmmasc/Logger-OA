@@ -4,7 +4,7 @@ defaults.py
 Constantes y valores por defecto globales para la aplicación.
 """
 
-from src.config.settings_service import ThemeValue, LanguageValue
+from .settings_service import ThemeValue, LanguageValue
 
 DEFAULT_LANGUAGE = LanguageValue.ES.value
 DEFAULT_THEME = ThemeValue.LIGHT.value
