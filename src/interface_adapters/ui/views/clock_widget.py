@@ -34,7 +34,7 @@ class ClockWidget(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         # Label OA/UTC
         self.label = QLabel(label_text)
-        self.label.setAlignment(Qt.AlignCenter)
+        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.label.setObjectName("ClockLabelOA" if not self.utc else "ClockLabelUTC")
         font_label = QFont()
         font_label.setFamily("Consolas, Menlo, Courier New, Liberation Mono, Monospace")
@@ -43,7 +43,7 @@ class ClockWidget(QWidget):
         self.label.setFont(font_label)
         # Hora
         self.time = QLabel()
-        self.time.setAlignment(Qt.AlignCenter)
+        self.time.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.time.setObjectName("ClockTimeOA" if not self.utc else "ClockTimeUTC")
         font_time = QFont()
         font_time.setFamily("Consolas, Menlo, Courier New, Liberation Mono, Monospace")
@@ -52,7 +52,7 @@ class ClockWidget(QWidget):
         self.time.setFont(font_time)
         # Fecha
         self.date = QLabel()
-        self.date.setAlignment(Qt.AlignCenter)
+        self.date.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.date.setObjectName("ClockDateOA" if not self.utc else "ClockDateUTC")
         font_date = QFont()
         font_date.setFamily("Consolas, Menlo, Courier New, Liberation Mono, Monospace")
@@ -69,10 +69,10 @@ class ClockWidget(QWidget):
         self.timer.start(1000)
         self.update_clock()
         # Políticas de tamaño fijo para compactar el widget
-        self.label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.time.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.date.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.label.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        self.time.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        self.date.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
 
     def update_clock(self):
         """
