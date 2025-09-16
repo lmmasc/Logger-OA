@@ -1,3 +1,10 @@
+"""
+ContactEditDialog
+Diálogo para editar un contacto del log, con campos y selectores según tipo de log.
+Respeta traducción y tipos de datos.
+"""
+
+# --- Imports de terceros ---
 from PySide6.QtWidgets import (
     QDialog,
     QVBoxLayout,
@@ -9,8 +16,11 @@ from PySide6.QtWidgets import (
     QDateTimeEdit,
 )
 from PySide6.QtCore import QDateTime, Qt
+
+# --- Imports de la aplicación ---
 from translation.translation_service import translation_service
 from src.config.settings_service import LanguageValue
+import datetime
 
 
 class ContactEditDialog(QDialog):
@@ -20,6 +30,13 @@ class ContactEditDialog(QDialog):
     """
 
     def __init__(self, contact, log_type, parent=None):
+        """
+        Inicializa el diálogo de edición de contacto.
+        Args:
+            contact (dict): Datos del contacto a editar.
+            log_type (str): Tipo de log ('ops' o 'contest').
+            parent (QWidget, opcional): Widget padre.
+        """
         super().__init__(parent)
         self.setWindowTitle(translation_service.tr("edit_contact_dialog_title"))
         self.setMinimumWidth(420)
@@ -124,9 +141,9 @@ class ContactEditDialog(QDialog):
         if self.log_type == "contest":
             # Mostrar hora OA (UTC-5)
             if ts:
-                import datetime
-
-                dt_utc = datetime.datetime.utcfromtimestamp(int(ts))
+                dt_utc = datetime.datetime.fromtimestamp(
+                    int(ts), tz=datetime.timezone.utc
+                )
                 dt_oa = dt_utc - datetime.timedelta(hours=5)
                 dt_qt = QDateTime(
                     dt_oa.year,
@@ -146,13 +163,13 @@ class ContactEditDialog(QDialog):
                 label = "OA Time (UTC-5)"
             self.inputs["datetime_oa"] = QDateTimeEdit(dt_qt, self)
             self.inputs["datetime_oa"].setDisplayFormat(date_fmt)
-            self.inputs["datetime_oa"].setTimeSpec(Qt.LocalTime)
+            self.inputs["datetime_oa"].setTimeSpec(Qt.TimeSpec.LocalTime)
             layout.addWidget(QLabel(label))
             layout.addWidget(self.inputs["datetime_oa"])
         else:
             # Operativos: mantener UTC
             if ts:
-                dt_utc = QDateTime.fromSecsSinceEpoch(int(ts), Qt.UTC)
+                dt_utc = QDateTime.fromSecsSinceEpoch(int(ts), Qt.TimeSpec.UTC)
             else:
                 dt_utc = QDateTime.currentDateTimeUtc()
             if lang == LanguageValue.ES:
@@ -163,7 +180,7 @@ class ContactEditDialog(QDialog):
                 label = translation_service.tr("edit_contact_datetime_utc_en")
             self.inputs["datetime_utc"] = QDateTimeEdit(dt_utc, self)
             self.inputs["datetime_utc"].setDisplayFormat(date_fmt)
-            self.inputs["datetime_utc"].setTimeSpec(Qt.UTC)
+            self.inputs["datetime_utc"].setTimeSpec(Qt.TimeSpec.UTC)
             layout.addWidget(QLabel(label))
             layout.addWidget(self.inputs["datetime_utc"])
         # Botones
@@ -178,6 +195,9 @@ class ContactEditDialog(QDialog):
         self.setLayout(layout)
 
     def accept(self):
+        """
+        Obtiene los datos editados del contacto y los guarda en result_contact.
+        """
         result = self.contact.copy()
         for k, widget in self.inputs.items():
             if isinstance(widget, QLineEdit):
@@ -204,12 +224,20 @@ class ContactEditDialog(QDialog):
                 and self.log_type == "contest"
                 and isinstance(widget, QDateTimeEdit)
             ):
-                import datetime
+                # Convertir QDateTime a datetime.datetime antes de sumar timedelta
+                dt_oa_dt = widget.dateTime().toPython()
+                import datetime as dtmod
 
-                dt_oa = widget.dateTime().toPython()
-                dt_utc = dt_oa + datetime.timedelta(hours=5)
-                ts = int(dt_utc.replace(tzinfo=datetime.timezone.utc).timestamp())
-                result["timestamp"] = ts
+                if isinstance(dt_oa_dt, dtmod.datetime):
+                    dt_utc = dt_oa_dt + dtmod.timedelta(hours=5)
+                    ts = int(dt_utc.replace(tzinfo=dtmod.timezone.utc).timestamp())
+                    result["timestamp"] = ts
+                else:
+                    # Si no es datetime, intentar convertir
+                    dt_oa_dt = dtmod.datetime.fromisoformat(str(dt_oa_dt))
+                    dt_utc = dt_oa_dt + dtmod.timedelta(hours=5)
+                    ts = int(dt_utc.replace(tzinfo=dtmod.timezone.utc).timestamp())
+                    result["timestamp"] = ts
             elif (
                 k == "datetime_utc"
                 and self.log_type == "ops"
