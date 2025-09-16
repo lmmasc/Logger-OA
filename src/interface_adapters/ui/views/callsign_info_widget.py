@@ -137,27 +137,23 @@ class CallsignInfoWidget(QWidget):
             if len(exact_matches) == 1:
                 operator = exact_matches[0]
                 enabled = (
-                    translation_service.tr("enabled")
+                    translation_service.tr("ui_enabled_status")
                     if operator.enabled
-                    else translation_service.tr("disabled")
+                    else translation_service.tr("ui_disabled_status")
                 )
                 summary = f"<table width='100%' style='font-size:16px;'>"
                 summary += "<tr>"
                 summary += f"<td><b>{operator.name}</b></td>"
-                summary += f"<td>{translation_service.tr('district')}: {operator.district}</td>"
+                summary += f"<td>{translation_service.tr('ui_district_label')}: {operator.district}</td>"
                 summary += f"<td>{translation_service.tr('category')}: {operator.category}</td>"
                 summary += "</tr><tr>"
-                summary += (
-                    f"<td>{translation_service.tr('country')}: {operator.country}</td>"
-                )
+                summary += f"<td>{translation_service.tr('ui_country_label')}: {operator.country}</td>"
                 summary += f"<td>{translation_service.tr('province')}: {operator.province}</td>"
-                summary += (
-                    f"<td>{translation_service.tr('type')}: {operator.type_}</td>"
-                )
+                summary += f"<td>{translation_service.tr('ui_type_label')}: {operator.type_}</td>"
                 summary += "</tr><tr>"
                 summary += f"<td>{enabled}</td>"
-                summary += f"<td>{translation_service.tr('department')}: {operator.department}</td>"
-                summary += f"<td>{translation_service.tr('expiration')}: {operator.expiration_date}</td>"
+                summary += f"<td>{translation_service.tr('ui_department_label')}: {operator.department}</td>"
+                summary += f"<td>{translation_service.tr('ui_expiration_label')}: {operator.expiration_date}</td>"
                 summary += "</tr></table>"
                 self.show_summary(summary)
             else:

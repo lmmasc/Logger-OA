@@ -253,9 +253,11 @@ class LogOpsView(QWidget):
                     msg_box = QMessageBox(self)
                     msg_box.setIcon(QMessageBox.Icon.Warning)
                     msg_box.setWindowTitle(
-                        translation_service.tr("invalid_callsign_title")
+                        translation_service.tr("dialog_invalid_callsign_title")
                     )
-                    msg_box.setText(translation_service.tr("invalid_callsign_msg"))
+                    msg_box.setText(
+                        translation_service.tr("dialog_invalid_callsign_msg")
+                    )
                     msg_box.setInformativeText(
                         f"{translation_service.tr('callsign_not_found')}: {filtro}"
                     )
@@ -324,7 +326,7 @@ class LogOpsView(QWidget):
         msg_box = QMessageBox(self)
         msg_box.setIcon(QMessageBox.Icon.Question)
         msg_box.setWindowTitle(translation_service.tr("delete_contact"))
-        msg_box.setText(translation_service.tr("confirm_delete_contact"))
+        msg_box.setText(translation_service.tr("dialog_confirm_delete_contact"))
         msg_box.setInformativeText(
             f"{translation_service.tr('table_header_callsign')}: {callsign}\n{translation_service.tr('table_header_name')}: {name}"
         )

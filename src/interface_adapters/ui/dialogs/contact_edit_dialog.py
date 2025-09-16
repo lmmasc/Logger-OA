@@ -53,11 +53,11 @@ class ContactEditDialog(QDialog):
         if log_type == "ops":
             self.inputs["name"] = QLineEdit(self)
             self.inputs["name"].setText(contact.get("name", ""))
-            layout.addWidget(QLabel(translation_service.tr("name")))
+            layout.addWidget(QLabel(translation_service.tr("ui_name_label")))
             layout.addWidget(self.inputs["name"])
             self.inputs["country"] = QLineEdit(self)
             self.inputs["country"].setText(contact.get("country", ""))
-            layout.addWidget(QLabel(translation_service.tr("country")))
+            layout.addWidget(QLabel(translation_service.tr("ui_country_label")))
             layout.addWidget(self.inputs["country"])
             self.inputs["region"] = QLineEdit(self)
             self.inputs["region"].setText(contact.get("region", ""))

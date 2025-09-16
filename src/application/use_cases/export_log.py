@@ -5,6 +5,7 @@ from config.paths import get_export_dir
 from utils.resources import get_resource_path
 from interface_adapters.ui.view_manager import LogType
 from config.settings_service import LanguageValue
+from typing import Optional
 
 
 def export_log_to_txt(db_path: str, export_path: str, translation_service=None) -> str:
@@ -42,7 +43,7 @@ def export_log_to_txt(db_path: str, export_path: str, translation_service=None) 
     if log_type == LogType.CONTEST_LOG.value:
         headers = [
             translation_service.tr("table_header_callsign"),
-            translation_service.tr("name"),
+            translation_service.tr("ui_name_label"),
             translation_service.tr("region"),
             "QTR",
             translation_service.tr("rs_rx"),
@@ -65,8 +66,8 @@ def export_log_to_txt(db_path: str, export_path: str, translation_service=None) 
     elif log_type == LogType.OPERATION_LOG.value:
         headers = [
             translation_service.tr("table_header_callsign"),
-            translation_service.tr("name"),
-            translation_service.tr("country"),
+            translation_service.tr("ui_name_label"),
+            translation_service.tr("ui_country_label"),
             translation_service.tr("region"),
             translation_service.tr("station"),
             translation_service.tr("energy"),
@@ -145,7 +146,7 @@ def export_log_to_txt(db_path: str, export_path: str, translation_service=None) 
 
 
 def export_log_to_csv(
-    db_path: str, export_filename: str = None, translation_service=None
+    db_path: str, export_filename: Optional[str] = None, translation_service=None
 ) -> str:
     """
     Exporta todos los contactos de un log a un archivo CSV en la carpeta de exportación, detectando tipo de log y usando cabeceras traducidas.
@@ -181,7 +182,7 @@ def export_log_to_csv(
     if log_type == LogType.CONTEST_LOG.value:
         headers = [
             translation_service.tr("table_header_callsign"),
-            translation_service.tr("name"),
+            translation_service.tr("ui_name_label"),
             translation_service.tr("region"),
             "QTR",
             translation_service.tr("rs_rx"),
@@ -204,8 +205,8 @@ def export_log_to_csv(
     elif log_type == LogType.OPERATION_LOG.value:
         headers = [
             translation_service.tr("table_header_callsign"),
-            translation_service.tr("name"),
-            translation_service.tr("country"),
+            translation_service.tr("ui_name_label"),
+            translation_service.tr("ui_country_label"),
             translation_service.tr("region"),
             translation_service.tr("station"),
             translation_service.tr("energy"),

@@ -53,7 +53,7 @@ class ContactTableWidget(QWidget):
         if self.log_type == LogType.CONTEST_LOG:
             headers = [
                 translation_service.tr("table_header_callsign"),
-                translation_service.tr("name"),
+                translation_service.tr("ui_name_label"),
                 translation_service.tr("region"),
                 "QTR",
                 translation_service.tr("rs_rx"),
@@ -65,9 +65,9 @@ class ContactTableWidget(QWidget):
         else:
             headers = [
                 translation_service.tr("table_header_callsign"),
-                translation_service.tr("name"),
+                translation_service.tr("ui_name_label"),
                 translation_service.tr("country"),
-                translation_service.tr("region"),
+                translation_service.tr("ui_country_label"),
                 translation_service.tr("station"),
                 translation_service.tr("energy"),
                 translation_service.tr("table_header_power"),

@@ -314,7 +314,7 @@ class LogContestView(QWidget):
         msg_box = QMessageBox(self)
         msg_box.setIcon(QMessageBox.Icon.Question)
         msg_box.setWindowTitle(translation_service.tr("delete_contact"))
-        msg_box.setText(translation_service.tr("confirm_delete_contact"))
+        msg_box.setText(translation_service.tr("dialog_confirm_delete_contact"))
         msg_box.setInformativeText(
             f"{translation_service.tr('table_header_callsign')}: {getattr(self, 'callsign', '')}"
         )
