@@ -4,39 +4,46 @@ Cada función recibe la instancia de MainWindow como primer argumento.
 """
 
 from translation.translation_service import translation_service
-from config.settings_service import settings_service
+from config.settings_service import (
+    settings_service,
+    SettingsKey,
+    ThemeValue,
+    LanguageValue,
+)
 
 # Métodos de configuración y actualización de UI
 
 
-def set_language(self, lang: str) -> None:
+def set_language(self, lang: LanguageValue) -> None:
     translation_service.set_language(lang)
-    current_lang = settings_service.get_value("language", "es")
+    current_lang = LanguageValue(
+        settings_service.get_value(SettingsKey.LANGUAGE.value, LanguageValue.ES.value)
+    )
     if current_lang != lang:
-        settings_service.set_value("language", lang)
+        settings_service.set_value(SettingsKey.LANGUAGE.value, lang.value)
     refresh_ui(self)
 
 
 def set_light_theme(self) -> None:
-    self.theme_manager.apply_theme("light")
+    self.theme_manager.apply_theme(ThemeValue.LIGHT)
     refresh_ui(self)
 
 
 def set_dark_theme(self) -> None:
-    self.theme_manager.apply_theme("dark")
+    self.theme_manager.apply_theme(ThemeValue.DARK)
     refresh_ui(self)
 
 
 def _update_theme_menu_checks(self) -> None:
     theme = self.theme_manager.current_theme
-    self.menu_bar.light_theme_action.setChecked(theme == "light")
-    self.menu_bar.dark_theme_action.setChecked(theme == "dark")
+    self.menu_bar.light_theme_action.setChecked(theme == ThemeValue.LIGHT)
+    self.menu_bar.dark_theme_action.setChecked(theme == ThemeValue.DARK)
 
 
 def _update_language_menu_checks(self) -> None:
     current_lang = translation_service.get_language()
-    self.menu_bar.lang_es_action.setChecked(current_lang == "es")
-    self.menu_bar.lang_en_action.setChecked(current_lang == "en")
+    self.menu_bar.lang_es_action.setChecked(current_lang == LanguageValue.ES)
+    self.menu_bar.lang_en_action.setChecked(current_lang == LanguageValue.EN)
 
 
 def refresh_ui(self) -> None:
@@ -65,9 +72,11 @@ def _retranslate_ui(self) -> None:
 
 def _set_initial_theme_and_language(self) -> None:
     theme = self.theme_manager.current_theme
-    if theme == "dark":
+    if theme == ThemeValue.DARK:
         set_dark_theme(self)
     else:
         set_light_theme(self)
-    lang = settings_service.get_value("language", "es")
+    lang = LanguageValue(
+        settings_service.get_value(SettingsKey.LANGUAGE.value, LanguageValue.ES.value)
+    )
     set_language(self, lang)

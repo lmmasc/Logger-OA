@@ -11,7 +11,7 @@ import os
 from PySide6.QtWidgets import QMainWindow, QApplication
 
 # Imports internos: configuración, traducción, UI, acciones
-from config.settings_service import settings_service
+from config.settings_service import settings_service, LanguageValue, SettingsKey
 from translation.translation_service import translation_service
 from .themes.theme_manager import ThemeManager
 from .menu_bar import MainMenuBar
@@ -65,8 +65,11 @@ class MainWindow(QMainWindow):
         )
 
         # Configuración de idioma y título
-        lang = str(settings_service.get_value("language", "es"))
-        translation_service.set_language(lang)
+        lang = settings_service.get_value(
+            SettingsKey.LANGUAGE.value, LanguageValue.ES.value
+        )
+        lang_enum = LanguageValue(lang)
+        translation_service.set_language(lang_enum)
         self.setWindowTitle(translation_service.tr("main_window_title"))
         self.resize(1200, 700)
         self.center()
@@ -121,7 +124,7 @@ class MainWindow(QMainWindow):
             self.log_ops_view.set_log_data(self.current_log)
 
     # --- Gestión de temas e idioma ---
-    def set_language(self, lang: str) -> None:
+    def set_language(self, lang: LanguageValue) -> None:
         """
         Cambia el idioma de la interfaz.
         """
@@ -190,8 +193,12 @@ class MainWindow(QMainWindow):
         self.menu_bar.open_folder_requested.connect(self._open_data_folder)
         self.menu_bar.light_theme_requested.connect(self.set_light_theme)
         self.menu_bar.dark_theme_requested.connect(self.set_dark_theme)
-        self.menu_bar.lang_es_requested.connect(lambda: self.set_language("es"))
-        self.menu_bar.lang_en_requested.connect(lambda: self.set_language("en"))
+        self.menu_bar.lang_es_requested.connect(
+            lambda: self.set_language(LanguageValue.ES)
+        )
+        self.menu_bar.lang_en_requested.connect(
+            lambda: self.set_language(LanguageValue.EN)
+        )
         self.menu_bar.log_new_requested.connect(lambda: action_log_new(self))
         self.menu_bar.log_open_requested.connect(lambda: action_log_open(self))
         self.menu_bar.log_export_requested.connect(lambda: action_log_export(self))
