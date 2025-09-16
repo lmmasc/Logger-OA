@@ -13,6 +13,7 @@ from .clock_widget import ClockWidget
 from .log_form_widget import LogFormWidget
 from .contact_table_widget import ContactTableWidget
 from config.settings_service import LanguageValue
+from interface_adapters.ui.utils import find_main_window
 
 from .header_widget import HeaderWidget
 from .contact_queue_widget import ContactQueueWidget
@@ -286,19 +287,16 @@ class LogContestView(QWidget):
         if reply != QMessageBox.StandardButton.Yes:
             return
         # Eliminar usando el caso de uso
-        main_window = (
-            self._find_main_window()
-            if hasattr(self, "_find_main_window")
-            else self.parent()
-        )
-        if (
-            not main_window
-            or not hasattr(main_window, "current_log")
-            or not main_window.current_log
-        ):
+        main_window = find_main_window(self)
+        if not main_window or not hasattr(main_window, "current_log"):
             return
-        db_path = getattr(main_window.current_log, "db_path", None)
-        log_id = getattr(main_window.current_log, "id", None)
+        current_log = main_window.current_log
+        if not current_log or not hasattr(current_log, "db_path"):
+            return
+        db_path = current_log.db_path
+        log_id = getattr(current_log, "id", None)
+        if db_path is None or log_id is None or contact_id is None:
+            return
         from application.use_cases.contact_management import delete_contact_from_log
 
         delete_contact_from_log(db_path, contact_id)
@@ -319,11 +317,3 @@ class LogContestView(QWidget):
     def _on_selection_changed(self):
         selected_rows = self.table_widget.table.selectionModel().selectedRows()
         self.delete_contact_btn.setEnabled(len(selected_rows) == 1)
-
-    def _find_main_window(self):
-        parent = self.parent()
-        while parent:
-            if parent.__class__.__name__ == "MainWindow":
-                return parent
-            parent = parent.parent()
-        return None
