@@ -305,7 +305,12 @@ class LogContestView(QWidget):
 
         repo = ContactLogRepository(db_path)
         contacts = repo.get_contacts(log_id)
-        main_window.current_log.contacts = contacts
+        if (
+            hasattr(main_window, "current_log")
+            and main_window.current_log is not None
+            and hasattr(main_window.current_log, "contacts")
+        ):
+            main_window.current_log.contacts = contacts
         self.table_widget.set_contacts(contacts)
         # Actualizar intercambio enviado tras eliminar contacto
         if hasattr(self.form_widget, "exchange_sent_input") and hasattr(
