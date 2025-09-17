@@ -1,6 +1,7 @@
 # Menu translations (English)
 MENU_TRANSLATIONS = {
     "menu_auto_theme": "Auto (System)",
+    "menu_auto_language": "Auto (System Language)",
     "menu_file_menu": "File",
     "menu_log_menu": "Log",
     "menu_database_menu": "Database",

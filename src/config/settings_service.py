@@ -50,7 +50,7 @@ class ThemeValue(Enum):
 class LanguageValue(Enum):
     ES = "es"
     EN = "en"
-    # Agrega aquí otros valores de idioma si existen
+    AUTO = "auto"  # Nuevo valor para idioma automático
 
 
 # Instancia global para acceso centralizado

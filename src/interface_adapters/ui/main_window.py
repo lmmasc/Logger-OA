@@ -206,6 +206,9 @@ class MainWindow(QMainWindow):
         self.menu_bar.lang_en_requested.connect(
             lambda: self.set_language(LanguageValue.EN)
         )
+        self.menu_bar.lang_auto_requested.connect(
+            lambda: self.set_language(LanguageValue.AUTO)
+        )
         self.menu_bar.log_new_requested.connect(lambda: action_log_new(self))
         self.menu_bar.log_open_requested.connect(lambda: action_log_open(self))
         self.menu_bar.log_export_requested.connect(lambda: action_log_export(self))

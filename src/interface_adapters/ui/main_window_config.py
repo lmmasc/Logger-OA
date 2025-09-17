@@ -56,6 +56,7 @@ def _update_language_menu_checks(self) -> None:
     current_lang = translation_service.get_language()
     self.menu_bar.lang_es_action.setChecked(current_lang == LanguageValue.ES)
     self.menu_bar.lang_en_action.setChecked(current_lang == LanguageValue.EN)
+    self.menu_bar.lang_auto_action.setChecked(current_lang == LanguageValue.AUTO)
 
 
 def refresh_ui(self) -> None:

@@ -35,6 +35,7 @@ class MainMenuBar(QMenuBar):
     auto_theme_requested = Signal()
     lang_es_requested = Signal()
     lang_en_requested = Signal()
+    lang_auto_requested = Signal()
     manual_requested = Signal()
 
     def __init__(self, parent=None):
@@ -143,10 +144,15 @@ class MainMenuBar(QMenuBar):
         )
         self.lang_es_action = QAction(translation_service.tr("menu_spanish"), self)
         self.lang_en_action = QAction(translation_service.tr("menu_english"), self)
+        self.lang_auto_action = QAction(
+            translation_service.tr("menu_auto_language"), self
+        )
         self.lang_es_action.setCheckable(True)
         self.lang_en_action.setCheckable(True)
+        self.lang_auto_action.setCheckable(True)
         self.language_submenu.addAction(self.lang_es_action)
         self.language_submenu.addAction(self.lang_en_action)
+        self.language_submenu.addAction(self.lang_auto_action)
         self.preferences_menu.addMenu(self.language_submenu)
         self.addMenu(self.preferences_menu)
 
@@ -179,6 +185,7 @@ class MainMenuBar(QMenuBar):
         self.auto_theme_action.triggered.connect(self.auto_theme_requested.emit)
         self.lang_es_action.triggered.connect(self.lang_es_requested.emit)
         self.lang_en_action.triggered.connect(self.lang_en_requested.emit)
+        self.lang_auto_action.triggered.connect(self.lang_auto_requested.emit)
         self.manual_action.triggered.connect(self.manual_requested.emit)
 
     def retranslate_ui(self):
@@ -213,6 +220,7 @@ class MainMenuBar(QMenuBar):
         self.language_submenu.setTitle(translation_service.tr("menu_language_menu"))
         self.lang_es_action.setText(translation_service.tr("menu_spanish"))
         self.lang_en_action.setText(translation_service.tr("menu_english"))
+        self.lang_auto_action.setText(translation_service.tr("menu_auto_language"))
 
         self.help_menu.setTitle(translation_service.tr("menu_help_menu"))
         self.about_action.setText(translation_service.tr("menu_about"))
