@@ -172,12 +172,12 @@ class ContactEditDialog(QDialog):
                 dt_utc = QDateTime.fromSecsSinceEpoch(int(ts), Qt.TimeSpec.UTC)
             else:
                 dt_utc = QDateTime.currentDateTimeUtc()
+            # El formato de fecha sigue dependiendo del idioma, pero el label se traduce con una sola clave
             if lang == LanguageValue.ES:
                 date_fmt = "HH:mm dd/MM/yyyy 'UTC'"
-                label = translation_service.tr("edit_contact_datetime_utc_es")
             else:
                 date_fmt = "HH:mm MM/dd/yyyy 'UTC'"
-                label = translation_service.tr("edit_contact_datetime_utc_en")
+            label = translation_service.tr("edit_contact_datetime_utc")
             self.inputs["datetime_utc"] = QDateTimeEdit(dt_utc, self)
             self.inputs["datetime_utc"].setDisplayFormat(date_fmt)
             self.inputs["datetime_utc"].setTimeSpec(Qt.TimeSpec.UTC)
