@@ -14,6 +14,7 @@ MESSAGES_TRANSLATIONS = {
     "delete_db_warning": "¿Está seguro que desea borrar la base de datos? Esta acción no se puede deshacer.",
     "delete_db_confirm": "Confirmar borrado",
     "delete_db_success": "La base de datos ha sido borrada y recreada vacía.",
+    "delete_db_failed": "No se pudo borrar la base de datos. Verifique permisos o el estado del archivo.",
     "delete_db_cancel": "Operación cancelada. La base de datos no fue modificada.",
     "wait_message": "Procesando, por favor espere...",
     "credits_message": "Desarrollado por Miguel OA4BAU y Raquel OA4EHN",

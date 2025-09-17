@@ -388,14 +388,9 @@ def action_db_delete(self):
             QMessageBox.critical(
                 self,
                 translation_service.tr("main_window_title"),
-                f"{translation_service.tr('import_failed')}: {e}",
+                f"{translation_service.tr('delete_db_failed')}: {e}",
             )
-    else:
-        QMessageBox.information(
-            self,
-            translation_service.tr("main_window_title"),
-            translation_service.tr("delete_db_cancel"),
-        )
+    # Si se cancela, no se muestra ningún mensaje
 
 
 def action_db_backup(self):
