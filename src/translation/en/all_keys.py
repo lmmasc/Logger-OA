@@ -1,5 +1,5 @@
 # Todas las claves y traducciones actuales (inglés)
-ALL_TRANSLATIONS_EN = {
+ALL_KEYS_TRANSLATIONS = {
     "cps_operation": "CPS",
     "rener_operation": "RENER",
     "bulletin_operation": "Bulletin",

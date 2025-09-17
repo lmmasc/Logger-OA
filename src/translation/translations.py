@@ -4,15 +4,16 @@ from utils.resources import get_resource_path
 from config.settings_service import LanguageValue
 
 TRANSLATION_MODULES = [
-    "ui",
-    "menu",
-    "log_ops",
-    "log_contest",
-    "table_headers",
-    "messages",
-    "forms",
-    "operator",
-    "import_summary",
+    "all_keys",
+    # "ui",
+    # "menu",
+    # "log_ops",
+    # "log_contest",
+    # "table_headers",
+    # "messages",
+    # "forms",
+    # "operator",
+    # "import_summary",
     # Agrega aquí más módulos según crezcan las secciones
 ]
 
@@ -32,8 +33,8 @@ def load_translations(lang_code: LanguageValue):
             dict_name = f"{module_name.upper()}_TRANSLATIONS"
             section = getattr(mod, dict_name, {})
             translations.update(section)
-        except Exception:
-            pass  # Si el módulo no existe, lo ignora
+        except Exception as e:
+            print(f"Error al importar translation.{lang_str}.{module_name}: {e}")
     # Ejemplo de uso universal si se cargan archivos:
     # path = get_resource_path(f"src/translation/{lang_str}/{module_name}.py")
     return translations

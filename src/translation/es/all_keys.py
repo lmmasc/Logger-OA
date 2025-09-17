@@ -1,5 +1,5 @@
 # Todas las claves y traducciones actuales (español)
-ALL_TRANSLATIONS_ES = {
+ALL_KEYS_TRANSLATIONS = {
     "cps_operation": "CPS",
     "operation_rep_label": "Repetidor",
     "operation_freq_label": "Frecuencia",
