@@ -19,7 +19,7 @@ from PySide6.QtCore import QDateTime, Qt
 
 # --- Imports de la aplicación ---
 from translation.translation_service import translation_service
-from src.config.settings_service import LanguageValue
+from config.settings_service import LanguageValue
 import datetime
 
 
