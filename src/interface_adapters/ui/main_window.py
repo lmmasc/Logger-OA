@@ -191,8 +191,15 @@ class MainWindow(QMainWindow):
         self.menu_bar.manual_requested.connect(lambda: show_manual_dialog(self))
         self.menu_bar.about_requested.connect(lambda: show_about_dialog(self))
         self.menu_bar.open_folder_requested.connect(self._open_data_folder)
-        self.menu_bar.light_theme_requested.connect(self.set_light_theme)
-        self.menu_bar.dark_theme_requested.connect(self.set_dark_theme)
+        self.menu_bar.light_theme_requested.connect(
+            lambda: self._on_theme_selected("light")
+        )
+        self.menu_bar.dark_theme_requested.connect(
+            lambda: self._on_theme_selected("dark")
+        )
+        self.menu_bar.auto_theme_requested.connect(
+            lambda: self._on_theme_selected("auto")
+        )
         self.menu_bar.lang_es_requested.connect(
             lambda: self.set_language(LanguageValue.ES)
         )
@@ -212,6 +219,22 @@ class MainWindow(QMainWindow):
         self.menu_bar.db_backup_action.triggered.connect(self._on_db_backup)
         self.menu_bar.db_restore_action.triggered.connect(self._on_db_restore)
         self.menu_bar.db_import_db_action.triggered.connect(self._on_db_import_db)
+
+    def _on_theme_selected(self, theme_key: str):
+        from .main_window_config import (
+            set_light_theme,
+            set_dark_theme,
+            set_auto_theme,
+            _update_theme_menu_checks,
+        )
+
+        if theme_key == "light":
+            set_light_theme(self)
+        elif theme_key == "dark":
+            set_dark_theme(self)
+        elif theme_key == "auto":
+            set_auto_theme(self)
+        _update_theme_menu_checks(self)
 
     # --- Gestión de base de datos (delegación a acciones) ---
     def _on_db_backup(self):

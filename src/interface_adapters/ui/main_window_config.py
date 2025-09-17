@@ -26,18 +26,30 @@ def set_language(self, lang: LanguageValue) -> None:
 
 def set_light_theme(self) -> None:
     self.theme_manager.apply_theme(ThemeValue.LIGHT)
+    settings_service.set_value(SettingsKey.THEME.value, ThemeValue.LIGHT.value)
     refresh_ui(self)
 
 
 def set_dark_theme(self) -> None:
     self.theme_manager.apply_theme(ThemeValue.DARK)
+    settings_service.set_value(SettingsKey.THEME.value, ThemeValue.DARK.value)
+    refresh_ui(self)
+
+
+def set_auto_theme(self) -> None:
+    from .themes.system_theme import detect_system_theme
+
+    detected_theme = detect_system_theme()
+    self.theme_manager.apply_theme(detected_theme)
+    settings_service.set_value(SettingsKey.THEME.value, ThemeValue.AUTO.value)
     refresh_ui(self)
 
 
 def _update_theme_menu_checks(self) -> None:
-    theme = self.theme_manager.current_theme
-    self.menu_bar.light_theme_action.setChecked(theme == ThemeValue.LIGHT)
-    self.menu_bar.dark_theme_action.setChecked(theme == ThemeValue.DARK)
+    theme = settings_service.get_value(SettingsKey.THEME.value, ThemeValue.LIGHT.value)
+    self.menu_bar.light_theme_action.setChecked(theme == ThemeValue.LIGHT.value)
+    self.menu_bar.dark_theme_action.setChecked(theme == ThemeValue.DARK.value)
+    self.menu_bar.auto_theme_action.setChecked(theme == ThemeValue.AUTO.value)
 
 
 def _update_language_menu_checks(self) -> None:
@@ -71,11 +83,13 @@ def _retranslate_ui(self) -> None:
 
 
 def _set_initial_theme_and_language(self) -> None:
-    theme = self.theme_manager.current_theme
-    if theme == ThemeValue.DARK:
+    theme = settings_service.get_value(SettingsKey.THEME.value, ThemeValue.LIGHT.value)
+    if theme == ThemeValue.DARK.value:
         set_dark_theme(self)
-    else:
+    elif theme == ThemeValue.LIGHT.value:
         set_light_theme(self)
+    elif theme == ThemeValue.AUTO.value:
+        set_auto_theme(self)
     lang = LanguageValue(
         settings_service.get_value(SettingsKey.LANGUAGE.value, LanguageValue.ES.value)
     )

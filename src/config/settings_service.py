@@ -42,6 +42,7 @@ class SettingsKey(Enum):
 class ThemeValue(Enum):
     LIGHT = "light"
     DARK = "dark"
+    AUTO = "auto"
     # Agrega aquí otros valores de tema si existen
 
 
