@@ -1,5 +1,7 @@
 # General messages translations (English)
 MESSAGES_TRANSLATIONS = {
+    "contact_queue_duplicate_title": "Duplicate contact",
+    "contact_queue_duplicate_msg": "This contact already exists in the queue.",
     "export_db": "Export database",
     "export_log": "Export log",
     "select_export_format": "Select export format:",

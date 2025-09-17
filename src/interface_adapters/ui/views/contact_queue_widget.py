@@ -93,10 +93,20 @@ class ContactQueueWidget(QWidget):
 
     def add_to_queue(self, text):
         """
-        Agrega un contacto a la cola.
+        Agrega un contacto a la cola, evitando duplicados.
         Args:
             text (str): Texto del contacto a agregar.
         """
+        for i in range(self.queue_list.count()):
+            if self.queue_list.item(i).text() == text:
+                from PySide6.QtWidgets import QMessageBox
+
+                QMessageBox.information(
+                    self,
+                    translation_service.tr("contact_queue_duplicate_title"),
+                    translation_service.tr("contact_queue_duplicate_msg"),
+                )
+                return
         item = QListWidgetItem(text)
         self.queue_list.addItem(item)
 

@@ -1,5 +1,7 @@
 # Mensajes generales (español)
 MESSAGES_TRANSLATIONS = {
+    "contact_queue_duplicate_title": "Contacto duplicado",
+    "contact_queue_duplicate_msg": "Este contacto ya existe en la cola de espera.",
     "export_db": "Exportar base de datos",
     "export_log": "Exportar log",
     "select_export_format": "Selecciona el formato de exportación:",
