@@ -500,8 +500,7 @@ class LogFormWidget(QWidget):
                         ].table_widget
                         table_widget.set_contacts(contacts)
                         table = table_widget.table
-                        table.scrollToBottom()
-                        table.setFocus()
+                        table.scrollToTop()
                         parent = self.parent()
                         while parent:
                             callsign_input = getattr(parent, "callsign_input", None)
@@ -520,8 +519,7 @@ class LogFormWidget(QWidget):
                         ].table_widget
                         table_widget.set_contacts(contacts)
                         table = table_widget.table
-                        table.scrollToBottom()
-                        table.setFocus()
+                        table.scrollToTop()
                         parent = self.parent()
                         while parent:
                             callsign_input = getattr(parent, "callsign_input", None)
