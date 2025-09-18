@@ -136,10 +136,38 @@ class MainMenuBar(QMenuBar):
         self.database_menu.addAction(self.db_delete_action)
         self.addMenu(self.database_menu)
 
-        # Menú Preferencias con submenús Aspecto e Idioma
+        # Menú Preferencias con submenús Indicativo, Aspecto e Idioma
         self.preferences_menu = QMenu(
             translation_service.tr("menu_preferences_menu"), self
         )
+        # Indicative submenu in Preferences
+        self.indicative_submenu = QMenu(
+            translation_service.tr("menu_indicative_menu"), self.preferences_menu
+        )
+        self.set_callsign_action = QAction(
+            translation_service.tr("menu_set_callsign"), self
+        )
+        self.set_callsign_action.setCheckable(False)
+        self.indicative_submenu.addAction(self.set_callsign_action)
+        self.indicative_submenu.addSeparator()
+        self.callsign_saved_mode_action = QAction(
+            translation_service.tr("menu_callsign_saved_mode"), self
+        )
+        self.callsign_saved_mode_action.setCheckable(True)
+        self.callsign_always_ask_mode_action = QAction(
+            translation_service.tr("menu_callsign_always_ask_mode"), self
+        )
+        self.callsign_always_ask_mode_action.setCheckable(True)
+        self.indicative_submenu.addAction(self.callsign_saved_mode_action)
+        self.indicative_submenu.addAction(self.callsign_always_ask_mode_action)
+        self.indicative_submenu.addSeparator()
+        self.callsign_display_action = QAction(
+            translation_service.tr("menu_callsign_display"), self
+        )
+        self.callsign_display_action.setEnabled(False)
+        self.indicative_submenu.addAction(self.callsign_display_action)
+        self.preferences_menu.addMenu(self.indicative_submenu)
+
         # Submenú Aspecto
         self.aspect_submenu = QMenu(
             translation_service.tr("menu_aspect_menu"), self.preferences_menu
@@ -176,6 +204,7 @@ class MainMenuBar(QMenuBar):
         self.language_submenu.addAction(self.lang_en_action)
         self.language_submenu.addAction(self.lang_auto_action)
         self.preferences_menu.addMenu(self.language_submenu)
+
         self.addMenu(self.preferences_menu)
 
         # Menú Ayuda
@@ -257,6 +286,17 @@ class MainMenuBar(QMenuBar):
         self.lang_es_action.setText(translation_service.tr("menu_spanish"))
         self.lang_en_action.setText(translation_service.tr("menu_english"))
         self.lang_auto_action.setText(translation_service.tr("menu_auto_language"))
+        self.indicative_submenu.setTitle(translation_service.tr("menu_indicative_menu"))
+        self.set_callsign_action.setText(translation_service.tr("menu_set_callsign"))
+        self.callsign_saved_mode_action.setText(
+            translation_service.tr("menu_callsign_saved_mode")
+        )
+        self.callsign_always_ask_mode_action.setText(
+            translation_service.tr("menu_callsign_always_ask_mode")
+        )
+        self.callsign_display_action.setText(
+            translation_service.tr("menu_callsign_display")
+        )
 
         self.help_menu.setTitle(translation_service.tr("menu_help_menu"))
         self.about_action.setText(translation_service.tr("menu_about"))

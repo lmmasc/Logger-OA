@@ -35,6 +35,11 @@ MENUS_TRANSLATIONS = {
     "menu_new_concurso": "Nuevo concurso",
     "menu_open_operativo": "Abrir operativo",
     "menu_open_concurso": "Abrir concurso",
+    "menu_indicative_menu": "Indicativo",
+    "menu_set_callsign": "Setear indicativo",
+    "menu_callsign_saved_mode": "Usar guardado",
+    "menu_callsign_always_ask_mode": "Preguntar siempre",
+    "menu_callsign_display": "Indicativo guardado: {callsign}",
 }
 TABLE_HEADERS_TRANSLATIONS = {
     "table_header_callsign": "Indicativo",
@@ -215,6 +220,8 @@ UI_TRANSLATIONS = {
     "import_summary_ok": "Operadores procesados correctamente: {}",
     "import_summary_protected": "Protegidos (no deshabilitados por fecha): {}",
     "import_summary_unchanged": "Sin cambios: {}",
+    "set_callsign_dialog_title": "Setear indicativo",
+    "set_callsign_dialog_label": "Ingrese el nuevo indicativo:",
 }
 
 ALL_KEYS_TRANSLATIONS = {}

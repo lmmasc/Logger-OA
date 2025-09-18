@@ -8,10 +8,15 @@ Gestiona la UI, menús, vistas, temas, idioma y delega acciones a main_window_ac
 import os
 
 # Imports externos
-from PySide6.QtWidgets import QMainWindow, QApplication
+from PySide6.QtWidgets import QMainWindow, QApplication, QInputDialog
 
 # Imports internos: configuración, traducción, UI, acciones
-from config.settings_service import settings_service, LanguageValue, SettingsKey
+from config.settings_service import (
+    settings_service,
+    LanguageValue,
+    SettingsKey,
+    CallsignMode,
+)
 from translation.translation_service import translation_service
 from .themes.theme_manager import ThemeManager
 from .menu_bar import MainMenuBar
@@ -103,6 +108,9 @@ class MainWindow(QMainWindow):
 
         # Actualizar cabecera al cambiar idioma
         translation_service.signal.language_changed.connect(self._on_language_changed)
+
+        # Inicializar estado del submenú Indicative
+        self._set_initial_callsign_menu_state()
 
     # --- Gestión de vistas principales ---
     def show_view(self, view_id: ViewID) -> None:
@@ -242,6 +250,13 @@ class MainWindow(QMainWindow):
         self.menu_bar.db_backup_action.triggered.connect(self._on_db_backup)
         self.menu_bar.db_restore_action.triggered.connect(self._on_db_restore)
         self.menu_bar.db_import_db_action.triggered.connect(self._on_db_import_db)
+        self.menu_bar.set_callsign_action.triggered.connect(self._on_set_callsign)
+        self.menu_bar.callsign_saved_mode_action.triggered.connect(
+            self._on_callsign_saved_mode
+        )
+        self.menu_bar.callsign_always_ask_mode_action.triggered.connect(
+            self._on_callsign_always_ask_mode
+        )
 
     def _on_theme_selected(self, theme_key: str):
         from .main_window_config import (
@@ -305,6 +320,67 @@ class MainWindow(QMainWindow):
             self.log_contest_view.retranslate_ui()
         elif self.current_log_type == LogType.OPERATION_LOG:
             self.log_ops_view.retranslate_ui()
+
+    def _on_set_callsign(self):
+        """Muestra un diálogo para ingresar el indicativo y lo guarda con persistencia."""
+        from PySide6.QtWidgets import QInputDialog
+
+        current_callsign = str(settings_service.get_callsign())
+        dialog = QInputDialog(self)
+        dialog.setWindowTitle(translation_service.tr("set_callsign_dialog_title"))
+        dialog.setLabelText(translation_service.tr("set_callsign_dialog_label"))
+        dialog.setTextValue(current_callsign)
+        dialog.setMinimumWidth(350)
+        dialog.setMinimumHeight(150)
+
+        # Normalización en tiempo real
+        def normalize_text(text):
+            normalized = text.upper()
+            if text != normalized:
+                dialog.setTextValue(normalized)
+
+        dialog.textValueChanged.connect(normalize_text)
+        ok = dialog.exec()
+        callsign = dialog.textValue().upper()
+        if ok and callsign:
+            settings_service.set_callsign(callsign)
+            self._update_callsign_display()
+
+    def _on_callsign_saved_mode(self):
+        """Activa el modo 'saved' y actualiza la persistencia y la UI."""
+        settings_service.set_callsign_mode(CallsignMode.SAVED)
+        self.menu_bar.callsign_saved_mode_action.setChecked(True)
+        self.menu_bar.callsign_always_ask_mode_action.setChecked(False)
+        self._update_callsign_display()
+
+    def _on_callsign_always_ask_mode(self):
+        """Activa el modo 'always_ask' y actualiza la persistencia y la UI."""
+        settings_service.set_callsign_mode(CallsignMode.ALWAYS_ASK)
+        self.menu_bar.callsign_saved_mode_action.setChecked(False)
+        self.menu_bar.callsign_always_ask_mode_action.setChecked(True)
+        self._update_callsign_display()
+
+    def _update_callsign_display(self):
+        """Actualiza la acción de display para mostrar el indicativo guardado si corresponde."""
+        mode = settings_service.get_callsign_mode()
+        callsign = settings_service.get_callsign()
+        if mode == CallsignMode.SAVED:
+            self.menu_bar.callsign_display_action.setText(
+                self.tr(f"Saved callsign: {callsign}")
+            )
+            self.menu_bar.callsign_display_action.setVisible(True)
+        else:
+            self.menu_bar.callsign_display_action.setText("")
+            self.menu_bar.callsign_display_action.setVisible(False)
+
+    def _set_initial_callsign_menu_state(self):
+        """Inicializa el estado del submenú Indicative al iniciar la app."""
+        mode = settings_service.get_callsign_mode()
+        self.menu_bar.callsign_saved_mode_action.setChecked(mode == CallsignMode.SAVED)
+        self.menu_bar.callsign_always_ask_mode_action.setChecked(
+            mode == CallsignMode.ALWAYS_ASK
+        )
+        self._update_callsign_display()
 
 
 # Fin de main_window.py

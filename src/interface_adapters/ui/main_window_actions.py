@@ -20,6 +20,7 @@ from datetime import datetime
 # Imports internos
 from config.paths import get_database_path, get_log_dir, BASE_PATH, get_export_dir
 from config.defaults import OPERATIONS_DIR, CONTESTS_DIR
+from config.settings_service import settings_service, CallsignMode
 from translation.translation_service import translation_service
 from application.use_cases.update_operators_from_pdf import update_operators_from_pdf
 from application.use_cases.create_log import create_log
@@ -42,14 +43,17 @@ def action_log_new(self):
     """
     Crea un nuevo log (operativo o concurso) mediante diálogos.
     """
-    indicativo_dialog = EnterCallsignDialog(self)
-    if not indicativo_dialog.exec() or not indicativo_dialog.callsign:
-        self.current_log = None
-        self.current_log_type = None
-        self.show_view(ViewID.WELCOME_VIEW)
-        self.update_menu_state()
-        return
-    indicativo = {"callsign": indicativo_dialog.callsign}
+    callsign_mode = settings_service.get_callsign_mode()
+    if callsign_mode == CallsignMode.SAVED:
+        callsign = str(settings_service.get_callsign())
+    else:
+        indicativo_dialog = EnterCallsignDialog(self)
+        if not indicativo_dialog.exec() or not indicativo_dialog.callsign:
+            self.current_log = None
+            self.current_log_type = None
+            return
+        callsign = str(indicativo_dialog.callsign)
+    indicativo = {"callsign": callsign}
 
     contest_name = None
     contest_dialog = SelectContestDialog(self)
@@ -462,14 +466,18 @@ def action_log_new_operativo(self):
     )
     from application.use_cases.create_log import create_log
 
-    indicativo_dialog = EnterCallsignDialog(self)
-    if not indicativo_dialog.exec() or not indicativo_dialog.callsign:
-        self.current_log = None
-        self.current_log_type = None
-        self.show_view(ViewID.WELCOME_VIEW)
-        self.update_menu_state()
-        return
-    indicativo = indicativo_dialog.callsign
+    callsign_mode = settings_service.get_callsign_mode()
+    if callsign_mode == CallsignMode.SAVED:
+        indicativo = str(settings_service.get_callsign())
+    else:
+        indicativo_dialog = EnterCallsignDialog(self)
+        if not indicativo_dialog.exec() or not indicativo_dialog.callsign:
+            self.current_log = None
+            self.current_log_type = None
+            self.show_view(ViewID.WELCOME_VIEW)
+            self.update_menu_state()
+            return
+        indicativo = indicativo_dialog.callsign
     op_dialog = OperativoConfigDialog(self)
     if not op_dialog.exec():
         self.current_log = None
@@ -501,14 +509,18 @@ def action_log_new_concurso(self):
     from application.use_cases.create_log import create_log
     from translation.translation_service import translation_service
 
-    indicativo_dialog = EnterCallsignDialog(self)
-    if not indicativo_dialog.exec() or not indicativo_dialog.callsign:
-        self.current_log = None
-        self.current_log_type = None
-        self.show_view(ViewID.WELCOME_VIEW)
-        self.update_menu_state()
-        return
-    indicativo = indicativo_dialog.callsign
+    callsign_mode = settings_service.get_callsign_mode()
+    if callsign_mode == CallsignMode.SAVED:
+        indicativo = str(settings_service.get_callsign())
+    else:
+        indicativo_dialog = EnterCallsignDialog(self)
+        if not indicativo_dialog.exec() or not indicativo_dialog.callsign:
+            self.current_log = None
+            self.current_log_type = None
+            self.show_view(ViewID.WELCOME_VIEW)
+            self.update_menu_state()
+            return
+        indicativo = indicativo_dialog.callsign
     contest_dialog = SelectContestDialog(self)
     if not contest_dialog.exec():
         self.current_log = None

@@ -35,6 +35,11 @@ MENUS_TRANSLATIONS = {
     "menu_new_concurso": "New contest",
     "menu_open_operativo": "Open operation",
     "menu_open_concurso": "Open contest",
+    "menu_indicative_menu": "Callsign",
+    "menu_set_callsign": "Set callsign",
+    "menu_callsign_saved_mode": "Use saved",
+    "menu_callsign_always_ask_mode": "Always ask",
+    "menu_callsign_display": "Saved callsign: {callsign}",
 }
 TABLE_HEADERS_TRANSLATIONS = {
     "table_header_callsign": "Callsign",
@@ -215,6 +220,8 @@ UI_TRANSLATIONS = {
     "import_summary_ok": "Operators processed successfully: {}",
     "import_summary_protected": "Protected (not disabled due to date): {}",
     "import_summary_unchanged": "Unchanged: {}",
+    "set_callsign_dialog_title": "Set callsign",
+    "set_callsign_dialog_label": "Enter new callsign:",
 }
 
 ALL_KEYS_TRANSLATIONS = {}
