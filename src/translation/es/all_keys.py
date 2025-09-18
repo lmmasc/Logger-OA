@@ -31,6 +31,10 @@ MENUS_TRANSLATIONS = {
     "menu_export_db_csv": "Exportar .csv",
     "menu_manual": "Manual de uso",
     "menu_preferences_menu": "Preferencias",
+    "menu_new_operativo": "Nuevo operativo",
+    "menu_new_concurso": "Nuevo concurso",
+    "menu_open_operativo": "Abrir operativo",
+    "menu_open_concurso": "Abrir concurso",
 }
 TABLE_HEADERS_TRANSLATIONS = {
     "table_header_callsign": "Indicativo",
