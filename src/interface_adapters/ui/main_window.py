@@ -180,10 +180,15 @@ class MainWindow(QMainWindow):
         Habilita/deshabilita las acciones del menú según el estado del log abierto.
         """
         log_open = self.current_log is not None
+        # Deshabilitar acciones internas
         self.menu_bar.log_new_operativo_action.setEnabled(not log_open)
         self.menu_bar.log_new_concurso_action.setEnabled(not log_open)
         self.menu_bar.log_open_operativo_action.setEnabled(not log_open)
         self.menu_bar.log_open_concurso_action.setEnabled(not log_open)
+        # Deshabilitar submenús completos
+        self.menu_bar.new_menu.setEnabled(not log_open)
+        self.menu_bar.open_menu.setEnabled(not log_open)
+        # Exportar y cerrar solo si hay log abierto
         self.menu_bar.log_export_action.setEnabled(log_open)
         self.menu_bar.log_close_action.setEnabled(log_open)
 
