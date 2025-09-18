@@ -4,8 +4,13 @@ settings_service.py
 Servicio centralizado para la gestión de configuraciones de la aplicación usando QSettings.
 """
 
-from PySide6.QtCore import QSettings
+from PySide6.QtCore import QSettings, QObject, Signal
 from enum import Enum
+
+
+class SettingsSignals(QObject):
+    callsign_changed = Signal()
+    callsign_mode_changed = Signal()
 
 
 class SettingsService:
@@ -15,8 +20,8 @@ class SettingsService:
     """
 
     def __init__(self):
-        # Cambia estos valores por los de tu organización y app si lo deseas
         self.settings = QSettings("LoggerOA", "LoggerOAApp")
+        self.signal = SettingsSignals()
 
     def set_value(self, key, value):
         """Guarda un valor en la configuración."""
@@ -37,8 +42,9 @@ class SettingsService:
         return self.get_value(SettingsKey.CALLSIGN.value, default or DEFAULT_CALLSIGN)
 
     def set_callsign(self, callsign):
-        """Guarda el indicativo."""
+        """Guarda el indicativo y emite señal."""
         self.set_value(SettingsKey.CALLSIGN.value, callsign)
+        self.signal.callsign_changed.emit()
 
     def get_callsign_mode(self, default=None):
         """Obtiene el modo de indicativo guardado o el valor por defecto."""
@@ -50,11 +56,12 @@ class SettingsService:
         return CallsignMode(mode)
 
     def set_callsign_mode(self, mode):
-        """Guarda el modo de indicativo."""
+        """Guarda el modo de indicativo y emite señal."""
         if isinstance(mode, CallsignMode):
             self.set_value(SettingsKey.CALLSIGN_MODE.value, mode.value)
         else:
             self.set_value(SettingsKey.CALLSIGN_MODE.value, mode)
+        self.signal.callsign_mode_changed.emit()
 
 
 # Enum para las claves de configuración

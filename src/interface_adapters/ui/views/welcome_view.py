@@ -1,16 +1,26 @@
+"""
+WelcomeView
+
+Vista de bienvenida para Logger OA v2. Muestra un mensaje de bienvenida, el logo, créditos y el indicativo guardado si el modo está en 'Usar guardado'.
+El mensaje se actualiza automáticamente al cambiar el idioma, el indicativo o el modo de indicativo.
+"""
+
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QSpacerItem, QSizePolicy
 from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Qt
 from translation.translation_service import translation_service
 from utils.resources import get_resource_path
+from config.settings_service import settings_service, CallsignMode
 
 
 class WelcomeView(QWidget):
-
     def __init__(self, parent=None):
+        """
+        Inicializa la vista de bienvenida.
+        Muestra el mensaje de bienvenida, el logo, los créditos y el indicativo guardado si corresponde.
+        El mensaje se actualiza automáticamente al cambiar idioma, indicativo o modo de indicativo.
+        """
         super().__init__(parent)
-        from config.settings_service import settings_service, CallsignMode
-
         layout = QVBoxLayout()
         # Mensaje de bienvenida arriba
         welcome_text = translation_service.tr("welcome_message")
@@ -68,11 +78,15 @@ class WelcomeView(QWidget):
 
         self.setLayout(layout)
 
+        # Conexión de señales para actualización reactiva
         translation_service.signal.language_changed.connect(self.retranslate_ui)
+        settings_service.signal.callsign_changed.connect(self.retranslate_ui)
+        settings_service.signal.callsign_mode_changed.connect(self.retranslate_ui)
 
     def retranslate_ui(self):
-        from config.settings_service import settings_service, CallsignMode
-
+        """
+        Actualiza el mensaje de bienvenida y los créditos al cambiar idioma, indicativo o modo de indicativo.
+        """
         welcome_text = translation_service.tr("welcome_message")
         mode = settings_service.get_callsign_mode()
         if mode == CallsignMode.SAVED:
