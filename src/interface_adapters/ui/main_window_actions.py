@@ -39,53 +39,6 @@ from interface_adapters.ui.dialogs.export_format_dialog import ExportFormatDialo
 
 
 # --- Acciones de Log ---
-def action_log_new(self):
-    """
-    Crea un nuevo log (operativo o concurso) mediante diálogos.
-    """
-    callsign_mode = settings_service.get_callsign_mode()
-    if callsign_mode == CallsignMode.SAVED:
-        callsign = str(settings_service.get_callsign())
-    else:
-        indicativo_dialog = EnterCallsignDialog(self)
-        if not indicativo_dialog.exec() or not indicativo_dialog.callsign:
-            self.current_log = None
-            self.current_log_type = None
-            return
-        callsign = str(indicativo_dialog.callsign)
-    indicativo = {"callsign": callsign}
-
-    contest_name = None
-    contest_dialog = SelectContestDialog(self)
-    if not contest_dialog.exec():
-        self.current_log = None
-        self.current_log_type = None
-        self.show_view(ViewID.WELCOME_VIEW)
-        self.update_menu_state()
-        return
-    contest_name = contest_dialog.selected_contest
-
-    extra_kwargs = {}
-    contest_keys = [
-        "contest_world_radio_day",
-        "contest_independence_peru",
-        "contest_peruvian_ham_day",
-    ]
-    contest_index = contest_dialog.contest_box.currentIndex()
-    contest_key = contest_keys[contest_index]
-    extra_kwargs["contest_key"] = contest_key
-    extra_kwargs["name"] = translation_service.tr(contest_key)
-    extra_kwargs["metadata"] = {"contest_name_key": contest_key}
-
-    db_path, log = create_log(
-        LogType.CONTEST_LOG, indicativo["callsign"], **extra_kwargs
-    )
-    self.current_log = log
-    self.current_log_type = LogType.CONTEST_LOG
-    cabecera = f"{log.operator} - {contest_name} - {log.start_time}"
-    self.setWindowTitle(cabecera)
-    self.show_view(ViewID.LOG_CONTEST_VIEW)
-    self.update_menu_state()
 
 
 def action_log_open(self):
@@ -436,7 +389,7 @@ def on_menu_action(self, action: str):
     Ejecuta la acción correspondiente según el string recibido.
     """
     action_map = {
-        "log_new": self.action_log_new,
+        # "log_new": self.action_log_new,  # Eliminado
         "log_open": self.action_log_open,
         "log_export": self.action_log_export,
         "log_close": self.action_log_close,
