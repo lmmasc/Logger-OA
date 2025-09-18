@@ -413,11 +413,7 @@ def action_log_new_operativo(self):
     """
     Crea un nuevo log operativo directamente, sin diálogo de selección de tipo.
     """
-    from interface_adapters.ui.dialogs.enter_callsign_dialog import EnterCallsignDialog
-    from interface_adapters.ui.dialogs.operativo_config_dialog import (
-        OperativoConfigDialog,
-    )
-    from application.use_cases.create_log import create_log
+    # ...existing code...
 
     callsign_mode = settings_service.get_callsign_mode()
     if callsign_mode == CallsignMode.SAVED:
@@ -457,10 +453,7 @@ def action_log_new_concurso(self):
     """
     Crea un nuevo log concurso directamente, sin diálogo de selección de tipo.
     """
-    from interface_adapters.ui.dialogs.enter_callsign_dialog import EnterCallsignDialog
-    from interface_adapters.ui.dialogs.select_contest_dialog import SelectContestDialog
-    from application.use_cases.create_log import create_log
-    from translation.translation_service import translation_service
+    # ...existing code...
 
     callsign_mode = settings_service.get_callsign_mode()
     if callsign_mode == CallsignMode.SAVED:
@@ -507,12 +500,7 @@ def action_log_open_operativo(self):
     """
     Abre un log operativo existente directamente, sin diálogo de selección de tipo.
     """
-    import os
-    from config.defaults import OPERATIONS_DIR
-    from config.paths import get_log_dir
-    from application.use_cases.open_log import open_log
-    from PySide6.QtWidgets import QFileDialog, QMessageBox
-    from translation.translation_service import translation_service
+    # ...existing code...
 
     log_folder = os.path.join(get_log_dir(), OPERATIONS_DIR)
     os.makedirs(log_folder, exist_ok=True)
@@ -548,12 +536,7 @@ def action_log_open_concurso(self):
     """
     Abre un log concurso existente directamente, sin diálogo de selección de tipo.
     """
-    import os
-    from config.defaults import CONTESTS_DIR
-    from config.paths import get_log_dir
-    from application.use_cases.open_log import open_log
-    from PySide6.QtWidgets import QFileDialog, QMessageBox
-    from translation.translation_service import translation_service
+    # ...existing code...
 
     log_folder = os.path.join(get_log_dir(), CONTESTS_DIR)
     os.makedirs(log_folder, exist_ok=True)
