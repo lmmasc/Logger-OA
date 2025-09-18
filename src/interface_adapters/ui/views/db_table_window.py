@@ -35,22 +35,22 @@ class DBTableWindow(QWidget):
     Permite filtrar, editar, agregar y eliminar operadores, con persistencia de configuración y soporte multilenguaje.
     """
 
-    COLUMN_KEYS = [
-        "callsign",
-        "name",
-        "category",
-        "type",
-        "region",
-        "district",
-        "province",
-        "department",
-        "license",
-        "resolution",
-        "expiration_date",
-        "cutoff_date",
-        "enabled",
-        "country",
-        "updated_at",
+    COLUMNS = [
+        {"key": "callsign", "translation": "db_table_header_callsign"},
+        {"key": "name", "translation": "db_table_header_name"},
+        {"key": "category", "translation": "db_table_header_category"},
+        {"key": "type", "translation": "db_table_header_type"},
+        {"key": "region", "translation": "db_table_header_region"},
+        {"key": "district", "translation": "db_table_header_district"},
+        {"key": "province", "translation": "db_table_header_province"},
+        {"key": "department", "translation": "db_table_header_department"},
+        {"key": "license", "translation": "db_table_header_license"},
+        {"key": "resolution", "translation": "db_table_header_resolution"},
+        {"key": "expiration_date", "translation": "db_table_header_expiration_date"},
+        {"key": "cutoff_date", "translation": "db_table_header_cutoff_date"},
+        {"key": "enabled", "translation": "db_table_header_enabled"},
+        {"key": "country", "translation": "db_table_header_country"},
+        {"key": "updated_at", "translation": "db_table_header_updated_at"},
     ]
 
     # --- Inicialización y eventos principales ---
@@ -96,18 +96,19 @@ class DBTableWindow(QWidget):
         self.checkbox_layout = QGridLayout()  # Cambiado de QHBoxLayout a QGridLayout
         self.column_checkboxes = []
         self.headers = self.get_translated_headers()
+        column_keys = [col["key"] for col in self.COLUMNS]
         col_visible = settings_service.get_value("db_table_column_visible_dict", None)
         if not col_visible or not isinstance(col_visible, dict):
-            col_visible = {k: True for k in self.COLUMN_KEYS}
+            col_visible = {k: True for k in column_keys}
         col_visible["callsign"] = True
         col_visible["name"] = True
         # --- Distribuir los checkboxes en dos filas ---
-        num_cols = len(self.COLUMN_KEYS)
+        num_cols = len(column_keys)
         split = num_cols // 2 + num_cols % 2  # Primera fila más si es impar
-        for idx, key in enumerate(self.COLUMN_KEYS):
+        for idx, coldef in enumerate(self.COLUMNS):
+            key = coldef["key"]
             cb = QCheckBox(self.headers[idx])
             cb.setObjectName(key)
-            # Eliminar la lógica que los deshabilita y los deja siempre activos
             cb.setChecked(bool(col_visible.get(key, True)))
             cb.stateChanged.connect(partial(self.toggle_column, idx))
             self.column_checkboxes.append(cb)
@@ -199,9 +200,7 @@ class DBTableWindow(QWidget):
         """
         Devuelve la lista de headers traducidos para la tabla y los checkboxes.
         """
-        return [
-            translation_service.tr(f"table_header_{key}") for key in self.COLUMN_KEYS
-        ]
+        return [translation_service.tr(col["translation"]) for col in self.COLUMNS]
 
     # --- Métodos de visibilidad y checkboxes ---
     def toggle_column(self, col, state):
@@ -210,11 +209,12 @@ class DBTableWindow(QWidget):
         """
         if self._updating_ui:
             return
-        key = self.COLUMN_KEYS[col]
+        column_keys = [col["key"] for col in self.COLUMNS]
+        key = column_keys[col]
         col_visible = settings_service.get_value("db_table_column_visible_dict", None)
         if not col_visible or not isinstance(col_visible, dict):
-            col_visible = {k: True for k in self.COLUMN_KEYS}
-        for idx, key in enumerate(self.COLUMN_KEYS):
+            col_visible = {k: True for k in column_keys}
+        for idx, key in enumerate(column_keys):
             col_visible[key] = self.column_checkboxes[idx].isChecked()
         settings_service.set_value("db_table_column_visible_dict", col_visible)
         self.apply_column_visibility()
@@ -223,12 +223,13 @@ class DBTableWindow(QWidget):
         """
         Aplica la visibilidad de columnas según el estado de los checkboxes.
         """
+        column_keys = [col["key"] for col in self.COLUMNS]
         if self.table.columnCount() != len(self.column_checkboxes):
             return
         vis_states = {}
         for idx, cb in enumerate(self.column_checkboxes):
             self.table.setColumnHidden(idx, not cb.isChecked())
-            vis_states[self.COLUMN_KEYS[idx]] = cb.isChecked()
+            vis_states[column_keys[idx]] = cb.isChecked()
 
     # --- Métodos de filtro ---
     def apply_filter(self):
@@ -275,8 +276,9 @@ class DBTableWindow(QWidget):
         self.table.setHorizontalHeaderLabels(headers)
         self.filter_column_combo.clear()
         self.filter_column_combo.addItems(headers)
+        column_keys = [col["key"] for col in self.COLUMNS]
         for row_idx, op in enumerate(operators):
-            for col_idx, key in enumerate(self.COLUMN_KEYS):
+            for col_idx, key in enumerate(column_keys):
                 if key == "enabled":
                     display = (
                         translation_service.tr("yes")
