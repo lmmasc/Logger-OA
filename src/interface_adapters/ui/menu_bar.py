@@ -45,27 +45,25 @@ class MainMenuBar(QMenuBar):
         self._connect_signals()
 
     def _create_menus(self):
-        # Menú Archivo
+        # Menú Archivo (ahora incluye acciones de Log)
         self.file_menu = QMenu(translation_service.tr("menu_file_menu"), self)
+        self.log_new_action = QAction(translation_service.tr("menu_new"), self)
+        self.file_menu.addAction(self.log_new_action)
+        self.log_open_action = QAction(translation_service.tr("menu_open"), self)
+        self.file_menu.addAction(self.log_open_action)
+        self.log_export_action = QAction(translation_service.tr("menu_export"), self)
+        self.file_menu.addAction(self.log_export_action)
+        self.log_close_action = QAction(translation_service.tr("menu_close"), self)
+        self.file_menu.addAction(self.log_close_action)
+        self.file_menu.addSeparator()
         self.open_folder_action = QAction(
             translation_service.tr("menu_open_folder"), self
         )
         self.file_menu.addAction(self.open_folder_action)
+        self.file_menu.addSeparator()
         self.exit_action = QAction(translation_service.tr("menu_exit"), self)
         self.file_menu.addAction(self.exit_action)
         self.addMenu(self.file_menu)
-
-        # Menú Log unificado
-        self.log_menu = QMenu(translation_service.tr("menu_log_menu"), self)
-        self.log_new_action = QAction(translation_service.tr("menu_new"), self)
-        self.log_open_action = QAction(translation_service.tr("menu_open"), self)
-        self.log_export_action = QAction(translation_service.tr("menu_export"), self)
-        self.log_close_action = QAction(translation_service.tr("menu_close"), self)
-        self.log_menu.addAction(self.log_new_action)
-        self.log_menu.addAction(self.log_open_action)
-        self.log_menu.addAction(self.log_export_action)
-        self.log_menu.addAction(self.log_close_action)
-        self.addMenu(self.log_menu)
 
         # Menú Base de datos
         self.database_menu = QMenu(translation_service.tr("menu_database_menu"), self)
@@ -195,7 +193,6 @@ class MainMenuBar(QMenuBar):
         self.file_menu.setTitle(translation_service.tr("menu_file_menu"))
         self.open_folder_action.setText(translation_service.tr("menu_open_folder"))
         self.exit_action.setText(translation_service.tr("menu_exit"))
-        self.log_menu.setTitle(translation_service.tr("menu_log_menu"))
         self.log_new_action.setText(translation_service.tr("menu_new"))
         self.log_open_action.setText(translation_service.tr("menu_open"))
         self.log_export_action.setText(translation_service.tr("menu_export"))
