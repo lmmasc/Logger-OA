@@ -20,8 +20,10 @@ from .views.log_ops_view import LogOpsView
 from .views.log_contest_view import LogContestView
 from .view_manager import ViewManager, ViewID, LogType
 from .main_window_actions import (
-    action_log_new,
-    action_log_open,
+    action_log_new_operativo,
+    action_log_new_concurso,
+    action_log_open_operativo,
+    action_log_open_concurso,
     action_log_export,
     action_log_close,
     action_db_import_pdf,
@@ -178,8 +180,10 @@ class MainWindow(QMainWindow):
         Habilita/deshabilita las acciones del menú según el estado del log abierto.
         """
         log_open = self.current_log is not None
-        self.menu_bar.log_new_action.setEnabled(not log_open)
-        self.menu_bar.log_open_action.setEnabled(not log_open)
+        self.menu_bar.log_new_operativo_action.setEnabled(not log_open)
+        self.menu_bar.log_new_concurso_action.setEnabled(not log_open)
+        self.menu_bar.log_open_operativo_action.setEnabled(not log_open)
+        self.menu_bar.log_open_concurso_action.setEnabled(not log_open)
         self.menu_bar.log_export_action.setEnabled(log_open)
         self.menu_bar.log_close_action.setEnabled(log_open)
 
@@ -209,8 +213,19 @@ class MainWindow(QMainWindow):
         self.menu_bar.lang_auto_requested.connect(
             lambda: self.set_language(LanguageValue.AUTO)
         )
-        self.menu_bar.log_new_requested.connect(lambda: action_log_new(self))
-        self.menu_bar.log_open_requested.connect(lambda: action_log_open(self))
+        # Nuevos handlers para submenús
+        self.menu_bar.log_new_operativo_requested.connect(
+            lambda: action_log_new_operativo(self)
+        )
+        self.menu_bar.log_new_concurso_requested.connect(
+            lambda: action_log_new_concurso(self)
+        )
+        self.menu_bar.log_open_operativo_requested.connect(
+            lambda: action_log_open_operativo(self)
+        )
+        self.menu_bar.log_open_concurso_requested.connect(
+            lambda: action_log_open_concurso(self)
+        )
         self.menu_bar.log_export_requested.connect(lambda: action_log_export(self))
         self.menu_bar.log_close_requested.connect(lambda: action_log_close(self))
         self.menu_bar.db_import_pdf_requested.connect(

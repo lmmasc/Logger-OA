@@ -37,6 +37,10 @@ class MainMenuBar(QMenuBar):
     lang_en_requested = Signal()
     lang_auto_requested = Signal()
     manual_requested = Signal()
+    log_new_operativo_requested = Signal()
+    log_new_concurso_requested = Signal()
+    log_open_operativo_requested = Signal()
+    log_open_concurso_requested = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -47,10 +51,30 @@ class MainMenuBar(QMenuBar):
     def _create_menus(self):
         # Menú Archivo (ahora incluye acciones de Log)
         self.file_menu = QMenu(translation_service.tr("menu_file_menu"), self)
-        self.log_new_action = QAction(translation_service.tr("menu_new"), self)
-        self.file_menu.addAction(self.log_new_action)
-        self.log_open_action = QAction(translation_service.tr("menu_open"), self)
-        self.file_menu.addAction(self.log_open_action)
+        # Submenú Nuevo
+        self.new_menu = QMenu(translation_service.tr("menu_new"), self.file_menu)
+        self.log_new_operativo_action = QAction(
+            translation_service.tr("menu_new_operativo"), self
+        )
+        self.log_new_concurso_action = QAction(
+            translation_service.tr("menu_new_concurso"), self
+        )
+        self.new_menu.addAction(self.log_new_operativo_action)
+        self.new_menu.addAction(self.log_new_concurso_action)
+        self.file_menu.addMenu(self.new_menu)
+
+        # Submenú Abrir
+        self.open_menu = QMenu(translation_service.tr("menu_open"), self.file_menu)
+        self.log_open_operativo_action = QAction(
+            translation_service.tr("menu_open_operativo"), self
+        )
+        self.log_open_concurso_action = QAction(
+            translation_service.tr("menu_open_concurso"), self
+        )
+        self.open_menu.addAction(self.log_open_operativo_action)
+        self.open_menu.addAction(self.log_open_concurso_action)
+        self.file_menu.addMenu(self.open_menu)
+
         self.log_export_action = QAction(translation_service.tr("menu_export"), self)
         self.file_menu.addAction(self.log_export_action)
         self.log_close_action = QAction(translation_service.tr("menu_close"), self)
@@ -163,11 +187,18 @@ class MainMenuBar(QMenuBar):
         self.addMenu(self.help_menu)
 
     def _connect_signals(self):
-        """
-        Conecta las acciones del menú a las señales personalizadas.
-        """
-        self.log_new_action.triggered.connect(self.log_new_requested.emit)
-        self.log_open_action.triggered.connect(self.log_open_requested.emit)
+        self.log_new_operativo_action.triggered.connect(
+            self.log_new_operativo_requested.emit
+        )
+        self.log_new_concurso_action.triggered.connect(
+            self.log_new_concurso_requested.emit
+        )
+        self.log_open_operativo_action.triggered.connect(
+            self.log_open_operativo_requested.emit
+        )
+        self.log_open_concurso_action.triggered.connect(
+            self.log_open_concurso_requested.emit
+        )
         self.log_export_action.triggered.connect(self.log_export_requested.emit)
         self.log_close_action.triggered.connect(self.log_close_requested.emit)
         self.db_import_pdf_action.triggered.connect(self.db_import_pdf_requested.emit)
@@ -177,7 +208,6 @@ class MainMenuBar(QMenuBar):
         self.open_folder_action.triggered.connect(self.open_folder_requested.emit)
         self.about_action.triggered.connect(self.about_requested.emit)
         self.exit_action.triggered.connect(self.exit_requested.emit)
-        # Preferencias (Aspecto e Idioma)
         self.light_theme_action.triggered.connect(self.light_theme_requested.emit)
         self.dark_theme_action.triggered.connect(self.dark_theme_requested.emit)
         self.auto_theme_action.triggered.connect(self.auto_theme_requested.emit)
@@ -187,14 +217,23 @@ class MainMenuBar(QMenuBar):
         self.manual_action.triggered.connect(self.manual_requested.emit)
 
     def retranslate_ui(self):
-        """
-        Actualiza los textos de todos los menús y acciones según el idioma actual.
-        """
         self.file_menu.setTitle(translation_service.tr("menu_file_menu"))
         self.open_folder_action.setText(translation_service.tr("menu_open_folder"))
         self.exit_action.setText(translation_service.tr("menu_exit"))
-        self.log_new_action.setText(translation_service.tr("menu_new"))
-        self.log_open_action.setText(translation_service.tr("menu_open"))
+        self.new_menu.setTitle(translation_service.tr("menu_new"))
+        self.log_new_operativo_action.setText(
+            translation_service.tr("menu_new_operativo")
+        )
+        self.log_new_concurso_action.setText(
+            translation_service.tr("menu_new_concurso")
+        )
+        self.open_menu.setTitle(translation_service.tr("menu_open"))
+        self.log_open_operativo_action.setText(
+            translation_service.tr("menu_open_operativo")
+        )
+        self.log_open_concurso_action.setText(
+            translation_service.tr("menu_open_concurso")
+        )
         self.log_export_action.setText(translation_service.tr("menu_export"))
         self.log_close_action.setText(translation_service.tr("menu_close"))
 

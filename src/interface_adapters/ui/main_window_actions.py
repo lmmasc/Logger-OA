@@ -25,11 +25,7 @@ from application.use_cases.update_operators_from_pdf import update_operators_fro
 from application.use_cases.create_log import create_log
 from application.use_cases.open_log import open_log
 from application.use_cases import export_log
-from interface_adapters.ui.dialogs.select_log_type_dialog import SelectLogTypeDialog
 from interface_adapters.ui.dialogs.wait_dialog import WaitDialog
-from interface_adapters.ui.dialogs.select_log_type_dialog_open import (
-    SelectLogTypeDialogOpen,
-)
 from interface_adapters.ui.dialogs.select_contest_dialog import SelectContestDialog
 from interface_adapters.ui.dialogs.enter_callsign_dialog import EnterCallsignDialog
 from interface_adapters.ui.dialogs.operativo_config_dialog import OperativoConfigDialog
@@ -46,81 +42,45 @@ def action_log_new(self):
     """
     Crea un nuevo log (operativo o concurso) mediante diálogos.
     """
-    # Diálogo modularizado para seleccionar tipo de log
-    dialog = SelectLogTypeDialog(self)
-    if not dialog.exec():
+    indicativo_dialog = EnterCallsignDialog(self)
+    if not indicativo_dialog.exec() or not indicativo_dialog.callsign:
         self.current_log = None
         self.current_log_type = None
         self.show_view(ViewID.WELCOME_VIEW)
         self.update_menu_state()
         return
-    selected = {"type": dialog.selected_type}  # dialog.selected_type ya es LogType Enum
+    indicativo = {"callsign": indicativo_dialog.callsign}
+
     contest_name = None
-    if selected["type"]:
-        indicativo_dialog = EnterCallsignDialog(self)
-        if not indicativo_dialog.exec() or not indicativo_dialog.callsign:
-            self.current_log = None
-            self.current_log_type = None
-            self.show_view(ViewID.WELCOME_VIEW)
-            self.update_menu_state()
-            return
-        indicativo = {"callsign": indicativo_dialog.callsign}
-
-        if selected["type"] == LogType.CONTEST_LOG:
-            contest_dialog = SelectContestDialog(self)
-            if not contest_dialog.exec():
-                self.current_log = None
-                self.current_log_type = None
-                self.show_view(ViewID.WELCOME_VIEW)
-                self.update_menu_state()
-                return
-            contest_name = contest_dialog.selected_contest
-
-        extra_kwargs = {}
-        if selected["type"] == LogType.CONTEST_LOG:
-            contest_keys = [
-                "contest_world_radio_day",
-                "contest_independence_peru",
-                "contest_peruvian_ham_day",
-            ]
-            contest_index = contest_dialog.contest_box.currentIndex()
-            contest_key = contest_keys[contest_index]
-            extra_kwargs["contest_key"] = contest_key
-            extra_kwargs["name"] = translation_service.tr(contest_key)
-            extra_kwargs["metadata"] = {"contest_name_key": contest_key}
-        elif selected["type"] == LogType.OPERATION_LOG:
-            op_dialog = OperativoConfigDialog(self)
-            if not op_dialog.exec():
-                return  # Cancelado
-            operativo_config = op_dialog.get_config()
-            extra_kwargs["operation_type"] = operativo_config.get(
-                "operation_type", "type"
-            )
-            extra_kwargs["frequency_band"] = operativo_config.get(
-                "frequency_band", "band"
-            )
-            extra_kwargs["repeater_key"] = operativo_config.get("repeater_key", None)
-            extra_kwargs["metadata"] = operativo_config
-        db_path, log = create_log(
-            selected["type"], indicativo["callsign"], **extra_kwargs
-        )
-        self.current_log = log
-        self.current_log_type = selected["type"]
-        if self.current_log_type == LogType.CONTEST_LOG:
-            cabecera = f"{log.operator} - {contest_name} - {log.start_time}"
-            self.setWindowTitle(cabecera)
-        else:
-            self.setWindowTitle(f"{log.operator} - Operativo - {log.start_time}")
-        if self.current_log_type == LogType.OPERATION_LOG:
-            self.show_view(ViewID.LOG_OPS_VIEW)
-        elif self.current_log_type == LogType.CONTEST_LOG:
-            self.show_view(ViewID.LOG_CONTEST_VIEW)
-        else:
-            self.show_view(ViewID.WELCOME_VIEW)
-    else:
+    contest_dialog = SelectContestDialog(self)
+    if not contest_dialog.exec():
         self.current_log = None
         self.current_log_type = None
         self.show_view(ViewID.WELCOME_VIEW)
+        self.update_menu_state()
+        return
+    contest_name = contest_dialog.selected_contest
+
+    extra_kwargs = {}
+    contest_keys = [
+        "contest_world_radio_day",
+        "contest_independence_peru",
+        "contest_peruvian_ham_day",
+    ]
+    contest_index = contest_dialog.contest_box.currentIndex()
+    contest_key = contest_keys[contest_index]
+    extra_kwargs["contest_key"] = contest_key
+    extra_kwargs["name"] = translation_service.tr(contest_key)
+    extra_kwargs["metadata"] = {"contest_name_key": contest_key}
+
+    db_path, log = create_log(
+        LogType.CONTEST_LOG, indicativo["callsign"], **extra_kwargs
+    )
+    self.current_log = log
+    self.current_log_type = LogType.CONTEST_LOG
+    cabecera = f"{log.operator} - {contest_name} - {log.start_time}"
+    self.setWindowTitle(cabecera)
+    self.show_view(ViewID.LOG_CONTEST_VIEW)
     self.update_menu_state()
 
 
@@ -128,18 +88,13 @@ def action_log_open(self):
     """
     Abre un log existente, seleccionando tipo y archivo.
     """
-    # Usar diálogo modularizado para seleccionar tipo de log
-    dialog = SelectLogTypeDialogOpen(self)
-    if not dialog.exec() or not dialog.selected_type:
-        self.current_log = None
-        self.current_log_type = None
-        self.show_view(ViewID.WELCOME_VIEW)
-        self.update_menu_state()
-        return
-    selected_type = dialog.selected_type
     log_folder = os.path.join(
         get_log_dir(),
-        OPERATIONS_DIR if selected_type == LogType.OPERATION_LOG else CONTESTS_DIR,
+        (
+            OPERATIONS_DIR
+            if self.current_log_type == LogType.OPERATION_LOG
+            else CONTESTS_DIR
+        ),
     )
     os.makedirs(log_folder, exist_ok=True)
     file_path, _ = QFileDialog.getOpenFileName(
@@ -495,3 +450,171 @@ def on_menu_action(self, action: str):
         handler()
     else:
         QMessageBox.warning(self, "Acción no implementada", f"No handler for {action}")
+
+
+def action_log_new_operativo(self):
+    """
+    Crea un nuevo log operativo directamente, sin diálogo de selección de tipo.
+    """
+    from interface_adapters.ui.dialogs.enter_callsign_dialog import EnterCallsignDialog
+    from interface_adapters.ui.dialogs.operativo_config_dialog import (
+        OperativoConfigDialog,
+    )
+    from application.use_cases.create_log import create_log
+
+    indicativo_dialog = EnterCallsignDialog(self)
+    if not indicativo_dialog.exec() or not indicativo_dialog.callsign:
+        self.current_log = None
+        self.current_log_type = None
+        self.show_view(ViewID.WELCOME_VIEW)
+        self.update_menu_state()
+        return
+    indicativo = indicativo_dialog.callsign
+    op_dialog = OperativoConfigDialog(self)
+    if not op_dialog.exec():
+        self.current_log = None
+        self.current_log_type = None
+        self.show_view(ViewID.WELCOME_VIEW)
+        self.update_menu_state()
+        return
+    operativo_config = op_dialog.get_config()
+    extra_kwargs = {
+        "operation_type": operativo_config.get("operation_type", "type"),
+        "frequency_band": operativo_config.get("frequency_band", "band"),
+        "repeater_key": operativo_config.get("repeater_key", None),
+        "metadata": operativo_config,
+    }
+    db_path, log = create_log(LogType.OPERATION_LOG, indicativo, **extra_kwargs)
+    self.current_log = log
+    self.current_log_type = LogType.OPERATION_LOG
+    self.setWindowTitle(f"{log.operator} - Operativo - {log.start_time}")
+    self.show_view(ViewID.LOG_OPS_VIEW)
+    self.update_menu_state()
+
+
+def action_log_new_concurso(self):
+    """
+    Crea un nuevo log concurso directamente, sin diálogo de selección de tipo.
+    """
+    from interface_adapters.ui.dialogs.enter_callsign_dialog import EnterCallsignDialog
+    from interface_adapters.ui.dialogs.select_contest_dialog import SelectContestDialog
+    from application.use_cases.create_log import create_log
+    from translation.translation_service import translation_service
+
+    indicativo_dialog = EnterCallsignDialog(self)
+    if not indicativo_dialog.exec() or not indicativo_dialog.callsign:
+        self.current_log = None
+        self.current_log_type = None
+        self.show_view(ViewID.WELCOME_VIEW)
+        self.update_menu_state()
+        return
+    indicativo = indicativo_dialog.callsign
+    contest_dialog = SelectContestDialog(self)
+    if not contest_dialog.exec():
+        self.current_log = None
+        self.current_log_type = None
+        self.show_view(ViewID.WELCOME_VIEW)
+        self.update_menu_state()
+        return
+    contest_name = contest_dialog.selected_contest
+    contest_keys = [
+        "contest_world_radio_day",
+        "contest_independence_peru",
+        "contest_peruvian_ham_day",
+    ]
+    contest_index = contest_dialog.contest_box.currentIndex()
+    contest_key = contest_keys[contest_index]
+    extra_kwargs = {
+        "contest_key": contest_key,
+        "name": translation_service.tr(contest_key),
+        "metadata": {"contest_name_key": contest_key},
+    }
+    db_path, log = create_log(LogType.CONTEST_LOG, indicativo, **extra_kwargs)
+    self.current_log = log
+    self.current_log_type = LogType.CONTEST_LOG
+    cabecera = f"{log.operator} - {contest_name} - {log.start_time}"
+    self.setWindowTitle(cabecera)
+    self.show_view(ViewID.LOG_CONTEST_VIEW)
+    self.update_menu_state()
+
+
+def action_log_open_operativo(self):
+    """
+    Abre un log operativo existente directamente, sin diálogo de selección de tipo.
+    """
+    import os
+    from config.defaults import OPERATIONS_DIR
+    from config.paths import get_log_dir
+    from application.use_cases.open_log import open_log
+    from PySide6.QtWidgets import QFileDialog, QMessageBox
+    from translation.translation_service import translation_service
+
+    log_folder = os.path.join(get_log_dir(), OPERATIONS_DIR)
+    os.makedirs(log_folder, exist_ok=True)
+    file_path, _ = QFileDialog.getOpenFileName(
+        self,
+        translation_service.tr("open_log"),
+        log_folder,
+        "SQLite Files (*.sqlite);;All Files (*)",
+    )
+    if file_path:
+        try:
+            log = open_log(file_path)
+            self.current_log = log
+            self.current_log_type = LogType.OPERATION_LOG
+            self.show_view(ViewID.LOG_OPS_VIEW)
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                translation_service.tr("main_window_title"),
+                f"{translation_service.tr('open_failed')}: {e}",
+            )
+            self.current_log = None
+            self.current_log_type = None
+            self.show_view(ViewID.WELCOME_VIEW)
+    else:
+        self.current_log = None
+        self.current_log_type = None
+        self.show_view(ViewID.WELCOME_VIEW)
+    self.update_menu_state()
+
+
+def action_log_open_concurso(self):
+    """
+    Abre un log concurso existente directamente, sin diálogo de selección de tipo.
+    """
+    import os
+    from config.defaults import CONTESTS_DIR
+    from config.paths import get_log_dir
+    from application.use_cases.open_log import open_log
+    from PySide6.QtWidgets import QFileDialog, QMessageBox
+    from translation.translation_service import translation_service
+
+    log_folder = os.path.join(get_log_dir(), CONTESTS_DIR)
+    os.makedirs(log_folder, exist_ok=True)
+    file_path, _ = QFileDialog.getOpenFileName(
+        self,
+        translation_service.tr("open_log"),
+        log_folder,
+        "SQLite Files (*.sqlite);;All Files (*)",
+    )
+    if file_path:
+        try:
+            log = open_log(file_path)
+            self.current_log = log
+            self.current_log_type = LogType.CONTEST_LOG
+            self.show_view(ViewID.LOG_CONTEST_VIEW)
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                translation_service.tr("main_window_title"),
+                f"{translation_service.tr('open_failed')}: {e}",
+            )
+            self.current_log = None
+            self.current_log_type = None
+            self.show_view(ViewID.WELCOME_VIEW)
+    else:
+        self.current_log = None
+        self.current_log_type = None
+        self.show_view(ViewID.WELCOME_VIEW)
+    self.update_menu_state()
