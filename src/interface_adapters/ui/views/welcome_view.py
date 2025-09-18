@@ -9,9 +9,16 @@ class WelcomeView(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        from config.settings_service import settings_service, CallsignMode
+
         layout = QVBoxLayout()
         # Mensaje de bienvenida arriba
-        self.label = QLabel(translation_service.tr("welcome_message"))
+        welcome_text = translation_service.tr("welcome_message")
+        mode = settings_service.get_callsign_mode()
+        if mode == CallsignMode.SAVED:
+            callsign = str(settings_service.get_callsign())
+            welcome_text += f" ({callsign})"
+        self.label = QLabel(welcome_text)
         self.label.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop
         )
@@ -64,5 +71,12 @@ class WelcomeView(QWidget):
         translation_service.signal.language_changed.connect(self.retranslate_ui)
 
     def retranslate_ui(self):
-        self.label.setText(translation_service.tr("welcome_message"))
+        from config.settings_service import settings_service, CallsignMode
+
+        welcome_text = translation_service.tr("welcome_message")
+        mode = settings_service.get_callsign_mode()
+        if mode == CallsignMode.SAVED:
+            callsign = str(settings_service.get_callsign())
+            welcome_text += f" ({callsign})"
+        self.label.setText(welcome_text)
         self.credits_label.setText(translation_service.tr("credits_message"))
