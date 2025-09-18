@@ -46,36 +46,52 @@ class ContactTableWidget(QWidget):
         # Evitar que la tabla reciba el foco por tabulación si no es interactiva
         self.table.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
+    # Definición de columnas y claves de traducción diferenciadas
+    LOG_CONTEST_COLUMNS = [
+        {"key": "callsign", "translation": "log_contest_table_header_callsign"},
+        {"key": "name", "translation": "log_contest_table_header_name"},
+        {"key": "region", "translation": "log_contest_table_header_region"},
+        {"key": "qtr_oa", "translation": "log_contest_table_header_qtr_oa"},
+        {"key": "rs_rx", "translation": "log_contest_table_header_rs_rx"},
+        {
+            "key": "exchange_received",
+            "translation": "log_contest_table_header_exchange_received",
+        },
+        {"key": "rs_tx", "translation": "log_contest_table_header_rs_tx"},
+        {
+            "key": "exchange_sent",
+            "translation": "log_contest_table_header_exchange_sent",
+        },
+        {"key": "observations", "translation": "log_contest_table_header_observations"},
+    ]
+    LOG_OPERATIVE_COLUMNS = [
+        {"key": "callsign", "translation": "log_operative_table_header_callsign"},
+        {"key": "name", "translation": "log_operative_table_header_name"},
+        {"key": "country", "translation": "log_operative_table_header_country"},
+        {"key": "region", "translation": "log_operative_table_header_region"},
+        {"key": "station", "translation": "log_operative_table_header_station"},
+        {"key": "energy", "translation": "log_operative_table_header_energy"},
+        {"key": "power", "translation": "log_operative_table_header_power"},
+        {"key": "rs_rx", "translation": "log_operative_table_header_rs_rx"},
+        {"key": "rs_tx", "translation": "log_operative_table_header_rs_tx"},
+        {"key": "qtr_oa", "translation": "log_operative_table_header_qtr_oa"},
+        {"key": "qtr_utc", "translation": "log_operative_table_header_qtr_utc"},
+        {"key": "obs", "translation": "log_operative_table_header_obs"},
+    ]
+
     def set_columns(self):
         """
         Configura los headers de la tabla según el tipo de log (operativo o concurso).
         """
         if self.log_type == LogType.CONTEST_LOG:
             headers = [
-                translation_service.tr("table_header_callsign"),
-                translation_service.tr("ui_name_label"),
-                translation_service.tr("region"),
-                "QTR",
-                translation_service.tr("rs_rx"),
-                translation_service.tr("table_header_exchange_rx"),
-                translation_service.tr("rs_tx"),
-                translation_service.tr("table_header_exchange_tx"),
-                translation_service.tr("observations"),
+                translation_service.tr(col["translation"])
+                for col in self.LOG_CONTEST_COLUMNS
             ]
         else:
             headers = [
-                translation_service.tr("table_header_callsign"),
-                translation_service.tr("name"),
-                translation_service.tr("country"),
-                translation_service.tr("region"),
-                translation_service.tr("station"),
-                translation_service.tr("energy"),
-                translation_service.tr("table_header_power"),
-                translation_service.tr("rs_rx"),
-                translation_service.tr("rs_tx"),
-                translation_service.tr("clock_oa_label"),
-                translation_service.tr("clock_utc_label"),
-                translation_service.tr("observations"),
+                translation_service.tr(col["translation"])
+                for col in self.LOG_OPERATIVE_COLUMNS
             ]
         self.table.setColumnCount(len(headers))
         self.table.setHorizontalHeaderLabels(headers)
@@ -91,32 +107,9 @@ class ContactTableWidget(QWidget):
         self._last_contacts = contacts
         # Define las claves esperadas según el tipo de log
         if self.log_type == LogType.CONTEST_LOG:
-            keys = [
-                "callsign",
-                "name",
-                "region",
-                "qtr_oa",
-                "rs_rx",
-                "exchange_received",
-                "rs_tx",
-                "exchange_sent",
-                "observations",
-            ]
+            keys = [col["key"] for col in self.LOG_CONTEST_COLUMNS]
         else:
-            keys = [
-                "callsign",
-                "name",
-                "country",
-                "region",
-                "station",
-                "energy",
-                "power",
-                "rs_rx",
-                "rs_tx",
-                "qtr_oa",
-                "qtr_utc",
-                "obs",
-            ]
+            keys = [col["key"] for col in self.LOG_OPERATIVE_COLUMNS]
         self.table.setRowCount(len(contacts))
         self.table.setColumnCount(len(keys))
         import datetime

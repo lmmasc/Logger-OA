@@ -100,8 +100,8 @@ class DBTableWindow(QWidget):
         col_visible = settings_service.get_value("db_table_column_visible_dict", None)
         if not col_visible or not isinstance(col_visible, dict):
             col_visible = {k: True for k in column_keys}
-        col_visible["callsign"] = True
-        col_visible["name"] = True
+        # col_visible["callsign"] = True
+        # col_visible["name"] = True
         # --- Distribuir los checkboxes en dos filas ---
         num_cols = len(column_keys)
         split = num_cols // 2 + num_cols % 2  # Primera fila más si es impar
