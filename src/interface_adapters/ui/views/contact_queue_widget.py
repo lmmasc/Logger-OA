@@ -7,7 +7,6 @@ Widget para mostrar y gestionar la cola de contactos en espera.
 - Soporte para menú contextual y señal para selección de indicativo.
 """
 
-# --- Imports de terceros ---
 from PySide6.QtCore import Signal, Qt
 from PySide6.QtWidgets import (
     QWidget,
@@ -20,6 +19,22 @@ from PySide6.QtWidgets import (
     QStyledItemDelegate,
     QStyle,
 )
+from PySide6.QtGui import QFont, QFontDatabase
+from utils.resources import get_resource_path
+from PySide6.QtCore import Signal, Qt
+from PySide6.QtWidgets import (
+    QWidget,
+    QHBoxLayout,
+    QListWidget,
+    QLabel,
+    QMenu,
+    QListWidgetItem,
+    QListView,
+    QStyledItemDelegate,
+    QStyle,
+)
+from PySide6.QtGui import QFont, QFontDatabase
+from utils.resources import get_resource_path
 
 # --- Imports de la aplicación ---
 from translation.translation_service import translation_service
@@ -65,7 +80,14 @@ class ContactQueueWidget(QWidget):
         self.queue_list.setWrapping(False)
         self.label.setFixedHeight(42)
         self.queue_list.setFixedHeight(68)
+        font_path = get_resource_path("assets/RobotoMono-Regular.ttf")
+        font_id = QFontDatabase.addApplicationFont(font_path)
+        font_families = QFontDatabase.applicationFontFamilies(font_id)
         font = self.queue_list.font()
+        if font_families:
+            font.setFamily(font_families[0])
+        else:
+            font.setFamily("Monospace")
         font.setPointSize(18)
         self.queue_list.setFont(font)
         self.queue_list.setObjectName("ContactQueueList")
