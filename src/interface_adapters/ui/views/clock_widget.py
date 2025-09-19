@@ -15,6 +15,8 @@ import datetime
 from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QSizePolicy
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QFont
+from utils.resources import get_resource_path
+from PySide6.QtGui import QFontDatabase
 
 # --- Imports de la aplicación ---
 from translation.translation_service import translation_service
@@ -55,8 +57,16 @@ class ClockWidget(QWidget):
         self.time = QLabel()
         self.time.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.time.setObjectName("ClockTimeOA" if not self.utc else "ClockTimeUTC")
+        font_path = get_resource_path("assets/RobotoMono-Regular.ttf")
+        font_id = QFontDatabase.addApplicationFont(font_path)
+        font_families = QFontDatabase.applicationFontFamilies(font_id)
         font_time = QFont()
-        font_time.setFamily("Consolas, Menlo, Courier New, Liberation Mono, Monospace")
+        if font_families:
+            font_time.setFamily(font_families[0])
+        else:
+            font_time.setFamily(
+                "Consolas, Menlo, Courier New, Liberation Mono, Monospace"
+            )
         font_time.setBold(True)
         font_time.setPointSize(20)
         self.time.setFont(font_time)
@@ -65,7 +75,12 @@ class ClockWidget(QWidget):
         self.date.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.date.setObjectName("ClockDateOA" if not self.utc else "ClockDateUTC")
         font_date = QFont()
-        font_date.setFamily("Consolas, Menlo, Courier New, Liberation Mono, Monospace")
+        if font_families:
+            font_date.setFamily(font_families[0])
+        else:
+            font_date.setFamily(
+                "Consolas, Menlo, Courier New, Liberation Mono, Monospace"
+            )
         font_date.setPointSize(20)
         self.date.setFont(font_date)
         # Layout
