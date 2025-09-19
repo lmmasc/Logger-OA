@@ -20,6 +20,7 @@ from PySide6.QtCore import QDateTime, Qt
 # --- Imports de la aplicación ---
 from translation.translation_service import translation_service
 from config.settings_service import LanguageValue
+from interface_adapters.ui.view_manager import LogType
 import datetime
 
 
@@ -50,7 +51,7 @@ class ContactEditDialog(QDialog):
         self.inputs["callsign"].setText(contact.get("callsign", ""))
         layout.addWidget(QLabel(translation_service.tr("ui_callsign_label")))
         layout.addWidget(self.inputs["callsign"])
-        if log_type == "ops":
+        if self.log_type == LogType.OPERATION_LOG:
             self.inputs["name"] = QLineEdit(self)
             self.inputs["name"].setText(contact.get("name", ""))
             layout.addWidget(QLabel(translation_service.tr("ui_name_label")))
@@ -138,7 +139,7 @@ class ContactEditDialog(QDialog):
         # Campo de edición de fecha/hora OA para concursos, UTC para operativos
         ts = contact.get("timestamp", None)
         lang = translation_service.get_language()
-        if self.log_type == "contest":
+        if self.log_type == LogType.CONTEST_LOG:
             # Mostrar hora OA (UTC-5)
             if ts:
                 dt_utc = datetime.datetime.fromtimestamp(
@@ -221,7 +222,7 @@ class ContactEditDialog(QDialog):
                     result[k] = keys[widget.currentIndex()]
             elif (
                 k == "datetime_oa"
-                and self.log_type == "contest"
+                and self.log_type == LogType.CONTEST_LOG
                 and isinstance(widget, QDateTimeEdit)
             ):
                 # Convertir QDateTime a datetime.datetime antes de sumar timedelta
@@ -240,7 +241,7 @@ class ContactEditDialog(QDialog):
                     result["timestamp"] = ts
             elif (
                 k == "datetime_utc"
-                and self.log_type == "ops"
+                and self.log_type == LogType.OPERATION_LOG
                 and isinstance(widget, QDateTimeEdit)
             ):
                 ts = widget.dateTime().toSecsSinceEpoch()
