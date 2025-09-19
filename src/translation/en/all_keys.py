@@ -49,11 +49,11 @@ TABLE_HEADERS_TRANSLATIONS = {
     "log_operative_table_header_region": "Region",
     "log_operative_table_header_station": "Station",
     "log_operative_table_header_energy": "Energy",
-    "log_operative_table_header_power": "Power",
+    "log_operative_table_header_power": "Pwr.",
     "log_operative_table_header_rs_rx": "RS (RX)",
     "log_operative_table_header_rs_tx": "RS (TX)",
-    "log_operative_table_header_qtr_oa": "OA Time",
-    "log_operative_table_header_qtr_utc": "UTC Time",
+    "log_operative_table_header_qtr_oa": "QTR OA",
+    "log_operative_table_header_qtr_utc": "QTR UTC",
     "log_operative_table_header_obs": "Observations",
     # Export headers for CSV/TXT (Operative Log)
     # Export headers for TXT (Operative Log)
@@ -111,6 +111,7 @@ TABLE_HEADERS_TRANSLATIONS = {
     "log_contest_table_header_rs_tx": "RS (TX)",
     "log_contest_table_header_exchange_sent": "Exchange Sent",
     "log_contest_table_header_observations": "Observations",
+    # DB table headers
     "db_table_header_callsign": "Callsign",
     "db_table_header_name": "Name",
     "db_table_header_category": "Category",
