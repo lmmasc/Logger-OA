@@ -172,6 +172,7 @@ UI_TRANSLATIONS = {
     "operation_band_label": "Banda:",
     "operation_mode_label": "Modo:",
     "callsign_summary": "Resumen de indicativo",
+    "ui_callsign_label": "Indicativo",
     "ui_enabled_status": "Habilitado",
     "ui_disabled_status": "No habilitado",
     "ui_type_label": "Tipo",

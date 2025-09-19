@@ -48,7 +48,7 @@ class ContactEditDialog(QDialog):
         # Campos comunes
         self.inputs["callsign"] = QLineEdit(self)
         self.inputs["callsign"].setText(contact.get("callsign", ""))
-        layout.addWidget(QLabel(translation_service.tr("table_header_callsign")))
+        layout.addWidget(QLabel(translation_service.tr("ui_callsign_label")))
         layout.addWidget(self.inputs["callsign"])
         if log_type == "ops":
             self.inputs["name"] = QLineEdit(self)

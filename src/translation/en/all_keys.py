@@ -186,6 +186,7 @@ UI_TRANSLATIONS = {
     "operation_band_label": "Band:",
     "operation_mode_label": "Mode:",
     "callsign_summary": "Callsign summary",
+    "ui_callsign_label": "Callsign",
     "ui_enabled_status": "Enabled",
     "ui_disabled_status": "Disabled",
     "ui_type_label": "Type",

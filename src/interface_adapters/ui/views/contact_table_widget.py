@@ -116,9 +116,9 @@ class ContactTableWidget(QWidget):
 
         lang = translation_service.get_language()
         if lang == LanguageValue.ES:
-            date_fmt = "%d/%m/%Y"
+            date_fmt = "%d/%m"
         else:
-            date_fmt = "%m/%d/%Y"
+            date_fmt = "%m/%d"
 
         # Numeración invertida: la fila superior tiene el número más alto
         total = len(contacts)
