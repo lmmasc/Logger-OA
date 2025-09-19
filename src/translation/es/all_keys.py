@@ -107,9 +107,9 @@ TABLE_HEADERS_TRANSLATIONS = {
     "log_contest_table_header_region": "Región",
     "log_contest_table_header_qtr_oa": "Hora OA",
     "log_contest_table_header_rs_rx": "RS (RX)",
-    "log_contest_table_header_exchange_received": "Intercambio recibido",
+    "log_contest_table_header_exchange_received": "Int. (RX)",
     "log_contest_table_header_rs_tx": "RS (TX)",
-    "log_contest_table_header_exchange_sent": "Intercambio enviado",
+    "log_contest_table_header_exchange_sent": "Int. (TX)",
     "log_contest_table_header_observations": "Observaciones",
     # DB table headers
     "db_table_header_callsign": "Indicativo",
