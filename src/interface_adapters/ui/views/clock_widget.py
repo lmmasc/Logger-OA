@@ -12,7 +12,7 @@ Widget de reloj digital con soporte OA/UTC y formato de fecha/hora dependiente d
 import datetime
 
 # --- Imports de terceros ---
-from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QSizePolicy
+from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QSizePolicy, QVBoxLayout
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QFont
 from utils.resources import get_resource_path
@@ -41,19 +41,11 @@ class ClockWidget(QWidget):
         """
         super().__init__(parent)
         self.utc = utc
-        layout = QHBoxLayout()
-        layout.setSpacing(12)
-        layout.setContentsMargins(0, 0, 0, 0)
-        # Label OA/UTC
-        self.label = QLabel(label_text)
-        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.label.setObjectName("ClockLabelOA" if not self.utc else "ClockLabelUTC")
-        font_label = QFont()
-        font_label.setFamily("Consolas, Menlo, Courier New, Liberation Mono, Monospace")
-        font_label.setBold(True)
-        font_label.setPointSize(20)
-        self.label.setFont(font_label)
-        # Hora
+        # Layout principal vertical
+        main_layout = QVBoxLayout()
+        main_layout.setSpacing(2)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        # Fila superior: hora
         self.time = QLabel()
         self.time.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.time.setObjectName("ClockTimeOA" if not self.utc else "ClockTimeUTC")
@@ -68,9 +60,21 @@ class ClockWidget(QWidget):
                 "Consolas, Menlo, Courier New, Liberation Mono, Monospace"
             )
         font_time.setBold(True)
-        font_time.setPointSize(20)
+        font_time.setPointSize(30)
         self.time.setFont(font_time)
-        # Fecha
+        main_layout.addWidget(self.time)
+        # Fila inferior: label OA/UTC + fecha
+        bottom_layout = QHBoxLayout()
+        bottom_layout.setSpacing(2)
+        bottom_layout.setContentsMargins(0, 0, 0, 0)
+        self.label = QLabel(label_text)
+        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.label.setObjectName("ClockLabelOA" if not self.utc else "ClockLabelUTC")
+        font_label = QFont()
+        # font_label.setFamily("Consolas, Menlo, Courier New, Liberation Mono, Monospace")
+        font_label.setBold(True)
+        font_label.setPointSize(14)
+        self.label.setFont(font_label)
         self.date = QLabel()
         self.date.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.date.setObjectName("ClockDateOA" if not self.utc else "ClockDateUTC")
@@ -81,13 +85,12 @@ class ClockWidget(QWidget):
             font_date.setFamily(
                 "Consolas, Menlo, Courier New, Liberation Mono, Monospace"
             )
-        font_date.setPointSize(20)
+        font_date.setPointSize(16)
         self.date.setFont(font_date)
-        # Layout
-        layout.addWidget(self.label)
-        layout.addWidget(self.time)
-        layout.addWidget(self.date)
-        self.setLayout(layout)
+        bottom_layout.addWidget(self.label)
+        bottom_layout.addWidget(self.date)
+        main_layout.addLayout(bottom_layout)
+        self.setLayout(main_layout)
         # Timer para actualizar cada segundo
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_clock)
