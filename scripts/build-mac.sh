@@ -3,12 +3,15 @@
 
 cd "$(dirname "$0")/.."
 rm -f LoggerOA.spec
+rm -rf build dist *.spec
+# Incluir recursos y módulos necesarios en el binario
 .venv-mac/bin/pyinstaller src/main.py \
   --name LoggerOA \
   --windowed \
-  --onedir \
+  --onefile \
   --noconfirm \
   --icon=assets/app_icon.icns \
+  --name LoggerOA \
   --paths src \
   --add-data "assets:assets" \
   --add-data "src/config:src/config" \
