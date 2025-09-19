@@ -12,7 +12,7 @@ Widget de reloj digital con soporte OA/UTC y formato de fecha/hora dependiente d
 import datetime
 
 # --- Imports de terceros ---
-from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QSizePolicy, QVBoxLayout
+from PySide6.QtWidgets import QFrame, QLabel, QHBoxLayout, QSizePolicy, QVBoxLayout
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QFont
 from utils.resources import get_resource_path
@@ -20,10 +20,10 @@ from PySide6.QtGui import QFontDatabase
 
 # --- Imports de la aplicación ---
 from translation.translation_service import translation_service
-from config.settings_service import LanguageValue
+from config.settings_service import LanguageValue, settings_service, ThemeValue
 
 
-class ClockWidget(QWidget):
+class ClockWidget(QFrame):
     """
     Widget de reloj digital para mostrar hora y fecha en formato OA o UTC.
     El formato de fecha depende del idioma configurado en translation_service.
@@ -43,7 +43,7 @@ class ClockWidget(QWidget):
         self.utc = utc
         # Layout principal vertical
         main_layout = QVBoxLayout()
-        main_layout.setSpacing(2)
+        main_layout.setSpacing(4)
         main_layout.setContentsMargins(0, 0, 0, 0)
         # Fila superior: hora
         self.time = QLabel()
@@ -90,7 +90,13 @@ class ClockWidget(QWidget):
         bottom_layout.addWidget(self.label)
         bottom_layout.addWidget(self.date)
         main_layout.addLayout(bottom_layout)
+        if not self.utc:
+            self.setObjectName("ClockWidgetOA")
+        else:
+            self.setObjectName("ClockWidgetUTC")
         self.setLayout(main_layout)
+        # --- Borde dinámico según tema ---
+        # El estilo del borde se gestiona desde el módulo de temas, no aquí
         # Timer para actualizar cada segundo
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_clock)

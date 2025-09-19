@@ -291,6 +291,23 @@ QScrollBar::handle:pressed {
 }
 /* Fin scrollbars personalizados */
 
+/* Estilo personalizado para el widget del reloj */
+QFrame#ClockWidget {
+    border: 6px solid red;
+    border-radius: 12px;
+    background-color: yellow;
+}
+QFrame#ClockWidgetOA {
+    border: 3px solid #b71c1c;
+    border-radius: 12px;
+    background-color: #f5f5f5;
+}
+QFrame#ClockWidgetUTC {
+    border: 3px solid #1b5e20;
+    border-radius: 12px;
+    background-color: #f5f5f5;
+}
+
 /* Fin de estilos para tema claro */
 
 
