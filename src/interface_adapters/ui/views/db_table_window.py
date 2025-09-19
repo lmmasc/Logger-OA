@@ -19,6 +19,8 @@ from PySide6.QtWidgets import (
     QGridLayout,  # Para grid de checkboxes
 )
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QFont, QFontDatabase
+from utils.resources import get_resource_path
 
 # --- Imports de la aplicación ---
 from interface_adapters.controllers.radio_operator_controller import (
@@ -66,7 +68,14 @@ class DBTableWindow(QWidget):
         main_layout = QVBoxLayout()
         filter_layout = QHBoxLayout()
         self.filter_edit = QLineEdit()
+        font_path = get_resource_path("assets/RobotoMono-Regular.ttf")
+        font_id = QFontDatabase.addApplicationFont(font_path)
+        font_families = QFontDatabase.applicationFontFamilies(font_id)
         font = self.filter_edit.font()
+        if font_families:
+            font.setFamily(font_families[0])
+        else:
+            font.setFamily("Monospace")
         font.setPointSize(16)
         font.setBold(True)
         self.filter_edit.setFont(font)
