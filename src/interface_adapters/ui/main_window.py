@@ -70,6 +70,7 @@ class MainWindow(QMainWindow):
         self.db_table_window = (
             None  # Instancia única de ventana de tabla de base de datos
         )
+        self.manual_window = None  # Instancia única de ventana de manual de ayuda
 
         # Configuración de idioma y título
         lang = settings_service.get_value(
@@ -310,6 +311,8 @@ class MainWindow(QMainWindow):
         """
         if self.db_table_window is not None:
             self.db_table_window.close()
+        if hasattr(self, "manual_window") and self.manual_window is not None:
+            self.manual_window.close()
         super().closeEvent(event)
 
     def _on_language_changed(self):
