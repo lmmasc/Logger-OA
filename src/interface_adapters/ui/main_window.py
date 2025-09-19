@@ -46,11 +46,11 @@ from .main_window_config import (
     set_language,
     set_light_theme,
     set_dark_theme,
-    _set_initial_theme_and_language,
-    _update_theme_menu_checks,
-    _update_language_menu_checks,
+    set_initial_theme_and_language,
+    update_theme_menu_checks,
+    update_language_menu_checks,
     refresh_ui,
-    _retranslate_ui,
+    retranslate_ui,
 )
 
 
@@ -104,7 +104,7 @@ class MainWindow(QMainWindow):
         self._connect_menu_actions()
 
         # Aplicar tema e idioma guardados
-        _set_initial_theme_and_language(self)
+        set_initial_theme_and_language(self)
         self.update_menu_state()
 
         # Actualizar cabecera al cambiar idioma
@@ -157,19 +157,19 @@ class MainWindow(QMainWindow):
         """
         Aplica el tema e idioma guardados al iniciar la aplicación.
         """
-        _set_initial_theme_and_language(self)
+        set_initial_theme_and_language(self)
 
-    def _update_theme_menu_checks(self) -> None:
+    def update_theme_menu_checks(self) -> None:
         """
         Actualiza los checks del menú de tema según el tema activo.
         """
-        _update_theme_menu_checks(self)
+        update_theme_menu_checks(self)
 
-    def _update_language_menu_checks(self) -> None:
+    def update_language_menu_checks(self) -> None:
         """
         Actualiza los checks del menú de idioma según el idioma activo.
         """
-        _update_language_menu_checks(self)
+        update_language_menu_checks(self)
 
     def refresh_ui(self) -> None:
         """
@@ -181,7 +181,7 @@ class MainWindow(QMainWindow):
         """
         Retraduce la interfaz gráfica al cambiar el idioma.
         """
-        _retranslate_ui(self)
+        retranslate_ui(self)
 
     # --- Gestión de menú y acciones ---
     def update_menu_state(self):
@@ -264,7 +264,7 @@ class MainWindow(QMainWindow):
             set_light_theme,
             set_dark_theme,
             set_auto_theme,
-            _update_theme_menu_checks,
+            update_theme_menu_checks,
         )
 
         if theme_key == "light":
@@ -273,7 +273,7 @@ class MainWindow(QMainWindow):
             set_dark_theme(self)
         elif theme_key == "auto":
             set_auto_theme(self)
-        _update_theme_menu_checks(self)
+        update_theme_menu_checks(self)
 
     # --- Gestión de base de datos (delegación a acciones) ---
     def _on_db_backup(self):

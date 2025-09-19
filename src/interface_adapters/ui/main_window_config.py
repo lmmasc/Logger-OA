@@ -45,14 +45,14 @@ def set_auto_theme(self) -> None:
     refresh_ui(self)
 
 
-def _update_theme_menu_checks(self) -> None:
+def update_theme_menu_checks(self) -> None:
     theme = settings_service.get_value(SettingsKey.THEME.value, ThemeValue.LIGHT.value)
     self.menu_bar.light_theme_action.setChecked(theme == ThemeValue.LIGHT.value)
     self.menu_bar.dark_theme_action.setChecked(theme == ThemeValue.DARK.value)
     self.menu_bar.auto_theme_action.setChecked(theme == ThemeValue.AUTO.value)
 
 
-def _update_language_menu_checks(self) -> None:
+def update_language_menu_checks(self) -> None:
     current_lang = translation_service.get_language()
     self.menu_bar.lang_es_action.setChecked(current_lang == LanguageValue.ES)
     self.menu_bar.lang_en_action.setChecked(current_lang == LanguageValue.EN)
@@ -70,11 +70,11 @@ def refresh_ui(self) -> None:
         self.db_table_window, "retranslate_ui"
     ):
         self.db_table_window.retranslate_ui()
-    _update_language_menu_checks(self)
-    _update_theme_menu_checks(self)
+    update_language_menu_checks(self)
+    update_theme_menu_checks(self)
 
 
-def _retranslate_ui(self) -> None:
+def retranslate_ui(self) -> None:
     self.setWindowTitle(translation_service.tr("main_window_title"))
     if hasattr(self.menu_bar, "retranslate_ui"):
         self.menu_bar.retranslate_ui()
@@ -83,7 +83,7 @@ def _retranslate_ui(self) -> None:
             view.retranslate_ui()
 
 
-def _set_initial_theme_and_language(self) -> None:
+def set_initial_theme_and_language(self) -> None:
     theme = settings_service.get_value(SettingsKey.THEME.value, ThemeValue.LIGHT.value)
     if theme == ThemeValue.DARK.value:
         set_dark_theme(self)
