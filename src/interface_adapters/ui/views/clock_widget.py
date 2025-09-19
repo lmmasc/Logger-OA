@@ -43,8 +43,8 @@ class ClockWidget(QFrame):
         self.utc = utc
         # Layout principal vertical
         main_layout = QVBoxLayout()
-        main_layout.setSpacing(4)
-        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(1)  # Espacio mínimo entre filas
+        main_layout.setContentsMargins(6, 2, 6, 2)  # Márgenes mínimos verticales
         # Fila superior: hora
         self.time = QLabel()
         self.time.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -65,7 +65,7 @@ class ClockWidget(QFrame):
         main_layout.addWidget(self.time)
         # Fila inferior: label OA/UTC + fecha
         bottom_layout = QHBoxLayout()
-        bottom_layout.setSpacing(2)
+        bottom_layout.setSpacing(2)  # Espacio mínimo entre label y fecha
         bottom_layout.setContentsMargins(0, 0, 0, 0)
         self.label = QLabel(label_text)
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
