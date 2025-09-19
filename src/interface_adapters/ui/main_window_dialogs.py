@@ -3,7 +3,13 @@ Módulo de diálogos personalizados para MainWindow.
 Cada función recibe la instancia de MainWindow como primer argumento.
 """
 
-from PySide6.QtWidgets import QMessageBox, QDialog, QVBoxLayout, QTextEdit, QPushButton
+from PySide6.QtWidgets import (
+    QMessageBox,
+    QDialog,
+    QVBoxLayout,
+    QTextBrowser,
+    QPushButton,
+)
 from utils.resources import get_resource_path
 from translation.translation_service import translation_service
 
@@ -35,22 +41,28 @@ def show_manual_dialog(self):
         dialog_title = "Manual de uso"
         close_text = "Cerrar"
     manual_text = "Manual not available."
+    html_text = "<p>Manual not available.</p>"
     try:
+        import markdown
+
         with open(manual_path, "r", encoding="utf-8") as f:
             manual_text = f.read()
+            html_text = markdown.markdown(
+                manual_text, extensions=["extra", "tables", "toc"]
+            )
     except Exception as e:
-        manual_text += f"\nError: {e}"
+        html_text += f"<br>Error: {e}"
     dialog = QDialog(self)
     dialog.setWindowTitle(dialog_title)
     layout = QVBoxLayout(dialog)
-    text_edit = QTextEdit(dialog)
-    text_edit.setReadOnly(True)
-    text_edit.setPlainText(manual_text)
-    layout.addWidget(text_edit)
+    text_browser = QTextBrowser(dialog)
+    text_browser.setOpenExternalLinks(True)
+    text_browser.setHtml(html_text)
+    layout.addWidget(text_browser)
     close_btn = QPushButton(close_text, dialog)
     close_btn.clicked.connect(dialog.accept)
     layout.addWidget(close_btn)
-    dialog.resize(700, 600)
+    dialog.resize(800, 700)
 
     # Recargar el manual si cambia el idioma mientras el diálogo está abierto
     def reload_manual():
@@ -65,11 +77,16 @@ def show_manual_dialog(self):
             new_title = "Manual de uso"
             new_close = "Cerrar"
         try:
+            import markdown
+
             with open(new_path, "r", encoding="utf-8") as f:
                 new_text = f.read()
+                new_html = markdown.markdown(
+                    new_text, extensions=["extra", "tables", "toc"]
+                )
         except Exception as e:
-            new_text = f"Manual not available.\nError: {e}"
-        text_edit.setPlainText(new_text)
+            new_html = f"<p>Manual not available.<br>Error: {e}</p>"
+        text_browser.setHtml(new_html)
         dialog.setWindowTitle(new_title)
         close_btn.setText(new_close)
 
