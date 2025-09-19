@@ -5,7 +5,8 @@ CallsignInputWidget: Widget para ingreso y normalización de indicativo (callsig
 """
 
 from PySide6.QtWidgets import QWidget, QLineEdit, QVBoxLayout, QLabel
-from PySide6.QtGui import QFont
+from PySide6.QtGui import QFont, QFontDatabase
+from utils.resources import get_resource_path
 from PySide6.QtCore import Signal, Qt
 from translation.translation_service import translation_service
 
@@ -37,7 +38,14 @@ class CallsignInputWidget(QWidget):
         # Campo de texto para indicativo
         self.input = QLineEdit(self)
         self.input.setObjectName("callsignInput")
+        font_path = get_resource_path("assets/RobotoMono-Regular.ttf")
+        font_id = QFontDatabase.addApplicationFont(font_path)
+        font_families = QFontDatabase.applicationFontFamilies(font_id)
         font = QFont()
+        if font_families:
+            font.setFamily(font_families[0])
+        else:
+            font.setFamily("Monospace")
         font.setPointSize(32)
         font.setBold(True)
         self.input.setFont(font)
