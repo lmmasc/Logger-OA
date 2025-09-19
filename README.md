@@ -36,7 +36,7 @@ Aplicación de escritorio multiplataforma para la gestión de concursos y operac
 ## Características principales
 - Gestión de concursos y operaciones de radioaficionados OA.
 - Base de datos local SQLite, sin dependencias externas.
-- Importación automática de operadores OA desde listados oficiales en PDF.
+- Importación automática de operadores OA desde listados oficiales del MTC en PDF.
 - Feedback visual en importación: diálogo de espera traducido y resumen detallado (total, nuevos, actualizados, deshabilitados, rehabilitados).
 - Interfaz gráfica moderna con PySide6 (Qt), temas claro/oscuro y cambio de idioma.
 - Arquitectura desacoplada basada en Clean Architecture.
@@ -70,12 +70,31 @@ Aplicación de escritorio multiplataforma para la gestión de concursos y operac
    git clone <URL_DEL_REPOSITORIO>
    cd "Logger OA v2"
    ```
-2. Crea y activa un entorno virtual:
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate  # Linux/macOS
-   .venv\Scripts\activate   # Windows
-   ```
+2. Crea y activa el entorno virtual correspondiente (según tu sistema operativo). Los scripts de build requieren estos nombres específicos:
+
+  **Linux:**
+  ```bash
+  python3 -m venv .venv-linux
+  source .venv-linux/bin/activate
+  ```
+
+  **macOS:**
+  ```bash
+  python3 -m venv .venv-mac
+  source .venv-mac/bin/activate
+  ```
+
+  **Windows (cmd):**
+  ```cmd
+  python -m venv .venv-windows
+  .venv-windows\Scripts\activate
+  ```
+
+  **Windows (PowerShell):**
+  ```powershell
+  python -m venv .venv-windows
+  .venv-windows\Scripts\Activate.ps1
+  ```
 3. Instala las dependencias:
    ```bash
    pip install -r requirements.txt
@@ -102,6 +121,10 @@ from src.application.use_cases.update_operators_from_pdf import update_operators
 resultado = update_operators_from_pdf('BaseDocs/396528-radioaficionados_autorizados_al_13ago2025.pdf')
 print(resultado)
 ```
+
+
+### Acceso al Manual de Usuario
+El manual de usuario completo está disponible desde la propia aplicación, en el menú **Ayuda > Manual de uso**.
 
 ### Ejemplo práctico: Importar operadores OA desde PDF
 1. Abre la aplicación.
@@ -155,11 +178,11 @@ tests/                     # Pruebas unitarias y de integración
 
 ## Internacionalización y Traducciones
 
-El sistema de traducciones es modular y extensible. Los archivos de traducción se encuentran en `src/translation/<idioma>/` y están organizados por secciones (`ui.py`, `menu.py`, `messages.py`, etc.).
+El sistema de traducciones es modular y extensible. Los archivos de traducción se encuentran en `src/translation/<idioma>/` y están organizados por subdiccionarios en un archivo all_keys.py (`ALL_KEYS_TRANSLATIONS` `UI_TRANSLATIONS MENUS_TRANSLATIONS` `TABLE_HEADERS_TRANSLATIONS`), etc.).
 
 Para agregar un nuevo idioma:
 1. Crea una carpeta en `src/translation/` con el código del idioma (ej: `fr/` para francés).
-2. Copia y adapta los archivos de traducción existentes.
+2. Copia y adapta el archivo de traducción existente.
 3. El loader central (`translations.py`) combinará automáticamente los módulos.
 
 ---
@@ -175,15 +198,6 @@ Ejecuta el script correspondiente para generar el ejecutable standalone.
 
 ---
 
-## Contribución
-
-Las contribuciones son bienvenidas. Para colaborar:
-- Sigue la arquitectura y estilo modular del proyecto.
-- Usa `pytest` para pruebas.
-- Reporta bugs o solicita mejoras vía issues.
-- Antes de hacer un pull request, asegúrate de que las pruebas pasen y la documentación esté actualizada.
-
----
 
 ## Testing
 
