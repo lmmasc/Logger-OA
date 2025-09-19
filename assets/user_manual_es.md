@@ -75,9 +75,49 @@ Al abrir Logger OA, verás la ventana principal con los siguientes menús:
 
 
 ### Crear un nuevo log
-1. Ve a **Archivo > Nuevo** y selecciona **Nuevo operativo** o **Nuevo concurso**.
-2. Si corresponde, define el indicativo en el submenú **Preferencias > Indicativo**.
-3. Completa los datos requeridos y comienza a registrar tus contactos.
+
+1. Ve a **Archivo > Nuevo** y selecciona:
+	- **Nuevo operativo**: Para registrar operaciones regulares.
+	- **Nuevo concurso**: Para registrar participaciones en concursos.
+
+2. **Opciones al crear un log operativo:**
+	- Define el indicativo principal de operación.
+	- Selecciona el tipo de operación (CPS, RENER, BOLETIN).
+	- Elige la banda de frecuencia y el modo (HF, VHF, LSB, USB, FM, etc.).
+	- Ingresa la frecuencia y, si corresponde, el repetidor.
+	- La aplicación genera automáticamente el archivo de log y lo asocia a la sesión.
+
+3. **Opciones al crear un log de concurso:**
+	- Define el indicativo principal de operación.
+	- Selecciona el concurso en el que participas (de una lista predefinida).
+	- El log se asocia al nombre del concurso y se genera el archivo correspondiente.
+
+4. Una vez creado el log, la ventana principal mostrará el encabezado con los datos seleccionados y podrás comenzar a registrar contactos.
+
+### Registrar un contacto en el log
+1. Escribe el indicativo en el campo "Ingrese indicativo". Si el indicativo existe en la base de datos, se autocompletan los datos asociados y se muestra un resumen en lugar de sugerencias.
+2. Completa los campos requeridos del formulario (estación, energía, potencia, RS RX/TX, observaciones, etc. según el tipo de log).
+3. Haz clic en **Agregar contacto**. El sistema valida los datos y verifica duplicados. Si el contacto ya existe en el bloque horario (en concursos), se solicita confirmación.
+4. Si el indicativo no está en la base de datos, se ofrece agregarlo mediante un diálogo. Si se acepta, se registra el operador y luego el contacto.
+5. El contacto se agrega al log y la tabla se actualiza automáticamente. El campo de indicativo se limpia para ingresar el siguiente.
+
+### Eliminar un contacto del log
+1. Selecciona el contacto que deseas eliminar en la tabla de contactos del log, seleccionando la fila correspondiente para que se habilite el boton de eliminar.
+2. Haz clic en el botón **Eliminar contacto**.
+3. El sistema solicitará confirmación antes de eliminar el contacto.
+4. Una vez confirmado, el contacto será eliminado del log y la tabla se actualizará automáticamente.
+
+### Funcionamiento de las sugerencias
+- Al escribir en el campo de indicativo, a su lado aparecen sugerencias de operadores que coinciden con lo ingresado (mínimo 2 caracteres).
+- Las sugerencias muestran el indicativo y el nombre del operador al poner el puntero sobre el.
+- Puedes hacer clic en una sugerencia para autocompletar el campo de indicativo y cargar los datos asociados.
+
+### Funcionamiento de la cola de espera
+- Puedes agregar indicativos a la cola de espera usando el botón correspondiente o desde el campo de ingreso.
+- La cola muestra los indicativos pendientes de registro.
+- Al hacer clic en un indicativo de la cola, se autocompleta el campo de ingreso para facilitar el registro.
+- Puedes eliminar indicativos de la cola usando el menú contextual (clic derecho sobre el indicativo y seleccionar "Eliminar").
+- El sistema evita duplicados en la cola y muestra un mensaje si intentas agregar el mismo indicativo dos veces.
 
 ### Abrir un log existente
 1. Ve a **Archivo > Abrir** y selecciona **Abrir operativo** o **Abrir concurso**.
@@ -91,6 +131,21 @@ Al abrir Logger OA, verás la ventana principal con los siguientes menús:
 1. Ve a **Base de datos > Importar desde PDF**.
 2. Selecciona el archivo PDF oficial.
 3. Espera el procesamiento y revisa el resumen de la importación.
+
+### Uso de la ventana de base de datos de operadores
+1. Ve al menú **Base de datos > Mostrar base de datos** para abrir la ventana de gestión de operadores OA.
+2. La ventana muestra una tabla con todos los operadores registrados y sus datos principales.
+	- Puedes agregar un nuevo operador usando el botón **Agregar operador**.
+	- Para editar un operador, haz doble clic sobre la fila correspondiente.
+	- Para eliminar un operador, selecciona la fila y haz clic en **Eliminar operador** (se solicitará confirmación).
+3. En la parte superior, puedes filtrar los operadores por cualquier columna seleccionando el campo en el menú desplegable y escribiendo el texto en el campo de filtro.
+	- El filtro es dinámico y muestra el número de resultados encontrados.
+	- El texto del filtro se normaliza automáticamente a mayúsculas para facilitar la búsqueda.
+4. Debajo del filtro, encontrarás una serie de casillas de verificación (checkboxes) para cada columna de la tabla.
+	- Puedes mostrar u ocultar columnas activando o desactivando las casillas correspondientes.
+	- La configuración de columnas visibles se guarda automáticamente y se mantiene en futuras sesiones.
+5. Puedes ajustar el ancho de las columnas arrastrando los bordes en el encabezado de la tabla.
+	- Los anchos configurados se guardan automáticamente.
 
 ### Cambiar tema o idioma
 - Ve a **Preferencias > Aspecto** para alternar entre modo claro, oscuro o automático.
@@ -117,7 +172,7 @@ Sí, descarga el ejecutable adecuado para Windows, Linux o macOS.
 Importa el PDF oficial más reciente desde el menú correspondiente.
 
 **¿Cómo obtengo ayuda?**  
-La única ayuda disponible es la que se brinda en este manual de usuario, accesible desde el menú Ayuda > Manual de uso dentro de la aplicación. No se ofrece soporte oficial ni atención personalizada.
+La única ayuda disponible es la que se brinda en este manual de usuario, accesible desde el menú Ayuda > Manual de uso dentro de la aplicación. No se ofrece soporte oficial ni atención personalizada. Pero siempre habrá algun colega OA que te pueda ayudar !
 
 ---
 
@@ -132,4 +187,4 @@ No se brinda soporte oficial ni atención personalizada. El uso del software es 
 **Condiciones de uso:**
 El uso de Logger OA implica la aceptación de la licencia MIT y del descargo de responsabilidad. Si distribuyes, modificas o creas versiones derivadas, debes mantener la mención a los autores originales. No se ofrece soporte oficial ni garantía sobre el funcionamiento, seguridad o resultados del software.
 
-¡Gracias por usar Logger OA v2!
+¡Gracias por usar Logger OA ,73!
