@@ -5,7 +5,8 @@ CallsignInfoWidget: Widget para mostrar información y sugerencias de indicativo
 """
 
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QListWidget, QListWidgetItem
-from PySide6.QtGui import QFont
+from PySide6.QtGui import QFont, QFontDatabase
+from utils.resources import get_resource_path
 from PySide6.QtCore import Signal, Qt
 from translation.translation_service import translation_service
 from utils.text import get_filtered_operators
@@ -93,9 +94,16 @@ class CallsignInfoWidget(QWidget):
         operadores = (
             get_filtered_operators(filtro) if filtro and len(filtro) >= 2 else []
         )
+        font_path = get_resource_path("assets/RobotoMono-Regular.ttf")
+        font_id = QFontDatabase.addApplicationFont(font_path)
+        font_families = QFontDatabase.applicationFontFamilies(font_id)
         for op in operadores:
             item = QListWidgetItem(op.callsign)
             font = QFont()
+            if font_families:
+                font.setFamily(font_families[0])
+            else:
+                font.setFamily("Monospace")
             font.setPointSize(18)
             font.setBold(True)
             item.setFont(font)
