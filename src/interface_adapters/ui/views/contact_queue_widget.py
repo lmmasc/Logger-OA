@@ -88,7 +88,7 @@ class ContactQueueWidget(QWidget):
             font.setFamily(font_families[0])
         else:
             font.setFamily("Monospace")
-        font.setPointSize(18)
+        font.setPointSize(20)
         self.queue_list.setFont(font)
         self.queue_list.setObjectName("ContactQueueList")
         self.queue_list.setItemDelegate(NoFocusDelegate())

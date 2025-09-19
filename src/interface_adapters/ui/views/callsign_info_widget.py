@@ -104,7 +104,7 @@ class CallsignInfoWidget(QWidget):
                 font.setFamily(font_families[0])
             else:
                 font.setFamily("Monospace")
-            font.setPointSize(18)
+            font.setPointSize(20)
             font.setBold(True)
             item.setFont(font)
             if op.name:
