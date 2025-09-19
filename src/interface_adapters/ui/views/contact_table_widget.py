@@ -102,15 +102,18 @@ class ContactTableWidget(QWidget):
         Args:
             contacts: Lista de diccionarios con los datos de los contactos.
         """
-        # Invertir el orden de los contactos para mostrar los más recientes primero
-        contacts = list(reversed(contacts))
-        self._last_contacts = contacts
+        # Guardar los contactos en el orden original
+        self._last_contacts = (
+            contacts.copy() if isinstance(contacts, list) else list(contacts)
+        )
+        # Solo invertir para mostrar en la tabla
+        display_contacts = list(reversed(contacts))
         # Define las claves esperadas según el tipo de log
         if self.log_type == LogType.CONTEST_LOG:
             keys = [col["key"] for col in self.LOG_CONTEST_COLUMNS]
         else:
             keys = [col["key"] for col in self.LOG_OPERATIVE_COLUMNS]
-        self.table.setRowCount(len(contacts))
+        self.table.setRowCount(len(display_contacts))
         self.table.setColumnCount(len(keys))
         import datetime
 
@@ -121,8 +124,8 @@ class ContactTableWidget(QWidget):
             date_fmt = "%m/%d"
 
         # Numeración invertida: la fila superior tiene el número más alto
-        total = len(contacts)
-        for row, contact in enumerate(contacts):
+        total = len(display_contacts)
+        for row, contact in enumerate(display_contacts):
             # Establecer el número de orden invertido en la primera columna
             item_num = QTableWidgetItem(str(total - row))
             self.table.setVerticalHeaderItem(row, item_num)
