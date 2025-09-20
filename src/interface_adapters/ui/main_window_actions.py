@@ -220,66 +220,6 @@ def action_log_open_concurso(self):
     self.update_menu_state()
 
 
-def action_log_export(self):
-    """
-    Exporta el log abierto en el formato seleccionado por el usuario.
-    """
-    if not hasattr(self, "current_log") or self.current_log is None:
-        QMessageBox.warning(
-            self,
-            translation_service.tr("main_window_title"),
-            translation_service.tr("no_log_open"),
-        )
-        return
-    log_type = getattr(self, "current_log_type", None)
-    dialog = ExportFormatDialog(log_type, self)
-    if not dialog.exec() or not dialog.selected_ext:
-        return
-    selected_ext = dialog.selected_ext
-    db_path = getattr(self.current_log, "db_path", None)
-    if not db_path:
-        QMessageBox.warning(
-            self,
-            translation_service.tr("main_window_title"),
-            translation_service.tr("no_db_path"),
-        )
-        return
-    base_name = os.path.splitext(os.path.basename(db_path))[0]
-    default_filename = f"{base_name}{selected_ext}"
-    export_dir = get_export_dir()
-    export_path, _ = QFileDialog.getSaveFileName(
-        self,
-        translation_service.tr("export_log"),
-        os.path.join(export_dir, default_filename),
-        f"{selected_ext.upper()} (*{selected_ext})",
-    )
-    if not export_path:
-        return
-    # Conectar con la función real de exportación
-    try:
-        if selected_ext == ".txt":
-            export_log.export_log_to_txt(db_path, export_path)
-        elif selected_ext == ".csv":
-            export_log.export_log_to_csv(db_path, export_path)
-        elif selected_ext == ".adi":
-            export_log.export_log_to_adi(db_path, export_path)
-        elif selected_ext == ".pdf":
-            export_log.export_log_to_pdf(db_path, export_path)
-        else:
-            raise ValueError(f"Formato no soportado: {selected_ext}")
-        QMessageBox.information(
-            self,
-            translation_service.tr("export_log"),
-            translation_service.tr("export_success"),
-        )
-    except Exception as e:
-        QMessageBox.critical(
-            self,
-            translation_service.tr("export_log"),
-            f"{translation_service.tr('export_failed')}: {e}",
-        )
-
-
 def action_log_export_txt(self):
     """
     Exporta el log abierto en formato TXT.

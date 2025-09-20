@@ -29,7 +29,6 @@ from .main_window_actions import (
     action_log_new_concurso,
     action_log_open_operativo,
     action_log_open_concurso,
-    action_log_export,
     action_log_close,
     action_db_import_pdf,
     action_db_export,
@@ -244,7 +243,6 @@ class MainWindow(QMainWindow):
         self.menu_bar.log_open_concurso_requested.connect(
             lambda: action_log_open_concurso(self)
         )
-        self.menu_bar.log_export_requested.connect(lambda: action_log_export(self))
         self.menu_bar.log_close_requested.connect(lambda: action_log_close(self))
         self.menu_bar.db_import_pdf_requested.connect(
             lambda: action_db_import_pdf(self)
