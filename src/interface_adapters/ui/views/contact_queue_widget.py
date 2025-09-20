@@ -98,10 +98,24 @@ class ContactQueueWidget(QWidget):
         main_layout.addWidget(self.label)
         main_layout.addWidget(self.queue_list)
         self.setLayout(main_layout)
+
         self.queue_list.setSelectionMode(QListWidget.SelectionMode.SingleSelection)
         self.queue_list.itemClicked.connect(self._on_item_clicked)
         self.queue_list.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.queue_list.customContextMenuRequested.connect(self._on_context_menu)
+        self.queue_list.installEventFilter(self)
+
+    def eventFilter(self, obj, event):
+        from PySide6.QtCore import QEvent, Qt
+
+        # Solo interceptar si el foco está en la lista de la cola
+        if obj == self.queue_list and event.type() == QEvent.KeyPress:  # type: ignore
+            if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:  # type: ignore
+                item = self.queue_list.currentItem()
+                if item:
+                    self._on_item_clicked(item)
+                    return True
+        return super().eventFilter(obj, event)
 
     def set_queue(self, contacts):
         """

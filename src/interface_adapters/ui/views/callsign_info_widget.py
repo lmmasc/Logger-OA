@@ -13,6 +13,18 @@ from utils.text import get_filtered_operators
 
 
 class CallsignInfoWidget(QWidget):
+    def eventFilter(self, obj, event):
+        from PySide6.QtCore import QEvent, Qt
+
+        # Solo interceptar si el foco está en la lista de sugerencias
+        if obj == self.suggestion_list and event.type() == QEvent.KeyPress:  # type: ignore
+            if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:  # type: ignore
+                item = self.suggestion_list.currentItem()
+                if item:
+                    self._on_suggestion_clicked(item)
+                    return True
+        return super().eventFilter(obj, event)
+
     """
     Widget para mostrar información y sugerencias de indicativos.
     Presenta un título dinámico, un área de resumen y una lista de sugerencias.
@@ -64,6 +76,7 @@ class CallsignInfoWidget(QWidget):
         self.suggestion_list.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         self.suggestion_list.hide()
         self.suggestion_list.itemClicked.connect(self._on_suggestion_clicked)
+        self.suggestion_list.installEventFilter(self)
         layout.addWidget(self.suggestion_list)
         self.setLayout(layout)
         self.retranslate_ui()
