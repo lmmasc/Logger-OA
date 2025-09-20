@@ -141,14 +141,14 @@ class LogOpsView(QWidget):
         translation_service.signal.language_changed.connect(self.retranslate_ui)
         self.update_header()
         # Evitar foco en cola y tabla
-        self.queue_widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.queue_widget.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         self.table_widget.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
-        self.callsign_info.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.callsign_info.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         self.callsign_input.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.header_widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.form_widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         if hasattr(self.queue_widget, "queue_list"):
-            self.queue_widget.queue_list.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.queue_widget.queue_list.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         if hasattr(self.table_widget, "table"):
             self.table_widget.table.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         self.add_contact_btn.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
@@ -180,14 +180,37 @@ class LogOpsView(QWidget):
     def eventFilter(self, obj, event):
         from PySide6.QtCore import QEvent, Qt
 
-        # Detectar F1 en toda la ventana
+        # Detectar teclas F1-F4 en toda la ventana
         if event.type() == QEvent.KeyPress:  # type: ignore
+            # F1: foco al campo input de indicativo
             if event.key() == Qt.Key_F1:  # type: ignore
-                # Foco al campo input de indicativo
                 if hasattr(self, "callsign_input") and hasattr(
                     self.callsign_input, "input"
                 ):
                     self.callsign_input.input.setFocus()
+                    return True
+            # F2: foco a sugerencias
+            if event.key() == Qt.Key_F2:  # type: ignore
+                if hasattr(self, "callsign_info") and hasattr(
+                    self.callsign_info, "suggestion_list"
+                ):
+                    self.callsign_info.suggestion_list.setFocus()
+                    return True
+            # F3: foco a cola de espera
+            if event.key() == Qt.Key_F3:  # type: ignore
+                if hasattr(self, "queue_widget"):
+                    # Si tiene queue_list, enfocar ese; si no, el widget principal
+                    if hasattr(self.queue_widget, "queue_list"):
+                        self.queue_widget.queue_list.setFocus()
+                    else:
+                        self.queue_widget.setFocus()
+                    return True
+            # F4: foco a la tabla de contactos
+            if event.key() == Qt.Key_F4:  # type: ignore
+                if hasattr(self, "table_widget") and hasattr(
+                    self.table_widget, "table"
+                ):
+                    self.table_widget.table.setFocus()
                     return True
         return super().eventFilter(obj, event)
 

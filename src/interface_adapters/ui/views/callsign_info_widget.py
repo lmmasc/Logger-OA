@@ -61,7 +61,7 @@ class CallsignInfoWidget(QWidget):
         self.suggestion_list.setResizeMode(QListWidget.ResizeMode.Adjust)
         self.suggestion_list.setSpacing(5)
         self.suggestion_list.setObjectName("callsignSuggestionList")
-        self.suggestion_list.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.suggestion_list.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         self.suggestion_list.hide()
         self.suggestion_list.itemClicked.connect(self._on_suggestion_clicked)
         layout.addWidget(self.suggestion_list)
