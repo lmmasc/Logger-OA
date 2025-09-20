@@ -374,6 +374,17 @@ def action_log_export_pdf(self):
             translation_service.tr("no_db_path"),
         )
         return
+    # Verificar tipo de log antes de abrir el selector de archivos
+    log_type = getattr(self.current_log, "log_type", None)
+    from interface_adapters.ui.view_manager import LogType
+
+    if log_type != LogType.CONTEST_LOG:
+        QMessageBox.warning(
+            self,
+            translation_service.tr("export_log"),
+            translation_service.tr("export_pdf_not_supported_for_log_type"),
+        )
+        return
     base_name = os.path.splitext(os.path.basename(db_path))[0]
     default_filename = f"{base_name}.pdf"
     export_dir = get_export_dir()

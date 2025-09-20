@@ -295,6 +295,7 @@ UI_TRANSLATIONS = {
     "set_callsign_dialog_label": "Ingrese el nuevo indicativo:",
     "log_type_mismatch_error": "El archivo seleccionado no corresponde al tipo de log esperado.",
     "dialog_no_callsign_entered": "No se ha ingresado un indicativo.",
+    "export_pdf_not_supported_for_log_type": "El formato PDF solo está disponible para logs de concurso.",
 }
 
 ALL_KEYS_TRANSLATIONS = {}

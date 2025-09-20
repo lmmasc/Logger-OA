@@ -407,10 +407,15 @@ def export_log_to_pdf(db_path: str, export_path: str) -> str:
         operator = row[2]
         start_time = row[3]
         metadata = row[5]
+    # Solo soporta logs de concurso
+    from translation.translation_service import translation_service as ts
+
+    if log_type != LogType.CONTEST_LOG.value:
+        raise ValueError("Exportación a PDF solo soportada para logs de concurso.")
     contacts = repo.get_contacts(log_id)
     if not contacts:
         raise ValueError("No hay contactos para exportar.")
-
+    # ...existing code for PDF generation...
     # Obtener datos del operador
     op_data = get_radio_operator_by_callsign(operator)
     op_name = op_data[1] if op_data else ""
