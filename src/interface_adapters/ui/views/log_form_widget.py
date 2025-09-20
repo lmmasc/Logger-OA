@@ -5,6 +5,7 @@ from domain.contact_type import ContactType
 
 # Third-party imports
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QIntValidator
 from PySide6.QtWidgets import (
     QWidget,
     QLineEdit,
@@ -77,6 +78,7 @@ class LogFormWidget(QWidget):
             self.rs_rx_input.setSizePolicy(
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
             )
+            self.rs_rx_input.setValidator(QIntValidator(10, 99, self))
             rs_rx_label = QLabel(translation_service.tr("rs_rx"))
             rs_rx_label.setAlignment(
                 Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
@@ -93,6 +95,7 @@ class LogFormWidget(QWidget):
             self.exchange_received_input.setSizePolicy(
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
             )
+            self.exchange_received_input.setValidator(QIntValidator(0, 999, self))
             exchange_received_label = QLabel(
                 translation_service.tr("exchange_received")
             )
@@ -112,6 +115,7 @@ class LogFormWidget(QWidget):
             self.rs_tx_input.setSizePolicy(
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
             )
+            self.rs_tx_input.setValidator(QIntValidator(10, 99, self))
             rs_tx_label = QLabel(translation_service.tr("rs_tx"))
             rs_tx_label.setAlignment(
                 Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
@@ -128,6 +132,7 @@ class LogFormWidget(QWidget):
             self.exchange_sent_input.setSizePolicy(
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
             )
+            self.exchange_sent_input.setValidator(QIntValidator(0, 999, self))
             exchange_sent_label = QLabel(translation_service.tr("exchange_sent"))
             exchange_sent_label.setAlignment(
                 Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
@@ -228,6 +233,7 @@ class LogFormWidget(QWidget):
             self.rs_rx_input.setSizePolicy(
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
             )
+            self.rs_rx_input.setValidator(QIntValidator(10, 99, self))
             rs_rx_label = QLabel(translation_service.tr("rs_rx"))
             rs_rx_label.setAlignment(
                 Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
@@ -245,6 +251,7 @@ class LogFormWidget(QWidget):
             self.rs_tx_input.setSizePolicy(
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
             )
+            self.rs_tx_input.setValidator(QIntValidator(10, 99, self))
             rs_tx_label = QLabel(translation_service.tr("rs_tx"))
             rs_tx_label.setAlignment(
                 Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
