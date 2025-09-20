@@ -133,7 +133,7 @@ class LogContestView(QWidget):
         self.setLayout(layout)
         # Evitar foco en cola y tabla
         self.queue_widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.table_widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.table_widget.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         self.callsign_info.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.callsign_input.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.header_widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -142,7 +142,7 @@ class LogContestView(QWidget):
         if hasattr(self.queue_widget, "queue_list"):
             self.queue_widget.queue_list.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         if hasattr(self.table_widget, "table"):
-            self.table_widget.table.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.table_widget.table.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         # Refuerzo en botones
         self.add_contact_btn.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.delete_contact_btn.setFocusPolicy(Qt.FocusPolicy.StrongFocus)

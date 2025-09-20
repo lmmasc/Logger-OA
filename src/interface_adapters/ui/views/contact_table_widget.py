@@ -44,7 +44,23 @@ class ContactTableWidget(QWidget):
         # Conectar doble clic a método personalizado
         self.table.itemDoubleClicked.connect(self._on_item_double_clicked)
         # Evitar que la tabla reciba el foco por tabulación si no es interactiva
-        self.table.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.table.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
+        # Instalar eventFilter para detectar Tab
+        self.table.installEventFilter(self)
+
+    def eventFilter(self, obj, event):
+        from PySide6.QtCore import QEvent, Qt
+
+        if obj == self.table and event.type() == QEvent.KeyPress:
+            if event.key() == Qt.Key_F1:  # F1 key
+                parent = self.parent()
+                while parent is not None:
+                    callsign_input = getattr(parent, "callsign_input", None)
+                    if callsign_input is not None and hasattr(callsign_input, "input"):
+                        callsign_input.input.setFocus()
+                        return True  # Evento consumido
+                    parent = parent.parent()
+        return super().eventFilter(obj, event)
 
     # Definición de columnas y claves de traducción diferenciadas
     LOG_CONTEST_COLUMNS = [
