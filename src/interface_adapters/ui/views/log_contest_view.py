@@ -166,6 +166,11 @@ class LogContestView(QWidget):
                 self.form_widget.observations_input, self.add_contact_btn
             )
             QWidget.setTabOrder(self.add_contact_btn, self.delete_contact_btn)
+        # Habilitar el botón de eliminar solo si hay una fila seleccionada (igual que LogOpsView)
+        if hasattr(self.table_widget, "table"):
+            self.table_widget.table.itemSelectionChanged.connect(
+                self._on_selection_changed
+            )
         # Instalar eventFilter para F1 en toda la vista
         self.installEventFilter(self)
 
