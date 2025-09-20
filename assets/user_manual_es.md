@@ -29,6 +29,7 @@ Bienvenido a Logger OA, la aplicación multiplataforma para radioaficionados OA 
 Al abrir Logger OA, verás la ventana principal con los siguientes menús:
 
 
+
 ### Menú Archivo
 - **Nuevo** (submenú):
 	- **Nuevo operativo**: Crea un nuevo log de operación.
@@ -36,7 +37,11 @@ Al abrir Logger OA, verás la ventana principal con los siguientes menús:
 - **Abrir** (submenú):
 	- **Abrir operativo**: Abre un log de operación existente.
 	- **Abrir concurso**: Abre un log de concurso existente.
-- **Exportar log**: Exporta el log actual en formato compatible.
+- **Exportar** (submenú):
+	- **Exportar como TXT**: Exporta el log actual en formato texto plano. Al finalizar, se abre la carpeta y se selecciona el archivo exportado.
+	- **Exportar como CSV**: Exporta el log actual en formato CSV (hoja de cálculo). Al finalizar, se abre la carpeta y se selecciona el archivo exportado.
+	- **Exportar como ADI**: Exporta el log actual en formato ADIF para otros programas de radioafición. Al finalizar, se abre la carpeta y se selecciona el archivo exportado.
+	- **Exportar como PDF**: Exporta el log de concurso en formato planilla PDF (solo disponible para logs de concurso). Al finalizar, se abre la carpeta y se selecciona el archivo exportado.
 - **Cerrar log**: Cierra el log actual y vuelve a la pantalla de bienvenida.
 - **Abrir carpeta**: Accede rápidamente a la carpeta de trabajo.
 - **Salir**: Cierra la aplicación.

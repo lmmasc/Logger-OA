@@ -35,7 +35,11 @@ When you open Logger OA, you will see the main window with the following menus:
 - **Open** (submenu):
 	- **Open Operation Log**: Open an existing operation log.
 	- **Open Contest Log**: Open an existing contest log.
-- **Export Log**: Export the current log in a compatible format.
+- **Export** (submenu):
+	- **Export as TXT**: Export the current log in plain text format. When finished, the folder opens and the exported file is selected.
+	- **Export as CSV**: Export the current log in CSV (spreadsheet) format. When finished, the folder opens and the exported file is selected.
+	- **Export as ADI**: Export the current log in ADIF format for other ham radio programs. When finished, the folder opens and the exported file is selected.
+	- **Export as PDF**: Export the contest log in PDF sheet format (only available for contest logs). When finished, the folder opens and the exported file is selected.
 - **Close Log**: Close the current log and return to the welcome screen.
 - **Open Folder**: Quickly access the working folder.
 - **Exit**: Close the application.
@@ -122,7 +126,7 @@ When you open Logger OA, you will see the main window with the following menus:
 2. Choose the log file you want to open.
 
 ### Export Logs and Database
-- To export a log: **File > Export Log**.
+- To export a log: **File > Export > [Format]** (TXT, CSV, ADI, PDF). After exporting, the folder will open and the exported file will be selected automatically, regardless of your operating system (Windows, macOS, Linux). If your system does not support file selection, the folder will simply open as a fallback.
 - To export the database: **Database > Export to CSV**.
 
 ### Import OA Operators from PDF
