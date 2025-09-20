@@ -594,7 +594,7 @@ class LogFormWidget(QWidget):
                     ].table_widget
                     table_widget.set_contacts(contacts)
                     table = table_widget.table
-                    table.scrollToBottom()
+                    table.scrollToTop()
                     table.setFocus()
                     parent = self.parent()
                     while parent:
@@ -614,7 +614,7 @@ class LogFormWidget(QWidget):
                     ].table_widget
                     table_widget.set_contacts(contacts)
                     table = table_widget.table
-                    table.scrollToBottom()
+                    table.scrollToTop()
                     table.setFocus()
                     parent = self.parent()
                     while parent:

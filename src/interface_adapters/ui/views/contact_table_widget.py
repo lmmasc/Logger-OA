@@ -256,6 +256,8 @@ class ContactTableWidget(QWidget):
             if hasattr(current_log, "contacts"):
                 current_log.contacts = contacts
             self.set_contacts(contacts)
+            # Replicar el flujo del botón: seleccionar celda superior, foco y scroll
+            self.table.scrollToTop()
 
     def save_column_widths(self, *args):
         """
