@@ -28,7 +28,7 @@ class CallsignInputWidget(QWidget):
         super().__init__(parent)
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
+        layout.setSpacing(4)
         layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         # Label descriptivo
         self.label = QLabel("", self)
@@ -50,7 +50,8 @@ class CallsignInputWidget(QWidget):
         font.setBold(True)
         self.input.setFont(font)
         self.input.setFixedWidth(320)
-        self.input.setFixedHeight(64)
+        self.input.setFixedHeight(90)
+        self.input.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.label)
         layout.addWidget(self.input)
         self.setLayout(layout)

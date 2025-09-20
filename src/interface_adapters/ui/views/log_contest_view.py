@@ -42,7 +42,7 @@ class LogContestView(QWidget):
         self.callsign = callsign
         self.log_date = log_date
         layout = QVBoxLayout()
-        layout.setContentsMargins(10, 4, 10, 10)
+        layout.setContentsMargins(10, 4, 10, 4)
         layout.setSpacing(2)
         layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         # Header al inicio
@@ -54,7 +54,7 @@ class LogContestView(QWidget):
         # Fila horizontal: input de indicativo y área de info
         indicativo_row = QWidget(self)
         indicativo_layout = QHBoxLayout(indicativo_row)
-        indicativo_layout.setContentsMargins(0, 0, 0, 0)
+        indicativo_layout.setContentsMargins(10, 0, 10, 0)
         indicativo_layout.setSpacing(8)
         indicativo_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         self.callsign_input = CallsignInputWidget(indicativo_row)
@@ -102,7 +102,7 @@ class LogContestView(QWidget):
         self.delete_contact_btn.clicked.connect(self._on_delete_contact)
         clock_row = QWidget(self)
         clock_layout = QHBoxLayout(clock_row)
-        clock_layout.setContentsMargins(0, 0, 0, 0)
+        clock_layout.setContentsMargins(10, 0, 10, 0)
         clock_layout.setSpacing(16)
         clock_layout.addWidget(self.oa_clock)
         clock_layout.addWidget(self.utc_clock)

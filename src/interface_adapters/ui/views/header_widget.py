@@ -22,7 +22,7 @@ class HeaderWidget(QWidget):
         self.label = QLabel(text)
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         font = QFont()
-        font.setPointSize(22)
+        font.setPointSize(18)
         font.setBold(True)
         self.label.setFont(font)
         layout.addWidget(self.label)
