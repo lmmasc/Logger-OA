@@ -83,6 +83,7 @@ class LogContestView(QWidget):
         self.queue_widget.setCallsign.connect(self.callsign_input.set_callsign)
         # Conectar señal para agregar a la cola desde el input de indicativo
         self.callsign_input.addToQueue.connect(self.queue_widget.add_to_queue)
+        self.callsign_input.addContactRequested.connect(self._on_add_contact)
         # Formulario de log de concurso
         self.form_widget = LogFormWidget(
             self,

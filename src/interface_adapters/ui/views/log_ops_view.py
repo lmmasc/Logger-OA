@@ -133,6 +133,7 @@ class LogOpsView(QWidget):
         self.table_widget.table.itemSelectionChanged.connect(self._on_selection_changed)
         self.queue_widget.setCallsign.connect(self.callsign_input.set_callsign)
         self.callsign_input.addToQueue.connect(self.queue_widget.add_to_queue)
+        self.callsign_input.addContactRequested.connect(self._on_add_contact)
         self.callsign_info.suggestionSelected.connect(self._on_suggestion_selected)
         self.callsign_input.input.textChanged.connect(self.callsign_info.update_info)
         self.callsign_info.update_info(self.callsign_input.get_callsign())

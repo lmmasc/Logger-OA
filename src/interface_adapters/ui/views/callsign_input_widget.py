@@ -12,6 +12,7 @@ from translation.translation_service import translation_service
 
 
 class CallsignInputWidget(QWidget):
+    addContactRequested = Signal(str)  # Señal para agregar contacto directamente
     """
     Widget independiente para el campo de indicativo (callsign).
     Permite reutilización y fácil integración de validaciones/autocompletado.
@@ -57,7 +58,7 @@ class CallsignInputWidget(QWidget):
         self.setLayout(layout)
         # Conexiones
         self.input.textChanged.connect(self._normalize_upper)
-        self.input.returnPressed.connect(self._on_return_pressed)
+        self.input.installEventFilter(self)
         translation_service.signal.language_changed.connect(self.retranslate_ui)
         # Refuerzo de tabulación: solo el campo input debe recibir el foco
         self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -78,14 +79,21 @@ class CallsignInputWidget(QWidget):
             self.input.setCursorPosition(cursor_pos)
             self.input.blockSignals(False)
 
-    def _on_return_pressed(self):
-        """
-        Emite la señal addToQueue con el indicativo ingresado y limpia el campo.
-        """
-        text = self.input.text().strip()
-        if text:
-            self.addToQueue.emit(text)
-            self.input.clear()
+    def eventFilter(self, obj, event):
+        from PySide6.QtCore import QEvent, Qt
+
+        if obj == self.input and event.type() == QEvent.KeyPress:  # type: ignore
+            if event.key() in (Qt.Key_Return, Qt.Key_Enter):  # type: ignore
+                text = self.input.text().strip()
+                if text:
+                    if event.modifiers() & Qt.KeyboardModifier.AltModifier:  # Alt+Enter
+                        self.addContactRequested.emit(text)
+                        return True
+                    else:
+                        self.addToQueue.emit(text)
+                        self.input.clear()
+                        return True
+        return super().eventFilter(obj, event)
 
     def get_callsign(self):
         """
