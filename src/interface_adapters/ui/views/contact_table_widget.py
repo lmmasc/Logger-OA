@@ -167,7 +167,15 @@ class ContactTableWidget(QWidget):
                     value = str(val).zfill(3) if val else ""
                 else:
                     value = contact.get(key, "")
-                self.table.setItem(row, col, QTableWidgetItem(str(value)))
+                # --- Alineación derecha para RS_RX y RS_TX en concursos ---
+                if self.log_type == LogType.CONTEST_LOG and key in ("rs_rx", "rs_tx"):
+                    item = QTableWidgetItem(str(value))
+                    item.setTextAlignment(
+                        Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+                    )
+                    self.table.setItem(row, col, item)
+                else:
+                    self.table.setItem(row, col, QTableWidgetItem(str(value)))
         self.table.viewport().update()
         self.table.repaint()
         self.table.hide()
