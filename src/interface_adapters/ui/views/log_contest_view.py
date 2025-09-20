@@ -109,6 +109,7 @@ class LogContestView(QWidget):
         self.qrz_btn.setObjectName("QRZButton")
         self.qrz_btn.setToolTip("Abrir QRZ.com para el indicativo")
         self.qrz_btn.clicked.connect(self._on_open_qrz)
+        self.qrz_btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         clock_row = QWidget(self)
         clock_layout = QHBoxLayout(clock_row)
         clock_layout.setContentsMargins(10, 0, 10, 0)
