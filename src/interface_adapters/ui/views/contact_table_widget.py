@@ -51,8 +51,8 @@ class ContactTableWidget(QWidget):
     def eventFilter(self, obj, event):
         from PySide6.QtCore import QEvent, Qt
 
-        if obj == self.table and event.type() == QEvent.KeyPress:
-            if event.key() == Qt.Key_F1:  # F1 key
+        if obj == self.table and event.type() == QEvent.KeyPress:  # type: ignore
+            if event.key() == Qt.Key_F1:  # type: ignore  # F1 key
                 parent = self.parent()
                 while parent is not None:
                     callsign_input = getattr(parent, "callsign_input", None)
