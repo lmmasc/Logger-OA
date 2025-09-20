@@ -166,6 +166,22 @@ class LogContestView(QWidget):
                 self.form_widget.observations_input, self.add_contact_btn
             )
             QWidget.setTabOrder(self.add_contact_btn, self.delete_contact_btn)
+        # Instalar eventFilter para F1 en toda la vista
+        self.installEventFilter(self)
+
+    def eventFilter(self, obj, event):
+        from PySide6.QtCore import QEvent, Qt
+
+        # Detectar F1 en toda la ventana
+        if event.type() == QEvent.KeyPress:  # type: ignore
+            if event.key() == Qt.Key_F1:  # type: ignore
+                # Foco al campo input de indicativo
+                if hasattr(self, "callsign_input") and hasattr(
+                    self.callsign_input, "input"
+                ):
+                    self.callsign_input.input.setFocus()
+                    return True
+        return super().eventFilter(obj, event)
         # Habilitar el botón de eliminar solo si hay una fila seleccionada
         self.table_widget.table.itemSelectionChanged.connect(self._on_selection_changed)
 

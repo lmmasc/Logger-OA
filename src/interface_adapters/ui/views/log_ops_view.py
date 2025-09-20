@@ -174,6 +174,22 @@ class LogOpsView(QWidget):
             QWidget.setTabOrder(
                 self.form_widget.rs_tx_input, self.form_widget.observations_input
             )
+        # Instalar eventFilter para F1 en toda la vista
+        self.installEventFilter(self)
+
+    def eventFilter(self, obj, event):
+        from PySide6.QtCore import QEvent, Qt
+
+        # Detectar F1 en toda la ventana
+        if event.type() == QEvent.KeyPress:  # type: ignore
+            if event.key() == Qt.Key_F1:  # type: ignore
+                # Foco al campo input de indicativo
+                if hasattr(self, "callsign_input") and hasattr(
+                    self.callsign_input, "input"
+                ):
+                    self.callsign_input.input.setFocus()
+                    return True
+        return super().eventFilter(obj, event)
 
     def set_log_data(self, log):
         """
