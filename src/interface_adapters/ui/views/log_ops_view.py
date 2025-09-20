@@ -328,7 +328,7 @@ class LogOpsView(QWidget):
         msg_box.setWindowTitle(translation_service.tr("delete_contact"))
         msg_box.setText(translation_service.tr("dialog_confirm_delete_contact"))
         msg_box.setInformativeText(
-            f"{translation_service.tr('table_header_callsign')}: {callsign}\n{translation_service.tr('table_header_name')}: {name}"
+            f"{translation_service.tr('log_operative_table_header_callsign')}: {callsign}\n{translation_service.tr('log_operative_table_header_name')}: {name}"
         )
         msg_box.setStandardButtons(
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No

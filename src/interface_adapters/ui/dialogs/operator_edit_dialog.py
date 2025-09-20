@@ -88,7 +88,7 @@ class OperatorEditDialog(QDialog):
         ]
         for key, widget_cls in fields:
             row = QHBoxLayout()
-            label = QLabel(translation_service.tr(f"table_header_{key}"))
+            label = QLabel(translation_service.tr(f"db_table_header_{key}"))
             row.addWidget(label)
             if widget_cls == QLineEdit:
                 widget = QLineEdit()
@@ -117,7 +117,7 @@ class OperatorEditDialog(QDialog):
             layout.addLayout(row)
         # --- Campo country como combo y campo adicional ---
         row_country = QHBoxLayout()
-        label_country = QLabel(translation_service.tr("table_header_country"))
+        label_country = QLabel(translation_service.tr("db_table_header_country"))
         row_country.addWidget(label_country)
         self.country_combo = QComboBox()
         self.country_combo.addItems(["PERU", "OTROS"])
