@@ -294,6 +294,7 @@ UI_TRANSLATIONS = {
     "set_callsign_dialog_title": "Setear indicativo",
     "set_callsign_dialog_label": "Ingrese el nuevo indicativo:",
     "log_type_mismatch_error": "El archivo seleccionado no corresponde al tipo de log esperado.",
+    "dialog_no_callsign_entered": "No se ha ingresado un indicativo.",
 }
 
 ALL_KEYS_TRANSLATIONS = {}

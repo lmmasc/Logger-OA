@@ -104,6 +104,11 @@ class LogContestView(QWidget):
         self.delete_contact_btn.setObjectName("DeleteContactButton")
         self.delete_contact_btn.setEnabled(False)
         self.delete_contact_btn.clicked.connect(self._on_delete_contact)
+        # Botón QRZ
+        self.qrz_btn = QPushButton("QRZ", self)
+        self.qrz_btn.setObjectName("QRZButton")
+        self.qrz_btn.setToolTip("Abrir QRZ.com para el indicativo")
+        self.qrz_btn.clicked.connect(self._on_open_qrz)
         clock_row = QWidget(self)
         clock_layout = QHBoxLayout(clock_row)
         clock_layout.setContentsMargins(10, 0, 10, 0)
@@ -112,6 +117,7 @@ class LogContestView(QWidget):
         clock_layout.addWidget(self.utc_clock)
         clock_layout.addWidget(self.add_contact_btn)
         clock_layout.addWidget(self.delete_contact_btn)
+        clock_layout.addWidget(self.qrz_btn)
         clock_row.setLayout(clock_layout)
         layout.addWidget(clock_row)
         # Tabla de contactos
@@ -374,3 +380,17 @@ class LogContestView(QWidget):
         """
         selected_rows = self.table_widget.table.selectionModel().selectedRows()
         self.delete_contact_btn.setEnabled(len(selected_rows) == 1)
+
+    def _on_open_qrz(self):
+        callsign = self.callsign_input.get_callsign().strip()
+        if not callsign:
+            from PySide6.QtWidgets import QMessageBox
+
+            QMessageBox.warning(
+                self, "QRZ", translation_service.tr("dialog_no_callsign_entered")
+            )
+            return
+        import webbrowser
+
+        url = f"https://www.qrz.com/db/{callsign}"
+        webbrowser.open(url)

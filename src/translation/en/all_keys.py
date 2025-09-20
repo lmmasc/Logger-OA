@@ -294,6 +294,7 @@ UI_TRANSLATIONS = {
     "set_callsign_dialog_title": "Set callsign",
     "set_callsign_dialog_label": "Enter new callsign:",
     "log_type_mismatch_error": "The selected file does not match the expected log type.",
+    "dialog_no_callsign_entered": "No callsign entered.",
 }
 
 ALL_KEYS_TRANSLATIONS = {}
