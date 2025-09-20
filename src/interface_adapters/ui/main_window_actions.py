@@ -1,43 +1,6 @@
 import sys
 import subprocess
 
-
-def open_folder_and_select_file(file_path):
-    """
-    Abre el explorador de archivos en la carpeta del archivo y lo selecciona si es posible.
-    Funciona en Windows, macOS y Linux (con fallback).
-    """
-    folder = os.path.dirname(file_path)
-    try:
-        if sys.platform.startswith("win"):
-            # Windows: explorer /select,"file"
-            subprocess.run(["explorer", "/select,", os.path.normpath(file_path)])
-        elif sys.platform == "darwin":
-            # macOS: open -R "file"
-            subprocess.run(["open", "-R", file_path])
-        elif sys.platform.startswith("linux"):
-            # Linux: intentar con nautilus, dolphin, thunar, luego fallback a xdg-open
-            # Selección si posible
-            for cmd in [
-                ["nautilus", "--select", file_path],
-                ["dolphin", "--select", file_path],
-                ["thunar", folder],
-            ]:
-                try:
-                    subprocess.Popen(cmd)
-                    return
-                except FileNotFoundError:
-                    continue
-            # Fallback: abrir solo la carpeta
-            subprocess.Popen(["xdg-open", folder])
-        else:
-            # Otros sistemas: solo abrir la carpeta
-            QDesktopServices.openUrl(QUrl.fromLocalFile(folder))
-    except Exception:
-        # Fallback final: abrir la carpeta
-        QDesktopServices.openUrl(QUrl.fromLocalFile(folder))
-
-
 """
 main_window_actions.py
 Acciones y handlers para MainWindow de Logger OA v2.
@@ -258,6 +221,42 @@ def action_log_open_concurso(self):
         self.current_log_type = None
         self.show_view(ViewID.WELCOME_VIEW)
     self.update_menu_state()
+
+
+def open_folder_and_select_file(file_path):
+    """
+    Abre el explorador de archivos en la carpeta del archivo y lo selecciona si es posible.
+    Funciona en Windows, macOS y Linux (con fallback).
+    """
+    folder = os.path.dirname(file_path)
+    try:
+        if sys.platform.startswith("win"):
+            # Windows: explorer /select,"file"
+            subprocess.run(["explorer", "/select,", os.path.normpath(file_path)])
+        elif sys.platform == "darwin":
+            # macOS: open -R "file"
+            subprocess.run(["open", "-R", file_path])
+        elif sys.platform.startswith("linux"):
+            # Linux: intentar con nautilus, dolphin, thunar, luego fallback a xdg-open
+            # Selección si posible
+            for cmd in [
+                ["nautilus", "--select", file_path],
+                ["dolphin", "--select", file_path],
+                ["thunar", folder],
+            ]:
+                try:
+                    subprocess.Popen(cmd)
+                    return
+                except FileNotFoundError:
+                    continue
+            # Fallback: abrir solo la carpeta
+            subprocess.Popen(["xdg-open", folder])
+        else:
+            # Otros sistemas: solo abrir la carpeta
+            QDesktopServices.openUrl(QUrl.fromLocalFile(folder))
+    except Exception:
+        # Fallback final: abrir la carpeta
+        QDesktopServices.openUrl(QUrl.fromLocalFile(folder))
 
 
 def action_log_export_txt(self):
