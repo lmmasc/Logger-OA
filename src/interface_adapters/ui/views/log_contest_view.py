@@ -79,6 +79,10 @@ class LogContestView(QWidget):
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
         )
         layout.addWidget(self.queue_widget)
+        # Conectar señal para llenar el campo de indicativo al hacer click en la cola
+        self.queue_widget.setCallsign.connect(self.callsign_input.set_callsign)
+        # Conectar señal para agregar a la cola desde el input de indicativo
+        self.callsign_input.addToQueue.connect(self.queue_widget.add_to_queue)
         # Formulario de log de concurso
         self.form_widget = LogFormWidget(
             self,
