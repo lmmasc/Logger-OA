@@ -41,6 +41,10 @@ class MainMenuBar(QMenuBar):
     log_new_concurso_requested = Signal()
     log_open_operativo_requested = Signal()
     log_open_concurso_requested = Signal()
+    log_export_txt_requested = Signal()
+    log_export_csv_requested = Signal()
+    log_export_adi_requested = Signal()
+    log_export_pdf_requested = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -75,8 +79,18 @@ class MainMenuBar(QMenuBar):
         self.open_menu.addAction(self.log_open_concurso_action)
         self.file_menu.addMenu(self.open_menu)
 
-        self.log_export_action = QAction(translation_service.tr("menu_export"), self)
-        self.file_menu.addAction(self.log_export_action)
+        # Submenú Exportar
+        self.export_menu = QMenu(translation_service.tr("menu_export"), self.file_menu)
+        self.export_txt_action = QAction("Exportar como TXT", self)
+        self.export_csv_action = QAction("Exportar como CSV", self)
+        self.export_adi_action = QAction("Exportar como ADI", self)
+        self.export_pdf_action = QAction("Exportar como PDF", self)
+        self.export_menu.addAction(self.export_txt_action)
+        self.export_menu.addAction(self.export_csv_action)
+        self.export_menu.addAction(self.export_adi_action)
+        self.export_menu.addAction(self.export_pdf_action)
+        self.file_menu.addMenu(self.export_menu)
+
         self.log_close_action = QAction(translation_service.tr("menu_close"), self)
         self.file_menu.addAction(self.log_close_action)
         self.file_menu.addSeparator()
@@ -228,7 +242,6 @@ class MainMenuBar(QMenuBar):
         self.log_open_concurso_action.triggered.connect(
             self.log_open_concurso_requested.emit
         )
-        self.log_export_action.triggered.connect(self.log_export_requested.emit)
         self.log_close_action.triggered.connect(self.log_close_requested.emit)
         self.db_import_pdf_action.triggered.connect(self.db_import_pdf_requested.emit)
         self.db_export_action.triggered.connect(self.db_export_requested.emit)
@@ -244,6 +257,10 @@ class MainMenuBar(QMenuBar):
         self.lang_en_action.triggered.connect(self.lang_en_requested.emit)
         self.lang_auto_action.triggered.connect(self.lang_auto_requested.emit)
         self.manual_action.triggered.connect(self.manual_requested.emit)
+        self.export_txt_action.triggered.connect(self.log_export_txt_requested.emit)
+        self.export_csv_action.triggered.connect(self.log_export_csv_requested.emit)
+        self.export_adi_action.triggered.connect(self.log_export_adi_requested.emit)
+        self.export_pdf_action.triggered.connect(self.log_export_pdf_requested.emit)
 
     def retranslate_ui(self):
         self.file_menu.setTitle(translation_service.tr("menu_file_menu"))
@@ -263,7 +280,6 @@ class MainMenuBar(QMenuBar):
         self.log_open_concurso_action.setText(
             translation_service.tr("menu_open_concurso")
         )
-        self.log_export_action.setText(translation_service.tr("menu_export"))
         self.log_close_action.setText(translation_service.tr("menu_close"))
 
         self.database_menu.setTitle(translation_service.tr("menu_database_menu"))

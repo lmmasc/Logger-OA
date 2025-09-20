@@ -280,6 +280,186 @@ def action_log_export(self):
         )
 
 
+def action_log_export_txt(self):
+    """
+    Exporta el log abierto en formato TXT.
+    """
+    if not hasattr(self, "current_log") or self.current_log is None:
+        QMessageBox.warning(
+            self,
+            translation_service.tr("main_window_title"),
+            translation_service.tr("no_log_open"),
+        )
+        return
+    db_path = getattr(self.current_log, "db_path", None)
+    if not db_path:
+        QMessageBox.warning(
+            self,
+            translation_service.tr("main_window_title"),
+            translation_service.tr("no_db_path"),
+        )
+        return
+    base_name = os.path.splitext(os.path.basename(db_path))[0]
+    default_filename = f"{base_name}.txt"
+    export_dir = get_export_dir()
+    export_path, _ = QFileDialog.getSaveFileName(
+        self,
+        translation_service.tr("export_log"),
+        os.path.join(export_dir, default_filename),
+        "TXT (*.txt)",
+    )
+    if not export_path:
+        return
+    try:
+        export_log.export_log_to_txt(db_path, export_path)
+        QMessageBox.information(
+            self,
+            translation_service.tr("export_log"),
+            translation_service.tr("export_success"),
+        )
+    except Exception as e:
+        QMessageBox.critical(
+            self,
+            translation_service.tr("export_log"),
+            f"{translation_service.tr('export_failed')}: {e}",
+        )
+
+
+def action_log_export_csv(self):
+    """
+    Exporta el log abierto en formato CSV.
+    """
+    if not hasattr(self, "current_log") or self.current_log is None:
+        QMessageBox.warning(
+            self,
+            translation_service.tr("main_window_title"),
+            translation_service.tr("no_log_open"),
+        )
+        return
+    db_path = getattr(self.current_log, "db_path", None)
+    if not db_path:
+        QMessageBox.warning(
+            self,
+            translation_service.tr("main_window_title"),
+            translation_service.tr("no_db_path"),
+        )
+        return
+    base_name = os.path.splitext(os.path.basename(db_path))[0]
+    default_filename = f"{base_name}.csv"
+    export_dir = get_export_dir()
+    export_path, _ = QFileDialog.getSaveFileName(
+        self,
+        translation_service.tr("export_log"),
+        os.path.join(export_dir, default_filename),
+        "CSV (*.csv)",
+    )
+    if not export_path:
+        return
+    try:
+        export_log.export_log_to_csv(db_path, export_path)
+        QMessageBox.information(
+            self,
+            translation_service.tr("export_log"),
+            translation_service.tr("export_success"),
+        )
+    except Exception as e:
+        QMessageBox.critical(
+            self,
+            translation_service.tr("export_log"),
+            f"{translation_service.tr('export_failed')}: {e}",
+        )
+
+
+def action_log_export_adi(self):
+    """
+    Exporta el log abierto en formato ADI (ADIF).
+    """
+    if not hasattr(self, "current_log") or self.current_log is None:
+        QMessageBox.warning(
+            self,
+            translation_service.tr("main_window_title"),
+            translation_service.tr("no_log_open"),
+        )
+        return
+    db_path = getattr(self.current_log, "db_path", None)
+    if not db_path:
+        QMessageBox.warning(
+            self,
+            translation_service.tr("main_window_title"),
+            translation_service.tr("no_db_path"),
+        )
+        return
+    base_name = os.path.splitext(os.path.basename(db_path))[0]
+    default_filename = f"{base_name}.adi"
+    export_dir = get_export_dir()
+    export_path, _ = QFileDialog.getSaveFileName(
+        self,
+        translation_service.tr("export_log"),
+        os.path.join(export_dir, default_filename),
+        "ADI (*.adi)",
+    )
+    if not export_path:
+        return
+    try:
+        export_log.export_log_to_adi(db_path, export_path)
+        QMessageBox.information(
+            self,
+            translation_service.tr("export_log"),
+            translation_service.tr("export_success"),
+        )
+    except Exception as e:
+        QMessageBox.critical(
+            self,
+            translation_service.tr("export_log"),
+            f"{translation_service.tr('export_failed')}: {e}",
+        )
+
+
+def action_log_export_pdf(self):
+    """
+    Exporta el log abierto en formato PDF.
+    """
+    if not hasattr(self, "current_log") or self.current_log is None:
+        QMessageBox.warning(
+            self,
+            translation_service.tr("main_window_title"),
+            translation_service.tr("no_log_open"),
+        )
+        return
+    db_path = getattr(self.current_log, "db_path", None)
+    if not db_path:
+        QMessageBox.warning(
+            self,
+            translation_service.tr("main_window_title"),
+            translation_service.tr("no_db_path"),
+        )
+        return
+    base_name = os.path.splitext(os.path.basename(db_path))[0]
+    default_filename = f"{base_name}.pdf"
+    export_dir = get_export_dir()
+    export_path, _ = QFileDialog.getSaveFileName(
+        self,
+        translation_service.tr("export_log"),
+        os.path.join(export_dir, default_filename),
+        "PDF (*.pdf)",
+    )
+    if not export_path:
+        return
+    try:
+        export_log.export_log_to_pdf(db_path, export_path)
+        QMessageBox.information(
+            self,
+            translation_service.tr("export_log"),
+            translation_service.tr("export_success"),
+        )
+    except Exception as e:
+        QMessageBox.critical(
+            self,
+            translation_service.tr("export_log"),
+            f"{translation_service.tr('export_failed')}: {e}",
+        )
+
+
 def action_log_close(self):
     """
     Cierra el log actual y vuelve a la vista de bienvenida.

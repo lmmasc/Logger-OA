@@ -40,6 +40,10 @@ from .main_window_actions import (
     action_open_data_folder,
     action_show_db_window,
     action_on_db_table_window_closed,
+    action_log_export_txt,
+    action_log_export_csv,
+    action_log_export_adi,
+    action_log_export_pdf,
 )
 from .main_window_dialogs import show_about_dialog, show_manual_dialog
 from .main_window_config import (
@@ -198,7 +202,7 @@ class MainWindow(QMainWindow):
         self.menu_bar.new_menu.setEnabled(not log_open)
         self.menu_bar.open_menu.setEnabled(not log_open)
         # Exportar y cerrar solo si hay log abierto
-        self.menu_bar.log_export_action.setEnabled(log_open)
+        self.menu_bar.export_menu.setEnabled(log_open)
         self.menu_bar.log_close_action.setEnabled(log_open)
 
     def _connect_menu_actions(self) -> None:
@@ -257,6 +261,18 @@ class MainWindow(QMainWindow):
         )
         self.menu_bar.callsign_always_ask_mode_action.triggered.connect(
             self._on_callsign_always_ask_mode
+        )
+        self.menu_bar.export_txt_action.triggered.connect(
+            lambda: action_log_export_txt(self)
+        )
+        self.menu_bar.export_csv_action.triggered.connect(
+            lambda: action_log_export_csv(self)
+        )
+        self.menu_bar.export_adi_action.triggered.connect(
+            lambda: action_log_export_adi(self)
+        )
+        self.menu_bar.export_pdf_action.triggered.connect(
+            lambda: action_log_export_pdf(self)
         )
 
     def _on_theme_selected(self, theme_key: str):
