@@ -162,6 +162,23 @@ When you open Logger OA, you will see the main window with the following menus:
 
 ---
 
+## Fast workflow and keyboard shortcuts
+
+Logger OA is optimized for efficient operation using only the keyboard. The available shortcuts let you register contacts and navigate the main sections without using the mouse:
+
+- **Enter** in the callsign field: adds the callsign to the waiting queue.
+- **Alt + Enter** in the callsign field: adds the contact directly to the log (if all required data is valid).
+- **Enter** on an operator suggestion: auto-completes the callsign field with the selected suggestion.
+- **Enter** on a callsign in the waiting queue: auto-completes the callsign field with the selected callsign.
+- **F1**: focus on the callsign input field.
+- **F2**: focus on the operator suggestions list.
+- **F3**: focus on the waiting queue.
+- **F4**: focus on the contacts table.
+
+These shortcuts enable a fast and efficient workflow, especially during intensive operation or contests. All functions have been implemented and tested to allow full keyboard control.
+
+---
+
 ## Frequently Asked Questions
 
 **Where is my data stored?**  

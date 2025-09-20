@@ -165,6 +165,23 @@ Al abrir Logger OA, verás la ventana principal con los siguientes menús:
 
 ---
 
+## Trabajo ágil y accesos rápidos con teclado
+
+Logger OA está optimizado para operar de forma eficiente solo con el teclado. Los accesos rápidos implementados permiten registrar contactos y navegar por las secciones principales sin depender del mouse:
+
+- **Enter** en el campo de indicativo: agrega el indicativo a la cola de espera.
+- **Alt + Enter** en el campo de indicativo: agrega el contacto directamente al log (si los datos están completos y válidos).
+- **Enter** sobre una sugerencia de operador: autocompleta el campo de indicativo con la sugerencia seleccionada.
+- **Enter** sobre un indicativo en la cola de espera: autocompleta el campo de indicativo con el indicativo seleccionado.
+- **F1**: foco al campo de ingreso de indicativo.
+- **F2**: foco a la lista de sugerencias de operadores.
+- **F3**: foco a la cola de espera de indicativos.
+- **F4**: foco a la tabla de contactos registrados.
+
+Estos accesos permiten un flujo de trabajo ágil y eficiente, especialmente en situaciones de operación intensiva o concursos. Todas las funciones han sido implementadas y probadas para facilitar el manejo solo con teclado.
+
+---
+
 ## Preguntas frecuentes
 
 **¿Dónde se guardan mis datos?**  
@@ -178,6 +195,7 @@ Importa el PDF oficial más reciente desde el menú correspondiente.
 
 **¿Cómo obtengo ayuda?**  
 La única ayuda disponible es la que se brinda en este manual de usuario, accesible desde el menú Ayuda > Manual de uso dentro de la aplicación. No se ofrece soporte oficial ni atención personalizada. Pero siempre habrá algun colega OA que te pueda ayudar !
+
 
 ---
 
