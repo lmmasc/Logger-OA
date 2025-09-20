@@ -1,3 +1,43 @@
+import sys
+import subprocess
+
+
+def open_folder_and_select_file(file_path):
+    """
+    Abre el explorador de archivos en la carpeta del archivo y lo selecciona si es posible.
+    Funciona en Windows, macOS y Linux (con fallback).
+    """
+    folder = os.path.dirname(file_path)
+    try:
+        if sys.platform.startswith("win"):
+            # Windows: explorer /select,"file"
+            subprocess.run(["explorer", "/select,", os.path.normpath(file_path)])
+        elif sys.platform == "darwin":
+            # macOS: open -R "file"
+            subprocess.run(["open", "-R", file_path])
+        elif sys.platform.startswith("linux"):
+            # Linux: intentar con nautilus, dolphin, thunar, luego fallback a xdg-open
+            # Selección si posible
+            for cmd in [
+                ["nautilus", "--select", file_path],
+                ["dolphin", "--select", file_path],
+                ["thunar", folder],
+            ]:
+                try:
+                    subprocess.Popen(cmd)
+                    return
+                except FileNotFoundError:
+                    continue
+            # Fallback: abrir solo la carpeta
+            subprocess.Popen(["xdg-open", folder])
+        else:
+            # Otros sistemas: solo abrir la carpeta
+            QDesktopServices.openUrl(QUrl.fromLocalFile(folder))
+    except Exception:
+        # Fallback final: abrir la carpeta
+        QDesktopServices.openUrl(QUrl.fromLocalFile(folder))
+
+
 """
 main_window_actions.py
 Acciones y handlers para MainWindow de Logger OA v2.
@@ -252,11 +292,7 @@ def action_log_export_txt(self):
         return
     try:
         export_log.export_log_to_txt(db_path, export_path)
-        QMessageBox.information(
-            self,
-            translation_service.tr("export_log"),
-            translation_service.tr("export_success"),
-        )
+        open_folder_and_select_file(export_path)
     except Exception as e:
         QMessageBox.critical(
             self,
@@ -297,11 +333,7 @@ def action_log_export_csv(self):
         return
     try:
         export_log.export_log_to_csv(db_path, export_path)
-        QMessageBox.information(
-            self,
-            translation_service.tr("export_log"),
-            translation_service.tr("export_success"),
-        )
+        open_folder_and_select_file(export_path)
     except Exception as e:
         QMessageBox.critical(
             self,
@@ -342,11 +374,7 @@ def action_log_export_adi(self):
         return
     try:
         export_log.export_log_to_adi(db_path, export_path)
-        QMessageBox.information(
-            self,
-            translation_service.tr("export_log"),
-            translation_service.tr("export_success"),
-        )
+        open_folder_and_select_file(export_path)
     except Exception as e:
         QMessageBox.critical(
             self,
@@ -398,11 +426,7 @@ def action_log_export_pdf(self):
         return
     try:
         export_log.export_log_to_pdf(db_path, export_path)
-        QMessageBox.information(
-            self,
-            translation_service.tr("export_log"),
-            translation_service.tr("export_success"),
-        )
+        open_folder_and_select_file(export_path)
     except Exception as e:
         QMessageBox.critical(
             self,
