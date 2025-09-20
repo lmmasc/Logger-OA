@@ -177,6 +177,7 @@ Logger OA está optimizado para operar de forma eficiente solo con el teclado. L
 - **F2**: foco a la lista de sugerencias de operadores.
 - **F3**: foco a la cola de espera de indicativos.
 - **F4**: foco a la tabla de contactos registrados.
+- **Suprimir (Delete)**: elimina el contacto seleccionado si la acción está habilitada, replicando el flujo del botón de eliminar contacto (requiere confirmación).
 
 Estos accesos permiten un flujo de trabajo ágil y eficiente, especialmente en situaciones de operación intensiva o concursos. Todas las funciones han sido implementadas y probadas para facilitar el manejo solo con teclado.
 

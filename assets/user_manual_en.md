@@ -174,6 +174,7 @@ Logger OA is optimized for efficient operation using only the keyboard. The avai
 - **F2**: focus on the operator suggestions list.
 - **F3**: focus on the waiting queue.
 - **F4**: focus on the contacts table.
+- **Delete**: deletes the selected contact if the action is enabled, replicating the behavior of the delete contact button (confirmation required).
 
 These shortcuts enable a fast and efficient workflow, especially during intensive operation or contests. All functions have been implemented and tested to allow full keyboard control.
 

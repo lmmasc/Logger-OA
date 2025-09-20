@@ -209,6 +209,14 @@ class LogContestView(QWidget):
                 ):
                     self.table_widget.table.setFocus()
                     return True
+            # Suprimir: eliminar contacto si el botón está habilitado
+            if event.key() == Qt.Key_Delete:  # type: ignore
+                if (
+                    hasattr(self, "delete_contact_btn")
+                    and self.delete_contact_btn.isEnabled()
+                ):
+                    self.delete_contact_btn.click()
+                    return True
         return super().eventFilter(obj, event)
         # Habilitar el botón de eliminar solo si hay una fila seleccionada
         self.table_widget.table.itemSelectionChanged.connect(self._on_selection_changed)
