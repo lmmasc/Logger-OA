@@ -81,10 +81,18 @@ class MainMenuBar(QMenuBar):
 
         # Submenú Exportar
         self.export_menu = QMenu(translation_service.tr("menu_export"), self.file_menu)
-        self.export_txt_action = QAction("Exportar como TXT", self)
-        self.export_csv_action = QAction("Exportar como CSV", self)
-        self.export_adi_action = QAction("Exportar como ADI", self)
-        self.export_pdf_action = QAction("Exportar como PDF", self)
+        self.export_txt_action = QAction(
+            translation_service.tr("menu_export_txt"), self
+        )
+        self.export_csv_action = QAction(
+            translation_service.tr("menu_export_csv"), self
+        )
+        self.export_adi_action = QAction(
+            translation_service.tr("menu_export_adi"), self
+        )
+        self.export_pdf_action = QAction(
+            translation_service.tr("menu_export_pdf"), self
+        )
         self.export_menu.addAction(self.export_txt_action)
         self.export_menu.addAction(self.export_csv_action)
         self.export_menu.addAction(self.export_adi_action)
@@ -281,6 +289,13 @@ class MainMenuBar(QMenuBar):
             translation_service.tr("menu_open_concurso")
         )
         self.log_close_action.setText(translation_service.tr("menu_close"))
+
+        self.export_menu.setTitle(translation_service.tr("menu_export"))
+
+        self.export_txt_action.setText(translation_service.tr("menu_export_txt"))
+        self.export_csv_action.setText(translation_service.tr("menu_export_csv"))
+        self.export_adi_action.setText(translation_service.tr("menu_export_adi"))
+        self.export_pdf_action.setText(translation_service.tr("menu_export_pdf"))
 
         self.database_menu.setTitle(translation_service.tr("menu_database_menu"))
         self.db_import_pdf_action.setText(
