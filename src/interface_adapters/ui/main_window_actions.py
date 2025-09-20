@@ -142,6 +142,18 @@ def action_log_open_operativo(self):
     if file_path:
         try:
             log = open_log(file_path)
+            # Verificar tipo de log
+            if getattr(log, "log_type", None) != LogType.OPERATION_LOG:
+                QMessageBox.critical(
+                    self,
+                    translation_service.tr("main_window_title"),
+                    translation_service.tr("log_type_mismatch_error"),
+                )
+                self.current_log = None
+                self.current_log_type = None
+                self.show_view(ViewID.WELCOME_VIEW)
+                self.update_menu_state()
+                return
             self.current_log = log
             self.current_log_type = LogType.OPERATION_LOG
             self.show_view(ViewID.LOG_OPS_VIEW)
@@ -177,6 +189,18 @@ def action_log_open_concurso(self):
     if file_path:
         try:
             log = open_log(file_path)
+            # Verificar tipo de log
+            if getattr(log, "log_type", None) != LogType.CONTEST_LOG:
+                QMessageBox.critical(
+                    self,
+                    translation_service.tr("main_window_title"),
+                    translation_service.tr("log_type_mismatch_error"),
+                )
+                self.current_log = None
+                self.current_log_type = None
+                self.show_view(ViewID.WELCOME_VIEW)
+                self.update_menu_state()
+                return
             self.current_log = log
             self.current_log_type = LogType.CONTEST_LOG
             self.show_view(ViewID.LOG_CONTEST_VIEW)

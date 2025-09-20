@@ -293,6 +293,7 @@ UI_TRANSLATIONS = {
     "import_summary_unchanged": "Sin cambios: {}",
     "set_callsign_dialog_title": "Setear indicativo",
     "set_callsign_dialog_label": "Ingrese el nuevo indicativo:",
+    "log_type_mismatch_error": "El archivo seleccionado no corresponde al tipo de log esperado.",
 }
 
 ALL_KEYS_TRANSLATIONS = {}
