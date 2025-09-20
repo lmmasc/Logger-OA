@@ -66,6 +66,8 @@ class ContactTableWidget(QWidget):
     ]
     LOG_OPERATIVE_COLUMNS = [
         {"key": "callsign", "translation": "log_operative_table_header_callsign"},
+        {"key": "qtr_oa", "translation": "log_operative_table_header_qtr_oa"},
+        {"key": "qtr_utc", "translation": "log_operative_table_header_qtr_utc"},
         {"key": "name", "translation": "log_operative_table_header_name"},
         {"key": "country", "translation": "log_operative_table_header_country"},
         {"key": "region", "translation": "log_operative_table_header_region"},
@@ -74,8 +76,6 @@ class ContactTableWidget(QWidget):
         {"key": "power", "translation": "log_operative_table_header_power"},
         {"key": "rs_rx", "translation": "log_operative_table_header_rs_rx"},
         {"key": "rs_tx", "translation": "log_operative_table_header_rs_tx"},
-        {"key": "qtr_oa", "translation": "log_operative_table_header_qtr_oa"},
-        {"key": "qtr_utc", "translation": "log_operative_table_header_qtr_utc"},
         {"key": "obs", "translation": "log_operative_table_header_obs"},
     ]
 
@@ -151,7 +151,11 @@ class ContactTableWidget(QWidget):
                             int(ts), tz=datetime.timezone.utc
                         ).strftime(f"%H:%M {date_fmt}")
                 elif key in ("station", "energy"):
-                    value = translation_service.tr(contact.get(key, ""))
+                    val = contact.get(key, "")
+                    if val == "no_data":  # Valor por defecto para "no data"
+                        value = ""
+                    else:
+                        value = translation_service.tr(contact.get(key, ""))
                 elif key == "power":
                     val = contact.get(key, "")
                     value = f"{val} W" if val else ""
