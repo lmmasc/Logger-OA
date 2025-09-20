@@ -307,9 +307,11 @@ class LogContestView(QWidget):
             if hasattr(self.table_widget, "_last_contacts")
             else []
         )
-        if row >= len(contact_list):
+        # Sincronizar el índice visual con el real (por inversión en la tabla)
+        real_index = len(contact_list) - 1 - row
+        if real_index < 0 or real_index >= len(contact_list):
             return
-        contact = contact_list[row]
+        contact = contact_list[real_index]
         contact_id = contact.get("id", None)
         callsign = contact.get("callsign", "")
         # Mostrar diálogo de confirmación
@@ -320,7 +322,6 @@ class LogContestView(QWidget):
         msg_box.setWindowTitle(translation_service.tr("delete_contact"))
         msg_box.setText(translation_service.tr("dialog_confirm_delete_contact"))
         msg_box.setInformativeText(
-            # f"{translation_service.tr('log_contest_table_header_callsign')}: {getattr(self, 'callsign', '')}"
             f"{translation_service.tr('log_contest_table_header_callsign')}: {callsign}"
         )
         msg_box.setStandardButtons(
