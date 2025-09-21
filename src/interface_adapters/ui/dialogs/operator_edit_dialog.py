@@ -98,6 +98,9 @@ class OperatorEditDialog(QDialog):
                         w.setText(text.upper()) if text != text.upper() else None
                     )
                 )
+                # Autocompletar país en tiempo real si es el campo 'callsign'
+                if key == "callsign":
+                    widget.textChanged.connect(self._autocomplete_country_from_callsign)
             elif widget_cls == QComboBox:
                 widget = QComboBox()
                 if key == "category":
@@ -291,3 +294,28 @@ class OperatorEditDialog(QDialog):
         # TODO: Validar fechas y otros campos si es necesario
         self.result_operator = self.get_operator_data()
         super().accept()
+
+    def _autocomplete_country_from_callsign(self, text):
+        """
+        Autocompleta el país en base al indicativo digitado usando callsign_utils y el idioma actual.
+        """
+        from domain.callsign_utils import callsign_to_country, get_country_full_name
+        from translation.translation_service import translation_service
+
+        itu_code = callsign_to_country(text)
+        # Obtener idioma actual ('es' o 'en')
+        lang_enum = translation_service.get_language()
+        lang = (
+            getattr(lang_enum, "value", "es")
+            if hasattr(lang_enum, "value")
+            else str(lang_enum)
+        )
+        if itu_code:
+            country_name = get_country_full_name(itu_code, lang=lang)
+            if country_name:
+                self.country_combo.setCurrentText("OTROS")
+                self.country_other.setText(country_name)
+            else:
+                self.country_other.clear()
+        else:
+            self.country_other.clear()
