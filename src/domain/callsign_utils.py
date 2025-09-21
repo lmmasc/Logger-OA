@@ -997,3 +997,18 @@ def callsign_to_country(callsign: str) -> str | None:
             if prefix in ITU_PREFIXES:
                 return ITU_PREFIXES[prefix]
     return None
+
+
+def get_country_full_name(itu_code: str, lang: str = "es") -> str | None:
+    """
+    Devuelve el nombre completo del país según el código ITU y el idioma.
+    Args:
+        itu_code (str): Código ITU del país (ej: 'USA', 'ESP').
+        lang (str): 'es' para español, 'en' para inglés. Por defecto 'es'.
+    Returns:
+        str | None: Nombre completo del país o None si no existe.
+    """
+    country = ITU_COUNTRY_NAMES.get(itu_code)
+    if country:
+        return country.get(lang)
+    return None
