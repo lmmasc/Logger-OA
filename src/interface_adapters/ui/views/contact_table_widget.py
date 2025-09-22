@@ -214,7 +214,11 @@ class ContactTableWidget(QWidget):
         row = item.row()
         if not hasattr(self, "_last_contacts") or row >= len(self._last_contacts):
             return
-        contact = self._last_contacts[row]
+            # La tabla muestra los contactos en orden invertido, así que el índice real es:
+        real_index = len(self._last_contacts) - 1 - row
+        if real_index < 0 or real_index >= len(self._last_contacts):
+            return
+        contact = self._last_contacts[real_index]
         # Importar y mostrar el diálogo de edición de contacto
         from interface_adapters.ui.dialogs.contact_edit_dialog import ContactEditDialog
         from PySide6.QtWidgets import QDialog
