@@ -93,13 +93,11 @@ class OperatorEditDialog(QDialog):
             row.addWidget(label)
             if widget_cls == QLineEdit:
                 widget = QLineEdit()
-                # Forzar mayúsculas en tiempo real
                 widget.textChanged.connect(
                     lambda text, w=widget: (
                         w.setText(text.upper()) if text != text.upper() else None
                     )
                 )
-                # Autocompletar país en tiempo real si es el campo 'callsign'
                 if key == "callsign":
                     widget.textChanged.connect(self._autocomplete_country_from_callsign)
             elif widget_cls == QComboBox:
@@ -119,42 +117,45 @@ class OperatorEditDialog(QDialog):
             row.addWidget(widget)
             self.inputs[key] = widget
             layout.addLayout(row)
-        # --- Campo country como combo y campo adicional ---
+        # --- Campo country como combo ITU ---
+        from domain.itu_country_names import ITU_COUNTRY_NAMES
+        from utils.text import normalize_ascii
+
+        # Detectar idioma actual correctamente
+        lang = "es"
+        if hasattr(translation_service, "get_language"):
+            lang_enum = translation_service.get_language()
+            lang = getattr(lang_enum, "value", str(lang_enum))
+        country_items = []
+        for itu_code, names in ITU_COUNTRY_NAMES.items():
+            name = names.get(lang, names.get("es", ""))
+            if name:
+                country_items.append((itu_code, normalize_ascii(name)))
+        country_items.sort(key=lambda x: x[1])
         row_country = QHBoxLayout()
         label_country = QLabel(translation_service.tr("db_table_header_country"))
         row_country.addWidget(label_country)
         self.country_combo = QComboBox()
-        self.country_combo.addItems(["PERU", "OTROS"])
+        for itu_code, name in country_items:
+            self.country_combo.addItem(name, itu_code)
         row_country.addWidget(self.country_combo)
-        self.country_other = QLineEdit()
-        self.country_other.setPlaceholderText(
-            translation_service.tr("other_country_placeholder")
-        )
-        self.country_other.setEnabled(True)
-        self.country_other.textChanged.connect(
-            lambda text: (
-                self.country_other.setText(text.upper())
-                if text != text.upper()
-                else None
-            )
-        )
-        row_country.addWidget(self.country_other)
         layout.addLayout(row_country)
         self.inputs["country"] = self.country_combo
-        self.inputs["country_other"] = self.country_other
         self.country_combo.currentIndexChanged.connect(self._on_country_changed)
-        # Botones
+        # Botones y estado inicial
         btns = QHBoxLayout()
-        self.btn_ok = QPushButton(translation_service.tr("yes_button"))
-        self.btn_cancel = QPushButton(translation_service.tr("no_button"))
-        btns.addWidget(self.btn_ok)
-        btns.addWidget(self.btn_cancel)
+        btn_ok = QPushButton(translation_service.tr("yes_button"))
+        btn_cancel = QPushButton(translation_service.tr("no_button"))
+        btns.addWidget(btn_ok)
+        btns.addWidget(btn_cancel)
         layout.addLayout(btns)
-        self.btn_ok.clicked.connect(self.accept)
-        self.btn_cancel.clicked.connect(self.reject)
-        # Estado inicial: país OTROS
+        btn_ok.clicked.connect(self.accept)
+        btn_cancel.clicked.connect(self.reject)
+        # Estado inicial: país PER
         if not self.operator:
-            self.country_combo.setCurrentText("OTROS")
+            idx_peru = self.country_combo.findData("PER")
+            if idx_peru >= 0:
+                self.country_combo.setCurrentIndex(idx_peru)
             self.inputs["enabled"].setCurrentIndex(0)  # SI/YES por defecto
             self._on_country_changed(self.country_combo.currentIndex())
 
@@ -185,9 +186,7 @@ class OperatorEditDialog(QDialog):
                         widget.clear()
                     elif isinstance(widget, QDateEdit):
                         widget.setDate(QDate.currentDate())
-        self.country_other.setEnabled(not is_peru)
-        if is_peru:
-            self.country_other.clear()
+        # country_other eliminado: solo combo ITU
 
     def _load_operator(self, op):
         """
@@ -228,6 +227,12 @@ class OperatorEditDialog(QDialog):
                     self.inputs[key].setDate(QDate.currentDate())
             else:
                 self.inputs[key].setDate(QDate.currentDate())
+        # Seleccionar país en combo por ITU
+        itu_code = getattr(op, "country", "PER")
+        idx_country = self.country_combo.findData(itu_code)
+        if idx_country >= 0:
+            self.country_combo.setCurrentIndex(idx_country)
+        self._on_country_changed(self.country_combo.currentIndex())
 
     def get_operator_data(self):
         """
@@ -238,12 +243,8 @@ class OperatorEditDialog(QDialog):
         data = {}
         for key, widget in self.inputs.items():
             if key == "country":
-                if self.country_combo.currentText() == "PERU":
-                    data["country"] = "PERU"
-                else:
-                    data["country"] = self.country_other.text().strip().upper()
-            elif key == "country_other":
-                continue
+                idx = widget.currentIndex()
+                data["country"] = widget.itemData(idx)
             elif isinstance(widget, QLineEdit):
                 data[key] = widget.text().strip().upper()
             elif isinstance(widget, QComboBox):
@@ -302,23 +303,10 @@ class OperatorEditDialog(QDialog):
         """
         Autocompleta el país en base al indicativo digitado usando callsign_utils y el idioma actual.
         """
-        from domain.callsign_utils import callsign_to_country, get_country_full_name
-        from translation.translation_service import translation_service
+        from domain.callsign_utils import callsign_to_country
 
         itu_code = callsign_to_country(text)
-        # Obtener idioma actual ('es' o 'en')
-        lang_enum = translation_service.get_language()
-        lang = (
-            getattr(lang_enum, "value", "es")
-            if hasattr(lang_enum, "value")
-            else str(lang_enum)
-        )
         if itu_code:
-            country_name = get_country_full_name(itu_code, lang=lang)
-            if country_name:
-                self.country_combo.setCurrentText("OTROS")
-                self.country_other.setText(country_name)
-            else:
-                self.country_other.clear()
-        else:
-            self.country_other.clear()
+            idx = self.country_combo.findData(itu_code)
+            if idx >= 0:
+                self.country_combo.setCurrentIndex(idx)
