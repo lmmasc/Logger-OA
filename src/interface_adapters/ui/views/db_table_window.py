@@ -286,21 +286,12 @@ class DBTableWindow(QWidget):
         self.filter_column_combo.clear()
         self.filter_column_combo.addItems(headers)
         column_keys = [col["key"] for col in self.COLUMNS]
-        from datetime import datetime, timezone, timedelta
 
-        def format_iso_date(ts):
-            if not ts:
-                return ""
-            dt_utc = datetime.fromtimestamp(int(ts), timezone.utc)
-            dt_peru = dt_utc.astimezone(timezone(timedelta(hours=-5)))
-            return dt_peru.strftime("%Y-%m-%d")
+        from utils.datetime import format_iso_date, format_iso_datetime
+        from domain.callsign_utils import get_country_full_name
+        from utils.text import normalize_ascii
 
-        def format_iso_datetime(ts):
-            if not ts:
-                return ""
-            dt_utc = datetime.fromtimestamp(int(ts), timezone.utc)
-            dt_peru = dt_utc.astimezone(timezone(timedelta(hours=-5)))
-            return dt_peru.strftime("%Y-%m-%d %H:%M:%S")
+        lang = getattr(translation_service, "current_lang", "es")
 
         for row_idx, op in enumerate(operators):
             for col_idx, key in enumerate(column_keys):
@@ -317,6 +308,14 @@ class DBTableWindow(QWidget):
                 elif key == "updated_at":
                     value = getattr(op, key, "")
                     item = QTableWidgetItem(format_iso_datetime(value))
+                elif key == "country":
+                    itu_code = normalize_ascii(getattr(op, "country", "")).upper()
+                    country_name = get_country_full_name(itu_code, lang)
+                    if country_name:
+                        display_country = normalize_ascii(country_name).upper()
+                    else:
+                        display_country = itu_code
+                    item = QTableWidgetItem(display_country)
                 else:
                     attr = (
                         "type_"

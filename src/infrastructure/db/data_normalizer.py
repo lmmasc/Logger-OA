@@ -26,7 +26,7 @@ def normalize_operator_data(raw_data):
         cutoff_date = row.get("cutoff_date", None)
         country = row.get("country", None)
         if not country or not country.strip():
-            country = "PERU"
+            country = "PER"
         else:
             country = normalize_ascii(country).upper()
         # Validar que sean enteros (timestamp UTC)
