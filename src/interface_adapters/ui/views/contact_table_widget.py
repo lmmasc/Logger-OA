@@ -78,7 +78,7 @@ class ContactTableWidget(QWidget):
             "key": "exchange_sent",
             "translation": "log_contest_table_header_exchange_sent",
         },
-        {"key": "observations", "translation": "log_contest_table_header_observations"},
+        {"key": "obs", "translation": "log_contest_table_header_observations"},
     ]
     LOG_OPERATIVE_COLUMNS = [
         {"key": "callsign", "translation": "log_operative_table_header_callsign"},

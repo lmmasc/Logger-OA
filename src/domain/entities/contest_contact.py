@@ -11,7 +11,7 @@ class ContestContact:
     exchange_sent: str = "-"
     rs_rx: str = "-"
     rs_tx: str = "-"
-    observations: str = ""
+    obs: str = ""
     block: int = 1
     points: int = 0
     timestamp: int = 0

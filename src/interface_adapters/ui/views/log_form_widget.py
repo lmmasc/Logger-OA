@@ -335,7 +335,7 @@ class LogFormWidget(QWidget):
                     "exchange_sent": self.exchange_sent_input.text(),
                     "rs_rx": self.rs_rx_input.text(),
                     "rs_tx": self.rs_tx_input.text(),
-                    "observations": self.observations_input.text(),
+                    "obs": self.observations_input.text(),
                     "block": 1,
                     "points": 0,
                     "timestamp": timestamp,

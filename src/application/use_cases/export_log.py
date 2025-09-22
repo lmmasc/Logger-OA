@@ -57,7 +57,7 @@ def export_log_to_txt(db_path: str, export_path: str, translation_service=None) 
             "translation": "log_contest_export_txt_header_exchange_sent",
         },
         {
-            "key": "observations",
+            "key": "obs",
             "translation": "log_contest_export_txt_header_observations",
         },
     ]
@@ -190,7 +190,7 @@ def export_log_to_csv(
             "translation": "log_contest_export_csv_header_exchange_sent",
         },
         {
-            "key": "observations",
+            "key": "obs",
             "translation": "log_contest_export_csv_header_observations",
         },
     ]
@@ -505,7 +505,7 @@ def export_log_to_pdf(db_path: str, export_path: str) -> str:
         rs_rx = str(contact.get("rs_rx", "")).zfill(2)
         exchange_rx = str(exchange_rx_num).zfill(3)
         recibido = rs_rx + exchange_rx
-        observaciones = contact.get("observations", "")
+        observaciones = contact.get("obs", "")
         tabla.append([str(idx), qtr, estacion, enviado, recibido, observaciones])
 
     # Crear PDF

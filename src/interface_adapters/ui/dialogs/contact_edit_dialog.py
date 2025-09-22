@@ -136,6 +136,11 @@ class ContactEditDialog(QDialog):
             self.inputs["exchange_sent"].setText(contact.get("exchange_sent", ""))
             layout.addWidget(QLabel(translation_service.tr("exchange_sent")))
             layout.addWidget(self.inputs["exchange_sent"])
+            # Agregar campo de observaciones para concursos
+            self.inputs["obs"] = QLineEdit(self)
+            self.inputs["obs"].setText(contact.get("obs", ""))
+            layout.addWidget(QLabel(translation_service.tr("observations")))
+            layout.addWidget(self.inputs["obs"])
         # Campo de edición de fecha/hora OA para concursos, UTC para operativos
         ts = contact.get("timestamp", None)
         lang = translation_service.get_language()
