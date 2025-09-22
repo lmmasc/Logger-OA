@@ -291,7 +291,11 @@ class DBTableWindow(QWidget):
         from domain.callsign_utils import get_country_full_name
         from utils.text import normalize_ascii
 
-        lang = getattr(translation_service, "current_lang", "es")
+        # Detectar idioma actual correctamente
+        lang = "es"
+        if hasattr(translation_service, "get_language"):
+            lang_enum = translation_service.get_language()
+            lang = getattr(lang_enum, "value", str(lang_enum))
 
         for row_idx, op in enumerate(operators):
             for col_idx, key in enumerate(column_keys):
