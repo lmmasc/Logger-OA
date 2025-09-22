@@ -15,7 +15,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QDateTimeEdit,
 )
-from PySide6.QtCore import QDateTime, Qt
+from PySide6.QtCore import QDateTime, Qt, QLocale
 
 # --- Imports de la aplicación ---
 from translation.translation_service import translation_service
@@ -144,6 +144,17 @@ class ContactEditDialog(QDialog):
         # Campo de edición de fecha/hora OA para concursos, UTC para operativos
         ts = contact.get("timestamp", None)
         lang = translation_service.get_language()
+        # Detectar locale para abreviatura de mes
+        import locale
+
+        try:
+            if lang == LanguageValue.ES:
+                locale.setlocale(locale.LC_TIME, "es_ES.UTF-8")
+            else:
+                locale.setlocale(locale.LC_TIME, "en_US.UTF-8")
+        except locale.Error:
+            locale.setlocale(locale.LC_TIME, "C")
+        date_fmt = "HH:mm - yyyy MMM dd"
         if self.log_type == LogType.CONTEST_LOG:
             # Mostrar hora OA (UTC-5)
             if ts:
@@ -161,15 +172,15 @@ class ContactEditDialog(QDialog):
                 )
             else:
                 dt_qt = QDateTime.currentDateTime()
-            if lang == LanguageValue.ES:
-                date_fmt = "HH:mm dd/MM/yyyy 'OA'"
-                label = "Hora OA (UTC-5)"
-            else:
-                date_fmt = "HH:mm MM/dd/yyyy 'OA'"
-                label = "OA Time (UTC-5)"
+            label = translation_service.tr("edit_contact_datetime_oa")
             self.inputs["datetime_oa"] = QDateTimeEdit(dt_qt, self)
             self.inputs["datetime_oa"].setDisplayFormat(date_fmt)
             self.inputs["datetime_oa"].setTimeSpec(Qt.TimeSpec.LocalTime)
+            # Ajustar locale Qt para el widget
+            if lang == LanguageValue.ES:
+                self.inputs["datetime_oa"].setLocale(QLocale(QLocale.Language.Spanish))
+            else:
+                self.inputs["datetime_oa"].setLocale(QLocale(QLocale.Language.English))
             layout.addWidget(QLabel(label))
             layout.addWidget(self.inputs["datetime_oa"])
         else:
@@ -178,15 +189,15 @@ class ContactEditDialog(QDialog):
                 dt_utc = QDateTime.fromSecsSinceEpoch(int(ts), Qt.TimeSpec.UTC)
             else:
                 dt_utc = QDateTime.currentDateTimeUtc()
-            # El formato de fecha sigue dependiendo del idioma, pero el label se traduce con una sola clave
-            if lang == LanguageValue.ES:
-                date_fmt = "HH:mm dd/MM/yyyy 'UTC'"
-            else:
-                date_fmt = "HH:mm MM/dd/yyyy 'UTC'"
             label = translation_service.tr("edit_contact_datetime_utc")
             self.inputs["datetime_utc"] = QDateTimeEdit(dt_utc, self)
             self.inputs["datetime_utc"].setDisplayFormat(date_fmt)
             self.inputs["datetime_utc"].setTimeSpec(Qt.TimeSpec.UTC)
+            # Ajustar locale Qt para el widget
+            if lang == LanguageValue.ES:
+                self.inputs["datetime_utc"].setLocale(QLocale(QLocale.Language.Spanish))
+            else:
+                self.inputs["datetime_utc"].setLocale(QLocale(QLocale.Language.English))
             layout.addWidget(QLabel(label))
             layout.addWidget(self.inputs["datetime_utc"])
         # Botones

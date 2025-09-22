@@ -7,6 +7,7 @@ from PySide6.QtWidgets import (
     QAbstractItemView,
 )
 from PySide6.QtCore import Qt
+import locale
 
 # --- Imports de la aplicación ---
 from translation.translation_service import translation_service
@@ -134,10 +135,15 @@ class ContactTableWidget(QWidget):
         import datetime
 
         lang = translation_service.get_language()
-        if lang == LanguageValue.ES:
-            date_fmt = "%d/%m"
-        else:
-            date_fmt = "%m/%d"
+        # Usar abreviatura de mes según idioma
+        try:
+            if lang == LanguageValue.ES:
+                locale.setlocale(locale.LC_TIME, "es_ES.UTF-8")
+            else:
+                locale.setlocale(locale.LC_TIME, "en_US.UTF-8")
+        except locale.Error:
+            locale.setlocale(locale.LC_TIME, "C")
+        date_fmt = "%b %d"
 
         # Numeración invertida: la fila superior tiene el número más alto
         total = len(display_contacts)
@@ -155,17 +161,14 @@ class ContactTableWidget(QWidget):
                             int(ts), tz=datetime.timezone.utc
                         )
                         dt_oa = dt_utc - datetime.timedelta(hours=5)
-                        if self.log_type == LogType.CONTEST_LOG:
-                            value = dt_oa.strftime("%H:%M")
-                        else:
-                            value = dt_oa.strftime(f"%H:%M {date_fmt}")
+                        value = dt_oa.strftime(f"%H:%M  {date_fmt}")
                 elif key == "qtr_utc":
                     ts = contact.get("timestamp", None)
                     value = ""
                     if ts:
                         value = datetime.datetime.fromtimestamp(
                             int(ts), tz=datetime.timezone.utc
-                        ).strftime(f"%H:%M {date_fmt}")
+                        ).strftime(f"%H:%M  {date_fmt}")
                 elif key in ("station", "energy"):
                     val = contact.get(key, "")
                     if val == "no_data":  # Valor por defecto para "no data"
