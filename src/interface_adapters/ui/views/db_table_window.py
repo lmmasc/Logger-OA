@@ -286,6 +286,22 @@ class DBTableWindow(QWidget):
         self.filter_column_combo.clear()
         self.filter_column_combo.addItems(headers)
         column_keys = [col["key"] for col in self.COLUMNS]
+        from datetime import datetime, timezone, timedelta
+
+        def format_iso_date(ts):
+            if not ts:
+                return ""
+            dt_utc = datetime.fromtimestamp(int(ts), timezone.utc)
+            dt_peru = dt_utc.astimezone(timezone(timedelta(hours=-5)))
+            return dt_peru.strftime("%Y-%m-%d")
+
+        def format_iso_datetime(ts):
+            if not ts:
+                return ""
+            dt_utc = datetime.fromtimestamp(int(ts), timezone.utc)
+            dt_peru = dt_utc.astimezone(timezone(timedelta(hours=-5)))
+            return dt_peru.strftime("%Y-%m-%d %H:%M:%S")
+
         for row_idx, op in enumerate(operators):
             for col_idx, key in enumerate(column_keys):
                 if key == "enabled":
@@ -295,6 +311,12 @@ class DBTableWindow(QWidget):
                         else translation_service.tr("no")
                     )
                     item = QTableWidgetItem(display)
+                elif key in ("expiration_date", "cutoff_date"):
+                    value = getattr(op, key, "")
+                    item = QTableWidgetItem(format_iso_date(value))
+                elif key == "updated_at":
+                    value = getattr(op, key, "")
+                    item = QTableWidgetItem(format_iso_datetime(value))
                 else:
                     attr = (
                         "type_"

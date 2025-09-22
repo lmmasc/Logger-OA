@@ -18,22 +18,22 @@ def integrate_operators_to_db(operators):
     # Crear tabla si no existe
     cur.execute(
         """CREATE TABLE IF NOT EXISTS radio_operators (
-			callsign TEXT PRIMARY KEY,
-			name TEXT,
-			category TEXT,
-			type TEXT,
+            callsign TEXT PRIMARY KEY,
+            name TEXT,
+            category TEXT,
+            type TEXT,
             region TEXT,
-			district TEXT,
-			province TEXT,
-			department TEXT,
-			license TEXT,
-			resolution TEXT,
-			expiration_date TEXT,
-			cutoff_date TEXT,
-			enabled INTEGER DEFAULT 1,
-			country TEXT DEFAULT '',
-			updated_at TEXT
-		)"""
+            district TEXT,
+            province TEXT,
+            department TEXT,
+            license TEXT,
+            resolution TEXT,
+            expiration_date INTEGER,
+            cutoff_date INTEGER,
+            enabled INTEGER DEFAULT 1,
+            country TEXT DEFAULT '',
+            updated_at INTEGER
+        )"""
     )
     upsert_sql = """
 			INSERT INTO radio_operators (
@@ -56,7 +56,9 @@ def integrate_operators_to_db(operators):
 				country=excluded.country,
 				updated_at=excluded.updated_at
 		"""
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    from datetime import timezone
+
+    now = int(datetime.now(timezone.utc).timestamp())
     for op in operators:
         cur.execute(
             upsert_sql,
@@ -72,10 +74,14 @@ def integrate_operators_to_db(operators):
                 op["license"],
                 op["resolution"],
                 op["expiration_date"],
-                op.get("cutoff_date", ""),
+                op.get("cutoff_date", None),
                 op.get("enabled", 1),
                 op.get("country", ""),
-                op.get("updated_at", now),
+                (
+                    op.get("updated_at", now)
+                    if isinstance(op.get("updated_at", now), int)
+                    else now
+                ),
             ),
         )
     conn.commit()

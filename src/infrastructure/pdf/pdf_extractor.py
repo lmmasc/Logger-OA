@@ -128,7 +128,24 @@ def extract_operators_from_pdf(pdf_path):
                             continue
                         exp_raw = data_es.get("fecha", "")
                         mdate = re.search(r"(\d{1,2}/\d{1,2}/\d{4})", exp_raw)
-                        exp_date = mdate.group(1) if mdate else exp_raw.strip()
+                        exp_date_str = mdate.group(1) if mdate else exp_raw.strip()
+                        from datetime import datetime, timezone, timedelta
+
+                        def date_to_utc_timestamp(date_str):
+                            try:
+                                # Interpreta la fecha como hora local de Perú (UTC-5)
+                                dt = datetime.strptime(date_str, "%d/%m/%Y")
+                                peru_offset = timedelta(hours=-5)
+                                dt_peru = dt.replace(
+                                    tzinfo=timezone(timedelta(hours=-5))
+                                )
+                                dt_utc = dt_peru.astimezone(timezone.utc)
+                                return int(dt_utc.timestamp())
+                            except Exception:
+                                return None
+
+                        exp_date = date_to_utc_timestamp(exp_date_str)
+                        cutoff_date = date_to_utc_timestamp(cutoff) if cutoff else None
                         data_en = {
                             "callsign": norm_cs,
                             "name": data_es.get("nombre", ""),
@@ -140,7 +157,7 @@ def extract_operators_from_pdf(pdf_path):
                             "license": data_es.get("licencia", ""),
                             "resolution": data_es.get("resolucion", ""),
                             "expiration_date": exp_date,
-                            "cutoff_date": cutoff,
+                            "cutoff_date": cutoff_date,
                         }
                         results.append(data_en)
                         seen_callsigns.add(norm_cs)

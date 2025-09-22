@@ -22,15 +22,18 @@ def normalize_operator_data(raw_data):
         department = normalize_ascii(row.get("department", "")).upper()
         license_ = normalize_ascii(row.get("license", ""))
         resolution = normalize_ascii(row.get("resolution", ""))
-        expiration_date = row.get("expiration_date", "")
-        cutoff_date = row.get("cutoff_date", "")
+        expiration_date = row.get("expiration_date", None)
+        cutoff_date = row.get("cutoff_date", None)
         country = row.get("country", None)
         if not country or not country.strip():
             country = "PERU"
         else:
             country = normalize_ascii(country).upper()
-        if expiration_date and not re.match(r"\d{2}/\d{2}/\d{4}", expiration_date):
-            expiration_date = ""
+        # Validar que sean enteros (timestamp UTC)
+        if expiration_date is not None and not isinstance(expiration_date, int):
+            expiration_date = None
+        if cutoff_date is not None and not isinstance(cutoff_date, int):
+            cutoff_date = None
         region = (
             f"{department}-{province}-{district}"
             if department or province or district
