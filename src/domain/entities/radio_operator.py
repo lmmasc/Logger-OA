@@ -14,8 +14,8 @@ class RadioOperator:
     department: str
     license_: str
     resolution: str
-    expiration_date: str
-    cutoff_date: str
+    expiration_date: Optional[int]
+    cutoff_date: Optional[int]
     enabled: int
     country: str
-    updated_at: Optional[str] = None
+    updated_at: Optional[int] = None

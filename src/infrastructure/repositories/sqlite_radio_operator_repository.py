@@ -8,7 +8,19 @@ from infrastructure.db import queries
 class SqliteRadioOperatorRepository(RadioOperatorRepository):
     def list_all(self) -> List[RadioOperator]:
         rows = queries.get_radio_operators()
-        return [RadioOperator(*row) for row in rows]
+        result = []
+        for row in rows:
+            # Convertir fechas a int si son str numéricos, o None si vacío
+            row = list(row)
+            for idx in [10, 11, 14]:  # expiration_date, cutoff_date, updated_at
+                val = row[idx]
+                if isinstance(val, str):
+                    if val.isdigit():
+                        row[idx] = int(val)
+                    elif val.strip() == "":
+                        row[idx] = None
+            result.append(RadioOperator(*row))
+        return result
 
     def add(self, operator: RadioOperator) -> None:
         queries.add_radio_operator(

@@ -21,6 +21,7 @@ from PySide6.QtCore import Qt, QDate
 # --- Imports de la aplicación ---
 from translation.translation_service import translation_service
 import datetime
+from datetime import timezone, timedelta
 
 
 class OperatorEditDialog(QDialog):
@@ -212,28 +213,21 @@ class OperatorEditDialog(QDialog):
         self.inputs["license"].setText(getattr(op, "license_", "").upper())
         self.inputs["resolution"].setText(getattr(op, "resolution", "").upper())
         # Fechas
+        from datetime import datetime, timezone, timedelta
+
         for key in ("expiration_date", "cutoff_date"):
-            val = getattr(op, key, "")
-            if val:
+            val = getattr(op, key, None)
+            if isinstance(val, int) and val > 0:
                 try:
-                    d, m, y = map(int, val.split("/"))
-                    self.inputs[key].setDate(QDate(y, m, d))
+                    dt_utc = datetime.fromtimestamp(val, timezone.utc)
+                    dt_peru = dt_utc.astimezone(timezone(timedelta(hours=-5)))
+                    self.inputs[key].setDate(
+                        QDate(dt_peru.year, dt_peru.month, dt_peru.day)
+                    )
                 except Exception:
-                    pass
-        # Enabled
-        enabled = getattr(op, "enabled", 1)
-        self.inputs["enabled"].setCurrentIndex(0 if enabled == 1 else 1)
-        # --- country ---
-        country_val = getattr(op, "country", "PERU").upper()
-        if country_val == "PERU":
-            self.country_combo.setCurrentText("PERU")
-            self.country_other.setEnabled(False)
-            self.country_other.clear()
-        else:
-            self.country_combo.setCurrentText("OTROS")
-            self.country_other.setEnabled(True)
-            self.country_other.setText(country_val)
-        self._on_country_changed(self.country_combo.currentIndex())
+                    self.inputs[key].setDate(QDate.currentDate())
+            else:
+                self.inputs[key].setDate(QDate.currentDate())
 
     def get_operator_data(self):
         """
@@ -258,9 +252,18 @@ class OperatorEditDialog(QDialog):
                 else:
                     data[key] = widget.currentText()
             elif isinstance(widget, QDateEdit):
-                data[key] = widget.date().toString("dd/MM/yyyy")
-        # Campo actualizado
-        data["updated_at"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                # Convertir fecha local Perú a timestamp UTC
+                qdate = widget.date()
+                dt_peru = datetime.datetime(
+                    qdate.year(),
+                    qdate.month(),
+                    qdate.day(),
+                    tzinfo=timezone(timedelta(hours=-5)),
+                )
+                dt_utc = dt_peru.astimezone(timezone.utc)
+                data[key] = int(dt_utc.timestamp())
+        # Campo actualizado: timestamp UTC con fecha y hora
+        data["updated_at"] = int(datetime.datetime.now(timezone.utc).timestamp())
         return data
 
     def accept(self):
