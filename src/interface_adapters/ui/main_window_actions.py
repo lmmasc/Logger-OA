@@ -405,7 +405,8 @@ def action_log_export_pdf(self):
     log_type = getattr(self.current_log, "log_type", None)
     from interface_adapters.ui.view_manager import LogType
 
-    if log_type != LogType.CONTEST_LOG:
+    # Permitir tanto Enum como string
+    if str(log_type) not in (str(LogType.CONTEST_LOG), LogType.CONTEST_LOG.value):
         QMessageBox.warning(
             self,
             translation_service.tr("export_log"),
