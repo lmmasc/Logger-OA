@@ -13,8 +13,9 @@ class LogValidator:
 
     @staticmethod
     def is_valid_callsign(callsign: str) -> bool:
-        # Validación simple de indicativo (puede mejorarse según país)
-        return bool(re.match(r"^[A-Z0-9]{3,}$", callsign.upper()))
+        # Permite indicativos con prefijos y/o sufijos separados por '/'
+        # Ejemplos válidos: OA4AHX/7, OA4/CD3WLD, LU1DZ/M, EA1AAA/P, OA4/CD3WLD/P
+        return bool(re.match(r"^[A-Z0-9]+(/[A-Z0-9]+)*$", callsign.upper()))
 
     @staticmethod
     def is_valid_time(timestr: str) -> bool:
