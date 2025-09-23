@@ -20,7 +20,6 @@ from .callsign_info_widget import CallsignInfoWidget
 from .clock_widget import ClockWidget
 from .log_form_widget import LogFormWidget
 from .contact_table_widget import ContactTableWidget
-from .header_widget import HeaderWidget
 from .contact_queue_widget import ContactQueueWidget
 
 
@@ -46,11 +45,7 @@ class LogContestView(QWidget):
         layout.setSpacing(2)
         layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         # Header al inicio
-        self.header_widget = HeaderWidget()
-        self.header_widget.setSizePolicy(
-            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
-        )
-        layout.addWidget(self.header_widget)
+        # Eliminado HeaderWidget
         # Fila horizontal: input de indicativo y área de info
         indicativo_row = QWidget(self)
         indicativo_layout = QHBoxLayout(indicativo_row)
@@ -137,7 +132,6 @@ class LogContestView(QWidget):
         self.table_widget.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         self.callsign_info.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         self.callsign_input.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.header_widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.form_widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         # Refuerzo en hijos internos
         if hasattr(self.queue_widget, "queue_list"):
@@ -282,8 +276,7 @@ class LogContestView(QWidget):
             except Exception:
                 log_date = str(dt)
         header_text = f"{callsign} - {contest_name} - {log_date}"
-        self.header_widget.update_text(header_text)
-        # Actualizar el título de la ventana principal si existe
+        # Solo actualizar el título de la ventana principal si la vista está visible
         from interface_adapters.ui.utils import find_main_window
 
         main_window = find_main_window(self)

@@ -16,7 +16,6 @@ from translation.translation_service import translation_service
 
 from .log_form_widget import LogFormWidget
 from .contact_table_widget import ContactTableWidget
-from .header_widget import HeaderWidget
 from .contact_queue_widget import ContactQueueWidget
 from .callsign_input_widget import CallsignInputWidget
 from .callsign_info_widget import CallsignInfoWidget
@@ -54,11 +53,7 @@ class LogOpsView(QWidget):
         layout.setContentsMargins(10, 4, 10, 4)
         layout.setSpacing(2)
         layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.header_widget = HeaderWidget()
-        self.header_widget.setSizePolicy(
-            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
-        )
-        layout.addWidget(self.header_widget)
+        # Eliminado HeaderWidget
         # Widgets de indicativo en una misma fila
         indicativo_row = QWidget(self)
         indicativo_layout = QHBoxLayout(indicativo_row)
@@ -146,7 +141,6 @@ class LogOpsView(QWidget):
         self.table_widget.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         self.callsign_info.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
         self.callsign_input.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.header_widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.form_widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         if hasattr(self.queue_widget, "queue_list"):
             self.queue_widget.queue_list.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
@@ -292,8 +286,7 @@ class LogOpsView(QWidget):
             header_parts.append(repeater)
         header_parts.append(log_date)
         header_text = " - ".join([str(p) for p in header_parts if p])
-        self.header_widget.update_text(header_text)
-        # Actualizar el título de la ventana principal si existe
+        # Solo actualizar el título de la ventana principal si la vista está visible
         from interface_adapters.ui.utils import find_main_window
 
         main_window = find_main_window(self)
