@@ -544,11 +544,7 @@ def action_db_export(self):
         return
     try:
         DatabaseController.export_database_to_csv(export_path, translation_service)
-        QMessageBox.information(
-            self,
-            translation_service.tr("main_window_title"),
-            translation_service.tr("export_success"),
-        )
+        open_folder_and_select_file(export_path)
     except Exception as e:
         QMessageBox.critical(
             self,
