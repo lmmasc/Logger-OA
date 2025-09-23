@@ -30,6 +30,7 @@ from infrastructure.repositories.sqlite_radio_operator_repository import (
     SqliteRadioOperatorRepository,
 )
 from datetime import datetime
+from utils.callsign_parser import parse_callsign
 
 
 class LogOpsView(QWidget):
@@ -305,14 +306,13 @@ class LogOpsView(QWidget):
         """
         # Obtener el indicativo actual
         current = self.callsign_input.get_callsign()
-        from utils.callsign_parser import parse_callsign
 
         base, prefijo, sufijo = parse_callsign(current)
         # Reconstruir manteniendo prefijo/sufijo
         nuevo = base_callsign
-        if prefijo:
+        if prefijo and not base_callsign.startswith(f"{prefijo}/"):
             nuevo = f"{prefijo}/{nuevo}"
-        if sufijo:
+        if sufijo and not base_callsign.endswith(f"/{sufijo}"):
             nuevo = f"{nuevo}/{sufijo}"
         self.callsign_input.set_callsign(nuevo)
         self.callsign_info.update_info(nuevo)
