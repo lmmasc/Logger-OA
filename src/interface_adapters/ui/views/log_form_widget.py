@@ -329,6 +329,10 @@ class LogFormWidget(QWidget):
             dict: Datos del formulario, adaptados según el tipo de log.
         """
         callsign_val = callsign if callsign is not None else ""
+        # Extraer indicativo base para buscar datos del operador
+        from utils.callsign_parser import parse_callsign
+
+        base_callsign, _, _ = parse_callsign(callsign_val)
         data = {
             "callsign": callsign_val,
             "rs_rx": self.rs_rx_input.text(),
@@ -339,7 +343,7 @@ class LogFormWidget(QWidget):
             # --- Bloque de extracción de datos para concurso ---
             contact_id = str(uuid.uuid4())
             timestamp = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
-            operator = get_operator_by_callsign(callsign_val)
+            operator = get_operator_by_callsign(base_callsign)
             name = operator.name if operator else "-"
             region = operator.region if operator else "-"
             data.update(
@@ -359,7 +363,7 @@ class LogFormWidget(QWidget):
             )
         elif self.log_type == LogType.OPERATION_LOG:
             # --- Bloque de extracción de datos para operativo ---
-            operator = get_operator_by_callsign(callsign_val)
+            operator = get_operator_by_callsign(base_callsign)
             name = operator.name if operator else ""
             country = operator.country if operator else ""
             region = operator.region if operator else "-"
@@ -419,11 +423,15 @@ class LogFormWidget(QWidget):
             callsign_input = getattr(parent, "callsign_input", None)
             if callsign_input and hasattr(callsign_input, "get_callsign"):
                 callsign_val = callsign_input.get_callsign().strip()
+        # Extraer indicativo base para buscar datos del operador
+        from utils.callsign_parser import parse_callsign
+
+        base_callsign, _, _ = parse_callsign(callsign_val)
         data = self.get_data(callsign_val)
         if callsign_val:
-            data["callsign"] = callsign_val
+            data["callsign"] = callsign_val  # Registrar el indicativo completo
         # Validación de campos y control de foco
-        operator = get_operator_by_callsign(callsign_val)
+        operator = get_operator_by_callsign(base_callsign)
         main_window = find_main_window(self)
         db_path = (
             getattr(main_window.current_log, "db_path", None)
