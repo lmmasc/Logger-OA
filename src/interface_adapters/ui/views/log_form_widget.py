@@ -406,6 +406,32 @@ class LogFormWidget(QWidget):
             )
         return data
 
+    def reset_form_fields(self):
+        """Reinicia los campos de estación, energía, potencia, RS y observaciones en modo operativo."""
+        if self.log_type == LogType.OPERATION_LOG:
+            if hasattr(self, "station_input"):
+                self.station_input.setCurrentIndex(0)
+            if hasattr(self, "energy_input"):
+                self.energy_input.setCurrentIndex(0)
+            if hasattr(self, "power_input"):
+                self.power_input.setText("1")
+            if hasattr(self, "rs_rx_input"):
+                self.rs_rx_input.setText("59")
+            if hasattr(self, "rs_tx_input"):
+                self.rs_tx_input.setText("59")
+            if hasattr(self, "observations_input"):
+                self.observations_input.setText("")
+        """Reinicia los campos RS (59), intercambio recibido y observaciones en blanco para concursos."""
+        if self.log_type == LogType.CONTEST_LOG:
+            if hasattr(self, "rs_rx_input"):
+                self.rs_rx_input.setText("59")
+            if hasattr(self, "rs_tx_input"):
+                self.rs_tx_input.setText("59")
+            if hasattr(self, "exchange_received_input"):
+                self.exchange_received_input.setText("")
+            if hasattr(self, "observations_input"):
+                self.observations_input.setText("")
+
     def _on_add_contact(self, callsign=None):
         """
         Lógica principal para agregar un contacto al log actual.
@@ -559,6 +585,8 @@ class LogFormWidget(QWidget):
                                 callsign_input.input.setFocus()
                                 break
                             parent = parent.parent()
+
+                self.reset_form_fields()
                 return True
             except Exception as e:
                 QMessageBox.critical(
@@ -648,6 +676,7 @@ class LogFormWidget(QWidget):
                             callsign_input.input.setFocus()
                             break
                         parent = parent.parent()
+            self.reset_form_fields()
             return True
         except Exception as e:
             QMessageBox.critical(
