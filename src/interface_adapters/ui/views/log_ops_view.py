@@ -293,6 +293,12 @@ class LogOpsView(QWidget):
         header_parts.append(log_date)
         header_text = " - ".join([str(p) for p in header_parts if p])
         self.header_widget.update_text(header_text)
+        # Actualizar el título de la ventana principal si existe
+        from interface_adapters.ui.utils import find_main_window
+
+        main_window = find_main_window(self)
+        if main_window and hasattr(main_window, "setWindowTitle"):
+            main_window.setWindowTitle(header_text)
 
     def _update_callsign_info(self):
         """

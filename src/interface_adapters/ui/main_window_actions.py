@@ -78,7 +78,7 @@ def action_log_new_operativo(self):
     db_path, log = create_log(LogType.OPERATION_LOG, indicativo, **extra_kwargs)
     self.current_log = log
     self.current_log_type = LogType.OPERATION_LOG
-    self.setWindowTitle(f"{log.operator} - Operativo - {log.start_time}")
+    # self.setWindowTitle(f"{log.operator} - Operativo - {log.start_time}")
     self.show_view(ViewID.LOG_OPS_VIEW)
     self.update_menu_state()
 
@@ -123,8 +123,8 @@ def action_log_new_concurso(self):
     db_path, log = create_log(LogType.CONTEST_LOG, indicativo, **extra_kwargs)
     self.current_log = log
     self.current_log_type = LogType.CONTEST_LOG
-    cabecera = f"{log.operator} - {contest_name} - {log.start_time}"
-    self.setWindowTitle(cabecera)
+    # cabecera = f"{log.operator} - {contest_name} - {log.start_time}"
+    # self.setWindowTitle(cabecera)
     self.show_view(ViewID.LOG_CONTEST_VIEW)
     self.update_menu_state()
 
@@ -173,6 +173,8 @@ def action_log_open_operativo(self):
         self.current_log = None
         self.current_log_type = None
         self.show_view(ViewID.WELCOME_VIEW)
+        # Restaurar título original
+        self.setWindowTitle(translation_service.tr("main_window_title"))
     self.update_menu_state()
 
 
@@ -220,6 +222,8 @@ def action_log_open_concurso(self):
         self.current_log = None
         self.current_log_type = None
         self.show_view(ViewID.WELCOME_VIEW)
+        # Restaurar título original
+        self.setWindowTitle(translation_service.tr("main_window_title"))
     self.update_menu_state()
 
 
@@ -442,6 +446,7 @@ def action_log_close(self):
     self.current_log = None
     self.current_log_type = None
     self.show_view(ViewID.WELCOME_VIEW)
+    self.setWindowTitle(translation_service.tr("main_window_title"))
     self.update_menu_state()
 
 
