@@ -111,13 +111,30 @@ class MainMenuBar(QMenuBar):
         self.file_menu.addAction(self.exit_action)
         self.addMenu(self.file_menu)
 
-        # Menú Base de datos
+        # Menú Base de datos reorganizado
         self.database_menu = QMenu(translation_service.tr("menu_database_menu"), self)
+        self.db_show_action = QAction(
+            translation_service.tr("menu_show_database"), self
+        )
+        self.database_menu.addAction(self.db_show_action)
+
+        # Submenú Importar
+        self.import_menu = QMenu(
+            translation_service.tr("menu_database_section_import"), self.database_menu
+        )
         self.db_import_pdf_action = QAction(
             translation_service.tr("menu_import_from_pdf"), self
         )
         self.db_import_db_action = QAction(
             translation_service.tr("menu_import_from_db"), self
+        )
+        self.import_menu.addAction(self.db_import_pdf_action)
+        self.import_menu.addAction(self.db_import_db_action)
+        self.database_menu.addMenu(self.import_menu)
+
+        # Submenú Backup
+        self.backup_menu = QMenu(
+            translation_service.tr("menu_database_section_backup"), self.database_menu
         )
         self.db_backup_action = QAction(
             translation_service.tr("menu_create_backup"), self
@@ -125,37 +142,30 @@ class MainMenuBar(QMenuBar):
         self.db_restore_action = QAction(
             translation_service.tr("menu_restore_backup"), self
         )
+        self.backup_menu.addAction(self.db_backup_action)
+        self.backup_menu.addAction(self.db_restore_action)
+        self.database_menu.addMenu(self.backup_menu)
+
+        # Submenú Exportar
+        self.export_db_menu = QMenu(
+            translation_service.tr("menu_database_section_export"), self.database_menu
+        )
         self.db_export_action = QAction(
             translation_service.tr("menu_export_db_csv"), self
         )
-        self.db_show_action = QAction(
-            translation_service.tr("menu_show_database"), self
+        self.export_db_menu.addAction(self.db_export_action)
+        self.database_menu.addMenu(self.export_db_menu)
+
+        # Submenú Borrar
+        self.delete_menu = QMenu(
+            translation_service.tr("menu_database_section_delete"), self.database_menu
         )
         self.db_delete_action = QAction(
             translation_service.tr("menu_delete_database"), self
         )
-        # Sección de visualización
-        self.database_menu.addSection(translation_service.tr("menu_show_database"))
-        self.database_menu.addAction(self.db_show_action)
-        # Sección de importación
-        self.database_menu.addSection(
-            translation_service.tr("menu_database_section_import")
-        )
-        self.database_menu.addAction(self.db_import_pdf_action)
-        self.database_menu.addAction(self.db_import_db_action)
-        # Sección de respaldo
-        self.database_menu.addSection(
-            translation_service.tr("menu_database_section_backup")
-        )
-        self.database_menu.addAction(self.db_backup_action)
-        self.database_menu.addAction(self.db_restore_action)
-        # Sección de exportación
-        self.database_menu.addSection(translation_service.tr("menu_export_db_csv"))
-        self.database_menu.addAction(self.db_export_action)
-        # Espacio en blanco antes del separador y la opción de borrar
-        self.database_menu.addAction(QAction(" ", self))
-        self.database_menu.addSeparator()
-        self.database_menu.addAction(self.db_delete_action)
+        self.delete_menu.addAction(self.db_delete_action)
+        self.database_menu.addMenu(self.delete_menu)
+
         self.addMenu(self.database_menu)
 
         # Menú Preferencias con submenús Indicativo, Aspecto e Idioma
