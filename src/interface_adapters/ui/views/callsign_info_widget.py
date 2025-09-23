@@ -165,19 +165,37 @@ class CallsignInfoWidget(QWidget):
                     if operator.enabled
                     else translation_service.tr("ui_disabled_status")
                 )
+                from domain.callsign_utils import get_country_full_name
+
+                lang_enum = (
+                    translation_service.get_language()
+                    if hasattr(translation_service, "get_language")
+                    else "es"
+                )
+                lang = "es" if str(lang_enum).lower().endswith("es") else "en"
+                country_name = (
+                    get_country_full_name(operator.country, lang) or operator.country
+                )
                 summary = f"<table width='100%' style='font-size:16px;'>"
                 summary += "<tr>"
                 summary += f"<td><b>{operator.name}</b></td>"
                 summary += f"<td>{translation_service.tr('ui_district_label')}: {operator.district}</td>"
                 summary += f"<td>{translation_service.tr('category')}: {operator.category}</td>"
                 summary += "</tr><tr>"
-                summary += f"<td>{translation_service.tr('ui_country_label')}: {operator.country}</td>"
+                summary += f"<td>{translation_service.tr('ui_country_label')}: {country_name}</td>"
                 summary += f"<td>{translation_service.tr('province')}: {operator.province}</td>"
                 summary += f"<td>{translation_service.tr('ui_type_label')}: {operator.type_}</td>"
                 summary += "</tr><tr>"
                 summary += f"<td>{enabled}</td>"
                 summary += f"<td>{translation_service.tr('ui_department_label')}: {operator.department}</td>"
-                summary += f"<td>{translation_service.tr('ui_expiration_label')}: {operator.expiration_date}</td>"
+                from utils.datetime import format_iso_date
+
+                expiration_str = format_iso_date(operator.expiration_date)
+                if expiration_str:
+                    # Convertir a dd/mm/yyyy
+                    parts = expiration_str.split("-")
+                    expiration_str = f"{parts[2]}/{parts[1]}/{parts[0]}"
+                summary += f"<td>{translation_service.tr('ui_expiration_label')}: {expiration_str}</td>"
                 summary += "</tr></table>"
                 self.show_summary(summary)
             else:
