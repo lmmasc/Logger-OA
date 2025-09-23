@@ -293,15 +293,26 @@ class LogOpsView(QWidget):
         if self.isVisible() and main_window and hasattr(main_window, "setWindowTitle"):
             main_window.setWindowTitle(header_text)
 
-    def _on_suggestion_selected(self, callsign):
+    def _on_suggestion_selected(self, base_callsign):
         """
         Maneja la selección de una sugerencia de indicativo.
-        Actualiza el campo de entrada y la información mostrada, y da foco al primer campo del formulario.
+        Actualiza el campo de entrada y la información mostrada, manteniendo prefijo/sufijo originales, y da foco al primer campo del formulario.
         Args:
-            callsign: Indicativo seleccionado.
+            base_callsign: Indicativo base seleccionado.
         """
-        self.callsign_input.set_callsign(callsign)
-        self.callsign_info.update_info(callsign)
+        # Obtener el indicativo actual
+        current = self.callsign_input.get_callsign()
+        from utils.callsign_parser import parse_callsign
+
+        base, prefijo, sufijo = parse_callsign(current)
+        # Reconstruir manteniendo prefijo/sufijo
+        nuevo = base_callsign
+        if prefijo:
+            nuevo = f"{prefijo}/{nuevo}"
+        if sufijo:
+            nuevo = f"{nuevo}/{sufijo}"
+        self.callsign_input.set_callsign(nuevo)
+        self.callsign_info.update_info(nuevo)
         # Foco al primer campo del formulario
         if hasattr(self.form_widget, "station_input"):
             self.form_widget.station_input.setFocus()
