@@ -293,43 +293,6 @@ class LogOpsView(QWidget):
         if self.isVisible() and main_window and hasattr(main_window, "setWindowTitle"):
             main_window.setWindowTitle(header_text)
 
-    def _update_callsign_info(self):
-        """
-        Actualiza el área de información de indicativos según el texto ingresado.
-        Muestra sugerencias si el texto es corto, o el resumen si hay coincidencia exacta.
-        """
-        filtro = self.callsign_input.get_callsign().strip()
-        if filtro:
-            # Si hay texto, mostrar sugerencias si el texto es corto, si no mostrar resumen
-            if len(filtro) < 3:
-                self.callsign_info.show_suggestions(filtro)
-            else:
-                # Buscar operador y mostrar resumen si existe
-                repo = SqliteRadioOperatorRepository()
-                operator = repo.get_operator_by_callsign(filtro)
-                if operator:
-                    resumen = f"{operator.callsign} - {operator.name}"
-                    self.callsign_info.show_summary(resumen)
-                else:
-                    msg_box = QMessageBox(self)
-                    msg_box.setIcon(QMessageBox.Icon.Warning)
-                    msg_box.setWindowTitle(
-                        translation_service.tr("dialog_invalid_callsign_title")
-                    )
-                    msg_box.setText(
-                        translation_service.tr("dialog_invalid_callsign_msg")
-                    )
-                    msg_box.setInformativeText(
-                        f"{translation_service.tr('callsign_not_found')}: {filtro}"
-                    )
-                    msg_box.setStandardButtons(QMessageBox.StandardButton.Ok)
-                    msg_box.exec()
-                    self.callsign_info.show_summary(
-                        translation_service.tr("callsign_not_found")
-                    )
-        else:
-            self.callsign_info.show_suggestions("")
-
     def _on_suggestion_selected(self, callsign):
         """
         Maneja la selección de una sugerencia de indicativo.

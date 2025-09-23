@@ -6,6 +6,7 @@ CallsignInfoWidget: Widget para mostrar información y sugerencias de indicativo
 
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QListWidget, QListWidgetItem
 from PySide6.QtGui import QFont, QFontDatabase
+from utils.callsign_parser import parse_callsign
 from utils.resources import get_resource_path
 from PySide6.QtCore import Signal, Qt
 from translation.translation_service import translation_service
@@ -149,12 +150,14 @@ class CallsignInfoWidget(QWidget):
         Args:
             text (str): Texto ingresado para buscar operadores.
         """
+
         filtro = text.strip().upper()
+        base, prefijo, sufijo = parse_callsign(filtro)
         if len(filtro) < 2:
             self.show_suggestions("")
         else:
-            operadores = get_filtered_operators(filtro)
-            exact_matches = [op for op in operadores if op.callsign.upper() == filtro]
+            operadores = get_filtered_operators(base)
+            exact_matches = [op for op in operadores if op.callsign.upper() == base]
             if len(exact_matches) == 1:
                 operator = exact_matches[0]
                 enabled = (
@@ -178,4 +181,4 @@ class CallsignInfoWidget(QWidget):
                 summary += "</tr></table>"
                 self.show_summary(summary)
             else:
-                self.show_suggestions(filtro)
+                self.show_suggestions(base)
