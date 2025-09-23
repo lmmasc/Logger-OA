@@ -79,6 +79,10 @@ class LogFormWidget(QWidget):
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
             )
             self.rs_rx_input.setValidator(QIntValidator(10, 99, self))
+            font_rs = self.rs_rx_input.font()
+            font_rs.setPointSize(18)
+            font_rs.setBold(True)
+            self.rs_rx_input.setFont(font_rs)
             rs_rx_label = QLabel(translation_service.tr("rs_rx"))
             rs_rx_label.setAlignment(
                 Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
@@ -91,11 +95,15 @@ class LogFormWidget(QWidget):
             form_row.addWidget(self.rs_rx_input)
             self.rs_rx_label = rs_rx_label
             self.exchange_received_input = QLineEdit(self)
-            self.exchange_received_input.setFixedWidth(80)
+            self.exchange_received_input.setFixedWidth(70)
             self.exchange_received_input.setSizePolicy(
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
             )
             self.exchange_received_input.setValidator(QIntValidator(0, 999, self))
+            font_ex = self.exchange_received_input.font()
+            font_ex.setPointSize(18)
+            font_ex.setBold(True)
+            self.exchange_received_input.setFont(font_ex)
             exchange_received_label = QLabel(
                 translation_service.tr("exchange_received")
             )
@@ -116,6 +124,10 @@ class LogFormWidget(QWidget):
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
             )
             self.rs_tx_input.setValidator(QIntValidator(10, 99, self))
+            font_rs_tx = self.rs_tx_input.font()
+            font_rs_tx.setPointSize(18)
+            font_rs_tx.setBold(True)
+            self.rs_tx_input.setFont(font_rs_tx)
             rs_tx_label = QLabel(translation_service.tr("rs_tx"))
             rs_tx_label.setAlignment(
                 Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
@@ -128,11 +140,15 @@ class LogFormWidget(QWidget):
             form_row.addWidget(self.rs_tx_input)
             self.rs_tx_label = rs_tx_label
             self.exchange_sent_input = QLineEdit(self)
-            self.exchange_sent_input.setFixedWidth(80)
+            self.exchange_sent_input.setFixedWidth(70)
             self.exchange_sent_input.setSizePolicy(
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
             )
             self.exchange_sent_input.setValidator(QIntValidator(0, 999, self))
+            font_ex_sent = self.exchange_sent_input.font()
+            font_ex_sent.setPointSize(18)
+            font_ex_sent.setBold(True)
+            self.exchange_sent_input.setFont(font_ex_sent)
             exchange_sent_label = QLabel(translation_service.tr("exchange_sent"))
             exchange_sent_label.setAlignment(
                 Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
