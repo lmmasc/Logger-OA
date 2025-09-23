@@ -114,6 +114,7 @@ class OperatorEditDialog(QDialog):
                 widget = QDateEdit()
                 widget.setDisplayFormat("dd/MM/yyyy")
                 widget.setCalendarPopup(True)
+                widget.setDate(QDate.currentDate())
             row.addWidget(widget)
             self.inputs[key] = widget
             layout.addLayout(row)
