@@ -240,6 +240,9 @@ class LogOpsView(QWidget):
         self.form_widget.retranslate_ui()
         self.table_widget.retranslate_ui()
         self.queue_widget.retranslate_ui()
+
+        self.callsign_info.update_info(self.callsign_input.get_callsign())
+
         # Actualizar textos de los botones de agregar y eliminar
         if hasattr(self, "add_contact_btn"):
             self.add_contact_btn.setText(translation_service.tr("add_contact"))

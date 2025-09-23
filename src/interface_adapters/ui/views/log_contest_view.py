@@ -53,7 +53,7 @@ class LogContestView(QWidget):
         indicativo_layout.setSpacing(8)
         indicativo_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         self.callsign_input = CallsignInputWidget(indicativo_row)
-        self.callsign_input.setFixedWidth(320)
+        # self.callsign_input.setFixedWidth(320)
         self.callsign_input.setSizePolicy(
             QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
         )
@@ -241,6 +241,9 @@ class LogContestView(QWidget):
         self.form_widget.retranslate_ui()
         self.table_widget.retranslate_ui()
         self.queue_widget.retranslate_ui()
+
+        self.callsign_info.update_info(self.callsign_input.get_callsign())
+
         # Establecer intercambio enviado al abrir el log de concurso
         if hasattr(self.form_widget, "exchange_sent_input") and hasattr(
             self.table_widget, "table"

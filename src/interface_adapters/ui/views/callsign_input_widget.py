@@ -50,7 +50,7 @@ class CallsignInputWidget(QWidget):
         font.setPointSize(32)
         font.setBold(True)
         self.input.setFont(font)
-        self.input.setFixedWidth(320)
+        self.input.setFixedWidth(360)
         self.input.setFixedHeight(90)
         self.input.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.label)
