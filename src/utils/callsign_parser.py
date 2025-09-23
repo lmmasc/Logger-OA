@@ -1,9 +1,6 @@
 import re
 from typing import Tuple, Optional
 
-import re
-from typing import Tuple, Optional
-
 
 def parse_callsign(raw: str) -> Tuple[str, Optional[str], Optional[str]]:
     """
@@ -23,31 +20,31 @@ def parse_callsign(raw: str) -> Tuple[str, Optional[str], Optional[str]]:
     """
     if not isinstance(raw, str):
         return "", None, None
-    indicativo = raw.strip().upper()
-    partes = indicativo.split("/")
-    base = None
-    prefijo = None
-    sufijo = None
-    # Buscar todas las partes que cumplen el patrón de base
-    base_indices = [
+    callsign_str = raw.strip().upper()
+    parts = callsign_str.split("/")
+    base_callsign = None
+    prefix = None
+    suffix = None
+    # Buscar todas las partes que cumplen el patrón de indicativo base
+    base_indexes = [
         i
-        for i, parte in enumerate(partes)
-        if re.match(r"^[A-Z]{1,3}\d{1,2}[A-Z]*$", parte)
+        for i, part in enumerate(parts)
+        if re.match(r"^[A-Z]{1,3}\d{1,2}[A-Z]*$", part)
     ]
-    if base_indices:
-        base_idx = base_indices[-1]
-        base = partes[base_idx]
+    if base_indexes:
+        base_idx = base_indexes[-1]
+        base_callsign = parts[base_idx]
         # Prefijo: si hay una parte antes del base
         if base_idx > 0:
-            prefijo = partes[base_idx - 1]
+            prefix = parts[base_idx - 1]
         # Sufijo: solo si hay partes después del base
-        if base_idx < len(partes) - 1:
-            sufijo_candidatos = partes[base_idx + 1 :]
-            sufijo = "/".join(sufijo_candidatos)
+        if base_idx < len(parts) - 1:
+            suffix_candidates = parts[base_idx + 1 :]
+            suffix = "/".join(suffix_candidates)
     else:
-        # Si no se encontró base, asumir el primero
-        if partes:
-            base = partes[0]
-            if len(partes) > 1:
-                sufijo = "/".join(partes[1:])
-    return base or "", prefijo, sufijo
+        # Si no se encontró base, asumir la primera parte
+        if parts:
+            base_callsign = parts[0]
+            if len(parts) > 1:
+                suffix = "/".join(parts[1:])
+    return base_callsign or "", prefix, suffix
