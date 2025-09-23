@@ -1,20 +1,34 @@
 import csv
 import os
+import json
+import sqlite3
+import datetime
+from typing import Optional
+from importlib import import_module
+
+# Terceros
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import mm
+
+# Locales
 from domain.repositories.contact_log_repository import ContactLogRepository
-from config.paths import get_export_dir
+from config.paths import get_export_dir, format_timestamp_local
 from utils.resources import get_resource_path
 from interface_adapters.ui.view_manager import LogType
 from config.settings_service import LanguageValue
-from typing import Optional
+from domain.callsign_utils import get_country_full_name
+from utils.text import normalize_ascii
+from infrastructure.db.queries import get_radio_operator_by_callsign
+from translation.translation_service import translation_service as ts
 
 
 def export_log_to_txt(db_path: str, export_path: str, translation_service=None) -> str:
     """
     Exporta el log a un archivo TXT, detectando tipo de log y usando cabeceras traducidas.
     """
-    import sqlite3
-    from importlib import import_module
-
     repo = ContactLogRepository(db_path)
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
@@ -38,7 +52,6 @@ def export_log_to_txt(db_path: str, export_path: str, translation_service=None) 
         translation_service = ts
     lang = translation_service.get_language()
     # Formatear start_time como fecha local desde timestamp
-    from config.paths import format_timestamp_local
 
     fecha_local = format_timestamp_local(start_time)
     # Headers y campos como en ContactTableWidget
@@ -93,9 +106,8 @@ def export_log_to_txt(db_path: str, export_path: str, translation_service=None) 
         fieldnames = [f["key"] for f in EXPORT_TXT_OPERATIVE_FIELDS]
     else:
         raise ValueError(f"Tipo de log no soportado para exportación: {log_type}")
-    # ...existing code...
+
     # Procesar filas como en la UI
-    import datetime
 
     date_fmt = "%d/%m/%Y"
     with open(export_path, "w", encoding="utf-8") as txtfile:
@@ -136,14 +148,12 @@ def export_log_to_txt(db_path: str, export_path: str, translation_service=None) 
                     val = contact.get(key, "")
                     row.append(str(val).zfill(3) if val else "")
                 elif key == "country":
-                    from domain.callsign_utils import get_country_full_name
 
                     lang = "es"
                     if hasattr(translation_service, "get_language"):
                         lang_enum = translation_service.get_language()
                         lang = getattr(lang_enum, "value", str(lang_enum))
                     itu_code = str(contact.get(key, ""))
-                    from utils.text import normalize_ascii
 
                     country_name = get_country_full_name(itu_code, lang) or itu_code
                     row.append(normalize_ascii(country_name))
@@ -159,9 +169,6 @@ def export_log_to_csv(
     """
     Exporta todos los contactos de un log a un archivo CSV en la carpeta de exportación, detectando tipo de log y usando cabeceras traducidas.
     """
-    import sqlite3
-    from importlib import import_module
-
     repo = ContactLogRepository(db_path)
     with sqlite3.connect(db_path) as conn:
         c = conn.cursor()
@@ -235,14 +242,12 @@ def export_log_to_csv(
         fieldnames = [f["key"] for f in EXPORT_CSV_OPERATIVE_FIELDS]
     else:
         raise ValueError(f"Tipo de log no soportado para exportación: {log_type}")
-    # ...existing code...
+
     # Procesar filas como en la UI
-    import datetime
 
     date_fmt = "%d/%m/%Y"
     # Determinar nombre de archivo
     if not export_filename:
-        from config.paths import format_timestamp_local
 
         fecha_local = format_timestamp_local(start_time)
         export_filename = f"{operator}_{log_type}_{fecha_local}.csv"
@@ -287,14 +292,12 @@ def export_log_to_csv(
                     val = contact.get(key, "")
                     row.append(str(val).zfill(3) if val else "")
                 elif key == "country":
-                    from domain.callsign_utils import get_country_full_name
 
                     lang = "es"
                     if hasattr(translation_service, "get_language"):
                         lang_enum = translation_service.get_language()
                         lang = getattr(lang_enum, "value", str(lang_enum))
                     itu_code = str(contact.get(key, ""))
-                    from utils.text import normalize_ascii
 
                     country_name = get_country_full_name(itu_code, lang) or itu_code
                     row.append(normalize_ascii(country_name))
@@ -308,11 +311,6 @@ def export_log_to_adi(db_path: str, export_path: str) -> str:
     """
     Exporta el log a un archivo ADI (ADIF) usando los campos mínimos recomendados.
     """
-    import sqlite3
-    from domain.repositories.contact_log_repository import ContactLogRepository
-    import datetime
-
-    import json
 
     repo = ContactLogRepository(db_path)
     with sqlite3.connect(db_path) as conn:
@@ -404,20 +402,6 @@ def export_log_to_pdf(db_path: str, export_path: str) -> str:
     """
     Exporta el log a un archivo PDF con formato de planilla de concursos OA-HF.
     """
-    import sqlite3
-    from reportlab.lib.pagesizes import A4
-    from reportlab.lib import colors
-    from reportlab.platypus import (
-        SimpleDocTemplate,
-        Table,
-        TableStyle,
-        Paragraph,
-        Spacer,
-    )
-    from reportlab.lib.styles import getSampleStyleSheet
-    from infrastructure.db.queries import get_radio_operator_by_callsign
-    from translation.translation_service import translation_service as ts
-    import datetime
 
     repo = ContactLogRepository(db_path)
     with sqlite3.connect(db_path) as conn:
@@ -451,7 +435,6 @@ def export_log_to_pdf(db_path: str, export_path: str) -> str:
     # Obtener nombre de concurso traducido
     contest_name = ""
     if metadata:
-        import json
 
         try:
             meta_dict = json.loads(metadata)
@@ -461,7 +444,6 @@ def export_log_to_pdf(db_path: str, export_path: str) -> str:
             pass
 
     # Formatear fecha local desde timestamp
-    from config.paths import format_timestamp_local
 
     fecha = format_timestamp_local(start_time)
 
@@ -480,7 +462,6 @@ def export_log_to_pdf(db_path: str, export_path: str) -> str:
     ]
 
     # Ajustar ancho de cabecera y tabla
-    from reportlab.lib.units import mm
 
     page_width = A4[0] - 2 * 20 * mm  # 20mm margen
     col_widths_cabecera = [page_width * 0.25, page_width * 0.75]
