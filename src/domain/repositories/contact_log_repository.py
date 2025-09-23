@@ -17,8 +17,8 @@ class ContactLogRepository:
                     id TEXT PRIMARY KEY,
                     type TEXT,
                     operator TEXT,
-                    start_time TEXT,
-                    end_time TEXT,
+                    start_time INTEGER,
+                    end_time INTEGER,
                     metadata TEXT
                 )
             """

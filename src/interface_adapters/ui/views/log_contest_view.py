@@ -271,18 +271,17 @@ class LogContestView(QWidget):
             else translation_service.tr("log_type_contest")
         )
         dt = log.start_time if log else ""
-        from datetime import datetime
+        log_date = ""
+        if dt:
+            from datetime import datetime, timezone, timedelta
 
-        lang = translation_service.get_language()
-        try:
-            date_obj = datetime.strptime(dt[:8], "%Y%m%d")
-            if lang == LanguageValue.ES:
-                log_date = date_obj.strftime("%d/%m/%Y")
-            else:
-                log_date = date_obj.strftime("%m/%d/%Y")
-        except Exception:
-            log_date = dt
-        header_text = f"{callsign} | {contest_name} | {log_date}"
+            try:
+                dt_utc = datetime.fromtimestamp(int(dt), tz=timezone.utc)
+                dt_peru = dt_utc - timedelta(hours=5)
+                log_date = dt_peru.strftime("%d/%m/%Y %H:%M")
+            except Exception:
+                log_date = str(dt)
+        header_text = f"{callsign} - {contest_name} - {log_date}"
         self.header_widget.update_text(header_text)
 
     def _update_callsign_info(self):

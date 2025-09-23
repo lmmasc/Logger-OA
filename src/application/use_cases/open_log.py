@@ -46,8 +46,8 @@ def open_log(db_path: str):
             log = OperationLog(
                 id=row[0],
                 operator=row[2],
-                start_time=row[3],
-                end_time=row[4],
+                start_time=int(row[3]) if row[3] is not None else 0,
+                end_time=int(row[4]) if row[4] is not None else 0,
                 metadata=metadata,
             )
             log.log_type = LogType.OPERATION_LOG
@@ -55,8 +55,8 @@ def open_log(db_path: str):
             log = ContestLog(
                 id=row[0],
                 operator=row[2],
-                start_time=row[3],
-                end_time=row[4],
+                start_time=int(row[3]) if row[3] is not None else 0,
+                end_time=int(row[4]) if row[4] is not None else 0,
                 metadata=metadata,
             )
             log.log_type = LogType.CONTEST_LOG

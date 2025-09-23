@@ -1,3 +1,14 @@
+def format_timestamp_local(timestamp: int) -> str:
+    """
+    Formatea un timestamp UTC entero a string local de Perú (YYYY-MM-DD_HH-MM-SS).
+    """
+    from datetime import datetime, timezone, timedelta
+
+    dt_utc = datetime.fromtimestamp(timestamp, tz=timezone.utc)
+    dt_peru = dt_utc - timedelta(hours=5)
+    return dt_peru.strftime("%Y-%m-%d_%H-%M-%S")
+
+
 """
 paths.py
 
@@ -79,7 +90,7 @@ def normalize_filename_text(text):
 
 
 def get_log_file_path(
-    operator_callsign: str, log_type: LogType, timestamp: str, **kwargs
+    operator_callsign: str, log_type: LogType, timestamp: int, **kwargs
 ) -> str:
     """
     Genera el path absoluto para un archivo de log SQLite según el tipo (operativo/concurso),
@@ -89,6 +100,13 @@ def get_log_file_path(
     """
     from .defaults import OPERATIONS_DIR, CONTESTS_DIR
     from translation.translation_service import translation_service
+
+    # Formatear el timestamp a string con hora de Perú (UTC-5)
+    from datetime import datetime, timezone, timedelta
+
+    dt_utc = datetime.fromtimestamp(timestamp, tz=timezone.utc)
+    dt_peru = dt_utc - timedelta(hours=5)
+    timestamp_str = dt_peru.strftime("%Y-%m-%d_%H-%M-%S")
 
     # Usar Enum LogType directamente y mapear carpeta
     LOG_TYPE_FOLDER_MAP = {
@@ -114,13 +132,13 @@ def get_log_file_path(
         if repeater_key:
             repeater = normalize_filename_text(translation_service.tr(repeater_key))
             filename_parts.append(repeater)
-        filename_parts.append(timestamp.lower())
+        filename_parts.append(timestamp_str.lower())
         filename = "_".join(filename_parts) + ".sqlite"
     elif log_type == LogType.CONTEST_LOG:
         contest_key = kwargs.get("contest_key", "contest")
         contest_name = normalize_filename_text(translation_service.tr(contest_key))
         filename = (
-            f"{operator_callsign.upper()}_{contest_name}_{timestamp.lower()}.sqlite"
+            f"{operator_callsign.upper()}_{contest_name}_{timestamp_str.lower()}.sqlite"
         )
     else:
         raise ValueError(f"Tipo de log no soportado: {log_type}")

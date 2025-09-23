@@ -37,7 +37,12 @@ def export_log_to_txt(db_path: str, export_path: str, translation_service=None) 
 
         translation_service = ts
     lang = translation_service.get_language()
+    # Formatear start_time como fecha local desde timestamp
+    from config.paths import format_timestamp_local
+
+    fecha_local = format_timestamp_local(start_time)
     # Headers y campos como en ContactTableWidget
+    # Usar fecha_local donde se requiera mostrar la fecha
     # ...existing code...
     # Comparar directamente con Enum
     # Definición de campos y traducciones diferenciadas para exportación TXT
@@ -231,7 +236,10 @@ def export_log_to_csv(
         date_fmt = "%m/%d/%Y"
     # Determinar nombre de archivo
     if not export_filename:
-        export_filename = f"{operator}_{log_type}_{start_time}.csv"
+        from config.paths import format_timestamp_local
+
+        fecha_local = format_timestamp_local(start_time)
+        export_filename = f"{operator}_{log_type}_{fecha_local}.csv"
     export_path = get_export_dir(export_filename)
     export_path = get_resource_path(export_path)
     with open(export_path, "w", newline="", encoding="utf-8") as csvfile:
@@ -434,20 +442,10 @@ def export_log_to_pdf(db_path: str, export_path: str) -> str:
         except Exception:
             pass
 
-    # Formatear fecha (solo año, mes, día, sin hora)
-    fecha = ""
-    try:
-        dt = datetime.datetime.fromisoformat(start_time)
-        fecha = dt.strftime("%Y-%m-%d")
-    except Exception:
-        # Si no es ISO, buscar patrón de fecha en el string
-        import re
+    # Formatear fecha local desde timestamp
+    from config.paths import format_timestamp_local
 
-        match = re.search(r"(\d{4}-\d{2}-\d{2})", start_time)
-        if match:
-            fecha = match.group(1)
-        else:
-            fecha = start_time.split()[0] if " " in start_time else start_time
+    fecha = format_timestamp_local(start_time)
 
     # Construir cabecera con cuadricula y ancho total
     cabecera_labels = [

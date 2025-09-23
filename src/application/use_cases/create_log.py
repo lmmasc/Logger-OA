@@ -12,7 +12,9 @@ def create_log(log_type: LogType, operator_callsign: str, **kwargs):
     log_type debe ser un Enum LogType.
     kwargs puede incluir campos adicionales según el tipo de log.
     """
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    from datetime import timezone
+
+    timestamp = int(datetime.now(timezone.utc).timestamp())
     # Extraer campos relevantes para el nombre de archivo
     if log_type == LogType.OPERATION_LOG:
         operation_type = kwargs.pop("operation_type", "type")

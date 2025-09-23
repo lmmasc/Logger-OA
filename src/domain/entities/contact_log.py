@@ -8,8 +8,8 @@ import re
 class ContactLog:
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
     operator: str = ""
-    start_time: str = ""
-    end_time: str = ""
+    start_time: int = 0  # timestamp UTC
+    end_time: int = 0  # timestamp UTC
     contacts: List[Any] = field(default_factory=list)  # Se especializa en subclases
     metadata: Optional[Dict[str, Any]] = field(default_factory=dict)
     db_path: Optional[str] = None  # Ruta a la base de datos asociada

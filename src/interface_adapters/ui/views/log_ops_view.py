@@ -272,7 +272,14 @@ class LogOpsView(QWidget):
             if meta and meta.get("repeater_key")
             else ""
         )
-        log_date = meta.get("log_date", "") if meta else ""
+        # Obtener start_time y formatear a string dd/mm/yyyy con hora de Perú
+        log_date = ""
+        if log and hasattr(log, "start_time") and log.start_time:
+            from datetime import datetime, timezone, timedelta
+
+            dt_utc = datetime.fromtimestamp(log.start_time, tz=timezone.utc)
+            dt_peru = dt_utc - timedelta(hours=5)
+            log_date = dt_peru.strftime("%d/%m/%Y %H:%M")
         show_freq = True
         if frequency_band.lower() == translation_service.tr("vhf").lower():
             repeater_key = meta.get("repeater_key", "")
@@ -284,7 +291,7 @@ class LogOpsView(QWidget):
         if repeater:
             header_parts.append(repeater)
         header_parts.append(log_date)
-        header_text = " | ".join([str(p) for p in header_parts if p])
+        header_text = " - ".join([str(p) for p in header_parts if p])
         self.header_widget.update_text(header_text)
 
     def _update_callsign_info(self):
