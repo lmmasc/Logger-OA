@@ -38,7 +38,6 @@ from infrastructure.db.reset import reset_database
 
 from .view_manager import ViewID, LogType
 from .main_window_db_window import show_db_window, on_db_table_window_closed
-from interface_adapters.ui.dialogs.export_format_dialog import ExportFormatDialog
 
 
 # --- Acciones de Log ---
