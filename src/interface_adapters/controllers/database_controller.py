@@ -2,11 +2,18 @@
 Controlador para operaciones de base de datos: backup, restaurar e importar.
 """
 
+import csv
+from domain.callsign_utils import get_country_full_name
+from utils.text import normalize_ascii
+from utils.datetime import format_iso_date, format_iso_datetime
 from infrastructure.db.backup_restore import (
     create_backup,
     list_backups,
     restore_backup,
     import_from_external_db,
+)
+from interface_adapters.controllers.radio_operator_controller import (
+    RadioOperatorController,
 )
 
 
@@ -16,10 +23,6 @@ class DatabaseController:
         """
         Exporta la base de datos de operadores a un archivo CSV, respetando el orden, formato y traducción visual de la tabla.
         """
-        from interface_adapters.controllers.radio_operator_controller import (
-            RadioOperatorController,
-        )
-        import csv
 
         controller = RadioOperatorController()
         operators = controller.list_operators()
@@ -51,7 +54,6 @@ class DatabaseController:
             writer.writerow(headers)
             for op in operators:
                 row = []
-                from domain.callsign_utils import get_country_full_name
 
                 lang_enum = (
                     translation_service.get_language()
@@ -59,8 +61,6 @@ class DatabaseController:
                     else "es"
                 )
                 lang = "es" if str(lang_enum).lower().endswith("es") else "en"
-                from utils.text import normalize_ascii
-                from utils.datetime import format_iso_date, format_iso_datetime
 
                 for key in COLUMN_KEYS:
                     if key == "enabled":
