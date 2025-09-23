@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QMessageBox,
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QEvent, Qt
 from translation.translation_service import translation_service
 
 from .log_form_widget import LogFormWidget
@@ -29,7 +29,7 @@ from interface_adapters.ui.utils import find_main_window
 from infrastructure.repositories.sqlite_radio_operator_repository import (
     SqliteRadioOperatorRepository,
 )
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from utils.callsign_parser import parse_callsign
 
 
@@ -174,7 +174,6 @@ class LogOpsView(QWidget):
         self.installEventFilter(self)
 
     def eventFilter(self, obj, event):
-        from PySide6.QtCore import QEvent, Qt
 
         # Detectar teclas F1-F4 en toda la ventana
         if event.type() == QEvent.KeyPress:  # type: ignore
@@ -273,7 +272,6 @@ class LogOpsView(QWidget):
         # Obtener start_time y formatear a string dd/mm/yyyy con hora de Perú
         log_date = ""
         if log and hasattr(log, "start_time") and log.start_time:
-            from datetime import datetime, timezone, timedelta
 
             dt_utc = datetime.fromtimestamp(log.start_time, tz=timezone.utc)
             dt_peru = dt_utc - timedelta(hours=5)
@@ -291,7 +289,6 @@ class LogOpsView(QWidget):
         header_parts.append(log_date)
         header_text = " - ".join([str(p) for p in header_parts if p])
         # Solo actualizar el título de la ventana principal si la vista está visible
-        from interface_adapters.ui.utils import find_main_window
 
         main_window = find_main_window(self)
         if self.isVisible() and main_window and hasattr(main_window, "setWindowTitle"):

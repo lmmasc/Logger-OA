@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QSizePolicy,
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QEvent, Qt
 
 # --- Imports de la aplicación ---
 from translation.translation_service import translation_service
@@ -15,6 +15,8 @@ from interface_adapters.ui.utils import find_main_window
 from interface_adapters.ui.view_manager import LogType
 
 # --- Imports de módulos locales (widgets) ---
+from application.use_cases.contact_management import delete_contact_from_log
+from domain.repositories.contact_log_repository import ContactLogRepository
 from .callsign_input_widget import CallsignInputWidget
 from .callsign_info_widget import CallsignInfoWidget
 from .clock_widget import ClockWidget
@@ -171,7 +173,6 @@ class LogContestView(QWidget):
         self.installEventFilter(self)
 
     def eventFilter(self, obj, event):
-        from PySide6.QtCore import QEvent, Qt
 
         # Detectar teclas F1-F4 en toda la ventana
         if event.type() == QEvent.KeyPress:  # type: ignore
@@ -391,11 +392,9 @@ class LogContestView(QWidget):
         log_id = getattr(current_log, "id", None)
         if db_path is None or log_id is None or contact_id is None:
             return
-        from application.use_cases.contact_management import delete_contact_from_log
 
         delete_contact_from_log(db_path, contact_id)
         # Actualizar la tabla
-        from domain.repositories.contact_log_repository import ContactLogRepository
 
         repo = ContactLogRepository(db_path)
         contacts = repo.get_contacts(log_id)
