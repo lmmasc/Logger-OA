@@ -36,6 +36,7 @@ from application.use_cases.contact_management import (
 from interface_adapters.ui.dialogs.operator_edit_dialog import OperatorEditDialog
 from domain.repositories.contact_log_repository import ContactLogRepository
 from interface_adapters.ui.utils import find_main_window
+from utils.callsign_parser import parse_callsign
 
 
 class LogFormWidget(QWidget):
@@ -452,9 +453,8 @@ class LogFormWidget(QWidget):
             if callsign_input and hasattr(callsign_input, "get_callsign"):
                 callsign_val = callsign_input.get_callsign().strip()
         # Extraer indicativo base para buscar datos del operador
-        from utils.callsign_parser import parse_callsign
 
-        base_callsign, _, _ = parse_callsign(callsign_val)
+        base_callsign, prefix, sufix = parse_callsign(callsign_val)
         # Validación de campos y control de foco
         # Intentar obtener el operador con el indicativo base
         operator = get_operator_by_callsign(base_callsign)
@@ -465,6 +465,12 @@ class LogFormWidget(QWidget):
         if not operator and callsign_val:
             operator = get_operator_by_callsign(callsign_val)
             data = self.get_data(callsign_val)
+            if callsign_val:
+                data["callsign"] = callsign_val  # Registrar el indicativo completo
+        # Si no se encuentra, intentar con el callsign con prefijo
+        if not operator and prefix:
+            operator = get_operator_by_callsign(f"{prefix}/{base_callsign}")
+            data = self.get_data(f"{prefix}/{base_callsign}")
             if callsign_val:
                 data["callsign"] = callsign_val  # Registrar el indicativo completo
 
