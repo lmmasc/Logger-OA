@@ -308,10 +308,23 @@ class DBTableWindow(QWidget):
                     item = QTableWidgetItem(display)
                 elif key in ("expiration_date", "cutoff_date"):
                     value = getattr(op, key, "")
-                    item = QTableWidgetItem(format_iso_date(value))
+                    date_str = format_iso_date(value)
+                    if date_str:
+                        parts = date_str.split("-")
+                        display_date = f"{parts[2]}/{parts[1]}/{parts[0]}"
+                    else:
+                        display_date = ""
+                    item = QTableWidgetItem(display_date)
                 elif key == "updated_at":
                     value = getattr(op, key, "")
-                    item = QTableWidgetItem(format_iso_datetime(value))
+                    dt_str = format_iso_datetime(value)
+                    if dt_str:
+                        date_part, time_part = dt_str.split(" ")
+                        y, m, d = date_part.split("-")
+                        display_dt = f"{time_part} {d}/{m}/{y}"
+                    else:
+                        display_dt = ""
+                    item = QTableWidgetItem(display_dt)
                 elif key == "country":
                     itu_code = normalize_ascii(getattr(op, "country", "")).upper()
                     country_name = get_country_full_name(itu_code, lang)
