@@ -153,11 +153,17 @@ class CallsignInfoWidget(QWidget):
 
         filtro = text.strip().upper()
         base, prefijo, sufijo = parse_callsign(filtro)
+        # print(f"Base: {base}, Prefijo: {prefijo}, Sufijo: {sufijo}")
         if len(filtro) < 2:
             self.show_suggestions("")
         else:
             operadores = get_filtered_operators(base)
-            exact_matches = [op for op in operadores if op.callsign.upper() == base]
+            exact_matches = [
+                op
+                for op in operadores
+                if op.callsign.upper() == base
+                or op.callsign.upper() == f"{prefijo}/{base}"
+            ]
             if len(exact_matches) == 1:
                 operator = exact_matches[0]
                 enabled = (
@@ -199,4 +205,6 @@ class CallsignInfoWidget(QWidget):
                 summary += "</tr></table>"
                 self.show_summary(summary)
             else:
+                # self.show_suggestions(f"{prefijo}/{base}" if prefijo else base)
                 self.show_suggestions(base)
+                # print(f"Para Sugerencias : {base}")
