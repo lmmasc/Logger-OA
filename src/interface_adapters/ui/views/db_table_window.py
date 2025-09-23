@@ -441,7 +441,7 @@ class DBTableWindow(QWidget):
         msg_box.setWindowTitle(translation_service.tr("delete_operator"))
         msg_box.setText(translation_service.tr("confirm_delete_operator"))
         msg_box.setInformativeText(
-            f"{translation_service.tr('table_header_callsign')}: {callsign}\n{translation_service.tr('table_header_name')}: {name}"
+            f"{translation_service.tr('db_table_header_callsign')}: {callsign}\n{translation_service.tr('db_table_header_name')}: {name}"
         )
         msg_box.setStandardButtons(
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
