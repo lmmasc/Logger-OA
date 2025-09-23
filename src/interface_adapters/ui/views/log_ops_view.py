@@ -297,7 +297,7 @@ class LogOpsView(QWidget):
         from interface_adapters.ui.utils import find_main_window
 
         main_window = find_main_window(self)
-        if main_window and hasattr(main_window, "setWindowTitle"):
+        if self.isVisible() and main_window and hasattr(main_window, "setWindowTitle"):
             main_window.setWindowTitle(header_text)
 
     def _update_callsign_info(self):
