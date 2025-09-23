@@ -20,6 +20,7 @@ QMainWindow {
 QMenuBar {
     background: #f5f5f5;
     color: #222;
+    border-bottom: 1px solid #d0d0d0;
 }
 QMenuBar::item:selected {
     background: #e0e0e0;
