@@ -97,10 +97,7 @@ def export_log_to_txt(db_path: str, export_path: str, translation_service=None) 
     # Procesar filas como en la UI
     import datetime
 
-    if lang == LanguageValue.ES:
-        date_fmt = "%d/%m/%Y"
-    else:
-        date_fmt = "%m/%d/%Y"
+    date_fmt = "%d/%m/%Y"
     with open(export_path, "w", encoding="utf-8") as txtfile:
         txtfile.write("\t".join(headers) + "\n")
         for contact in contacts:
@@ -138,6 +135,18 @@ def export_log_to_txt(db_path: str, export_path: str, translation_service=None) 
                 ):
                     val = contact.get(key, "")
                     row.append(str(val).zfill(3) if val else "")
+                elif key == "country":
+                    from domain.callsign_utils import get_country_full_name
+
+                    lang = "es"
+                    if hasattr(translation_service, "get_language"):
+                        lang_enum = translation_service.get_language()
+                        lang = getattr(lang_enum, "value", str(lang_enum))
+                    itu_code = str(contact.get(key, ""))
+                    from utils.text import normalize_ascii
+
+                    country_name = get_country_full_name(itu_code, lang) or itu_code
+                    row.append(normalize_ascii(country_name))
                 else:
                     row.append(str(contact.get(key, "")))
             txtfile.write("\t".join(row) + "\n")
@@ -230,10 +239,7 @@ def export_log_to_csv(
     # Procesar filas como en la UI
     import datetime
 
-    if lang == LanguageValue.ES:
-        date_fmt = "%d/%m/%Y"
-    else:
-        date_fmt = "%m/%d/%Y"
+    date_fmt = "%d/%m/%Y"
     # Determinar nombre de archivo
     if not export_filename:
         from config.paths import format_timestamp_local
@@ -280,6 +286,18 @@ def export_log_to_csv(
                 ):
                     val = contact.get(key, "")
                     row.append(str(val).zfill(3) if val else "")
+                elif key == "country":
+                    from domain.callsign_utils import get_country_full_name
+
+                    lang = "es"
+                    if hasattr(translation_service, "get_language"):
+                        lang_enum = translation_service.get_language()
+                        lang = getattr(lang_enum, "value", str(lang_enum))
+                    itu_code = str(contact.get(key, ""))
+                    from utils.text import normalize_ascii
+
+                    country_name = get_country_full_name(itu_code, lang) or itu_code
+                    row.append(normalize_ascii(country_name))
                 else:
                     row.append(str(contact.get(key, "")))
             writer.writerow(row)
