@@ -59,6 +59,9 @@ class DatabaseController:
                     else "es"
                 )
                 lang = "es" if str(lang_enum).lower().endswith("es") else "en"
+                from utils.text import normalize_ascii
+                from utils.datetime import format_iso_date, format_iso_datetime
+
                 for key in COLUMN_KEYS:
                     if key == "enabled":
                         value = (
@@ -69,9 +72,22 @@ class DatabaseController:
                     elif key == "country":
                         itu_code = getattr(op, key, "")
                         country_name = get_country_full_name(itu_code, lang) or itu_code
-                        from utils.text import normalize_ascii
-
                         value = normalize_ascii(country_name)
+                    elif key in ("expiration_date", "cutoff_date"):
+                        date_str = format_iso_date(getattr(op, key, ""))
+                        if date_str:
+                            parts = date_str.split("-")
+                            value = f"{parts[2]}/{parts[1]}/{parts[0]}"
+                        else:
+                            value = ""
+                    elif key == "updated_at":
+                        dt_str = format_iso_datetime(getattr(op, key, ""))
+                        if dt_str:
+                            date_part, time_part = dt_str.split(" ")
+                            y, m, d = date_part.split("-")
+                            value = f"{time_part} {d}/{m}/{y}"
+                        else:
+                            value = ""
                     else:
                         attr = (
                             "type_"
