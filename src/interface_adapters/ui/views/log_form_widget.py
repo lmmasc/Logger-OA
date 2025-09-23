@@ -573,7 +573,7 @@ class LogFormWidget(QWidget):
         msg_box.setWindowTitle(translation_service.tr("add_operator"))
         msg_box.setText(translation_service.tr("operator_not_found_msg"))
         msg_box.setInformativeText(
-            f"{translation_service.tr('table_header_callsign')}: {callsign}"
+            f"{translation_service.tr('ui_callsign_label')}: {callsign}"
         )
         msg_box.setStandardButtons(
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
