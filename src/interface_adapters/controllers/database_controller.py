@@ -42,13 +42,23 @@ class DatabaseController:
             "updated_at",
         ]
         # Encabezados traducidos
-        headers = [translation_service.tr(f"table_header_{key}") for key in COLUMN_KEYS]
+        headers = [
+            translation_service.tr(f"db_table_header_{key}") for key in COLUMN_KEYS
+        ]
 
         with open(csv_path, "w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             writer.writerow(headers)
             for op in operators:
                 row = []
+                from domain.callsign_utils import get_country_full_name
+
+                lang_enum = (
+                    translation_service.get_language()
+                    if hasattr(translation_service, "get_language")
+                    else "es"
+                )
+                lang = "es" if str(lang_enum).lower().endswith("es") else "en"
                 for key in COLUMN_KEYS:
                     if key == "enabled":
                         value = (
@@ -56,6 +66,12 @@ class DatabaseController:
                             if getattr(op, key) == 1
                             else translation_service.tr("no")
                         )
+                    elif key == "country":
+                        itu_code = getattr(op, key, "")
+                        country_name = get_country_full_name(itu_code, lang) or itu_code
+                        from utils.text import normalize_ascii
+
+                        value = normalize_ascii(country_name)
                     else:
                         attr = (
                             "type_"
