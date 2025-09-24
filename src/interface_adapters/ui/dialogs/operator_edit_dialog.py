@@ -77,7 +77,8 @@ class OperatorEditDialog(QDialog):
             ("name", QLineEdit),
             ("category", QComboBox),
             ("type", QComboBox),
-            ("region", QLineEdit),  # Campo agregado para región
+            ("country", QComboBox),
+            ("region", QLineEdit),
             ("department", QLineEdit),
             ("province", QLineEdit),
             ("district", QLineEdit),
@@ -118,11 +119,10 @@ class OperatorEditDialog(QDialog):
             row.addWidget(widget)
             self.inputs[key] = widget
             layout.addLayout(row)
-        # --- Campo country como combo ITU ---
+        # Inicializar el combo de país después de crearlo en el bucle
         from domain.itu_country_names import ITU_COUNTRY_NAMES
         from utils.text import normalize_ascii
 
-        # Detectar idioma actual correctamente
         lang = "es"
         if hasattr(translation_service, "get_language"):
             lang_enum = translation_service.get_language()
@@ -133,16 +133,10 @@ class OperatorEditDialog(QDialog):
             if name:
                 country_items.append((itu_code, normalize_ascii(name)))
         country_items.sort(key=lambda x: x[1])
-        row_country = QHBoxLayout()
-        label_country = QLabel(translation_service.tr("db_table_header_country"))
-        row_country.addWidget(label_country)
-        self.country_combo = QComboBox()
+        country_combo = self.inputs["country"]
         for itu_code, name in country_items:
-            self.country_combo.addItem(name, itu_code)
-        row_country.addWidget(self.country_combo)
-        layout.addLayout(row_country)
-        self.inputs["country"] = self.country_combo
-        self.country_combo.currentIndexChanged.connect(self._on_country_changed)
+            country_combo.addItem(name, itu_code)
+        country_combo.currentIndexChanged.connect(self._on_country_changed)
         # Botones y estado inicial
         btns = QHBoxLayout()
         btn_ok = QPushButton(translation_service.tr("yes_button"))
@@ -154,18 +148,18 @@ class OperatorEditDialog(QDialog):
         btn_cancel.clicked.connect(self.reject)
         # Estado inicial: país PER
         if not self.operator:
-            idx_peru = self.country_combo.findData("PER")
+            idx_peru = self.inputs["country"].findData("PER")
             if idx_peru >= 0:
-                self.country_combo.setCurrentIndex(idx_peru)
+                self.inputs["country"].setCurrentIndex(idx_peru)
             self.inputs["enabled"].setCurrentIndex(0)  # SI/YES por defecto
-            self._on_country_changed(self.country_combo.currentIndex())
+            self._on_country_changed(self.inputs["country"].currentIndex())
 
     def _on_country_changed(self, idx):
         """
         Habilita o deshabilita campos según el país seleccionado.
         Si es Perú, habilita todos los campos; si es OTROS, deshabilita y limpia los campos específicos de Perú.
         """
-        is_peru = self.country_combo.currentText() == "PERU"
+        is_peru = self.inputs["country"].currentText() == "PERU"
         for key in self._peru_fields:
             widget = self.inputs[key]
             if key in ("category", "type"):
@@ -230,10 +224,10 @@ class OperatorEditDialog(QDialog):
                 self.inputs[key].setDate(QDate.currentDate())
         # Seleccionar país en combo por ITU
         itu_code = getattr(op, "country", "PER")
-        idx_country = self.country_combo.findData(itu_code)
+        idx_country = self.inputs["country"].findData(itu_code)
         if idx_country >= 0:
-            self.country_combo.setCurrentIndex(idx_country)
-        self._on_country_changed(self.country_combo.currentIndex())
+            self.inputs["country"].setCurrentIndex(idx_country)
+        self._on_country_changed(self.inputs["country"].currentIndex())
 
         # Cargar el valor de 'enabled' en el combo
         enabled_val = getattr(op, "enabled", 1)
@@ -312,6 +306,6 @@ class OperatorEditDialog(QDialog):
 
         itu_code = callsign_to_country(text)
         if itu_code:
-            idx = self.country_combo.findData(itu_code)
+            idx = self.inputs["country"].findData(itu_code)
             if idx >= 0:
-                self.country_combo.setCurrentIndex(idx)
+                self.inputs["country"].setCurrentIndex(idx)
