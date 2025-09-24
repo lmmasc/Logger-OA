@@ -20,6 +20,8 @@ class SqliteRadioOperatorRepository(RadioOperatorRepository):
                     elif val.strip() == "":
                         row[idx] = None
             result.append(RadioOperator(*row))
+        # Ordenar alfabéticamente por indicativo (callsign)
+        result.sort(key=lambda op: op.callsign)
         return result
 
     def add(self, operator: RadioOperator) -> None:
