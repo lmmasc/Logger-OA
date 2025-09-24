@@ -196,6 +196,9 @@ class LogOpsView(QWidget):
             )
         # Instalar eventFilter para F1 en toda la vista
         self.installEventFilter(self)
+        self.callsign_info.operatorEnabledStatus.connect(
+            self._on_operator_enabled_status
+        )
 
     def eventFilter(self, obj, event):
 
@@ -438,3 +441,10 @@ class LogOpsView(QWidget):
 
         url = f"https://www.qrz.com/db/{callsign}"
         webbrowser.open(url)
+
+    def _on_operator_enabled_status(self, enabled):
+        """
+        Actualiza la alerta 'disabled' según el estado del operador.
+        """
+        # Si el operador está inhabilitado, activar solo la alerta 'disabled'.
+        self.alerts_widget.set_disabled_alert(not enabled)

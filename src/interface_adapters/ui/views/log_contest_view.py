@@ -462,9 +462,29 @@ class LogContestView(QWidget):
         url = f"https://www.qrz.com/db/{callsign}"
         webbrowser.open(url)
 
+    def _on_input_changed(self, text):
+        """
+        Habilita la alerta de duplicado en tiempo real si el indicativo ya está en el log (mismo bloque horario en concursos).
+        """
+        from application.use_cases.contact_management import find_duplicate_in_block
+
+        callsign = text.strip().upper()
+        import time
+
+        timestamp = int(time.time())
+        contacts = getattr(self.table_widget, "_last_contacts", [])
+        is_duplicate = False
+        if callsign and len(callsign) >= 2:
+            if self.form_widget.log_type == LogType.CONTEST_LOG:
+                dup = find_duplicate_in_block(callsign, timestamp, contacts)
+                is_duplicate = dup is not None
+            else:
+                is_duplicate = any(
+                    c.get("callsign", "").upper() == callsign for c in contacts
+                )
+        self.alerts_widget.set_duplicate_alert(is_duplicate)
+        # La alerta de disabled se actualiza solo desde _on_operator_enabled_status
+
     def _on_operator_enabled_status(self, enabled):
-        """
-        Actualiza la alerta 'disabled' según el estado del operador.
-        """
-        # Si el operador está inhabilitado, activar la alerta 'disabled'.
-        self.alerts_widget.set_alerts(True, not enabled)
+        # Actualizar solo la alerta de operador deshabilitado
+        self.alerts_widget.set_disabled_alert(not enabled)

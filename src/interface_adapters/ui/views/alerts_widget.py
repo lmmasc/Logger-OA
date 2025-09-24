@@ -39,7 +39,7 @@ class AlertsWidget(QWidget):
         # Hacer visible el widget aunque esté vacío
         self.setMinimumHeight(48)
         # Inicializa tema y estado
-        self.label1.setEnabled(True)
+        self.label1.setEnabled(False)
         self.label2.setEnabled(False)
 
         # Suscribirse a cambios de idioma
@@ -51,12 +51,17 @@ class AlertsWidget(QWidget):
         self.label1.setText(self._translation_service.tr("ui_alert_duplicate"))
         self.label2.setText(self._translation_service.tr("ui_alert_disabled"))
 
-    def set_alerts(self, enabled1: bool, enabled2: bool):
+    def set_duplicate_alert(self, enabled: bool):
         """
-        Cambia el estado habilitado/inhabilitado de los labels de alerta.
+        Cambia el estado habilitado/inhabilitado de la alerta de duplicado.
         """
-        self.label1.setEnabled(enabled1)
-        self.label2.setEnabled(enabled2)
+        self.label1.setEnabled(enabled)
+
+    def set_disabled_alert(self, enabled: bool):
+        """
+        Cambia el estado habilitado/inhabilitado de la alerta de operador deshabilitado.
+        """
+        self.label2.setEnabled(enabled)
 
     def clear_alerts(self):
         self.label1.setEnabled(False)
