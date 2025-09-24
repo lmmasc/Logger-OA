@@ -473,9 +473,22 @@ def action_log_export_simple_text(self):
         )
         return
     # Generar texto formateado tipo tabla para WhatsApp y depuración
-    lines = [
-        f"#  {translation_service.tr('log_operative_table_header_callsign')}   {translation_service.tr('log_operative_table_header_name')}"
-    ]
+    # Calcular el ancho máximo del indicativo
+    indicativos = []
+    for contact in contacts:
+        if isinstance(contact, dict):
+            indicativos.append(contact.get("callsign", "-"))
+        else:
+            indicativos.append(getattr(contact, "callsign", "-"))
+    max_callsign_len = max(len(str(i)) for i in indicativos) if indicativos else 10
+
+    # Encabezado con columnas alineadas
+    header_num = "Nº"
+    header_callsign = translation_service.tr("log_operative_table_header_callsign")
+    header_name = translation_service.tr("log_operative_table_header_name")
+    lines = [f"{header_num:>2}  {header_callsign:<{max_callsign_len}}  {header_name}"]
+
+    # Filas alineadas
     for idx, contact in enumerate(contacts, 1):
         if isinstance(contact, dict):
             indicativo = contact.get("callsign", "-")
@@ -483,7 +496,7 @@ def action_log_export_simple_text(self):
         else:
             indicativo = getattr(contact, "callsign", "-")
             nombre = getattr(contact, "name", "-")
-        lines.append(f"{idx:2d}  {indicativo:<10}  {nombre}")
+        lines.append(f"{idx:2d}  {indicativo:<{max_callsign_len}}  {nombre}")
     text = "\n".join(lines)
     # Crear ventana con QTextEdit para copiar
     dialog = QDialog(self)
