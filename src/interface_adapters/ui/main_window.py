@@ -69,6 +69,14 @@ class MainWindow(QMainWindow):
         Inicializa la ventana principal, configura título, tamaño, menús, temas, vistas y conecta señales.
         """
         super().__init__()
+        # Icono multiplataforma
+        from PySide6.QtGui import QIcon
+        import sys
+
+        if sys.platform.startswith("win"):
+            self.setWindowIcon(QIcon("assets/app_icon.ico"))
+        else:
+            self.setWindowIcon(QIcon("assets/app_icon.png"))
         self.current_log = None  # Log abierto (None si no hay log)
         self.current_log_type = None  # LogType.OPERATION_LOG o LogType.CONTEST_LOG
         self.db_table_window = (
