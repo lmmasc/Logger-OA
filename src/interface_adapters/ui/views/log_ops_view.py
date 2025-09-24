@@ -156,6 +156,7 @@ class LogOpsView(QWidget):
         self.callsign_input.addContactRequested.connect(self._on_add_contact)
         self.callsign_info.suggestionSelected.connect(self._on_suggestion_selected)
         self.callsign_input.input.textChanged.connect(self.callsign_info.update_info)
+        self.callsign_input.input.textChanged.connect(self._on_input_changed)
         self.callsign_info.update_info(self.callsign_input.get_callsign())
         self.setLayout(layout)
         # Conexión de señales para refresco de UI y relojes al cambiar idioma
@@ -441,6 +442,19 @@ class LogOpsView(QWidget):
 
         url = f"https://www.qrz.com/db/{callsign}"
         webbrowser.open(url)
+
+    def _on_input_changed(self, text):
+        """
+        Habilita la alerta de duplicado en tiempo real si el indicativo ya está en el log operativo.
+        """
+        callsign = text.strip().upper()
+        contacts = getattr(self.table_widget, "_last_contacts", [])
+        is_duplicate = False
+        if callsign and len(callsign) >= 2:
+            is_duplicate = any(
+                c.get("callsign", "").upper() == callsign for c in contacts
+            )
+        self.alerts_widget.set_duplicate_alert(is_duplicate)
 
     def _on_operator_enabled_status(self, enabled):
         """
