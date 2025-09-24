@@ -34,6 +34,7 @@ class CallsignInfoWidget(QWidget):
     """
 
     suggestionSelected = Signal(str)
+    operatorEnabledStatus = Signal(bool)  # Señal para estado de habilitación
 
     def __init__(self, parent=None):
         """
@@ -157,6 +158,7 @@ class CallsignInfoWidget(QWidget):
         base, prefijo, sufijo = parse_callsign(filtro)
         if len(filtro) < 2:
             self.show_suggestions("")
+            self.operatorEnabledStatus.emit(True)  # No alerta
         else:
             operadores = get_filtered_operators(base)
             exact_matches = [
@@ -176,6 +178,9 @@ class CallsignInfoWidget(QWidget):
                 country_name = (
                     get_country_full_name(operator.country, lang) or operator.country
                 )
+                # Determinar si el operador está habilitado
+                enabled_status = bool(getattr(operator, "enabled", True))
+                self.operatorEnabledStatus.emit(enabled_status)
                 if operator.country == "PER":
                     summary = f"<table width='100%' style='font-size:16px;'>"
                     summary += "<tr>"
@@ -204,3 +209,4 @@ class CallsignInfoWidget(QWidget):
                 self.show_summary(summary)
             else:
                 self.show_suggestions(base)
+                self.operatorEnabledStatus.emit(True)  # No alerta

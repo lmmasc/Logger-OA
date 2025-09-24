@@ -197,6 +197,10 @@ class LogContestView(QWidget):
         # Instalar eventFilter para F1 en toda la vista
         self.installEventFilter(self)
 
+        self.callsign_info.operatorEnabledStatus.connect(
+            self._on_operator_enabled_status
+        )
+
     def eventFilter(self, obj, event):
 
         # Detectar teclas F1-F4 en toda la ventana
@@ -457,3 +461,10 @@ class LogContestView(QWidget):
 
         url = f"https://www.qrz.com/db/{callsign}"
         webbrowser.open(url)
+
+    def _on_operator_enabled_status(self, enabled):
+        """
+        Actualiza la alerta 'disabled' según el estado del operador.
+        """
+        # Si el operador está inhabilitado, activar la alerta 'disabled'.
+        self.alerts_widget.set_alerts(True, not enabled)
