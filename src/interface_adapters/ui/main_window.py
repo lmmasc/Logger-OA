@@ -43,6 +43,7 @@ from .main_window_actions import (
     action_log_export_csv,
     action_log_export_adi,
     action_log_export_pdf,
+    action_log_export_simple_text,
 )
 from .main_window_dialogs import show_about_dialog, show_manual_dialog
 from .main_window_config import (
@@ -271,6 +272,9 @@ class MainWindow(QMainWindow):
         )
         self.menu_bar.export_pdf_action.triggered.connect(
             lambda: action_log_export_pdf(self)
+        )
+        self.menu_bar.export_whatsapp_action.triggered.connect(
+            lambda: action_log_export_simple_text(self)
         )
 
     def _on_theme_selected(self, theme_key: str):

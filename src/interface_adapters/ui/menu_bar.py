@@ -93,10 +93,12 @@ class MainMenuBar(QMenuBar):
         self.export_pdf_action = QAction(
             translation_service.tr("menu_export_pdf"), self
         )
+        self.export_whatsapp_action = QAction("Whatsapp", self)
         self.export_menu.addAction(self.export_txt_action)
         self.export_menu.addAction(self.export_csv_action)
         self.export_menu.addAction(self.export_adi_action)
         self.export_menu.addAction(self.export_pdf_action)
+        self.export_menu.addAction(self.export_whatsapp_action)
         self.file_menu.addMenu(self.export_menu)
 
         self.log_close_action = QAction(translation_service.tr("menu_close"), self)

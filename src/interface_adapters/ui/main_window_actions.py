@@ -12,6 +12,10 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QFileDialog,
     QApplication,
+    QDialog,
+    QVBoxLayout,
+    QTextEdit,
+    QPushButton,
 )
 from PySide6.QtCore import QTimer, QUrl
 from PySide6.QtGui import QDesktopServices
@@ -447,6 +451,56 @@ def action_log_close(self):
     self.show_view(ViewID.WELCOME_VIEW)
     self.setWindowTitle(translation_service.tr("main_window_title"))
     self.update_menu_state()
+
+
+def action_log_export_simple_text(self):
+    """
+    Muestra una ventana con el texto simple de exportación (orden, indicativo, nombre) para copiar fácilmente.
+    """
+    if not hasattr(self, "current_log") or self.current_log is None:
+        QMessageBox.warning(
+            self,
+            translation_service.tr("main_window_title"),
+            translation_service.tr("no_log_open"),
+        )
+        return
+    contacts = getattr(self.current_log, "contacts", None)
+    if not contacts:
+        QMessageBox.warning(
+            self,
+            translation_service.tr("main_window_title"),
+            "No hay contactos en el log actual.",
+        )
+        return
+    # Generar texto formateado tipo tabla para WhatsApp y depuración
+    lines = ["#  Indicativo   Nombre"]
+    for idx, contact in enumerate(contacts, 1):
+        if isinstance(contact, dict):
+            indicativo = contact.get("callsign", "-")
+            nombre = contact.get("name", "-")
+        else:
+            indicativo = getattr(contact, "callsign", "-")
+            nombre = getattr(contact, "name", "-")
+        lines.append(f"{idx:2d}  {indicativo:<10}  {nombre}")
+    text = "\n".join(lines)
+    # Crear ventana con QTextEdit para copiar
+    dialog = QDialog(self)
+    dialog.setWindowTitle("Exportación simple de log")
+    layout = QVBoxLayout(dialog)
+    text_edit = QTextEdit(dialog)
+    text_edit.setPlainText(text)
+    text_edit.setReadOnly(False)  # Permite copiar y editar
+    layout.addWidget(text_edit)
+    copy_btn = QPushButton("Copiar al portapapeles", dialog)
+    layout.addWidget(copy_btn)
+
+    def copy_to_clipboard():
+        clipboard = QApplication.clipboard()
+        clipboard.setText(text_edit.toPlainText())
+
+    copy_btn.clicked.connect(copy_to_clipboard)
+    dialog.resize(400, 300)
+    dialog.exec()
 
 
 # --- Acciones de Base de Datos ---
