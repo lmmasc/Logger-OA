@@ -235,6 +235,10 @@ class OperatorEditDialog(QDialog):
             self.country_combo.setCurrentIndex(idx_country)
         self._on_country_changed(self.country_combo.currentIndex())
 
+        # Cargar el valor de 'enabled' en el combo
+        enabled_val = getattr(op, "enabled", 1)
+        self.inputs["enabled"].setCurrentIndex(0 if enabled_val else 1)
+
     def get_operator_data(self):
         """
         Devuelve un dict con los datos ingresados/validados del operador.
