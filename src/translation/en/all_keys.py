@@ -140,6 +140,8 @@ TABLE_HEADERS_TRANSLATIONS = {
 }
 UI_TRANSLATIONS = {
     "export_simple_dialog_title": "Simple log export",
+    "ui_alert_duplicate": "Duplicate",
+    "ui_alert_disabled": "Disabled",
     "export_simple_copy_button": "Copy to clipboard",
     "cps_operation": "CPS",
     "rener_operation": "RENER",
