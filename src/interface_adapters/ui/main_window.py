@@ -17,6 +17,7 @@ from config.settings_service import (
     SettingsKey,
     CallsignMode,
 )
+from src.utils.resources import get_resource_path
 from translation.translation_service import translation_service
 from .themes.theme_manager import ThemeManager
 from .menu_bar import MainMenuBar
@@ -74,9 +75,9 @@ class MainWindow(QMainWindow):
         import sys
 
         if sys.platform.startswith("win"):
-            self.setWindowIcon(QIcon("assets/app_icon.ico"))
+            self.setWindowIcon(QIcon(get_resource_path("assets/app_icon.ico")))
         else:
-            self.setWindowIcon(QIcon("assets/app_icon.png"))
+            self.setWindowIcon(QIcon(get_resource_path("assets/app_icon.png")))
         self.current_log = None  # Log abierto (None si no hay log)
         self.current_log_type = None  # LogType.OPERATION_LOG o LogType.CONTEST_LOG
         self.db_table_window = (
