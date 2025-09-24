@@ -62,9 +62,9 @@ class OperatorEditDialog(QDialog):
         self._peru_fields = [
             "category",
             "type",
-            "district",
-            "province",
             "department",
+            "province",
+            "district",
             "license",
             "resolution",
             "expiration_date",
@@ -78,9 +78,9 @@ class OperatorEditDialog(QDialog):
             ("category", QComboBox),
             ("type", QComboBox),
             ("region", QLineEdit),  # Campo agregado para región
-            ("district", QLineEdit),
-            ("province", QLineEdit),
             ("department", QLineEdit),
+            ("province", QLineEdit),
+            ("district", QLineEdit),
             ("license", QLineEdit),
             ("resolution", QLineEdit),
             ("expiration_date", QDateEdit),
