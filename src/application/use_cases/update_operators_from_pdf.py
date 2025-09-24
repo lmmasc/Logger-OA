@@ -25,6 +25,17 @@ def update_operators_from_pdf(pdf_path):
     db_path = get_database_path()
     existing_rows = get_radio_operators()
     existing = {}
+
+    def to_int_or_none(val):
+        if isinstance(val, int):
+            return val
+        if isinstance(val, str):
+            try:
+                return int(val) if val.isdigit() else None
+            except Exception:
+                return None
+        return None
+
     for row in existing_rows:
         (
             callsign,
@@ -54,11 +65,11 @@ def update_operators_from_pdf(pdf_path):
             "department": department,
             "license": license_,
             "resolution": resolution,
-            "expiration_date": expiration_date,
-            "cutoff_date": cutoff_date,
+            "expiration_date": to_int_or_none(expiration_date),
+            "cutoff_date": to_int_or_none(cutoff_date),
             "enabled": enabled,
             "country": country,
-            "updated_at": updated_at,
+            "updated_at": to_int_or_none(updated_at),
         }
 
     now = int(datetime.now(timezone.utc).timestamp())

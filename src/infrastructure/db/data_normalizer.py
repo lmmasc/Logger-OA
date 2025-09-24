@@ -29,11 +29,21 @@ def normalize_operator_data(raw_data):
             country = "PER"
         else:
             country = normalize_ascii(country).upper()
-        # Validar que sean enteros (timestamp UTC)
-        if expiration_date is not None and not isinstance(expiration_date, int):
-            expiration_date = None
-        if cutoff_date is not None and not isinstance(cutoff_date, int):
-            cutoff_date = None
+
+        # Validar que sean enteros (timestamp UTC) o convertir si es string numérico
+        def to_int_or_none(val):
+            if isinstance(val, int):
+                return val
+            if isinstance(val, str):
+                try:
+                    # Solo convertir si es un string de dígitos
+                    return int(val) if val.isdigit() else None
+                except Exception:
+                    return None
+            return None
+
+        expiration_date = to_int_or_none(expiration_date)
+        cutoff_date = to_int_or_none(cutoff_date)
         region = (
             f"{department}-{province}-{district}"
             if department or province or district
