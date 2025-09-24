@@ -106,16 +106,40 @@ class LogOpsView(QWidget):
         self.qrz_btn.setObjectName("QRZButton")
         self.qrz_btn.setToolTip("Abrir QRZ.com para el indicativo")
         self.qrz_btn.clicked.connect(self._on_open_qrz)
-        # Layout horizontal para relojes y botón
+        # Layout horizontal: relojes a la izquierda, columna derecha con alertas y botones
+        from .alerts_widget import AlertsWidget
+
         clock_row = QWidget(self)
         clock_layout = QHBoxLayout(clock_row)
         clock_layout.setContentsMargins(10, 0, 10, 0)
         clock_layout.setSpacing(8)
+        # Relojes
         clock_layout.addWidget(self.oa_clock)
         clock_layout.addWidget(self.utc_clock)
-        clock_layout.addWidget(self.add_contact_btn)
-        clock_layout.addWidget(self.delete_contact_btn)
-        clock_layout.addWidget(self.qrz_btn)
+        # Columna derecha: alertas arriba, botones abajo
+        right_col = QWidget(clock_row)
+        right_col_layout = QVBoxLayout(right_col)
+        right_col_layout.setContentsMargins(0, 0, 0, 0)
+        right_col_layout.setSpacing(4)
+        # Widget de alertas
+        self.alerts_widget = AlertsWidget(right_col)
+        self.alerts_widget.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
+        )
+        right_col_layout.addWidget(self.alerts_widget)
+        # Fila de botones
+        btn_row = QWidget(right_col)
+        btn_layout = QHBoxLayout(btn_row)
+        btn_layout.setContentsMargins(0, 10, 0, 0)
+        btn_layout.setSpacing(8)
+        btn_layout.addWidget(self.add_contact_btn)
+        btn_layout.addWidget(self.delete_contact_btn)
+        btn_layout.addWidget(self.qrz_btn)
+        btn_row.setLayout(btn_layout)
+        right_col_layout.addWidget(btn_row)
+        right_col.setLayout(right_col_layout)
+        right_col.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        clock_layout.addWidget(right_col)
         clock_row.setLayout(clock_layout)
         layout.addWidget(clock_row)
         self.table_widget = ContactTableWidget(
