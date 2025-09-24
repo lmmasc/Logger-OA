@@ -67,16 +67,20 @@ class CallsignInputWidget(QWidget):
 
     def _normalize_upper(self, text):
         """
-        Normaliza el texto a mayúsculas en tiempo real, manteniendo la posición del cursor.
+        Normaliza el texto a mayúsculas y elimina espacios en tiempo real, manteniendo la posición del cursor.
         Args:
             text (str): Texto ingresado.
         """
-        upper_text = text.upper()
-        if text != upper_text:
+        normalized_text = text.replace(" ", "").upper()
+        if text != normalized_text:
             cursor_pos = self.input.cursorPosition()
             self.input.blockSignals(True)
-            self.input.setText(upper_text)
-            self.input.setCursorPosition(cursor_pos)
+            self.input.setText(normalized_text)
+            self.input.setCursorPosition(
+                cursor_pos
+                if cursor_pos <= len(normalized_text)
+                else len(normalized_text)
+            )
             self.input.blockSignals(False)
 
     def eventFilter(self, obj, event):
