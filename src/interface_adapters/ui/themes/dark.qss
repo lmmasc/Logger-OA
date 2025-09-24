@@ -168,6 +168,22 @@ QLabel#callsignSummary:focus {
     border: 2px solid palette(highlight);
 }
 
+QLabel#AlertLabel {
+    border: 2px solid #fff;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-weight: bold;
+    font-size: 20px;
+    background-color: #ff1744;
+    color: #fff;
+}
+QLabel#AlertLabel:disabled {
+    background-color: #33373a;
+    color: transparent;
+    border: 2px solid #444444;
+    opacity: 0.7;
+}
+
 /* =============================
    Listas de contactos y sugerencias
    ============================= */
