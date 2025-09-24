@@ -11,6 +11,8 @@ from utils.resources import get_resource_path
 from PySide6.QtCore import Signal, Qt
 from translation.translation_service import translation_service
 from utils.text import get_filtered_operators
+from utils.datetime import format_iso_date
+from domain.callsign_utils import get_country_full_name
 
 
 class CallsignInfoWidget(QWidget):
@@ -153,7 +155,6 @@ class CallsignInfoWidget(QWidget):
 
         filtro = text.strip().upper()
         base, prefijo, sufijo = parse_callsign(filtro)
-        # print(f"Base: {base}, Prefijo: {prefijo}, Sufijo: {sufijo}")
         if len(filtro) < 2:
             self.show_suggestions("")
         else:
@@ -166,13 +167,6 @@ class CallsignInfoWidget(QWidget):
             ]
             if len(exact_matches) == 1:
                 operator = exact_matches[0]
-                enabled = (
-                    translation_service.tr("ui_enabled_status")
-                    if operator.enabled
-                    else translation_service.tr("ui_disabled_status")
-                )
-                from domain.callsign_utils import get_country_full_name
-
                 lang_enum = (
                     translation_service.get_language()
                     if hasattr(translation_service, "get_language")
@@ -182,29 +176,31 @@ class CallsignInfoWidget(QWidget):
                 country_name = (
                     get_country_full_name(operator.country, lang) or operator.country
                 )
-                summary = f"<table width='100%' style='font-size:16px;'>"
-                summary += "<tr>"
-                summary += f"<td><b>{operator.name}</b></td>"
-                summary += f"<td>{translation_service.tr('ui_district_label')}: {operator.district}</td>"
-                summary += f"<td>{translation_service.tr('category')}: {operator.category}</td>"
-                summary += "</tr><tr>"
-                summary += f"<td>{translation_service.tr('ui_country_label')}: {country_name}</td>"
-                summary += f"<td>{translation_service.tr('province')}: {operator.province}</td>"
-                summary += f"<td>{translation_service.tr('ui_type_label')}: {operator.type_}</td>"
-                summary += "</tr><tr>"
-                summary += f"<td>{enabled}</td>"
-                summary += f"<td>{translation_service.tr('ui_department_label')}: {operator.department}</td>"
-                from utils.datetime import format_iso_date
-
-                expiration_str = format_iso_date(operator.expiration_date)
-                if expiration_str:
-                    # Convertir a dd/mm/yyyy
-                    parts = expiration_str.split("-")
-                    expiration_str = f"{parts[2]}/{parts[1]}/{parts[0]}"
-                summary += f"<td>{translation_service.tr('ui_expiration_label')}: {expiration_str}</td>"
-                summary += "</tr></table>"
+                if operator.country == "PER":
+                    summary = f"<table width='100%' style='font-size:16px;'>"
+                    summary += "<tr>"
+                    summary += f"<td><b>{operator.name}</b></td>"
+                    summary += f"<td>{translation_service.tr('ui_district_label')}: {operator.district}</td>"
+                    summary += f"<td>{translation_service.tr('category')}: {operator.category}</td>"
+                    summary += "</tr><tr>"
+                    summary += f"<td>{translation_service.tr('ui_country_label')}: {country_name}</td>"
+                    summary += f"<td>{translation_service.tr('province')}: {operator.province}</td>"
+                    summary += f"<td>{translation_service.tr('ui_type_label')}: {operator.type_}</td>"
+                    summary += "</tr><tr>"
+                    summary += f"<td></td>"
+                    summary += f"<td>{translation_service.tr('ui_department_label')}: {operator.department}</td>"
+                    expiration_str = format_iso_date(operator.expiration_date)
+                    if expiration_str:
+                        parts = expiration_str.split("-")
+                        expiration_str = f"{parts[2]}/{parts[1]}/{parts[0]}"
+                    summary += f"<td>{translation_service.tr('ui_expiration_label')}: {expiration_str}</td>"
+                    summary += "</tr></table>"
+                else:
+                    summary = f"<table width='100%' style='font-size:16px;'>"
+                    summary += f"<tr><td><b>{operator.name}</b></td></tr>"
+                    summary += f"<tr><td>{translation_service.tr('ui_country_label')}: {country_name}</td></tr>"
+                    summary += f"<tr><td>{translation_service.tr('region')}: {operator.region}</td></tr>"
+                    summary += "</table>"
                 self.show_summary(summary)
             else:
-                # self.show_suggestions(f"{prefijo}/{base}" if prefijo else base)
                 self.show_suggestions(base)
-                # print(f"Para Sugerencias : {base}")
