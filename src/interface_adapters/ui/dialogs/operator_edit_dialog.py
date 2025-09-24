@@ -154,6 +154,30 @@ class OperatorEditDialog(QDialog):
             self.inputs["enabled"].setCurrentIndex(0)  # SI/YES por defecto
             self._on_country_changed(self.inputs["country"].currentIndex())
 
+        if (
+            "department" in self.inputs
+            and "province" in self.inputs
+            and "district" in self.inputs
+        ):
+            self.inputs["department"].textChanged.connect(self._update_region_peru)
+            self.inputs["province"].textChanged.connect(self._update_region_peru)
+            self.inputs["district"].textChanged.connect(self._update_region_peru)
+
+    def _update_region_peru(self):
+        """
+        Actualiza el campo 'region' dinámicamente si país es Perú.
+        """
+        if self.inputs["country"].currentText() == "PERU":
+            departamento = self.inputs["department"].text().strip().upper()
+            provincia = self.inputs["province"].text().strip().upper()
+            distrito = self.inputs["district"].text().strip().upper()
+            region_value = (
+                f"{departamento}-{provincia}-{distrito}"
+                if departamento or provincia or distrito
+                else ""
+            )
+            self.inputs["region"].setText(region_value)
+
     def _on_country_changed(self, idx):
         """
         Habilita o deshabilita campos según el país seleccionado.
@@ -181,6 +205,22 @@ class OperatorEditDialog(QDialog):
                         widget.clear()
                     elif isinstance(widget, QDateEdit):
                         widget.setDate(QDate.currentDate())
+
+        # Deshabilitar y autollenar 'region' para Perú
+        region_widget = self.inputs["region"]
+        if is_peru:
+            region_widget.setEnabled(False)
+            departamento = self.inputs["department"].text().strip().upper()
+            provincia = self.inputs["province"].text().strip().upper()
+            distrito = self.inputs["district"].text().strip().upper()
+            region_value = (
+                f"{departamento}-{provincia}-{distrito}"
+                if departamento or provincia or distrito
+                else ""
+            )
+            region_widget.setText(region_value)
+        else:
+            region_widget.setEnabled(True)
         # country_other eliminado: solo combo ITU
 
     def _load_operator(self, op):
