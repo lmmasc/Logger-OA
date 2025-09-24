@@ -153,6 +153,7 @@ class LogContestView(QWidget):
         translation_service.signal.language_changed.connect(self.retranslate_ui)
         self.callsign_info.suggestionSelected.connect(self._on_suggestion_selected)
         self.callsign_input.input.textChanged.connect(self.callsign_info.update_info)
+        self.callsign_input.input.textChanged.connect(self._on_input_changed)
         self.callsign_info.update_info(self.callsign_input.get_callsign())
         self.setLayout(layout)
         # Evitar foco en cola y tabla
