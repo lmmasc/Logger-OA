@@ -473,7 +473,9 @@ def action_log_export_simple_text(self):
         )
         return
     # Generar texto formateado tipo tabla para WhatsApp y depuración
-    lines = ["#  Indicativo   Nombre"]
+    lines = [
+        f"#  {translation_service.tr('log_operative_table_header_callsign')}   {translation_service.tr('log_operative_table_header_name')}"
+    ]
     for idx, contact in enumerate(contacts, 1):
         if isinstance(contact, dict):
             indicativo = contact.get("callsign", "-")
@@ -485,13 +487,13 @@ def action_log_export_simple_text(self):
     text = "\n".join(lines)
     # Crear ventana con QTextEdit para copiar
     dialog = QDialog(self)
-    dialog.setWindowTitle("Exportación simple de log")
+    dialog.setWindowTitle(translation_service.tr("export_simple_dialog_title"))
     layout = QVBoxLayout(dialog)
     text_edit = QTextEdit(dialog)
     text_edit.setPlainText(text)
     text_edit.setReadOnly(False)  # Permite copiar y editar
     layout.addWidget(text_edit)
-    copy_btn = QPushButton("Copiar al portapapeles", dialog)
+    copy_btn = QPushButton(translation_service.tr("export_simple_copy_button"), dialog)
     layout.addWidget(copy_btn)
 
     def copy_to_clipboard():

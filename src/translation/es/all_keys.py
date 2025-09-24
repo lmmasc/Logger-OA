@@ -139,6 +139,8 @@ TABLE_HEADERS_TRANSLATIONS = {
     "table_header_power": "Pot.",
 }
 UI_TRANSLATIONS = {
+    "export_simple_dialog_title": "Exportación simple de log",
+    "export_simple_copy_button": "Copiar al portapapeles",
     "cps_operation": "CPS",
     "operation_rep_label": "Repetidor",
     "operation_freq_label": "Frecuencia",
