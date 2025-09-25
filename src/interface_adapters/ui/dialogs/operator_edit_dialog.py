@@ -186,6 +186,10 @@ class OperatorEditDialog(QDialog):
         is_peru = self.inputs["country"].currentText() == "PERU"
         for key in self._peru_fields:
             widget = self.inputs[key]
+            # Habilitar siempre 'license', 'resolution', 'expiration_date' y 'cutoff_date' para todos los países
+            if key in ("license", "resolution", "expiration_date", "cutoff_date"):
+                widget.setEnabled(True)
+                continue
             if key in ("category", "type"):
                 if is_peru:
                     widget.setEnabled(True)
@@ -238,13 +242,13 @@ class OperatorEditDialog(QDialog):
         type_val = getattr(op, "type_", "OPERADOR")
         idx_type = self.inputs["type"].findText(type_val)
         self.inputs["type"].setCurrentIndex(idx_type if idx_type >= 0 else 0)
-        self.inputs["region"].setText(
-            getattr(op, "region", "").upper()
-        )  # Cargar región
+        self.inputs["region"].setText(getattr(op, "region", "").upper())
         self.inputs["district"].setText(getattr(op, "district", "").upper())
         self.inputs["province"].setText(getattr(op, "province", "").upper())
         self.inputs["department"].setText(getattr(op, "department", "").upper())
-        self.inputs["license"].setText(getattr(op, "license_", "").upper())
+        # Cargar correctamente 'license' y 'resolution' para cualquier país
+        license_val = getattr(op, "license_", getattr(op, "license", ""))
+        self.inputs["license"].setText(license_val.upper())
         self.inputs["resolution"].setText(getattr(op, "resolution", "").upper())
         # Fechas
         from datetime import datetime, timezone, timedelta
