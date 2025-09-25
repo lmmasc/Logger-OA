@@ -72,10 +72,28 @@ class OperatorEditDialog(QDialog):
             "enabled",
         ]
         # Campos básicos (sin country)
+        # Inicializar widgets de categoría
+        category_row = QHBoxLayout()
+        category_label = QLabel(translation_service.tr("db_table_header_category"))
+        category_row.addWidget(category_label)
+        self.category_combo = QComboBox()
+        self.category_combo.addItems(["NOVICIO", "INTERMEDIO", "SUPERIOR"])
+        self.category_line = QLineEdit()
+        self.category_line.textChanged.connect(
+            lambda text, w=self.category_line: (
+                w.setText(text.upper()) if text != text.upper() else None
+            )
+        )
+        category_row.addWidget(self.category_combo)
+        category_row.addWidget(self.category_line)
+        self.category_line.hide()
+        self.inputs["category_combo"] = self.category_combo
+        self.inputs["category_line"] = self.category_line
+        self.inputs["category"] = self.category_combo
+
         fields = [
             ("callsign", QLineEdit),
             ("name", QLineEdit),
-            ("category", QComboBox),
             ("type", QComboBox),
             ("country", QComboBox),
             ("region", QLineEdit),
@@ -101,24 +119,31 @@ class OperatorEditDialog(QDialog):
                 )
                 if key == "callsign":
                     widget.textChanged.connect(self._autocomplete_country_from_callsign)
+                row.addWidget(widget)
+                self.inputs[key] = widget
             elif widget_cls == QComboBox:
                 widget = QComboBox()
-                if key == "category":
-                    widget.addItems(["NOVICIO", "INTERMEDIO", "SUPERIOR", "NO_APLICA"])
-                elif key == "type":
+                if key == "type":
                     widget.addItems(["OPERADOR", "INSTALADOR/OPERADOR", "NO_APLICA"])
                 elif key == "enabled":
                     widget.addItems(
                         [translation_service.tr("yes"), translation_service.tr("no")]
                     )
+                row.addWidget(widget)
+                self.inputs[key] = widget
             elif widget_cls == QDateEdit:
                 widget = QDateEdit()
                 widget.setDisplayFormat("dd/MM/yyyy")
                 widget.setCalendarPopup(True)
                 widget.setDate(QDate.currentDate())
-            row.addWidget(widget)
-            self.inputs[key] = widget
-            layout.addLayout(row)
+                row.addWidget(widget)
+                self.inputs[key] = widget
+            # Agregar el row de categoría justo después del nombre
+            if key == "name":
+                layout.addLayout(row)
+                layout.addLayout(category_row)
+            else:
+                layout.addLayout(row)
         # Inicializar el combo de país después de crearlo en el bucle
         from domain.itu_country_names import ITU_COUNTRY_NAMES
         from utils.text import normalize_ascii
@@ -185,12 +210,26 @@ class OperatorEditDialog(QDialog):
         """
         is_peru = self.inputs["country"].currentText() == "PERU"
         for key in self._peru_fields:
+            if key == "category":
+                # Solo cambiar si los widgets existen
+                if hasattr(self, "category_combo") and hasattr(self, "category_line"):
+                    if is_peru:
+                        self.category_combo.show()
+                        self.category_line.hide()
+                        self.category_combo.setEnabled(True)
+                        self.inputs["category"] = self.category_combo
+                    else:
+                        self.category_combo.hide()
+                        self.category_line.show()
+                        self.category_line.setEnabled(True)
+                        self.inputs["category"] = self.category_line
+                continue
             widget = self.inputs[key]
             # Habilitar siempre 'license', 'resolution', 'expiration_date' y 'cutoff_date' para todos los países
             if key in ("license", "resolution", "expiration_date", "cutoff_date"):
                 widget.setEnabled(True)
                 continue
-            if key in ("category", "type"):
+            if key == "type":
                 if is_peru:
                     widget.setEnabled(True)
                 else:
@@ -236,8 +275,17 @@ class OperatorEditDialog(QDialog):
         self.inputs["callsign"].setText(getattr(op, "callsign", "").upper())
         self.inputs["name"].setText(getattr(op, "name", "").upper())
         cat = getattr(op, "category", "NOVICIO")
-        idx = self.inputs["category"].findText(cat)
-        self.inputs["category"].setCurrentIndex(idx if idx >= 0 else 0)
+        is_peru = getattr(op, "country", "PER") == "PER"
+        if hasattr(self, "category_combo") and hasattr(self, "category_line"):
+            if is_peru:
+                idx = self.category_combo.findText(cat)
+                self.category_combo.setCurrentIndex(idx if idx >= 0 else 0)
+                self.category_combo.show()
+                self.category_line.hide()
+            else:
+                self.category_line.setText(cat.upper())
+                self.category_line.show()
+                self.category_combo.hide()
         # type como combo
         type_val = getattr(op, "type_", "OPERADOR")
         idx_type = self.inputs["type"].findText(type_val)
