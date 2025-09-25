@@ -92,38 +92,60 @@ def extract_operators_from_excel(excel_path):
         # Normalizar cabeceras para comparación
         normalized_headers = [str(h).strip().lower() if h else "" for h in header_row]
 
-        # Verificar si es formato chileno
-        if not _is_chilean_format(normalized_headers):
+        # Detectar formato chileno o argentino
+        if _is_chilean_format(normalized_headers):
+            print("✓ Formato chileno detectado correctamente")
+            column_mapping = _map_chilean_columns(normalized_headers)
+            row_count = 0
+            for row_data in worksheet.iter_rows(values_only=True, min_row=2):
+                row_count += 1
+                if not any(cell is not None and str(cell).strip() for cell in row_data):
+                    continue  # Saltar filas vacías
+                try:
+                    operator_data = _process_chilean_row(
+                        row_data, column_mapping, cutoff_timestamp
+                    )
+                    if (
+                        operator_data
+                        and operator_data["callsign"] not in seen_callsigns
+                    ):
+                        results.append(operator_data)
+                        seen_callsigns.add(operator_data["callsign"])
+                except Exception as e:
+                    print(f"⚠ Error procesando fila {row_count + 1}: {e}")
+                    continue
+            workbook.close()
+            print(f"✓ Procesados {len(results)} operadores chilenos únicos")
+        elif _is_argentine_format(normalized_headers):
+            print("✓ Formato argentino detectado correctamente")
+            column_mapping = _map_argentine_columns(normalized_headers)
+            row_count = 0
+            for row_data in worksheet.iter_rows(values_only=True, min_row=2):
+                row_count += 1
+                if not any(cell is not None and str(cell).strip() for cell in row_data):
+                    continue  # Saltar filas vacías
+                try:
+                    operator_data = _process_argentine_row(
+                        row_data, column_mapping, cutoff_timestamp
+                    )
+                    if (
+                        operator_data
+                        and operator_data["callsign"] not in seen_callsigns
+                    ):
+                        results.append(operator_data)
+                        seen_callsigns.add(operator_data["callsign"])
+                except Exception as e:
+                    print(f"⚠ Error procesando fila {row_count + 1}: {e}")
+                    continue
+            workbook.close()
+            print(f"✓ Procesados {len(results)} operadores argentinos únicos")
+        else:
+            if "workbook" in locals():
+                workbook.close()
             raise Exception(
-                "El formato del Excel no corresponde a operadores chilenos. "
-                "Se esperan columnas: Licencia, Señal Distintiva, Nombre, Rut, Región, Comuna, Fecha Vencimiento"
+                "El formato del Excel no corresponde a operadores chilenos ni argentinos. "
+                "Se esperan columnas: Chile (Licencia, Señal Distintiva, ...), Argentina (Titular de la Licencia, Señal Distintiva, ...)."
             )
-
-        print("✓ Formato chileno detectado correctamente")
-
-        # Mapear columnas del formato chileno
-        column_mapping = _map_chilean_columns(normalized_headers)
-
-        # Procesar filas de datos
-        row_count = 0
-        for row_data in worksheet.iter_rows(values_only=True, min_row=2):
-            row_count += 1
-            if not any(cell is not None and str(cell).strip() for cell in row_data):
-                continue  # Saltar filas vacías
-
-            try:
-                operator_data = _process_chilean_row(
-                    row_data, column_mapping, cutoff_timestamp
-                )
-                if operator_data and operator_data["callsign"] not in seen_callsigns:
-                    results.append(operator_data)
-                    seen_callsigns.add(operator_data["callsign"])
-            except Exception as e:
-                print(f"⚠ Error procesando fila {row_count + 1}: {e}")
-                continue
-
-        workbook.close()
-        print(f"✓ Procesados {len(results)} operadores chilenos únicos")
 
     except Exception as e:
         if "workbook" in locals():
@@ -162,6 +184,28 @@ def _is_chilean_format(headers):
     return True
 
 
+def _is_argentine_format(headers):
+    """
+    Verifica si las cabeceras corresponden al formato argentino.
+    Args:
+        headers (list): Lista de cabeceras normalizadas
+    Returns:
+        bool: True si es formato argentino
+    """
+    required_arg_headers = [
+        "titular de la licencia",
+        "señal distintiva",
+        "categoría",
+        "provincia",
+        "localidad",
+    ]
+    headers_joined = " ".join(headers).lower()
+    for required in required_arg_headers:
+        if required not in headers_joined:
+            return False
+    return True
+
+
 def _map_chilean_columns(headers):
     """
     Mapea las columnas del formato chileno a índices.
@@ -191,6 +235,30 @@ def _map_chilean_columns(headers):
         elif "fecha" in header_clean and "vencimiento" in header_clean:
             mapping["fecha_vencimiento"] = i
 
+    return mapping
+
+
+def _map_argentine_columns(headers):
+    """
+    Mapea las columnas del formato argentino a índices.
+    Args:
+        headers (list): Lista de cabeceras normalizadas
+    Returns:
+        dict: Mapeo de campo -> índice de columna
+    """
+    mapping = {}
+    for i, header in enumerate(headers):
+        header_clean = header.strip().lower()
+        if "titular" in header_clean and "licencia" in header_clean:
+            mapping["name"] = i
+        elif "señal" in header_clean and "distintiva" in header_clean:
+            mapping["callsign"] = i
+        elif "categoría" in header_clean:
+            mapping["category"] = i
+        elif "provincia" in header_clean:
+            mapping["province"] = i
+        elif "localidad" in header_clean:
+            mapping["district"] = i
     return mapping
 
 
@@ -268,6 +336,58 @@ def _process_chilean_row(row_data, column_mapping, cutoff_timestamp):
         "enabled": 1,  # Por defecto habilitado
     }
 
+    return operator_data
+
+
+def _process_argentine_row(row_data, column_mapping, cutoff_timestamp):
+    """
+    Procesa una fila de datos argentinos y la convierte al formato interno.
+    Args:
+        row_data (tuple): Datos de la fila
+        column_mapping (dict): Mapeo de columnas
+        cutoff_timestamp (int): Timestamp de la fecha de cutoff del archivo
+    Returns:
+        dict: Datos del operador en formato interno
+    """
+    callsign = _get_cell_value(row_data, column_mapping.get("callsign"))
+    name = _get_cell_value(row_data, column_mapping.get("name"))
+    category = _get_cell_value(row_data, column_mapping.get("category"))
+    province = _get_cell_value(row_data, column_mapping.get("province"))
+    district = _get_cell_value(row_data, column_mapping.get("district"))
+
+    # Validar callsign obligatorio
+    if not callsign:
+        raise Exception("Callsign vacío")
+
+    callsign_clean = callsign.strip().replace(" ", "").upper()
+
+    # Verificar que el callsign es argentino
+    country_code = callsign_to_country(callsign_clean)
+    if country_code != "ARG":
+        raise Exception(
+            f"Callsign {callsign_clean} no es argentino (detectado: {country_code})"
+        )
+
+    # Construir región normalizada: "PROVINCIA - LOCALIDAD"
+    region_normalized = _build_normalized_region(province, district)
+
+    # Construir datos del operador en formato interno
+    operator_data = {
+        "callsign": callsign_clean,
+        "name": name.strip() if name else "",
+        "category": category.strip() if category else "",
+        "type": "",  # No disponible en formato argentino
+        "region": region_normalized,  # PROVINCIA - LOCALIDAD
+        "district": district.strip() if district else "",
+        "province": province.strip() if province else "",
+        "department": "",  # No aplica para Argentina
+        "license": "",  # No disponible
+        "resolution": "",  # No disponible
+        "expiration_date": None,  # No hay vencimiento
+        "cutoff_date": cutoff_timestamp,
+        "country": "ARG",
+        "enabled": 1,  # Siempre habilitado (sin lógica de deshabilitación)
+    }
     return operator_data
 
 
