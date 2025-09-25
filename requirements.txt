@@ -5,3 +5,4 @@ markdown
 PySide6_Addons==6.9.2
 PySide6_Essentials==6.9.2
 shiboken6==6.9.2
+openpyxl

@@ -17,7 +17,7 @@ from config.settings_service import (
     SettingsKey,
     CallsignMode,
 )
-from src.utils.resources import get_resource_path
+from utils.resources import get_resource_path
 from translation.translation_service import translation_service
 from .themes.theme_manager import ThemeManager
 from .menu_bar import MainMenuBar
@@ -32,6 +32,7 @@ from .main_window_actions import (
     action_log_open_concurso,
     action_log_close,
     action_db_import_pdf,
+    action_db_import_excel,
     action_db_export,
     action_db_delete,
     action_db_backup,
@@ -256,6 +257,9 @@ class MainWindow(QMainWindow):
         self.menu_bar.log_close_requested.connect(lambda: action_log_close(self))
         self.menu_bar.db_import_pdf_requested.connect(
             lambda: action_db_import_pdf(self)
+        )
+        self.menu_bar.db_import_excel_requested.connect(
+            lambda: action_db_import_excel(self)
         )
         self.menu_bar.db_export_requested.connect(lambda: action_db_export(self))
         self.menu_bar.db_delete_requested.connect(lambda: action_db_delete(self))
