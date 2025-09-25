@@ -241,11 +241,20 @@ def _process_chilean_row(row_data, column_mapping, cutoff_timestamp):
     # Construir región normalizada: "REGION - COMUNA"
     region_normalized = _build_normalized_region(region, comuna)
 
+    # Asignar categoría según prefijo
+    category = ""
+    if callsign_clean.startswith("CA"):
+        category = "NOVICIO"
+    elif callsign_clean.startswith("CE"):
+        category = "GENERAL"
+    elif callsign_clean.startswith("CC") or callsign_clean.startswith("XQ"):
+        category = "SUPERIOR"
+
     # Construir datos del operador en formato interno
     operator_data = {
         "callsign": callsign_clean,
         "name": nombre.strip() if nombre else "",
-        "category": "",  # No disponible en formato chileno
+        "category": category,
         "type": "",  # No disponible en formato chileno
         "region": region_normalized,
         "district": "",  # No aplica para Chile
