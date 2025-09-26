@@ -25,6 +25,7 @@ class MainMenuBar(QMenuBar):
     log_close_requested = Signal()
     db_import_pdf_requested = Signal()
     db_import_excel_requested = Signal()
+    db_import_csv_requested = Signal()
     db_export_requested = Signal()
     db_show_requested = Signal()
     db_delete_requested = Signal()
@@ -131,11 +132,15 @@ class MainMenuBar(QMenuBar):
         self.db_import_excel_action = QAction(
             translation_service.tr("menu_import_from_excel"), self
         )
+        self.db_import_csv_action = QAction(
+            translation_service.tr("menu_import_from_csv"), self
+        )
         self.db_import_db_action = QAction(
             translation_service.tr("menu_import_from_db"), self
         )
         self.import_menu.addAction(self.db_import_pdf_action)
         self.import_menu.addAction(self.db_import_excel_action)
+        self.import_menu.addAction(self.db_import_csv_action)
         self.import_menu.addAction(self.db_import_db_action)
         self.database_menu.addMenu(self.import_menu)
 
@@ -272,6 +277,7 @@ class MainMenuBar(QMenuBar):
         self.db_import_excel_action.triggered.connect(
             self.db_import_excel_requested.emit
         )
+        self.db_import_csv_action.triggered.connect(self.db_import_csv_requested.emit)
         self.db_export_action.triggered.connect(self.db_export_requested.emit)
         self.db_show_action.triggered.connect(self.db_show_requested.emit)
         self.db_delete_action.triggered.connect(self.db_delete_requested.emit)
@@ -335,6 +341,9 @@ class MainMenuBar(QMenuBar):
         )
         self.db_import_excel_action.setText(
             translation_service.tr("menu_import_from_excel")
+        )
+        self.db_import_csv_action.setText(
+            translation_service.tr("menu_import_from_csv")
         )
         self.db_import_db_action.setText(translation_service.tr("menu_import_from_db"))
         self.db_backup_action.setText(translation_service.tr("menu_create_backup"))

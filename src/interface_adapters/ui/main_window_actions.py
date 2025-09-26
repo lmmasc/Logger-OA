@@ -680,6 +680,95 @@ def action_db_import_excel(self):
         QTimer.singleShot(100, do_import)
 
 
+def action_db_import_csv(self):
+    """
+    Importa operadores desde un archivo CSV (exportado por la propia aplicación), mostrando resumen visual.
+    """
+    file_dialog = QFileDialog(self)
+    file_dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
+    file_dialog.setNameFilter("Archivos CSV (*.csv)")
+    if file_dialog.exec():
+        selected_files = file_dialog.selectedFiles()
+        if not selected_files:
+            return
+        file_path = selected_files[0]
+    else:
+        return
+
+    def do_import():
+        wait_dialog = WaitDialog(
+            self,
+            translation_service.tr("wait_message"),
+        )
+        wait_dialog.show()
+        try:
+            from application.use_cases.update_operators_from_csv import (
+                update_operators_from_csv,
+            )
+
+            result = update_operators_from_csv(file_path)
+        except Exception as e:
+            wait_dialog.close()
+            QMessageBox.critical(
+                self,
+                translation_service.tr("main_window_title"),
+                f"{translation_service.tr('import_failed')}: {e}",
+            )
+            return
+        wait_dialog.close()
+        if isinstance(result, dict) and result.get("ok"):
+            summary = result
+            summary_lines = [
+                translation_service.tr("import_summary_total").format(
+                    summary.get("total", 0)
+                ),
+                translation_service.tr("import_summary_new").format(
+                    summary.get("new", 0)
+                ),
+                translation_service.tr("import_summary_updated").format(
+                    summary.get("updated", 0)
+                ),
+                translation_service.tr("import_summary_unchanged").format(
+                    summary.get("unchanged", 0)
+                ),
+                translation_service.tr("import_summary_disabled").format(
+                    summary.get("disabled", 0)
+                ),
+                translation_service.tr("import_summary_reenabled").format(
+                    summary.get("reenabled", 0)
+                ),
+            ]
+            if "protected" in summary:
+                summary_lines.append(
+                    translation_service.tr("import_summary_protected").format(
+                        summary["protected"]
+                    )
+                )
+            msg = "<br>".join(summary_lines)
+            QMessageBox.information(
+                self,
+                translation_service.tr("main_window_title"),
+                msg,
+            )
+        elif result:
+            QMessageBox.information(
+                self,
+                translation_service.tr("main_window_title"),
+                translation_service.tr("import_success"),
+            )
+        else:
+            error_msg = translation_service.tr("import_failed")
+            if "error" in result:
+                error_msg += f": {result['error']}"
+            QMessageBox.warning(
+                self,
+                translation_service.tr("main_window_title"),
+                error_msg,
+            )
+
+    QTimer.singleShot(100, do_import)
+
+
 def action_db_export(self):
     """
     Exporta la base de datos de operadores a CSV.

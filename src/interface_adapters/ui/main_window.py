@@ -33,6 +33,7 @@ from .main_window_actions import (
     action_log_close,
     action_db_import_pdf,
     action_db_import_excel,
+    action_db_import_csv,
     action_db_export,
     action_db_delete,
     action_db_backup,
@@ -260,6 +261,9 @@ class MainWindow(QMainWindow):
         )
         self.menu_bar.db_import_excel_requested.connect(
             lambda: action_db_import_excel(self)
+        )
+        self.menu_bar.db_import_csv_requested.connect(
+            lambda: action_db_import_csv(self)
         )
         self.menu_bar.db_export_requested.connect(lambda: action_db_export(self))
         self.menu_bar.db_delete_requested.connect(lambda: action_db_delete(self))
