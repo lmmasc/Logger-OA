@@ -192,7 +192,7 @@ class OperatorEditDialog(QDialog):
         """
         Actualiza el campo 'region' dinámicamente si país es Perú.
         """
-        if self.inputs["country"].currentText() == "PERU":
+        if self._get_widget_text(self.inputs["country"]) == "PERU":
             departamento = self.inputs["department"].text().strip().upper()
             provincia = self.inputs["province"].text().strip().upper()
             distrito = self.inputs["district"].text().strip().upper()
@@ -208,7 +208,7 @@ class OperatorEditDialog(QDialog):
         Habilita o deshabilita campos según el país seleccionado.
         Si es Perú, habilita todos los campos; si es OTROS, deshabilita y limpia los campos específicos de Perú.
         """
-        is_peru = self.inputs["country"].currentText() == "PERU"
+        is_peru = self._get_widget_text(self.inputs["country"]) == "PERU"
         for key in self._peru_fields:
             if key == "category":
                 # Solo cambiar si los widgets existen
@@ -233,7 +233,7 @@ class OperatorEditDialog(QDialog):
                 if is_peru:
                     widget.setEnabled(True)
                 else:
-                    widget.setCurrentText("NO_APLICA")
+                    self._set_widget_text(widget, "NO_APLICA")
                     widget.setEnabled(False)
             elif key == "enabled":
                 if is_peru:
@@ -329,20 +329,48 @@ class OperatorEditDialog(QDialog):
         """
         Devuelve un dict con los datos ingresados/validados del operador.
         Returns:
-            dict: Datos del operador.
+            dict: Datos del operador válidos para RadioOperator.
         """
         data = {}
-        for key, widget in self.inputs.items():
-            if key == "country":
+
+        # Mapeo de campos UI a campos del modelo
+        field_mapping = {
+            "callsign": "callsign",
+            "name": "name",
+            "category": "category",
+            "type": "type_",
+            "region": "region",
+            "district": "district",
+            "province": "province",
+            "department": "department",
+            "license": "license_",
+            "resolution": "resolution",
+            "expiration_date": "expiration_date",
+            "cutoff_date": "cutoff_date",
+            "enabled": "enabled",
+            "country": "country",
+        }
+
+        for ui_key, model_key in field_mapping.items():
+            if ui_key not in self.inputs:
+                continue
+
+            widget = self.inputs[ui_key]
+
+            if ui_key == "country":
                 idx = widget.currentIndex()
-                data["country"] = widget.itemData(idx)
+                data[model_key] = widget.itemData(idx)
             elif isinstance(widget, QLineEdit):
-                data[key] = widget.text().strip().upper()
+                data[model_key] = widget.text().strip().upper()
             elif isinstance(widget, QComboBox):
-                if key == "enabled":
-                    data[key] = 1 if widget.currentIndex() == 0 else 0
+                if ui_key == "enabled":
+                    data[model_key] = 1 if widget.currentIndex() == 0 else 0
                 else:
-                    data[key] = widget.currentText()
+                    # Para category, usar el widget correcto (puede ser combo o lineedit)
+                    if ui_key == "category":
+                        data[model_key] = self._get_widget_text(widget).strip()
+                    else:
+                        data[model_key] = self._get_widget_text(widget)
             elif isinstance(widget, QDateEdit):
                 # Convertir fecha local Perú a timestamp UTC
                 qdate = widget.date()
@@ -353,10 +381,41 @@ class OperatorEditDialog(QDialog):
                     tzinfo=timezone(timedelta(hours=-5)),
                 )
                 dt_utc = dt_peru.astimezone(timezone.utc)
-                data[key] = int(dt_utc.timestamp())
+                data[model_key] = int(dt_utc.timestamp())
+
         # Campo actualizado: timestamp UTC con fecha y hora
         data["updated_at"] = int(datetime.datetime.now(timezone.utc).timestamp())
         return data
+
+    def _get_widget_text(self, widget):
+        """
+        Obtiene el texto de un widget, sea QComboBox o QLineEdit.
+
+        Args:
+            widget: Widget del que obtener el texto
+
+        Returns:
+            str: Texto del widget
+        """
+        if hasattr(widget, "currentText"):
+            return widget.currentText()
+        elif hasattr(widget, "text"):
+            return widget.text()
+        else:
+            return str(widget.text()) if hasattr(widget, "text") else ""
+
+    def _set_widget_text(self, widget, text):
+        """
+        Establece el texto de un widget, sea QComboBox o QLineEdit.
+
+        Args:
+            widget: Widget al que establecer el texto
+            text: Texto a establecer
+        """
+        if hasattr(widget, "setCurrentText"):
+            widget.setCurrentText(text)
+        elif hasattr(widget, "setText"):
+            widget.setText(text)
 
     def accept(self):
         """
@@ -375,17 +434,20 @@ class OperatorEditDialog(QDialog):
                 self, self.windowTitle(), translation_service.tr("name_required")
             )
             return
-        # Validar categoría
-        if self.inputs["category"].currentText() not in (
-            "NOVICIO",
-            "INTERMEDIO",
-            "SUPERIOR",
-            "NO_APLICA",
-        ):
-            QMessageBox.warning(
-                self, self.windowTitle(), translation_service.tr("invalid_category")
-            )
-            return
+        # Validar categoría solo para operadores peruanos
+        country_text = self._get_widget_text(self.inputs["country"])
+        if country_text == "PERU":
+            category_text = self._get_widget_text(self.inputs["category"])
+            if category_text not in (
+                "NOVICIO",
+                "INTERMEDIO",
+                "SUPERIOR",
+                "NO_APLICA",
+            ):
+                QMessageBox.warning(
+                    self, self.windowTitle(), translation_service.tr("invalid_category")
+                )
+                return
         # TODO: Validar fechas y otros campos si es necesario
         self.result_operator = self.get_operator_data()
         super().accept()
