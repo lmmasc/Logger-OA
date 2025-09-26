@@ -114,10 +114,11 @@ def get_radio_operators():
     """
     db_path = get_database_path()
     conn = get_connection(db_path)
+    _ensure_indexes(conn)
     sql = (
         "SELECT callsign, name, category, type, region, district, province, department, "
         "license, resolution, expiration_date, cutoff_date, enabled, country, updated_at "
-        "FROM radio_operators"
+        "FROM radio_operators ORDER BY callsign ASC"
     )
     cursor = conn.cursor()
     cursor.execute(sql)
@@ -204,6 +205,7 @@ def get_radio_operator_by_callsign(callsign: str):
     """
     db_path = get_database_path()
     conn = get_connection(db_path)
+    _ensure_indexes(conn)
     sql = (
         "SELECT callsign, name, category, type, region, district, province, department, "
         "license, resolution, expiration_date, cutoff_date, enabled, country, updated_at "
@@ -214,3 +216,46 @@ def get_radio_operator_by_callsign(callsign: str):
     result = cursor.fetchone()
     conn.close()
     return result
+
+
+def search_radio_operators_by_callsign(pattern: str, limit: int = 50):
+    """
+    Busca operadores por callsign usando LIKE, devolviendo solo callsign y name.
+    pattern: patrón con % y _ (comodines SQL). Se aplica COLLATE NOCASE.
+    """
+    db_path = get_database_path()
+    conn = get_connection(db_path)
+    _ensure_indexes(conn)
+    sql = (
+        "SELECT callsign, name FROM radio_operators "
+        "WHERE callsign LIKE ? COLLATE NOCASE "
+        "ORDER BY LENGTH(callsign) ASC, callsign ASC LIMIT ?"
+    )
+    cursor = conn.cursor()
+    cursor.execute(sql, (pattern, limit))
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
+
+
+def _ensure_indexes(conn):
+    """
+    Crea índices necesarios si no existen para acelerar búsquedas y ORDER BY.
+    """
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "CREATE INDEX IF NOT EXISTS idx_radio_operators_callsign ON radio_operators(callsign)"
+        )
+        cur.execute(
+            "CREATE INDEX IF NOT EXISTS idx_radio_operators_country ON radio_operators(country)"
+        )
+        cur.execute(
+            "CREATE INDEX IF NOT EXISTS idx_radio_operators_enabled ON radio_operators(enabled)"
+        )
+        cur.execute(
+            "CREATE INDEX IF NOT EXISTS idx_radio_operators_name ON radio_operators(name)"
+        )
+        conn.commit()
+    except Exception:
+        pass

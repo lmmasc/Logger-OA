@@ -3,6 +3,13 @@ from typing import List
 from domain.entities.radio_operator import RadioOperator
 from domain.repositories.radio_operator_repository import RadioOperatorRepository
 from infrastructure.db import queries
+from dataclasses import dataclass
+
+
+@dataclass
+class OperatorSuggestion:
+    callsign: str
+    name: str
 
 
 class SqliteRadioOperatorRepository(RadioOperatorRepository):
@@ -78,3 +85,13 @@ class SqliteRadioOperatorRepository(RadioOperatorRepository):
 
             return RadioOperator(*row)
         return None
+
+    def search_suggestions(
+        self, prefix: str, limit: int = 50
+    ) -> List[OperatorSuggestion]:
+        """
+        Retorna sugerencias por prefijo usando SQL LIKE, p.ej. 'OA%'.
+        """
+        pattern = f"{prefix}%"
+        rows = queries.search_radio_operators_by_callsign(pattern, limit=limit)
+        return [OperatorSuggestion(callsign=r[0], name=r[1] or "") for r in rows]

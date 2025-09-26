@@ -8,9 +8,12 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QListWidget, QListWi
 from PySide6.QtGui import QFont, QFontDatabase
 from utils.callsign_parser import parse_callsign
 from utils.resources import get_resource_path
-from PySide6.QtCore import Signal, Qt
+from PySide6.QtCore import Signal, Qt, QTimer
 from translation.translation_service import translation_service
 from utils.text import get_filtered_operators
+from infrastructure.repositories.sqlite_radio_operator_repository import (
+    SqliteRadioOperatorRepository,
+)
 from utils.datetime import format_iso_date
 from domain.callsign_utils import get_country_full_name
 
@@ -85,6 +88,12 @@ class CallsignInfoWidget(QWidget):
         self.setLayout(layout)
         self.retranslate_ui()
         translation_service.signal.language_changed.connect(self.retranslate_ui)
+        # Debounce para evitar consultas por cada tecla
+        self._debounce = QTimer(self)
+        self._debounce.setSingleShot(True)
+        self._debounce.setInterval(120)  # ms
+        self._debounce.timeout.connect(self._do_update_info)
+        self._pending_text = ""
 
     def show_summary(self, text):
         """
@@ -108,9 +117,20 @@ class CallsignInfoWidget(QWidget):
         self.summary_label.hide()
         self.suggestion_list.show()
         self.suggestion_list.clear()
-        operadores = (
-            get_filtered_operators(filtro) if filtro and len(filtro) >= 2 else []
-        )
+        operadores = []
+        if filtro and len(filtro) >= 2:
+            # Primero intentar búsqueda por prefijo SQL (rápido y limitado)
+            try:
+                repo = SqliteRadioOperatorRepository()
+                from types import SimpleNamespace
+
+                for sug in repo.search_suggestions(filtro, limit=40):
+                    operadores.append(
+                        SimpleNamespace(callsign=sug.callsign, name=sug.name)
+                    )
+            except Exception:
+                # Fallback a filtrado en memoria si algo falla
+                operadores = get_filtered_operators(filtro)
         font_path = get_resource_path("assets/RobotoMono-Regular.ttf")
         font_id = QFontDatabase.addApplicationFont(font_path)
         font_families = QFontDatabase.applicationFontFamilies(font_id)
@@ -154,21 +174,26 @@ class CallsignInfoWidget(QWidget):
             text (str): Texto ingresado para buscar operadores.
         """
 
+        self._pending_text = text
+        # arrancar/reiniciar debounce
+        self._debounce.start()
+
+    def _do_update_info(self):
+        text = self._pending_text
         filtro = text.strip().upper()
         base, prefijo, sufijo = parse_callsign(filtro)
         if len(filtro) < 2:
             self.show_suggestions("")
             self.operatorEnabledStatus.emit(True)  # No alerta
         else:
-            operadores = get_filtered_operators(base)
-            exact_matches = [
-                op
-                for op in operadores
-                if op.callsign.upper() == base
-                or op.callsign.upper() == f"{prefijo}/{base}"
-            ]
-            if len(exact_matches) == 1:
-                operator = exact_matches[0]
+            # Evitar cargar toda la base: buscar coincidencia exacta por SQL
+            repo = SqliteRadioOperatorRepository()
+            operator = repo.get_operator_by_callsign(base)
+            if not operator and prefijo:
+                operator = repo.get_operator_by_callsign(f"{prefijo}/{base}")
+            if not operator and filtro:
+                operator = repo.get_operator_by_callsign(filtro)
+            if operator:
                 lang_enum = (
                     translation_service.get_language()
                     if hasattr(translation_service, "get_language")
