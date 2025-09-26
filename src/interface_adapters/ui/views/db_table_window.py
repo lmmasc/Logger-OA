@@ -18,7 +18,7 @@ from PySide6.QtWidgets import (
     QSizePolicy,
     QGridLayout,  # Para grid de checkboxes
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QFont, QFontDatabase
 from utils.resources import get_resource_path
 
@@ -65,7 +65,19 @@ class DBTableWindow(QWidget):
         self.setWindowTitle(translation_service.tr("db_table"))
         self.setWindowFlag(Qt.WindowType.Window)
         self.resize(1200, 700)
+
+        # Estado de paginación y filtro
+        self._page_size = 500
+        self._current_page = 0
+        self._total_count = 0
+        self._filter_timer = QTimer(self)
+        self._filter_timer.setSingleShot(True)
+        self._filter_timer.setInterval(180)
+        self._filter_timer.timeout.connect(self._apply_filter_debounced)
+
         main_layout = QVBoxLayout()
+
+        # Filtro y métricas
         filter_layout = QHBoxLayout()
         self.filter_edit = QLineEdit()
         font_path = get_resource_path("assets/RobotoMono-Regular.ttf")
@@ -96,24 +108,36 @@ class DBTableWindow(QWidget):
         filter_layout.addWidget(self.filter_results_count)
         filter_layout.addStretch()
         main_layout.addLayout(filter_layout)
+
+        # Tabla
         self.table = QTableWidget()
         main_layout.addWidget(self.table)
+
+        # Controlador
         self.controller = RadioOperatorController()
-        self.setLayout(main_layout)
-        self._ignore_item_changed = False
-        self._updating_ui = False
-        self.checkbox_layout = QGridLayout()  # Cambiado de QHBoxLayout a QGridLayout
+
+        # Checkboxes de visibilidad de columnas (grid 2 filas)
+        self.checkbox_layout = QGridLayout()
         self.column_checkboxes = []
         self.headers = self.get_translated_headers()
+        # Inicializar el selector de columna de filtro solo una vez
+        self.filter_column_combo.addItems(self.headers)
+        # Restaurar selección previa de columna de filtro
+        try:
+            raw_prev = settings_service.get_value("db_table_filter_col_index", "0")
+            prev_idx = int(str(raw_prev))
+        except Exception:
+            prev_idx = 0
+        if self.filter_column_combo.count():
+            self.filter_column_combo.setCurrentIndex(
+                min(max(prev_idx, 0), self.filter_column_combo.count() - 1)
+            )
         column_keys = [col["key"] for col in self.COLUMNS]
         col_visible = settings_service.get_value("db_table_column_visible_dict", None)
         if not col_visible or not isinstance(col_visible, dict):
             col_visible = {k: True for k in column_keys}
-        # col_visible["callsign"] = True
-        # col_visible["name"] = True
-        # --- Distribuir los checkboxes en dos filas ---
         num_cols = len(column_keys)
-        split = num_cols // 2 + num_cols % 2  # Primera fila más si es impar
+        split = num_cols // 2 + num_cols % 2
         for idx, coldef in enumerate(self.COLUMNS):
             key = coldef["key"]
             cb = QCheckBox(self.headers[idx])
@@ -127,9 +151,34 @@ class DBTableWindow(QWidget):
         self.checkbox_layout.setRowStretch(0, 1)
         self.checkbox_layout.setRowStretch(1, 1)
         main_layout.insertLayout(1, self.checkbox_layout)
+
+        # Controles de paginación
+        self.pagination_layout = QHBoxLayout()
+        self.btn_prev = QPushButton("◀")
+        self.btn_next = QPushButton("▶")
+        self.page_info = QLabel("")
+        self.btn_prev.clicked.connect(self._on_prev_page)
+        self.btn_next.clicked.connect(self._on_next_page)
+        self.pagination_layout.addStretch()
+        self.pagination_layout.addWidget(self.btn_prev)
+        self.pagination_layout.addWidget(self.page_info)
+        self.pagination_layout.addWidget(self.btn_next)
+        self.pagination_layout.addStretch()
+        main_layout.addLayout(self.pagination_layout)
+
+        # Final de layout
+        self.setLayout(main_layout)
+
+        # Flags internos
+        self._ignore_item_changed = False
+        self._updating_ui = False
+
+        # Cargar datos iniciales y conectar eventos de filtro
         self.load_data()
         self.filter_edit.textChanged.connect(self.apply_filter)
-        self.filter_column_combo.currentIndexChanged.connect(self.apply_filter)
+        self.filter_column_combo.currentIndexChanged.connect(
+            self._on_filter_column_changed
+        )
         # Conectar señal para guardar anchos de columnas al redimensionar
         self.table.horizontalHeader().sectionResized.connect(self.save_column_widths)
         self.table.setEditTriggers(
@@ -189,8 +238,20 @@ class DBTableWindow(QWidget):
         self.setWindowTitle(translation_service.tr("db_table"))
         self.headers = self.get_translated_headers()
         self.table.setHorizontalHeaderLabels(self.headers)
+        # Preservar selección del combo al retraducir
+        prev_index = (
+            self.filter_column_combo.currentIndex()
+            if self.filter_column_combo.count()
+            else 0
+        )
+        self.filter_column_combo.blockSignals(True)
         self.filter_column_combo.clear()
         self.filter_column_combo.addItems(self.headers)
+        if self.filter_column_combo.count():
+            self.filter_column_combo.setCurrentIndex(
+                min(max(prev_index, 0), self.filter_column_combo.count() - 1)
+            )
+        self.filter_column_combo.blockSignals(False)
         # Actualizar texto de los botones de agregar y eliminar operador
         if hasattr(self, "btn_add"):
             self.btn_add.setText(translation_service.tr("add_operator"))
@@ -243,24 +304,22 @@ class DBTableWindow(QWidget):
     # --- Métodos de filtro ---
     def apply_filter(self):
         """
-        Aplica el filtro de texto a la columna seleccionada en el combo.
+        Dispara filtro con debounce; la aplicación real recarga desde DB con WHERE/LIKE.
         """
-        text = self.filter_edit.text().strip()
-        col = self.filter_column_combo.currentIndex()
-        visible_count = 0
-        for row in range(self.table.rowCount()):
-            item = self.table.item(row, col)
-            if not text:
-                self.table.setRowHidden(row, False)
-                visible_count += 1
-            else:
-                value = item.text().strip() if item else ""
-                match = filter_text_match(value, text)
-                self.table.setRowHidden(row, not match)
-                if match:
-                    visible_count += 1
-        if hasattr(self, "filter_results_count"):
-            self.filter_results_count.setText(str(visible_count))
+        self._filter_timer.start()
+
+    def _apply_filter_debounced(self):
+        # Reiniciar a primera página al cambiar el filtro o columna
+        self._current_page = 0
+        self.load_data()
+
+    def _on_filter_column_changed(self, idx: int):
+        # Guardar índice seleccionado y aplicar filtro con debounce
+        try:
+            settings_service.set_value("db_table_filter_col_index", int(idx))
+        except Exception:
+            pass
+        self.apply_filter()
 
     # --- Métodos de datos y edición ---
     def load_data(self):
@@ -269,22 +328,38 @@ class DBTableWindow(QWidget):
         """
         self._updating_ui = True
         self.table.blockSignals(True)
-        operators = self.controller.list_operators()
-        operators = sorted(operators, key=lambda op: op.callsign)
+        # Obtener filtro actual
+        column_keys = [col["key"] for col in self.COLUMNS]
+        filter_col_key = (
+            column_keys[self.filter_column_combo.currentIndex()]
+            if self.filter_column_combo.count()
+            else "callsign"
+        )
+        filter_text = self.filter_edit.text().strip()
+        # Cargar datos paginados desde el controlador
+        operators, total = self.controller.list_operators_paged(
+            page=self._current_page,
+            page_size=self._page_size,
+            order_by="callsign",
+            asc=True,
+            filter_col=filter_col_key,
+            filter_text=filter_text,
+        )
+        self._total_count = total
         headers = self.headers
         if not operators:
             self.table.setRowCount(0)
             self.table.setColumnCount(0)
             self.table.setHorizontalHeaderLabels([])
-            self.filter_column_combo.clear()
             self._updating_ui = False
             self.table.blockSignals(False)
+            # Actualizar paginación aunque no haya datos
+            self._update_pagination_info()
             return
         self.table.setRowCount(len(operators))
         self.table.setColumnCount(len(headers))
         self.table.setHorizontalHeaderLabels(headers)
-        self.filter_column_combo.clear()
-        self.filter_column_combo.addItems(headers)
+        # No tocar el combo del filtro aquí para no resetear selección ni disparar señales
         column_keys = [col["key"] for col in self.COLUMNS]
 
         from utils.datetime import format_iso_date, format_iso_datetime
@@ -343,11 +418,10 @@ class DBTableWindow(QWidget):
                     item = QTableWidgetItem(str(value))
                 self.table.setItem(row_idx, col_idx, item)
         self.apply_column_visibility()
-        self.apply_filter()
-        # Reiniciar el contador de resultados si existe
+        # Actualizar contador y paginación
         if hasattr(self, "filter_results_count"):
-            total = self.table.rowCount()
-            self.filter_results_count.setText(str(total))
+            self.filter_results_count.setText(str(self._total_count))
+        self._update_pagination_info()
         # --- ANCHOS DE COLUMNA ---
         widths = settings_service.get_value("db_table_column_widths", None)
         # Validación para settings_service.get_value (anchos de columna)
@@ -360,6 +434,33 @@ class DBTableWindow(QWidget):
         self._updating_ui = False
         self.table.blockSignals(False)
 
+    def _on_prev_page(self):
+        if self._current_page > 0:
+            if hasattr(self, "_filter_timer"):
+                self._filter_timer.stop()
+            self._current_page -= 1
+            self.load_data()
+
+    def _on_next_page(self):
+        max_page = (
+            (self._total_count - 1) // self._page_size if self._total_count > 0 else 0
+        )
+        if self._current_page < max_page:
+            if hasattr(self, "_filter_timer"):
+                self._filter_timer.stop()
+            self._current_page += 1
+            self.load_data()
+
+    def _update_pagination_info(self):
+        max_page = (
+            (self._total_count - 1) // self._page_size if self._total_count > 0 else 0
+        )
+        self.page_info.setText(
+            f" {self._current_page + 1} / {max_page + 1}  ·  {self._total_count}"
+        )
+        self.btn_prev.setEnabled(self._current_page > 0)
+        self.btn_next.setEnabled(self._current_page < max_page)
+
     def _on_item_double_clicked(self, item):
         """
         Abre el diálogo de edición para el registro seleccionado.
@@ -367,10 +468,8 @@ class DBTableWindow(QWidget):
         row = item.row()
         callsign_item = self.table.item(row, 0)
         callsign = callsign_item.text() if callsign_item else ""
-        operator = next(
-            (op for op in self.controller.list_operators() if op.callsign == callsign),
-            None,
-        )
+        # Evitar cargar toda la base: obtener por callsign
+        operator = self.controller.get_operator_by_callsign(callsign)
         if operator:
             from interface_adapters.ui.dialogs.operator_edit_dialog import (
                 OperatorEditDialog,
@@ -397,24 +496,20 @@ class DBTableWindow(QWidget):
         if dlg.exec() == QDialog.DialogCode.Accepted and dlg.result_operator:
             # Crear nuevo operador y guardar
             op_data = dlg.result_operator
-            Operator = (
-                type(self.controller.list_operators()[0])
-                if self.controller.list_operators()
-                else None
-            )
-            if Operator:
-                # Mapear 'license' a 'license_' y 'type' a 'type_' para el constructor
-                op_data_fixed = {}
-                for k, v in op_data.items():
-                    if k == "license":
-                        op_data_fixed["license_"] = v
-                    elif k == "type":
-                        op_data_fixed["type_"] = v
-                    else:
-                        op_data_fixed[k] = v
-                new_op = Operator(**op_data_fixed)
-                self.controller.service.add_operator(new_op)
-                self.load_data()
+            from domain.entities.radio_operator import RadioOperator
+
+            # Mapear 'license' a 'license_' y 'type' a 'type_' para el constructor
+            op_data_fixed = {}
+            for k, v in op_data.items():
+                if k == "license":
+                    op_data_fixed["license_"] = v
+                elif k == "type":
+                    op_data_fixed["type_"] = v
+                else:
+                    op_data_fixed[k] = v
+            new_op = RadioOperator(**op_data_fixed)
+            self.controller.service.add_operator(new_op)
+            self.load_data()
 
     def _on_selection_changed(self):
         """

@@ -17,6 +17,24 @@ class RadioOperatorController:
     def list_operators(self):
         return self.service.list_operators()
 
+    def list_operators_paged(
+        self,
+        page: int,
+        page_size: int,
+        order_by: str = "callsign",
+        asc: bool = True,
+        filter_col: str | None = None,
+        filter_text: str | None = None,
+    ):
+        return self.service.list_operators_paged(
+            page=page,
+            page_size=page_size,
+            order_by=order_by,
+            asc=asc,
+            filter_col=filter_col,
+            filter_text=filter_text,
+        )
+
     def delete_operator_by_callsign(self, callsign: str) -> None:
         self.service.delete_operator_by_callsign(callsign)
 
@@ -69,5 +87,8 @@ class RadioOperatorController:
             updated_at=operator_data.get("updated_at", None),
         )
         self.service.update_operator(operator)
+
+    def get_operator_by_callsign(self, callsign: str):
+        return self.service.get_operator_by_callsign(callsign)
 
     # Métodos adicionales para agregar, actualizar, etc. pueden agregarse aquí

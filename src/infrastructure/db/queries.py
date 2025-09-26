@@ -259,3 +259,48 @@ def _ensure_indexes(conn):
         conn.commit()
     except Exception:
         pass
+
+
+def _build_filter_clause(filter_col: Optional[str], filter_text: Optional[str]):
+    if filter_col and filter_text:
+        # LIKE con comodines en ambas puntas, case-insensitive
+        return f" WHERE {filter_col} LIKE ? COLLATE NOCASE ", f"%{filter_text}%"
+    return "", None
+
+
+def get_radio_operators_paged(
+    page: int,
+    page_size: int,
+    order_by: str = "callsign",
+    asc: bool = True,
+    filter_col: Optional[str] = None,
+    filter_text: Optional[str] = None,
+) -> Tuple[List[Tuple], int]:
+    """
+    Devuelve filas paginadas y el total, con filtro opcional por columna usando LIKE.
+    """
+    db_path = get_database_path()
+    conn = get_connection(db_path)
+    _ensure_indexes(conn)
+    order = "ASC" if asc else "DESC"
+    where_clause, where_param = _build_filter_clause(filter_col, filter_text)
+    base_select = (
+        "SELECT callsign, name, category, type, region, district, province, department, "
+        "license, resolution, expiration_date, cutoff_date, enabled, country, updated_at "
+        f"FROM radio_operators{where_clause} ORDER BY {order_by} {order} LIMIT ? OFFSET ?"
+    )
+    base_count = f"SELECT COUNT(*) FROM radio_operators{where_clause}"
+    cur = conn.cursor()
+    params = []
+    if where_param is not None:
+        params.append(where_param)
+    params.extend([page_size, page * page_size])
+    cur.execute(base_select, tuple(params))
+    rows = cur.fetchall()
+    count_params = []
+    if where_param is not None:
+        count_params.append(where_param)
+    cur.execute(base_count, tuple(count_params))
+    total = cur.fetchone()[0]
+    conn.close()
+    return rows, int(total)

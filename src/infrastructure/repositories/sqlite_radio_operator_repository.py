@@ -1,5 +1,5 @@
 # Archivo migrado desde src/app/repositories/sqlite_radio_operator_repository.py
-from typing import List
+from typing import List, Tuple, Optional
 from domain.entities.radio_operator import RadioOperator
 from domain.repositories.radio_operator_repository import RadioOperatorRepository
 from infrastructure.db import queries
@@ -76,15 +76,15 @@ class SqliteRadioOperatorRepository(RadioOperatorRepository):
     def delete_by_callsign(self, callsign: str) -> None:
         queries.delete_radio_operator_by_callsign(callsign)
 
-    def get_operator_by_callsign(self, callsign: str):
-        from infrastructure.db.queries import get_radio_operator_by_callsign
-
-        row = get_radio_operator_by_callsign(callsign)
+    def get_by_callsign(self, callsign: str) -> Optional[RadioOperator]:
+        row = queries.get_radio_operator_by_callsign(callsign)
         if row:
-            from domain.entities.radio_operator import RadioOperator
-
             return RadioOperator(*row)
         return None
+
+    # Alias por compatibilidad con código existente en UI
+    def get_operator_by_callsign(self, callsign: str) -> Optional[RadioOperator]:
+        return self.get_by_callsign(callsign)
 
     def search_suggestions(
         self, prefix: str, limit: int = 50
@@ -95,3 +95,54 @@ class SqliteRadioOperatorRepository(RadioOperatorRepository):
         pattern = f"{prefix}%"
         rows = queries.search_radio_operators_by_callsign(pattern, limit=limit)
         return [OperatorSuggestion(callsign=r[0], name=r[1] or "") for r in rows]
+
+    def list_paged(
+        self,
+        page: int,
+        page_size: int,
+        order_by: str = "callsign",
+        asc: bool = True,
+        filter_col: Optional[str] = None,
+        filter_text: Optional[str] = None,
+    ) -> Tuple[List[RadioOperator], int]:
+        """Lista paginada y filtrada desde SQLite."""
+        # Seguridad básica de columnas permitidas
+        allowed_cols = {
+            "callsign",
+            "name",
+            "category",
+            "type",
+            "region",
+            "district",
+            "province",
+            "department",
+            "license",
+            "resolution",
+            "expiration_date",
+            "cutoff_date",
+            "enabled",
+            "country",
+            "updated_at",
+        }
+        if order_by not in allowed_cols:
+            order_by = "callsign"
+        rows, total = queries.get_radio_operators_paged(
+            page=page,
+            page_size=page_size,
+            order_by=order_by,
+            asc=asc,
+            filter_col=filter_col if filter_col in allowed_cols else None,
+            filter_text=filter_text,
+        )
+        result = []
+        for row in rows:
+            row = list(row)
+            for idx in [10, 11, 14]:
+                val = row[idx]
+                if isinstance(val, str):
+                    if val.isdigit():
+                        row[idx] = int(val)
+                    elif val.strip() == "":
+                        row[idx] = None
+            result.append(RadioOperator(*row))
+        return result, total
