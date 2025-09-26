@@ -274,8 +274,11 @@ def _map_uruguay_columns(header_row_norm):
     fecha_idx = find_idx(["fecha"])  # fecha (vencimiento)
 
     # Mínimos requeridos para considerar formato Uruguay
-    required = [callsign_idx, category_idx, fecha_idx]
+    # Requerir explícitamente la columna "permiso" y al menos una columna de nombres
+    required = [callsign_idx, category_idx, fecha_idx, permiso_idx]
     if any(x is None for x in required):
+        return None
+    if (surname_idx is None) and (names_idx is None):
         return None
 
     return {
@@ -372,6 +375,17 @@ def _parse_spanish_date_to_utc(date_str: str, country_code: str | None) -> int |
                 return int(dt_loc.astimezone(timezone.utc).timestamp())
             except Exception:
                 return None
+    # Intentar dd mm YYYY con espacios (numérico)
+    m = re.search(r"^(\d{1,2})\s+(\d{1,2})\s+(\d{4})$", s)
+    if m:
+        d, mo, y = map(int, m.groups())
+        try:
+            dt = datetime(y, mo, d)
+            tz = _tz_for_country(country_code)
+            dt_loc = dt.replace(tzinfo=tz)
+            return int(dt_loc.astimezone(timezone.utc).timestamp())
+        except Exception:
+            return None
     return None
 
 
