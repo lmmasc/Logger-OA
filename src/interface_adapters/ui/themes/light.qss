@@ -329,4 +329,24 @@ QFrame#ClockWidgetUTC {
 /* Fin de estilos para tema claro */
 
 
+/* =============================
+   Checkboxes
+   ============================= */
+QCheckBox::indicator {
+    background-color: #fff;
+    border: 1px solid #bdbdbd;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+}
+QCheckBox::indicator:checked {
+    background-color: #1976d2;
+    border: 1px solid #1976d2;
+}
+QCheckBox::indicator:disabled {
+    background-color: #e0e0e0;
+    border: 1px solid #bdbdbd;
+}
+
+
 
