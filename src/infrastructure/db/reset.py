@@ -14,3 +14,21 @@ def reset_database():
     if conn:
         init_radioamateur_table(conn)
         conn.close()
+
+
+def clear_database():
+    """
+    Borra todos los registros de todas las tablas y deja la estructura intacta.
+    Resetea los contadores de autoincremento y compacta el archivo.
+    """
+    import sqlite3
+    from config.paths import get_database_path
+
+    db_path = get_database_path()
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    # Solo borrar la tabla de operadores
+    cursor.execute("DELETE FROM radio_operators;")
+    conn.commit()
+    cursor.execute("VACUUM;")
+    conn.close()

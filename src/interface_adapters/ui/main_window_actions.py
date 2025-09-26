@@ -721,7 +721,9 @@ def action_db_delete(self):
     box.exec()
     if box.clickedButton() == yes_button:
         try:
-            reset_database()
+            from infrastructure.db.reset import clear_database
+
+            clear_database()
             QMessageBox.information(
                 self,
                 translation_service.tr("main_window_title"),
