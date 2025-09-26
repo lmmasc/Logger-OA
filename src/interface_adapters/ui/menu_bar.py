@@ -318,6 +318,18 @@ class MainMenuBar(QMenuBar):
         self.export_pdf_action.setText(translation_service.tr("menu_export_pdf"))
 
         self.database_menu.setTitle(translation_service.tr("menu_database_menu"))
+        self.import_menu.setTitle(
+            translation_service.tr("menu_database_section_import")
+        )
+        self.backup_menu.setTitle(
+            translation_service.tr("menu_database_section_backup")
+        )
+        self.export_db_menu.setTitle(
+            translation_service.tr("menu_database_section_export")
+        )
+        self.delete_menu.setTitle(
+            translation_service.tr("menu_database_section_delete")
+        )
         self.db_import_pdf_action.setText(
             translation_service.tr("menu_import_from_pdf")
         )
