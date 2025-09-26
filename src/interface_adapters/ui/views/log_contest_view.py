@@ -77,8 +77,8 @@ class LogContestView(QWidget):
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
         )
         layout.addWidget(self.queue_widget)
-        # Conectar señal para llenar el campo de indicativo al hacer click en la cola
-        self.queue_widget.setCallsign.connect(self.callsign_input.set_callsign)
+        # Conectar señal para llenar el campo de indicativo y devolver foco al input al hacer click en la cola
+        self.queue_widget.setCallsign.connect(self._on_queue_set_callsign)
         # Conectar señal para agregar a la cola desde el input de indicativo
         self.callsign_input.addToQueue.connect(self.queue_widget.add_to_queue)
         self.callsign_input.addContactRequested.connect(self._on_add_contact)
@@ -337,9 +337,18 @@ class LogContestView(QWidget):
             nuevo = f"{nuevo}/{sufijo}"
         self.callsign_input.set_callsign(nuevo)
         self.callsign_info.update_info(nuevo)
-        # Foco al campo RS_RX del formulario de concurso
-        if hasattr(self.form_widget, "rs_rx_input"):
-            self.form_widget.rs_rx_input.setFocus()
+        # Devolver foco al input de indicativo
+        if hasattr(self.callsign_input, "input"):
+            self.callsign_input.input.setFocus()
+
+    def _on_queue_set_callsign(self, callsign: str):
+        """
+        Maneja la selección de un indicativo desde la cola de espera en concursos.
+        Establece el indicativo en el input y devuelve el foco al mismo.
+        """
+        self.callsign_input.set_callsign(callsign)
+        if hasattr(self.callsign_input, "input"):
+            self.callsign_input.input.setFocus()
 
     def _on_add_contact(self):
         """

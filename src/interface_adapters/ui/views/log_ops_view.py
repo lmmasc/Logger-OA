@@ -151,7 +151,8 @@ class LogOpsView(QWidget):
         layout.addWidget(self.table_widget)
         # Habilitar el botón de eliminar solo si hay una fila seleccionada
         self.table_widget.table.itemSelectionChanged.connect(self._on_selection_changed)
-        self.queue_widget.setCallsign.connect(self.callsign_input.set_callsign)
+        # Al seleccionar desde la cola, establecer el indicativo y devolver el foco al input
+        self.queue_widget.setCallsign.connect(self._on_queue_set_callsign)
         self.callsign_input.addToQueue.connect(self.queue_widget.add_to_queue)
         self.callsign_input.addContactRequested.connect(self._on_add_contact)
         self.callsign_info.suggestionSelected.connect(self._on_suggestion_selected)
@@ -341,9 +342,18 @@ class LogOpsView(QWidget):
             nuevo = f"{nuevo}/{sufijo}"
         self.callsign_input.set_callsign(nuevo)
         self.callsign_info.update_info(nuevo)
-        # Foco al primer campo del formulario
-        if hasattr(self.form_widget, "station_input"):
-            self.form_widget.station_input.setFocus()
+        # Devolver foco al input de indicativo
+        if hasattr(self.callsign_input, "input"):
+            self.callsign_input.input.setFocus()
+
+    def _on_queue_set_callsign(self, callsign: str):
+        """
+        Maneja la selección de un indicativo desde la cola de espera.
+        Establece el indicativo en el input y devuelve el foco al mismo.
+        """
+        self.callsign_input.set_callsign(callsign)
+        if hasattr(self.callsign_input, "input"):
+            self.callsign_input.input.setFocus()
 
     def _on_add_contact(self):
         """
