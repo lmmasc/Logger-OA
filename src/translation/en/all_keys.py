@@ -135,11 +135,6 @@ TABLE_HEADERS_TRANSLATIONS = {
     "db_table_header_enabled": "Enabled",
     "db_table_header_country": "Country",
     "db_table_header_updated_at": "Updated At",
-    "table_header_exchange_rx": "Ex. (RX)",
-    "table_header_exchange_tx": "Ex. (TX)",
-    "table_header_interchange_rx": "Int. (RX)",
-    "table_header_interchange_tx": "Int. (TX)",
-    "table_header_power": "Pwr",
 }
 UI_TRANSLATIONS = {
     "export_simple_dialog_title": "Simple log export",
