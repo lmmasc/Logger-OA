@@ -62,3 +62,7 @@ Thumbs.db
 
 # Documentos locales
 BaseDocs/
+
+# Documentación del proyecto a ignorar
+release.md
+CHANGELOG.md
