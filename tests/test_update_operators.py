@@ -13,7 +13,7 @@ from src.application.use_cases.update_operators_from_pdf import (
 @pytest.mark.integration
 def test_update_operators_from_pdf():
     """Prueba la actualización de operadores desde un PDF de ejemplo."""
-    demo_pdf = "BaseDocs/396528-radioaficionados_autorizados_al_13ago2025.pdf"
+    demo_pdf = "BaseDocs/396528-radioaficionados_autorizados_al_24sep2025.pdf"
     if not os.path.exists(demo_pdf):
         pytest.skip(f"Archivo de prueba no disponible: {demo_pdf}")
     resultado = update_operators_from_pdf(demo_pdf)
