@@ -118,7 +118,7 @@ python src/main.py
 ### Ejemplo de uso como módulo
 ```python
 from src.application.use_cases.update_operators_from_pdf import update_operators_from_pdf
-resultado = update_operators_from_pdf('BaseDocs/396528-radioaficionados_autorizados_al_13ago2025.pdf')
+resultado = update_operators_from_pdf('BaseDocs/396528-radioaficionados_autorizados_al_24sep2025.pdf')
 print(resultado)
 ```
 
@@ -209,4 +209,13 @@ pytest
 ```
 
 ---
+
+## Créditos / Autoría
+
+### Autores
+- Miguel OA4BAU
+- Raquel OA4EHN
+
+### Colaboradores
+- Moises OA4EFJ 
 
