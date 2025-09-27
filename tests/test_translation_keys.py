@@ -14,11 +14,11 @@ def import_dict_from_py(file_path, dict_name):
 
 
 SRC = os.path.abspath(os.path.join(os.path.dirname(__file__), "../src"))
-EN_PATH = os.path.join(SRC, "translation/en/old_keys.py")
-ES_PATH = os.path.join(SRC, "translation/es/old_keys.py")
+EN_PATH = os.path.join(SRC, "translation/en/all_keys.py")
+ES_PATH = os.path.join(SRC, "translation/es/all_keys.py")
 
-ALL_TRANSLATIONS_EN = import_dict_from_py(EN_PATH, "ALL_TRANSLATIONS_EN")
-ALL_TRANSLATIONS_ES = import_dict_from_py(ES_PATH, "ALL_TRANSLATIONS_ES")
+ALL_TRANSLATIONS_EN = import_dict_from_py(EN_PATH, "ALL_KEYS_TRANSLATIONS")
+ALL_TRANSLATIONS_ES = import_dict_from_py(ES_PATH, "ALL_KEYS_TRANSLATIONS")
 
 
 class TestTranslationKeys(unittest.TestCase):
