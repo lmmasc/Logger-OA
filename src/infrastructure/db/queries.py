@@ -306,29 +306,23 @@ def get_radio_operators_paged(
     return rows, int(total)
 
 
-def disable_expired_for_countries(countries: Tuple[str, ...]) -> int:
+def disable_expired_operators() -> int:
     """
-    Deshabilita operadores con expiration_date vencida para los países indicados.
+    Deshabilita TODOS los operadores con expiration_date vencida, independientemente del país.
     Retorna la cantidad de filas afectadas.
 
-    Args:
-        countries: tupla de códigos ITU/ISO de país (por ejemplo: ("PER","CHL","URY")).
+    Si un operador no tiene expiration_date, permanece habilitado.
+    Solo se deshabilitan los que tienen fecha válida y ya vencida.
     """
     from datetime import datetime, timezone
 
-    if not countries:
-        return 0
-
     now_ts = int(datetime.now(timezone.utc).timestamp())
-    placeholders = ",".join(["?"] * len(countries))
     db_path = get_database_path()
     conn = get_connection(db_path)
     try:
         cur = conn.cursor()
         # Actualizar enabled=0 solo cuando está actualmente en 1, la fecha existe (no vacía)
         # y ya venció. Se castea expiration_date a INTEGER para bases donde está guardado como TEXT.
-        # Ampliar criterio de país: aceptar TRIM(country) IN (...), vacío/NULL, o prefijos de PER/CHL/URY
-        # Prefijos típicos: PER -> OA, OB, OC; CHL -> CA, CB, CE; URY -> CX, CW, CV
         sql = (
             f"UPDATE radio_operators "
             f"SET enabled = 0, updated_at = ? "
@@ -336,17 +330,22 @@ def disable_expired_for_countries(countries: Tuple[str, ...]) -> int:
             f"AND expiration_date IS NOT NULL "
             f"AND TRIM(expiration_date) <> '' "
             f"AND CAST(expiration_date AS INTEGER) > 0 "
-            f"AND CAST(expiration_date AS INTEGER) < ? "
-            f"AND ( UPPER(TRIM(country)) IN ({placeholders}) "
-            f"      OR TRIM(IFNULL(country,'')) = '' "
-            f"      OR callsign GLOB 'OA*' OR callsign GLOB 'OB*' OR callsign GLOB 'OC*' "
-            f"      OR callsign GLOB 'CA*' OR callsign GLOB 'CB*' OR callsign GLOB 'CE*' "
-            f"      OR callsign GLOB 'CX*' OR callsign GLOB 'CW*' OR callsign GLOB 'CV*' )"
+            f"AND CAST(expiration_date AS INTEGER) < ?"
         )
-        params = [now_ts, now_ts, *countries]
+        params = [now_ts, now_ts]
         cur.execute(sql, tuple(params))
         affected = cur.rowcount or 0
         conn.commit()
         return int(affected)
     finally:
         conn.close()
+
+
+def disable_expired_for_countries(countries: Tuple[str, ...]) -> int:
+    """
+    DEPRECATED: Usar disable_expired_operators() en su lugar.
+    Deshabilita operadores con expiration_date vencida para los países indicados.
+    Mantenida por compatibilidad temporal.
+    """
+    # Por compatibilidad, simplemente llamar a la nueva función generalizada
+    return disable_expired_operators()

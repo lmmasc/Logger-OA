@@ -167,6 +167,15 @@ def update_operators_from_pdf(pdf_path):
                 protected += 1
 
     result = integrate_operators_to_db(to_upsert)
+
+    # --- CHEQUEO POST-IMPORTACIÓN: deshabilitar vencidos ---
+    from infrastructure.db.queries import disable_expired_operators
+
+    try:
+        expired_disabled = disable_expired_operators()
+    except Exception:
+        expired_disabled = 0
+
     # --- NUEVO: Retornar resumen ---
     summary = {
         "total": total,
@@ -177,5 +186,6 @@ def update_operators_from_pdf(pdf_path):
         "reenabled": reenabled,
         "protected": protected,
         "ok": result,
+        "expired_disabled": expired_disabled,
     }
     return summary

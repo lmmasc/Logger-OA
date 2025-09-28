@@ -39,9 +39,9 @@ def main():
         # Crear la aplicación Qt y mostrar la ventana principal
         app = QApplication(sys.argv)
 
-        # Chequeo automático de vencimientos (PER, CHL, URY) al arranque
+        # Chequeo automático de vencimientos al arranque
         try:
-            affected = queries.disable_expired_for_countries(("PER", "CHL", "URY"))
+            affected = queries.disable_expired_operators()
             # Opcional: podríamos registrar 'affected' en el futuro
         except Exception:
             # No bloquear el arranque por este mantenimiento

@@ -192,6 +192,14 @@ def update_operators_from_excel(excel_path):
 
         result = integrate_operators_to_db(to_upsert)
 
+        # --- CHEQUEO POST-IMPORTACIÓN: deshabilitar vencidos ---
+        from infrastructure.db.queries import disable_expired_operators
+
+        try:
+            expired_disabled = disable_expired_operators()
+        except Exception:
+            expired_disabled = 0
+
         summary = {
             "total": total,
             "new": new,
@@ -201,6 +209,7 @@ def update_operators_from_excel(excel_path):
             "reenabled": reenabled,
             "protected": protected,
             "ok": result,
+            "expired_disabled": expired_disabled,
             "message": f"Procesamiento completado: {new} nuevos, {updated} actualizados, {disabled} deshabilitados",
         }
 
