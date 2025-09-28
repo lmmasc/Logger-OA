@@ -48,8 +48,11 @@ Al abrir Logger OA, verás la ventana principal con los siguientes menús:
 
 ### Menú Base de datos
 - **Mostrar base de datos**: Abre la ventana de gestión de operadores OA.
-- **Importar desde PDF**: Importa operadores OA desde un archivo PDF oficial. Selecciona el PDF y la app procesará los datos, mostrando un resumen (nuevos, actualizados, deshabilitados, rehabilitados).
-- **Importar desde base de datos**: Importa operadores desde otro archivo de base de datos.
+- **Importar** (submenú):
+    - **Importar desde PDF**: Importa operadores desde un archivo PDF oficial (compatible con formatos de Perú y Uruguay). Selecciona el PDF y la app procesará los datos, mostrando un resumen (nuevos, actualizados, deshabilitados, rehabilitados).
+    - **Importar desde Excel**: Importa operadores desde archivos Excel (compatible con formatos de Argentina y Chile).
+    - **Importar desde CSV**: Importa operadores desde archivos CSV generados por esta aplicación u otras fuentes compatibles.
+    - **Importar desde base de datos**: Importa operadores desde otro archivo de base de datos.
 - **Crear respaldo**: Genera una copia de seguridad de la base de datos local.
 - **Restaurar respaldo**: Restaura la base de datos desde un respaldo previo.
 - **Exportar a CSV**: Exporta la base de datos de operadores a un archivo CSV.
@@ -132,10 +135,14 @@ Al abrir Logger OA, verás la ventana principal con los siguientes menús:
 - Para exportar un log: **Archivo > Exportar log**.
 - Para exportar la base de datos: **Base de datos > Exportar a CSV**.
 
-### Importar operadores OA desde PDF
-1. Ve a **Base de datos > Importar desde PDF**.
-2. Selecciona el archivo PDF oficial.
-3. Espera el procesamiento y revisa el resumen de la importación.
+### Importar operadores desde archivos externos
+1. Ve a **Base de datos > Importar** y selecciona la fuente adecuada:
+   - **Importar desde PDF**: Para documentos oficiales de Perú o Uruguay en formato PDF.
+   - **Importar desde Excel**: Para listados oficiales de Argentina o Chile en formato Excel.
+   - **Importar desde CSV**: Para archivos CSV compatibles o exportados desde esta misma aplicación.
+   - **Importar desde base de datos**: Para importar desde una copia de seguridad u otra base de datos.
+2. Selecciona el archivo correspondiente.
+3. Espera el procesamiento y revisa el resumen de la importación que muestra la cantidad de registros nuevos, actualizados, deshabilitados y rehabilitados.
 
 ### Uso de la ventana de base de datos de operadores
 1. Ve al menú **Base de datos > Mostrar base de datos** para abrir la ventana de gestión de operadores OA.
@@ -170,7 +177,7 @@ Al abrir Logger OA, verás la ventana principal con los siguientes menús:
 Logger OA está optimizado para operar de forma eficiente solo con el teclado. Los accesos rápidos implementados permiten registrar contactos y navegar por las secciones principales sin depender del mouse:
 
 - **Enter** en el campo de indicativo: agrega el indicativo a la cola de espera.
-- **Alt + Enter** en el campo de indicativo: agrega el contacto directamente al log (si los datos están completos y válidos).
+- **Ctrl + Enter** en el campo de indicativo: agrega el contacto directamente al log (si los datos están completos y válidos).
 - **Enter** sobre una sugerencia de operador: autocompleta el campo de indicativo con la sugerencia seleccionada.
 - **Enter** sobre un indicativo en la cola de espera: autocompleta el campo de indicativo con el indicativo seleccionado.
 - **F1**: foco al campo de ingreso de indicativo.

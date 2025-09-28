@@ -1,7 +1,7 @@
 
 ## Licencia y condiciones de uso
 
-Este software se distribuye bajo la licencia MIT. Puedes copiarlo, modificarlo y crear tus propias versiones, siempre y cuando **menciones a los desarrolladores originales** en los créditos:
+Est- **Importación automática de operadores desde listados oficiales en PDF (Perú, Uruguay), Excel (Argentina, Chile) o CSV.** software se distribuye bajo la licencia MIT. Puedes copiarlo, modificarlo y crear tus propias versiones, siempre y cuando **menciones a los desarrolladores originales** en los créditos:
 
 - Miguel OA4BAU
 - Raquel OA4EHN
@@ -128,7 +128,7 @@ El manual de usuario completo está disponible desde la propia aplicación, en e
 
 ### Ejemplo práctico: Importar operadores OA desde PDF
 1. Abre la aplicación.
-2. Ve al menú "Importar PDF" y selecciona el archivo oficial.
+2. Ve al menú "Base de datos > Importar > Importar desde PDF" y selecciona el archivo oficial.
 3. Al finalizar, se muestra un resumen detallado (total, nuevos, actualizados, deshabilitados, rehabilitados).
 
 ---
