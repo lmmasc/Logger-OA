@@ -306,6 +306,8 @@ UI_TRANSLATIONS = {
     "log_type_mismatch_error": "The selected file does not match the expected log type.",
     "dialog_no_callsign_entered": "No callsign entered.",
     "export_pdf_not_supported_for_log_type": "PDF export is only available for contest logs.",
+    # New
+    "ui_set_expiration_date": "Set expiration",
 }
 
 ALL_KEYS_TRANSLATIONS = {}

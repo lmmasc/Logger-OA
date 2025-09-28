@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QDateEdit,
     QMessageBox,
+    QCheckBox,
 )
 from PySide6.QtCore import Qt, QDate
 
@@ -132,12 +133,36 @@ class OperatorEditDialog(QDialog):
                 row.addWidget(widget)
                 self.inputs[key] = widget
             elif widget_cls == QDateEdit:
-                widget = QDateEdit()
-                widget.setDisplayFormat("dd/MM/yyyy")
-                widget.setCalendarPopup(True)
-                widget.setDate(QDate.currentDate())
-                row.addWidget(widget)
-                self.inputs[key] = widget
+                # Vencimiento: agregar checkbox para activar/desactivar la fecha
+                if key == "expiration_date":
+                    checkbox = QCheckBox(
+                        translation_service.tr("ui_set_expiration_date")
+                    )
+                    checkbox.setObjectName("expiration_checkbox")
+                    row.addWidget(checkbox)
+                    widget = QDateEdit()
+                    widget.setDisplayFormat("dd/MM/yyyy")
+                    widget.setCalendarPopup(True)
+                    widget.setDate(QDate.currentDate())
+                    widget.setVisible(False)  # Oculto por defecto hasta que se active
+                    widget.setEnabled(False)
+
+                    # Toggle visibilidad/habilitación con el checkbox
+                    def _on_exp_toggled(checked, w=widget):
+                        w.setVisible(checked)
+                        w.setEnabled(checked)
+
+                    checkbox.toggled.connect(_on_exp_toggled)
+                    row.addWidget(widget)
+                    self.inputs["expiration_checkbox"] = checkbox
+                    self.inputs[key] = widget
+                else:
+                    widget = QDateEdit()
+                    widget.setDisplayFormat("dd/MM/yyyy")
+                    widget.setCalendarPopup(True)
+                    widget.setDate(QDate.currentDate())
+                    row.addWidget(widget)
+                    self.inputs[key] = widget
             # Agregar el row de categoría justo después del nombre
             if key == "name":
                 layout.addLayout(row)
@@ -301,19 +326,36 @@ class OperatorEditDialog(QDialog):
         # Fechas
         from datetime import datetime, timezone, timedelta
 
-        for key in ("expiration_date", "cutoff_date"):
-            val = getattr(op, key, None)
-            if isinstance(val, int) and val > 0:
+        # expiration_date: si tiene valor, activar checkbox y mostrar fecha; si no, dejar oculto
+        exp_val = getattr(op, "expiration_date", None)
+        if "expiration_checkbox" in self.inputs:
+            exp_cb = self.inputs["expiration_checkbox"]
+            if isinstance(exp_val, int) and exp_val > 0:
                 try:
-                    dt_utc = datetime.fromtimestamp(val, timezone.utc)
+                    dt_utc = datetime.fromtimestamp(exp_val, timezone.utc)
                     dt_peru = dt_utc.astimezone(timezone(timedelta(hours=-5)))
-                    self.inputs[key].setDate(
+                    self.inputs["expiration_date"].setDate(
                         QDate(dt_peru.year, dt_peru.month, dt_peru.day)
                     )
+                    exp_cb.setChecked(True)
                 except Exception:
-                    self.inputs[key].setDate(QDate.currentDate())
+                    exp_cb.setChecked(False)
             else:
-                self.inputs[key].setDate(QDate.currentDate())
+                exp_cb.setChecked(False)
+
+        # cutoff_date (se mantiene el comportamiento existente)
+        cut_val = getattr(op, "cutoff_date", None)
+        if isinstance(cut_val, int) and cut_val > 0:
+            try:
+                dt_utc = datetime.fromtimestamp(cut_val, timezone.utc)
+                dt_peru = dt_utc.astimezone(timezone(timedelta(hours=-5)))
+                self.inputs["cutoff_date"].setDate(
+                    QDate(dt_peru.year, dt_peru.month, dt_peru.day)
+                )
+            except Exception:
+                self.inputs["cutoff_date"].setDate(QDate.currentDate())
+        else:
+            self.inputs["cutoff_date"].setDate(QDate.currentDate())
         # Seleccionar país en combo por ITU
         itu_code = getattr(op, "country", "PER")
         idx_country = self.inputs["country"].findData(itu_code)
@@ -372,6 +414,12 @@ class OperatorEditDialog(QDialog):
                     else:
                         data[model_key] = self._get_widget_text(widget)
             elif isinstance(widget, QDateEdit):
+                # Manejo especial para expiration_date controlado por checkbox
+                if ui_key == "expiration_date":
+                    exp_cb = self.inputs.get("expiration_checkbox")
+                    if not exp_cb or not exp_cb.isChecked():
+                        data[model_key] = None
+                        continue
                 # Convertir fecha local Perú a timestamp UTC
                 qdate = widget.date()
                 dt_peru = datetime.datetime(

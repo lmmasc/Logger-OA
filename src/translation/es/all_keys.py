@@ -306,6 +306,8 @@ UI_TRANSLATIONS = {
     "log_type_mismatch_error": "El archivo seleccionado no corresponde al tipo de log esperado.",
     "dialog_no_callsign_entered": "No se ha ingresado un indicativo.",
     "export_pdf_not_supported_for_log_type": "El formato PDF solo está disponible para logs de concurso.",
+    # New
+    "ui_set_expiration_date": "Definir vencimiento",
 }
 
 ALL_KEYS_TRANSLATIONS = {}
