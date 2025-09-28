@@ -27,6 +27,7 @@ from infrastructure.repositories.sqlite_radio_operator_repository import (
 from application.use_cases.operator_management import (
     get_operator_by_callsign,
     create_operator,
+    find_operator_for_input,
 )
 from application.use_cases.contact_management import (
     validate_contact_for_log,
@@ -330,7 +331,7 @@ class LogFormWidget(QWidget):
             dict: Datos del formulario, adaptados según el tipo de log.
         """
         callsign_val = callsign if callsign is not None else ""
-        # Extraer indicativo base para buscar datos del operador
+        # Extraer indicativo base para posibles usos
         from utils.callsign_parser import parse_callsign
 
         base_callsign, _, _ = parse_callsign(callsign_val)
@@ -344,8 +345,8 @@ class LogFormWidget(QWidget):
             # --- Bloque de extracción de datos para concurso ---
             contact_id = str(uuid.uuid4())
             timestamp = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
-            # operator = get_operator_by_callsign(base_callsign)
-            operator = get_operator_by_callsign(callsign_val)
+            # Resolver operador usando lógica de prefijo/base/sufijo con SQLite
+            operator = find_operator_for_input(callsign_val)
             name = operator.name if operator else "-"
             region = operator.region if operator else "-"
             data.update(
@@ -365,8 +366,8 @@ class LogFormWidget(QWidget):
             )
         elif self.log_type == LogType.OPERATION_LOG:
             # --- Bloque de extracción de datos para operativo ---
-            # operator = get_operator_by_callsign(base_callsign)
-            operator = get_operator_by_callsign(callsign_val)
+            # Resolver operador usando lógica de prefijo/base/sufijo con SQLite
+            operator = find_operator_for_input(callsign_val)
             name = operator.name if operator else ""
             country = operator.country if operator else ""
             region = operator.region if operator else "-"

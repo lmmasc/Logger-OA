@@ -23,3 +23,27 @@ def create_operator(op_data: dict):
     repo = SqliteRadioOperatorRepository()
     repo.add(new_operator)
     return new_operator
+
+
+def find_operator_for_input(callsign: str) -> RadioOperator | None:
+    """
+    Resuelve el operador a partir del texto ingresado por el usuario, manteniendo la lógica anterior
+    de separación de prefijo/base/sufijo pero utilizando consultas SQLite (rápidas):
+    1) Busca por base
+    2) Si hay prefijo, intenta prefijo/base
+    3) Finalmente intenta el texto completo
+    """
+    from utils.callsign_parser import parse_callsign
+
+    repo = SqliteRadioOperatorRepository()
+    cs = (callsign or "").strip().upper()
+    base, prefijo, _ = parse_callsign(cs)
+    # 1) base
+    op = repo.get_operator_by_callsign(base) if base else None
+    # 2) prefijo/base
+    if not op and prefijo:
+        op = repo.get_operator_by_callsign(f"{prefijo}/{base}")
+    # 3) texto completo
+    if not op and cs:
+        op = repo.get_operator_by_callsign(cs)
+    return op
