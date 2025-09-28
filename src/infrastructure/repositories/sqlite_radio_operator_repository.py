@@ -96,12 +96,13 @@ class SqliteRadioOperatorRepository(RadioOperatorRepository):
         return self.get_by_callsign(callsign)
 
     def search_suggestions(
-        self, prefix: str, limit: int = 50
+        self, prefix: str, limit: int = 200
     ) -> List[OperatorSuggestion]:
         """
-        Retorna sugerencias por prefijo usando SQL LIKE, p.ej. 'OA%'.
+        Retorna sugerencias por coincidencia en cualquier parte usando SQL LIKE, p.ej. '%DFD%'.
         """
-        pattern = f"{prefix}%"
+        # Permitir coincidencias parciales en cualquier posición del indicativo
+        pattern = f"%{prefix}%"
         rows = queries.search_radio_operators_by_callsign(pattern, limit=limit)
         return [OperatorSuggestion(callsign=r[0], name=r[1] or "") for r in rows]
 
