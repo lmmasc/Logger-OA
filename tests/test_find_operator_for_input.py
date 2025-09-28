@@ -1,7 +1,6 @@
 import os
 import sqlite3
 import time
-import types
 import importlib
 import pytest
 
@@ -80,24 +79,34 @@ def _init_temp_db(tmp_path):
     return db_path
 
 
+def _patch_db_paths(monkeypatch, db_path: str):
+    """Patch get_database_path in both namespaced and non-namespaced modules without triggering Pylance unresolved imports."""
+    # queries modules
+    for mod_name in ("src.infrastructure.db.queries", "infrastructure.db.queries"):
+        try:
+            mod = importlib.import_module(mod_name)
+            monkeypatch.setattr(
+                mod, "get_database_path", lambda: db_path, raising=False
+            )
+        except Exception:
+            pass
+    # paths modules
+    for mod_name in ("src.config.paths", "config.paths"):
+        try:
+            mod = importlib.import_module(mod_name)
+            monkeypatch.setattr(
+                mod,
+                "get_database_path",
+                lambda filename="loggeroa.db": db_path,
+                raising=False,
+            )
+        except Exception:
+            pass
+
+
 def test_find_operator_for_input_base(monkeypatch, tmp_path):
     db_path = _init_temp_db(tmp_path)
-    # Monkeypatch get_database_path
-    from src.infrastructure.db import queries as q
-    from src.config import paths as paths_mod
-
-    # Also patch non-namespaced imports used at runtime
-    import infrastructure.db.queries as q2
-    import config.paths as paths_mod2
-
-    monkeypatch.setattr(q, "get_database_path", lambda: db_path)
-    monkeypatch.setattr(q2, "get_database_path", lambda: db_path)
-    monkeypatch.setattr(
-        paths_mod, "get_database_path", lambda filename="loggeroa.db": db_path
-    )
-    monkeypatch.setattr(
-        paths_mod2, "get_database_path", lambda filename="loggeroa.db": db_path
-    )
+    _patch_db_paths(monkeypatch, db_path)
 
     # Import after monkeypatch
     mod = importlib.import_module("src.application.use_cases.operator_management")
@@ -110,19 +119,7 @@ def test_find_operator_for_input_base(monkeypatch, tmp_path):
 
 def test_find_operator_for_input_with_prefix(monkeypatch, tmp_path):
     db_path = _init_temp_db(tmp_path)
-    from src.infrastructure.db import queries as q
-    from src.config import paths as paths_mod
-    import infrastructure.db.queries as q2
-    import config.paths as paths_mod2
-
-    monkeypatch.setattr(q, "get_database_path", lambda: db_path)
-    monkeypatch.setattr(q2, "get_database_path", lambda: db_path)
-    monkeypatch.setattr(
-        paths_mod, "get_database_path", lambda filename="loggeroa.db": db_path
-    )
-    monkeypatch.setattr(
-        paths_mod2, "get_database_path", lambda filename="loggeroa.db": db_path
-    )
+    _patch_db_paths(monkeypatch, db_path)
     mod = importlib.import_module("src.application.use_cases.operator_management")
 
     # Should resolve base OA4BAU from CE3/OA4BAU
@@ -133,19 +130,7 @@ def test_find_operator_for_input_with_prefix(monkeypatch, tmp_path):
 
 def test_find_operator_for_input_with_suffix(monkeypatch, tmp_path):
     db_path = _init_temp_db(tmp_path)
-    from src.infrastructure.db import queries as q
-    from src.config import paths as paths_mod
-    import infrastructure.db.queries as q2
-    import config.paths as paths_mod2
-
-    monkeypatch.setattr(q, "get_database_path", lambda: db_path)
-    monkeypatch.setattr(q2, "get_database_path", lambda: db_path)
-    monkeypatch.setattr(
-        paths_mod, "get_database_path", lambda filename="loggeroa.db": db_path
-    )
-    monkeypatch.setattr(
-        paths_mod2, "get_database_path", lambda filename="loggeroa.db": db_path
-    )
+    _patch_db_paths(monkeypatch, db_path)
     mod = importlib.import_module("src.application.use_cases.operator_management")
 
     # Suffix should be ignored for lookup
@@ -156,19 +141,7 @@ def test_find_operator_for_input_with_suffix(monkeypatch, tmp_path):
 
 def test_find_operator_for_input_prefix_and_suffix(monkeypatch, tmp_path):
     db_path = _init_temp_db(tmp_path)
-    from src.infrastructure.db import queries as q
-    from src.config import paths as paths_mod
-    import infrastructure.db.queries as q2
-    import config.paths as paths_mod2
-
-    monkeypatch.setattr(q, "get_database_path", lambda: db_path)
-    monkeypatch.setattr(q2, "get_database_path", lambda: db_path)
-    monkeypatch.setattr(
-        paths_mod, "get_database_path", lambda filename="loggeroa.db": db_path
-    )
-    monkeypatch.setattr(
-        paths_mod2, "get_database_path", lambda filename="loggeroa.db": db_path
-    )
+    _patch_db_paths(monkeypatch, db_path)
     mod = importlib.import_module("src.application.use_cases.operator_management")
 
     op = mod.find_operator_for_input("CE3/OA4BAU/M")
@@ -178,19 +151,7 @@ def test_find_operator_for_input_prefix_and_suffix(monkeypatch, tmp_path):
 
 def test_find_operator_for_input_no_match(monkeypatch, tmp_path):
     db_path = _init_temp_db(tmp_path)
-    from src.infrastructure.db import queries as q
-    from src.config import paths as paths_mod
-    import infrastructure.db.queries as q2
-    import config.paths as paths_mod2
-
-    monkeypatch.setattr(q, "get_database_path", lambda: db_path)
-    monkeypatch.setattr(q2, "get_database_path", lambda: db_path)
-    monkeypatch.setattr(
-        paths_mod, "get_database_path", lambda filename="loggeroa.db": db_path
-    )
-    monkeypatch.setattr(
-        paths_mod2, "get_database_path", lambda filename="loggeroa.db": db_path
-    )
+    _patch_db_paths(monkeypatch, db_path)
     mod = importlib.import_module("src.application.use_cases.operator_management")
 
     op = mod.find_operator_for_input("ZZ9/PLURAL/Z")
