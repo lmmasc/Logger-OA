@@ -13,6 +13,22 @@ class OperatorSuggestion:
 
 
 class SqliteRadioOperatorRepository(RadioOperatorRepository):
+    @staticmethod
+    def _to_sql_like_singlechar_pattern(text: str) -> str:
+        """
+        Convierte el texto de entrada al patrón LIKE de SQLite emulando el filtro anterior:
+        - '*' significa exactamente un (1) carácter (se mapea a '_')
+        - El resto de caracteres son literales; escapamos '%' y '_' para no tratarlos como comodines
+        - Coincidencia en cualquier parte: envolvemos con '%'
+        """
+        if text is None:
+            text = ""
+        # Usamos '\\' como carácter de escape en SQL (ESCAPE '\\')
+        esc = text.replace("\\", "\\\\")
+        esc = esc.replace("%", "\\%").replace("_", "\\_")
+        esc = esc.replace("*", "_")  # '*' de la UI => '_' (un solo carácter) en SQL
+        return f"%{esc}%"
+
     def list_all(self) -> List[RadioOperator]:
         rows = queries.get_radio_operators()
         result = []
@@ -99,10 +115,12 @@ class SqliteRadioOperatorRepository(RadioOperatorRepository):
         self, prefix: str, limit: int = 200
     ) -> List[OperatorSuggestion]:
         """
-        Retorna sugerencias por coincidencia en cualquier parte usando SQL LIKE, p.ej. '%DFD%'.
+        Retorna sugerencias emulando el filtro anterior con comodín de un solo carácter '*'.
+        Usa SQLite LIKE con ESCAPE para velocidad:
+        - '*' => '_' (un solo carácter)
+        - Coincide en cualquier parte (se envuelve con '%')
         """
-        # Permitir coincidencias parciales en cualquier posición del indicativo
-        pattern = f"%{prefix}%"
+        pattern = self._to_sql_like_singlechar_pattern(prefix)
         rows = queries.search_radio_operators_by_callsign(pattern, limit=limit)
         return [OperatorSuggestion(callsign=r[0], name=r[1] or "") for r in rows]
 

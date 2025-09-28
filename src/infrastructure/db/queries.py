@@ -228,7 +228,7 @@ def search_radio_operators_by_callsign(pattern: str, limit: int = 50):
     _ensure_indexes(conn)
     sql = (
         "SELECT callsign, name FROM radio_operators "
-        "WHERE callsign LIKE ? COLLATE NOCASE "
+        "WHERE callsign LIKE ? ESCAPE '\\' COLLATE NOCASE "
         "ORDER BY LENGTH(callsign) ASC, callsign ASC LIMIT ?"
     )
     cursor = conn.cursor()
