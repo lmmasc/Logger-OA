@@ -90,7 +90,9 @@ class CallsignInputWidget(QWidget):
             if event.key() in (Qt.Key_Return, Qt.Key_Enter):  # type: ignore
                 text = self.input.text().strip()
                 if text:
-                    if event.modifiers() & Qt.KeyboardModifier.AltModifier:  # Alt+Enter
+                    if (
+                        event.modifiers() & Qt.KeyboardModifier.ControlModifier
+                    ):  # Ctrl+Enter
                         self.addContactRequested.emit(text)
                         return True
                     else:
