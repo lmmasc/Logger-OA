@@ -1,7 +1,7 @@
 
 ## Licencia y condiciones de uso
 
-Est- **Importación automática de operadores desde listados oficiales en PDF (Perú, Uruguay), Excel (Argentina, Chile) o CSV.** software se distribuye bajo la licencia MIT. Puedes copiarlo, modificarlo y crear tus propias versiones, siempre y cuando **menciones a los desarrolladores originales** en los créditos:
+Este software se distribuye bajo la licencia MIT. Puedes copiarlo, modificarlo y crear tus propias versiones, siempre y cuando **menciones a los desarrolladores originales** en los créditos:
 
 - Miguel OA4BAU
 - Raquel OA4EHN
@@ -16,7 +16,7 @@ No se aceptan sugerencias ni mejoras en este repositorio oficial. Eres libre de 
 ![License: MIT](https://img.shields.io/badge/License-MIT-green)
 ![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20macOS-lightgrey)
 
-Aplicación de escritorio multiplataforma para la gestión de concursos y operaciones de radioaficionados OA (Perú), con arquitectura desacoplada, interfaz moderna y soporte para importación de datos desde PDF.
+Aplicación de escritorio multiplataforma para la gestión de concursos y operaciones de radioaficionados OA (Perú), con arquitectura desacoplada, interfaz moderna y soporte para importación de datos desde múltiples formatos y países.
 
 ---
 
@@ -36,7 +36,7 @@ Aplicación de escritorio multiplataforma para la gestión de concursos y operac
 ## Características principales
 - Gestión de concursos y operaciones de radioaficionados OA.
 - Base de datos local SQLite, sin dependencias externas.
-- Importación automática de operadores OA desde listados oficiales del MTC en PDF.
+- Importación automática de operadores desde listados oficiales en PDF (Perú, Uruguay), Excel (Argentina, Chile) o CSV.
 - Feedback visual en importación: diálogo de espera traducido y resumen detallado (total, nuevos, actualizados, deshabilitados, rehabilitados).
 - Interfaz gráfica moderna con PySide6 (Qt), temas claro/oscuro y cambio de idioma.
 - Arquitectura desacoplada basada en Clean Architecture.
