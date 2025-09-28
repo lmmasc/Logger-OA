@@ -79,7 +79,16 @@ class SqliteRadioOperatorRepository(RadioOperatorRepository):
     def get_by_callsign(self, callsign: str) -> Optional[RadioOperator]:
         row = queries.get_radio_operator_by_callsign(callsign)
         if row:
-            return RadioOperator(*row)
+            # Alinear conversión con list_all/list_paged: convertir fechas str a int y vacíos a None
+            row_list = list(row)
+            for idx in [10, 11, 14]:  # expiration_date, cutoff_date, updated_at
+                val = row_list[idx]
+                if isinstance(val, str):
+                    if val.isdigit():
+                        row_list[idx] = int(val)
+                    elif val.strip() == "":
+                        row_list[idx] = None
+            return RadioOperator(*row_list)
         return None
 
     # Alias por compatibilidad con código existente en UI

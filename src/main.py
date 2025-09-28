@@ -21,6 +21,7 @@ from config.paths import get_database_path
 from infrastructure.db.connection import get_connection
 from infrastructure.db.schema import init_radioamateur_table
 from interface_adapters.ui.main_window import MainWindow
+from infrastructure.db import queries
 
 
 def main():
@@ -37,6 +38,15 @@ def main():
 
         # Crear la aplicación Qt y mostrar la ventana principal
         app = QApplication(sys.argv)
+
+        # Chequeo automático de vencimientos (PER, CHL, URY) al arranque
+        try:
+            affected = queries.disable_expired_for_countries(("PER", "CHL", "URY"))
+            # Opcional: podríamos registrar 'affected' en el futuro
+        except Exception:
+            # No bloquear el arranque por este mantenimiento
+            pass
+
         window = MainWindow()
         window.show()
         sys.exit(app.exec())
