@@ -252,6 +252,14 @@ QLineEdit, QComboBox, QTimeEdit, QDateTimeEdit {
 QLineEdit:focus, QComboBox:focus, QTimeEdit:focus, QDateTimeEdit:focus {
     border: 2px solid palette(highlight);
 }
+/* Estado inválido para campos de entrada */
+QLineEdit[invalid="true"], QComboBox[invalid="true"], QTimeEdit[invalid="true"], QDateTimeEdit[invalid="true"], QDateEdit[invalid="true"] {
+    border: 2px solid #d93025;            /* rojo error */
+    background-color: #fdecea;            /* fondo tenue para destacar */
+}
+QLineEdit[invalid="true"]:focus, QComboBox[invalid="true"]:focus, QTimeEdit[invalid="true"]:focus, QDateTimeEdit[invalid="true"]:focus, QDateEdit[invalid="true"]:focus {
+    border: 2px solid #d93025;
+}
 /* Estado deshabilitado para campos de texto y combos */
 QLineEdit:disabled, QComboBox:disabled, QTimeEdit:disabled, QDateTimeEdit:disabled {
     background-color: #e0e0e0;

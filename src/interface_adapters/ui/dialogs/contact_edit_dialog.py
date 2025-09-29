@@ -105,18 +105,27 @@ class ContactEditDialog(QDialog):
             self.inputs["power"].setText(str(contact.get("power", "")))
             # Potencia: solo números 1..9999
             self.inputs["power"].setValidator(QIntValidator(1, 9999, self))
+            self.inputs["power"].textChanged.connect(
+                lambda _: self._validate_field("power")
+            )
             layout.addWidget(QLabel(translation_service.tr("power") + " (W)"))
             layout.addWidget(self.inputs["power"])
             self.inputs["rs_rx"] = QLineEdit(self)
             self.inputs["rs_rx"].setText(str(contact.get("rs_rx", "")))
             # RS (RX): solo números de 2 dígitos 11..59
             self.inputs["rs_rx"].setValidator(QIntValidator(11, 59, self))
+            self.inputs["rs_rx"].textChanged.connect(
+                lambda _: self._validate_field("rs_rx")
+            )
             layout.addWidget(QLabel(translation_service.tr("rs_rx")))
             layout.addWidget(self.inputs["rs_rx"])
             self.inputs["rs_tx"] = QLineEdit(self)
             self.inputs["rs_tx"].setText(str(contact.get("rs_tx", "")))
             # RS (TX): solo números de 2 dígitos 11..59
             self.inputs["rs_tx"].setValidator(QIntValidator(11, 59, self))
+            self.inputs["rs_tx"].textChanged.connect(
+                lambda _: self._validate_field("rs_tx")
+            )
             layout.addWidget(QLabel(translation_service.tr("rs_tx")))
             layout.addWidget(self.inputs["rs_tx"])
             self.inputs["obs"] = QLineEdit(self)
@@ -129,6 +138,9 @@ class ContactEditDialog(QDialog):
             self.inputs["rs_rx"].setText(str(contact.get("rs_rx", "")))
             # RS (RX): solo números de 2 dígitos 11..59
             self.inputs["rs_rx"].setValidator(QIntValidator(11, 59, self))
+            self.inputs["rs_rx"].textChanged.connect(
+                lambda _: self._validate_field("rs_rx")
+            )
             layout.addWidget(QLabel(translation_service.tr("rs_rx")))
             layout.addWidget(self.inputs["rs_rx"])
             self.inputs["exchange_received"] = QLineEdit(self)
@@ -137,18 +149,27 @@ class ContactEditDialog(QDialog):
             )
             # Intercambio recibido: solo números 1..999
             self.inputs["exchange_received"].setValidator(QIntValidator(1, 999, self))
+            self.inputs["exchange_received"].textChanged.connect(
+                lambda _: self._validate_field("exchange_received")
+            )
             layout.addWidget(QLabel(translation_service.tr("exchange_received")))
             layout.addWidget(self.inputs["exchange_received"])
             self.inputs["rs_tx"] = QLineEdit(self)
             self.inputs["rs_tx"].setText(str(contact.get("rs_tx", "")))
             # RS (TX): solo números de 2 dígitos 11..59
             self.inputs["rs_tx"].setValidator(QIntValidator(11, 59, self))
+            self.inputs["rs_tx"].textChanged.connect(
+                lambda _: self._validate_field("rs_tx")
+            )
             layout.addWidget(QLabel(translation_service.tr("rs_tx")))
             layout.addWidget(self.inputs["rs_tx"])
             self.inputs["exchange_sent"] = QLineEdit(self)
             self.inputs["exchange_sent"].setText(contact.get("exchange_sent", ""))
             # Intercambio enviado: solo números 1..999
             self.inputs["exchange_sent"].setValidator(QIntValidator(1, 999, self))
+            self.inputs["exchange_sent"].textChanged.connect(
+                lambda _: self._validate_field("exchange_sent")
+            )
             layout.addWidget(QLabel(translation_service.tr("exchange_sent")))
             layout.addWidget(self.inputs["exchange_sent"])
             # Agregar campo de observaciones para concursos
@@ -226,10 +247,56 @@ class ContactEditDialog(QDialog):
         layout.addLayout(btns)
         self.setLayout(layout)
 
+        # Validación inicial (marcar inválidos que estén vacíos o fuera de rango)
+        for key in ("power", "rs_rx", "rs_tx", "exchange_received", "exchange_sent"):
+            if key in self.inputs:
+                self._validate_field(key)
+
+    def _validate_field(self, key: str):
+        widget = self.inputs.get(key)
+        if not isinstance(widget, QLineEdit):
+            return
+        validator = widget.validator()
+        text = widget.text().strip()
+        invalid = False
+        if isinstance(validator, QIntValidator):
+            if text == "":
+                invalid = True
+            else:
+                try:
+                    value = int(text)
+                    bottom = validator.bottom()
+                    top = validator.top()
+                    invalid = not (bottom <= value <= top)
+                except ValueError:
+                    invalid = True
+        else:
+            invalid = text == ""
+        widget.setProperty("invalid", invalid)
+        widget.style().unpolish(widget)
+        widget.style().polish(widget)
+
     def accept(self):
         """
         Obtiene los datos editados del contacto y los guarda en result_contact.
         """
+        # Validación final: si algún campo marcado como inválido existe, no cerrar
+        invalid_keys = []
+        for key in ("power", "rs_rx", "rs_tx", "exchange_received", "exchange_sent"):
+            if key in self.inputs:
+                self._validate_field(key)
+                if self.inputs[key].property("invalid") is True:
+                    invalid_keys.append(key)
+        if invalid_keys:
+            # Mostrar un mensaje simple usando título del diálogo
+            from PySide6.QtWidgets import QMessageBox
+
+            QMessageBox.warning(
+                self,
+                self.windowTitle(),
+                translation_service.tr("contact_missing_fields"),
+            )
+            return
         result = self.contact.copy()
         for k, widget in self.inputs.items():
             if isinstance(widget, QLineEdit):
