@@ -7,7 +7,6 @@ from PySide6.QtWidgets import (
     QAbstractItemView,
 )
 from PySide6.QtCore import Qt
-import locale
 
 # --- Imports de la aplicación ---
 from translation.translation_service import translation_service
@@ -134,15 +133,6 @@ class ContactTableWidget(QWidget):
         self.table.setColumnCount(len(keys))
         import datetime
 
-        lang = translation_service.get_language()
-        # Usar abreviatura de mes según idioma
-        try:
-            if lang == LanguageValue.ES:
-                locale.setlocale(locale.LC_TIME, "es_ES.UTF-8")
-            else:
-                locale.setlocale(locale.LC_TIME, "en_US.UTF-8")
-        except locale.Error:
-            locale.setlocale(locale.LC_TIME, "C")
         time_fmt = "%H:%M"
 
         # Numeración invertida: la fila superior tiene el número más alto
