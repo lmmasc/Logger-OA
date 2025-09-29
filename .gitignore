@@ -66,3 +66,6 @@ BaseDocs/
 # Documentación del proyecto a ignorar
 release.md
 # CHANGELOG.md debe trackearse en el repo
+
+# Archivos generados por build
+src/version.py

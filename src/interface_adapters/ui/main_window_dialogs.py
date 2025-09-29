@@ -13,7 +13,8 @@ from PySide6.QtWidgets import (
 from utils.resources import get_resource_path
 from translation.translation_service import translation_service
 import markdown
-from version import APP_VERSION, APP_NAME
+
+# Importar versión perezosamente dentro del diálogo para permitir correr sin src/version.py
 
 
 def show_about_dialog(self):
@@ -22,9 +23,15 @@ def show_about_dialog(self):
     """
     base_msg = translation_service.tr("about_message")
     # Agregar versión de la app en el mensaje
-    # Evitar 'vv' si APP_VERSION ya incluye prefijo 'v'
-    v = str(APP_VERSION).lstrip().lstrip("vV")
-    version_line = f"\n\n{APP_NAME} v{v}"
+    try:
+        from version import APP_VERSION as _V, APP_NAME as _N
+
+        app_name = _N
+        v = str(_V).lstrip().lstrip("vV")  # Evitar 'vv' si ya tiene prefijo
+    except Exception:
+        app_name = "Logger OA"
+        v = "0.0.0-dev"
+    version_line = f"\n\n{app_name} v{v}"
     QMessageBox.information(
         self,
         translation_service.tr("about"),
