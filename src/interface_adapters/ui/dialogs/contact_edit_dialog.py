@@ -13,9 +13,9 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QComboBox,
     QPushButton,
-    QDateTimeEdit,
+    QTimeEdit,
 )
-from PySide6.QtCore import QDateTime, Qt, QLocale
+from PySide6.QtCore import QDateTime, Qt, QLocale, QTime
 from PySide6.QtGui import QIntValidator
 
 # --- Imports de la aplicación ---
@@ -190,7 +190,8 @@ class ContactEditDialog(QDialog):
                 locale.setlocale(locale.LC_TIME, "en_US.UTF-8")
         except locale.Error:
             locale.setlocale(locale.LC_TIME, "C")
-        date_fmt = "HH:mm - yyyy MMM dd"
+        # Guardamos la fecha base (UTC u OA) y mostramos sólo la hora
+        time_fmt = "HH:mm"
         if self.log_type == LogType.CONTEST_LOG:
             # Mostrar hora OA (UTC-5)
             if ts:
@@ -198,44 +199,47 @@ class ContactEditDialog(QDialog):
                     int(ts), tz=datetime.timezone.utc
                 )
                 dt_oa = dt_utc - datetime.timedelta(hours=5)
-                dt_qt = QDateTime(
-                    dt_oa.year,
-                    dt_oa.month,
-                    dt_oa.day,
-                    dt_oa.hour,
-                    dt_oa.minute,
-                    dt_oa.second,
-                )
+                # Guardar fecha OA base para conservarla al aceptar
+                self._date_oa = dt_oa.date()
+                qt_time = QTime(dt_oa.hour, dt_oa.minute, dt_oa.second)
             else:
-                dt_qt = QDateTime.currentDateTime()
+                now_utc = datetime.datetime.now(datetime.timezone.utc)
+                dt_oa = now_utc - datetime.timedelta(hours=5)
+                self._date_oa = dt_oa.date()
+                qt_time = QTime(dt_oa.hour, dt_oa.minute, dt_oa.second)
             label = translation_service.tr("edit_contact_datetime_oa")
-            self.inputs["datetime_oa"] = QDateTimeEdit(dt_qt, self)
-            self.inputs["datetime_oa"].setDisplayFormat(date_fmt)
-            self.inputs["datetime_oa"].setTimeSpec(Qt.TimeSpec.LocalTime)
+            self.inputs["time_oa"] = QTimeEdit(qt_time, self)
+            self.inputs["time_oa"].setDisplayFormat(time_fmt)
+            self.inputs["time_oa"].setTimeSpec(Qt.TimeSpec.LocalTime)
             # Ajustar locale Qt para el widget
             if lang == LanguageValue.ES:
-                self.inputs["datetime_oa"].setLocale(QLocale(QLocale.Language.Spanish))
+                self.inputs["time_oa"].setLocale(QLocale(QLocale.Language.Spanish))
             else:
-                self.inputs["datetime_oa"].setLocale(QLocale(QLocale.Language.English))
+                self.inputs["time_oa"].setLocale(QLocale(QLocale.Language.English))
             layout.addWidget(QLabel(label))
-            layout.addWidget(self.inputs["datetime_oa"])
+            layout.addWidget(self.inputs["time_oa"])
         else:
             # Operativos: mantener UTC
             if ts:
-                dt_utc = QDateTime.fromSecsSinceEpoch(int(ts), Qt.TimeSpec.UTC)
+                py_dt_utc = datetime.datetime.fromtimestamp(
+                    int(ts), tz=datetime.timezone.utc
+                )
             else:
-                dt_utc = QDateTime.currentDateTimeUtc()
+                py_dt_utc = datetime.datetime.now(datetime.timezone.utc)
             label = translation_service.tr("edit_contact_datetime_utc")
-            self.inputs["datetime_utc"] = QDateTimeEdit(dt_utc, self)
-            self.inputs["datetime_utc"].setDisplayFormat(date_fmt)
-            self.inputs["datetime_utc"].setTimeSpec(Qt.TimeSpec.UTC)
+            # Guardar fecha UTC base para conservarla al aceptar
+            self._date_utc = py_dt_utc.date()
+            qt_time = QTime(py_dt_utc.hour, py_dt_utc.minute, py_dt_utc.second)
+            self.inputs["time_utc"] = QTimeEdit(qt_time, self)
+            self.inputs["time_utc"].setDisplayFormat(time_fmt)
+            self.inputs["time_utc"].setTimeSpec(Qt.TimeSpec.UTC)
             # Ajustar locale Qt para el widget
             if lang == LanguageValue.ES:
-                self.inputs["datetime_utc"].setLocale(QLocale(QLocale.Language.Spanish))
+                self.inputs["time_utc"].setLocale(QLocale(QLocale.Language.Spanish))
             else:
-                self.inputs["datetime_utc"].setLocale(QLocale(QLocale.Language.English))
+                self.inputs["time_utc"].setLocale(QLocale(QLocale.Language.English))
             layout.addWidget(QLabel(label))
-            layout.addWidget(self.inputs["datetime_utc"])
+            layout.addWidget(self.inputs["time_utc"])
         # Botones
         btns = QHBoxLayout()
         btn_ok = QPushButton(translation_service.tr("accept_button"), self)
@@ -319,30 +323,48 @@ class ContactEditDialog(QDialog):
                     ]
                     result[k] = keys[widget.currentIndex()]
             elif (
-                k == "datetime_oa"
+                k == "time_oa"
                 and self.log_type == LogType.CONTEST_LOG
-                and isinstance(widget, QDateTimeEdit)
+                and isinstance(widget, QTimeEdit)
             ):
-                # Convertir QDateTime a datetime.datetime antes de sumar timedelta
-                dt_oa_dt = widget.dateTime().toPython()
-                import datetime as dtmod
-
-                if isinstance(dt_oa_dt, dtmod.datetime):
-                    dt_utc = dt_oa_dt + dtmod.timedelta(hours=5)
-                    ts = int(dt_utc.replace(tzinfo=dtmod.timezone.utc).timestamp())
-                    result["timestamp"] = ts
-                else:
-                    # Si no es datetime, intentar convertir
-                    dt_oa_dt = dtmod.datetime.fromisoformat(str(dt_oa_dt))
-                    dt_utc = dt_oa_dt + dtmod.timedelta(hours=5)
-                    ts = int(dt_utc.replace(tzinfo=dtmod.timezone.utc).timestamp())
-                    result["timestamp"] = ts
+                # Combinar la fecha OA base con la hora editada y convertir a UTC
+                qtime = widget.time()
+                base_date = getattr(self, "_date_oa", None)
+                if base_date is None:
+                    # Fallback: hoy en OA
+                    now_utc = datetime.datetime.now(datetime.timezone.utc)
+                    base_date = (now_utc - datetime.timedelta(hours=5)).date()
+                dt_oa_dt = datetime.datetime(
+                    base_date.year,
+                    base_date.month,
+                    base_date.day,
+                    qtime.hour(),
+                    qtime.minute(),
+                    qtime.second(),
+                )
+                dt_utc = dt_oa_dt + datetime.timedelta(hours=5)
+                ts = int(dt_utc.replace(tzinfo=datetime.timezone.utc).timestamp())
+                result["timestamp"] = ts
             elif (
-                k == "datetime_utc"
+                k == "time_utc"
                 and self.log_type == LogType.OPERATION_LOG
-                and isinstance(widget, QDateTimeEdit)
+                and isinstance(widget, QTimeEdit)
             ):
-                ts = widget.dateTime().toSecsSinceEpoch()
+                # Combinar la fecha UTC base con la hora editada
+                qtime = widget.time()
+                base_date = getattr(self, "_date_utc", None)
+                if base_date is None:
+                    base_date = datetime.datetime.now(datetime.timezone.utc).date()
+                dt_utc_dt = datetime.datetime(
+                    base_date.year,
+                    base_date.month,
+                    base_date.day,
+                    qtime.hour(),
+                    qtime.minute(),
+                    qtime.second(),
+                    tzinfo=datetime.timezone.utc,
+                )
+                ts = int(dt_utc_dt.timestamp())
                 result["timestamp"] = ts
         self.result_contact = result
         super().accept()

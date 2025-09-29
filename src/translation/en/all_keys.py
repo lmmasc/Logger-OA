@@ -231,7 +231,7 @@ UI_TRANSLATIONS = {
     "operator_not_found_msg": "The callsign does not exist in the database. Do you want to add it as a new operator?",
     "edit_contact_dialog_title": "Edit Contact",
     "cancel_button": "Cancel",
-    "edit_contact_datetime_utc": "Time and date (UTC)",
+    "edit_contact_datetime_utc": "Time (UTC)",
     "export_db": "Export database",
     "export_log": "Export log",
     "select_export_format": "Select export format:",
