@@ -76,11 +76,13 @@ class LogFormWidget(QWidget):
             # RS_RX, intercambio recibido/enviado, RS_TX, observaciones
             self.rs_rx_input = QLineEdit(self)
             self.rs_rx_input.setText("59")
-            self.rs_rx_input.setFixedWidth(50)
             self.rs_rx_input.setSizePolicy(
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
             )
-            self.rs_rx_input.setValidator(QIntValidator(10, 99, self))
+            self.rs_rx_input.setValidator(QIntValidator(11, 59, self))
+            self.rs_rx_input.textChanged.connect(
+                lambda _: self._validate_widget(self.rs_rx_input)
+            )
             font_rs = self.rs_rx_input.font()
             font_rs.setPointSize(18)
             font_rs.setBold(True)
@@ -101,7 +103,10 @@ class LogFormWidget(QWidget):
             self.exchange_received_input.setSizePolicy(
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
             )
-            self.exchange_received_input.setValidator(QIntValidator(0, 999, self))
+            self.exchange_received_input.setValidator(QIntValidator(1, 999, self))
+            self.exchange_received_input.textChanged.connect(
+                lambda _: self._validate_widget(self.exchange_received_input)
+            )
             font_ex = self.exchange_received_input.font()
             font_ex.setPointSize(18)
             font_ex.setBold(True)
@@ -125,7 +130,10 @@ class LogFormWidget(QWidget):
             self.rs_tx_input.setSizePolicy(
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
             )
-            self.rs_tx_input.setValidator(QIntValidator(10, 99, self))
+            self.rs_tx_input.setValidator(QIntValidator(11, 59, self))
+            self.rs_tx_input.textChanged.connect(
+                lambda _: self._validate_widget(self.rs_tx_input)
+            )
             font_rs_tx = self.rs_tx_input.font()
             font_rs_tx.setPointSize(18)
             font_rs_tx.setBold(True)
@@ -146,7 +154,10 @@ class LogFormWidget(QWidget):
             self.exchange_sent_input.setSizePolicy(
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
             )
-            self.exchange_sent_input.setValidator(QIntValidator(0, 999, self))
+            self.exchange_sent_input.setValidator(QIntValidator(1, 999, self))
+            self.exchange_sent_input.textChanged.connect(
+                lambda _: self._validate_widget(self.exchange_sent_input)
+            )
             font_ex_sent = self.exchange_sent_input.font()
             font_ex_sent.setPointSize(18)
             font_ex_sent.setBold(True)
@@ -234,6 +245,11 @@ class LogFormWidget(QWidget):
             self.power_input.setSizePolicy(
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
             )
+            # Potencia: solo números 1..9999
+            self.power_input.setValidator(QIntValidator(1, 9999, self))
+            self.power_input.textChanged.connect(
+                lambda _: self._validate_widget(self.power_input)
+            )
             power_label = QLabel(f"{translation_service.tr('power')} (W)")
             power_label.setAlignment(
                 Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
@@ -251,7 +267,10 @@ class LogFormWidget(QWidget):
             self.rs_rx_input.setSizePolicy(
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
             )
-            self.rs_rx_input.setValidator(QIntValidator(10, 99, self))
+            self.rs_rx_input.setValidator(QIntValidator(11, 59, self))
+            self.rs_rx_input.textChanged.connect(
+                lambda _: self._validate_widget(self.rs_rx_input)
+            )
             rs_rx_label = QLabel(translation_service.tr("rs_rx"))
             rs_rx_label.setAlignment(
                 Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
@@ -269,7 +288,10 @@ class LogFormWidget(QWidget):
             self.rs_tx_input.setSizePolicy(
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
             )
-            self.rs_tx_input.setValidator(QIntValidator(10, 99, self))
+            self.rs_tx_input.setValidator(QIntValidator(11, 59, self))
+            self.rs_tx_input.textChanged.connect(
+                lambda _: self._validate_widget(self.rs_tx_input)
+            )
             rs_tx_label = QLabel(translation_service.tr("rs_tx"))
             rs_tx_label.setAlignment(
                 Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
@@ -303,6 +325,47 @@ class LogFormWidget(QWidget):
         )
         main_layout.addWidget(form_row_widget)
         self.setLayout(main_layout)
+        # Validación inicial para mostrar estado inválido en campos vacíos o fuera de rango
+        self._initial_validate_fields()
+
+    def _validate_widget(self, widget: QLineEdit):
+        validator = widget.validator()
+        text = widget.text().strip()
+        invalid = False
+        if isinstance(validator, QIntValidator):
+            if text == "":
+                invalid = True
+            else:
+                try:
+                    val = int(text)
+                    invalid = not (validator.bottom() <= val <= validator.top())
+                except ValueError:
+                    invalid = True
+        widget.setProperty("invalid", invalid)
+        widget.style().unpolish(widget)
+        widget.style().polish(widget)
+
+    def _initial_validate_fields(self):
+        # Campos a validar según tipo de log
+        widgets = []
+        if self.log_type == LogType.CONTEST_LOG:
+            widgets = [
+                getattr(self, "rs_rx_input", None),
+                getattr(self, "exchange_received_input", None),
+                getattr(self, "rs_tx_input", None),
+                getattr(self, "exchange_sent_input", None),
+            ]
+        else:
+            widgets = [
+                getattr(self, "station_input", None),  # ignorado (no QLineEdit)
+                getattr(self, "energy_input", None),  # ignorado (no QLineEdit)
+                getattr(self, "power_input", None),
+                getattr(self, "rs_rx_input", None),
+                getattr(self, "rs_tx_input", None),
+            ]
+        for w in widgets:
+            if isinstance(w, QLineEdit):
+                self._validate_widget(w)
 
     def _setup_tab_order(self):
         """
