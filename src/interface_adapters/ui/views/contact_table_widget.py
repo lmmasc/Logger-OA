@@ -1,3 +1,6 @@
+# --- Imports de la librería estándar ---
+import datetime
+
 # --- Imports de terceros ---
 from PySide6.QtWidgets import (
     QWidget,
@@ -131,7 +134,6 @@ class ContactTableWidget(QWidget):
             keys = [col["key"] for col in self.LOG_OPERATIVE_COLUMNS]
         self.table.setRowCount(len(display_contacts))
         self.table.setColumnCount(len(keys))
-        import datetime
 
         time_fmt = "%H:%M"
 
@@ -156,9 +158,15 @@ class ContactTableWidget(QWidget):
                     ts = contact.get("timestamp", None)
                     value = ""
                     if ts:
-                        value = datetime.datetime.fromtimestamp(
+                        dt_utc = datetime.datetime.fromtimestamp(
                             int(ts), tz=datetime.timezone.utc
-                        ).strftime(time_fmt)
+                        )
+                        # Convertir a hora OA (UTC-5) para comparar fechas
+                        dt_oa = dt_utc - datetime.timedelta(hours=5)
+                        value = dt_utc.strftime(time_fmt)
+                        # Si la fecha en OA difiere de la UTC, marcar con '*'
+                        if dt_oa.date() != dt_utc.date():
+                            value += "*"
                 elif key in ("station", "energy"):
                     val = contact.get(key, "")
                     if val == "no_data":  # Valor por defecto para "no data"
