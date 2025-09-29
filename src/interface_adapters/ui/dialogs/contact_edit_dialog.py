@@ -202,7 +202,7 @@ class ContactEditDialog(QDialog):
             layout.addWidget(self.inputs["datetime_utc"])
         # Botones
         btns = QHBoxLayout()
-        btn_ok = QPushButton(translation_service.tr("ok_button"), self)
+        btn_ok = QPushButton(translation_service.tr("accept_button"), self)
         btn_cancel = QPushButton(translation_service.tr("cancel_button"), self)
         btn_ok.clicked.connect(self.accept)
         btn_cancel.clicked.connect(self.reject)
