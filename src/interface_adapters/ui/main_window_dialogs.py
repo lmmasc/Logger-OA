@@ -22,7 +22,9 @@ def show_about_dialog(self):
     """
     base_msg = translation_service.tr("about_message")
     # Agregar versión de la app en el mensaje
-    version_line = f"\n\n{APP_NAME} v{APP_VERSION}"
+    # Evitar 'vv' si APP_VERSION ya incluye prefijo 'v'
+    v = str(APP_VERSION).lstrip().lstrip("vV")
+    version_line = f"\n\n{APP_NAME} v{v}"
     QMessageBox.information(
         self,
         translation_service.tr("about"),

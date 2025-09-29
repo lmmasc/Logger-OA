@@ -374,7 +374,9 @@ class MainWindow(QMainWindow):
             except Exception:
                 version = ""
         if include_version and version:
-            self.setWindowTitle(f"{base_title} v{version}")
+            # Evitar 'vv' si APP_VERSION ya incluye prefijo 'v'
+            v = version.lstrip().lstrip("vV")
+            self.setWindowTitle(f"{base_title} v{v}")
         else:
             self.setWindowTitle(base_title)
 
