@@ -176,8 +176,11 @@ def action_log_open_operativo(self):
         self.current_log = None
         self.current_log_type = None
         self.show_view(ViewID.WELCOME_VIEW)
-        # Restaurar título original
-        self.setWindowTitle(translation_service.tr("main_window_title"))
+        # Restaurar título original con versión
+        if hasattr(self, "set_window_title"):
+            self.set_window_title(translation_service.tr("main_window_title"))
+        else:
+            self.setWindowTitle(translation_service.tr("main_window_title"))
     self.update_menu_state()
 
 
@@ -225,8 +228,11 @@ def action_log_open_concurso(self):
         self.current_log = None
         self.current_log_type = None
         self.show_view(ViewID.WELCOME_VIEW)
-        # Restaurar título original
-        self.setWindowTitle(translation_service.tr("main_window_title"))
+        # Restaurar título original con versión
+        if hasattr(self, "set_window_title"):
+            self.set_window_title(translation_service.tr("main_window_title"))
+        else:
+            self.setWindowTitle(translation_service.tr("main_window_title"))
     self.update_menu_state()
 
 
@@ -449,7 +455,10 @@ def action_log_close(self):
     self.current_log = None
     self.current_log_type = None
     self.show_view(ViewID.WELCOME_VIEW)
-    self.setWindowTitle(translation_service.tr("main_window_title"))
+    if hasattr(self, "set_window_title"):
+        self.set_window_title(translation_service.tr("main_window_title"))
+    else:
+        self.setWindowTitle(translation_service.tr("main_window_title"))
     self.update_menu_state()
 
 

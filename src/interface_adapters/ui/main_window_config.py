@@ -60,7 +60,11 @@ def update_language_menu_checks(self) -> None:
 
 
 def refresh_ui(self) -> None:
-    self.setWindowTitle(translation_service.tr("main_window_title"))
+    base_title = translation_service.tr("main_window_title")
+    if hasattr(self, "set_window_title"):
+        self.set_window_title(base_title)
+    else:
+        self.setWindowTitle(base_title)
     if hasattr(self.menu_bar, "retranslate_ui"):
         self.menu_bar.retranslate_ui()
     for view in self.view_manager.views.values():
@@ -75,7 +79,11 @@ def refresh_ui(self) -> None:
 
 
 def retranslate_ui(self) -> None:
-    self.setWindowTitle(translation_service.tr("main_window_title"))
+    base_title = translation_service.tr("main_window_title")
+    if hasattr(self, "set_window_title"):
+        self.set_window_title(base_title)
+    else:
+        self.setWindowTitle(base_title)
     if hasattr(self.menu_bar, "retranslate_ui"):
         self.menu_bar.retranslate_ui()
     for view in self.view_manager.views.values():

@@ -3,6 +3,11 @@
 
 cd "$(dirname "$0")/.."
 rm -f LoggerOA.spec
+
+# Generar version.py desde git (fallback a 0.0.0-dev)
+GIT_VERSION=$(git describe --tags --always --dirty 2>/dev/null || echo "0.0.0-dev")
+echo "APP_NAME = \"Logger OA\"" > src/version.py
+echo "APP_VERSION = \"${GIT_VERSION}\"" >> src/version.py
 # Incluir recursos y módulos necesarios en el binario
 .venv-linux/bin/pyinstaller src/main.py \
   --onefile \

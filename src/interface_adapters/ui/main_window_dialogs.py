@@ -13,16 +13,20 @@ from PySide6.QtWidgets import (
 from utils.resources import get_resource_path
 from translation.translation_service import translation_service
 import markdown
+from version import APP_VERSION, APP_NAME
 
 
 def show_about_dialog(self):
     """
     Muestra un cuadro de diálogo con información sobre la aplicación.
     """
+    base_msg = translation_service.tr("about_message")
+    # Agregar versión de la app en el mensaje
+    version_line = f"\n\n{APP_NAME} v{APP_VERSION}"
     QMessageBox.information(
         self,
         translation_service.tr("about"),
-        translation_service.tr("about_message"),
+        base_msg + version_line,
     )
 
 

@@ -3,6 +3,14 @@ REM Script para generar el ejecutable en Windows
 
 cd /d %~dp0\..
 del /F LoggerOA.spec
+REM Generar src\version.py desde git (fallback a 0.0.0-dev)
+for /f "delims=" %%a in ('git describe --tags --always --dirty 2^>NUL') do set GIT_VERSION=%%a
+if "%GIT_VERSION%"=="" set GIT_VERSION=0.0.0-dev
+(
+  echo APP_NAME = "Logger OA"
+  echo APP_VERSION = "%GIT_VERSION%"
+) > src\version.py
+
 .venv-windows\Scripts\pyinstaller src\main.py ^
   --windowed ^
   --onefile ^

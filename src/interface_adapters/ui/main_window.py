@@ -75,6 +75,7 @@ class MainWindow(QMainWindow):
         # Icono multiplataforma
         from PySide6.QtGui import QIcon
         import sys
+        from version import APP_VERSION
 
         if sys.platform.startswith("win"):
             self.setWindowIcon(QIcon(get_resource_path("assets/app_icon.ico")))
@@ -93,7 +94,11 @@ class MainWindow(QMainWindow):
         )
         lang_enum = LanguageValue(lang)
         translation_service.set_language(lang_enum)
-        self.setWindowTitle(translation_service.tr("main_window_title"))
+        # Título con versión
+        base_title = translation_service.tr("main_window_title")
+        # Guardar versión y usar helper para setear el título
+        self._app_version = APP_VERSION
+        self.set_window_title(base_title)
         self.resize(1200, 700)
         self.center()
 
@@ -134,6 +139,10 @@ class MainWindow(QMainWindow):
         Muestra la vista indicada y actualiza datos de contactos y cabecera si hay log abierto.
         """
         self.view_manager.show_view(view_id)
+        # Al volver a la vista de bienvenida, restaurar el título base con versión
+        if view_id == ViewID.WELCOME_VIEW:
+            base_title = translation_service.tr("main_window_title")
+            self.set_window_title(base_title)
         if self.current_log is not None:
             contacts = getattr(self.current_log, "contacts", [])
             if view_id == ViewID.LOG_OPS_VIEW and hasattr(
@@ -349,6 +358,25 @@ class MainWindow(QMainWindow):
         if hasattr(self, "manual_window") and self.manual_window is not None:
             self.manual_window.close()
         super().closeEvent(event)
+
+    def set_window_title(self, base_title: str) -> None:
+        """Setea el título de la ventana principal agregando la versión al final.
+
+        Debe usarse en lugar de setWindowTitle en el resto de la app para
+        conservar el sufijo de versión al cambiar vistas o idioma.
+        """
+        version = getattr(self, "_app_version", None)
+        if not version:
+            try:
+                from version import APP_VERSION as _V
+
+                version = _V
+            except Exception:
+                version = ""
+        if version:
+            self.setWindowTitle(f"{base_title} v{version}")
+        else:
+            self.setWindowTitle(base_title)
 
     def _on_language_changed(self):
         """

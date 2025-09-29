@@ -320,8 +320,11 @@ class LogOpsView(QWidget):
         # Solo actualizar el título de la ventana principal si la vista está visible
 
         main_window = find_main_window(self)
-        if self.isVisible() and main_window and hasattr(main_window, "setWindowTitle"):
-            main_window.setWindowTitle(header_text)
+        if self.isVisible() and main_window:
+            if hasattr(main_window, "set_window_title"):
+                main_window.set_window_title(header_text)
+            else:
+                main_window.set_window_title(header_text)
 
     def _on_suggestion_selected(self, base_callsign):
         """
