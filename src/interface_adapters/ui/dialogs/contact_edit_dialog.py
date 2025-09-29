@@ -16,6 +16,7 @@ from PySide6.QtWidgets import (
     QDateTimeEdit,
 )
 from PySide6.QtCore import QDateTime, Qt, QLocale
+from PySide6.QtGui import QIntValidator
 
 # --- Imports de la aplicación ---
 from translation.translation_service import translation_service
@@ -102,14 +103,20 @@ class ContactEditDialog(QDialog):
             layout.addWidget(self.inputs["energy"])
             self.inputs["power"] = QLineEdit(self)
             self.inputs["power"].setText(str(contact.get("power", "")))
+            # Potencia: solo números 1..9999
+            self.inputs["power"].setValidator(QIntValidator(1, 9999, self))
             layout.addWidget(QLabel(translation_service.tr("power") + " (W)"))
             layout.addWidget(self.inputs["power"])
             self.inputs["rs_rx"] = QLineEdit(self)
             self.inputs["rs_rx"].setText(str(contact.get("rs_rx", "")))
+            # RS (RX): solo números de 2 dígitos 11..59
+            self.inputs["rs_rx"].setValidator(QIntValidator(11, 59, self))
             layout.addWidget(QLabel(translation_service.tr("rs_rx")))
             layout.addWidget(self.inputs["rs_rx"])
             self.inputs["rs_tx"] = QLineEdit(self)
             self.inputs["rs_tx"].setText(str(contact.get("rs_tx", "")))
+            # RS (TX): solo números de 2 dígitos 11..59
+            self.inputs["rs_tx"].setValidator(QIntValidator(11, 59, self))
             layout.addWidget(QLabel(translation_service.tr("rs_tx")))
             layout.addWidget(self.inputs["rs_tx"])
             self.inputs["obs"] = QLineEdit(self)
@@ -120,20 +127,28 @@ class ContactEditDialog(QDialog):
             # Orden: indicativo, RS_RX, intercambio recibido, RS_TX, intercambio enviado
             self.inputs["rs_rx"] = QLineEdit(self)
             self.inputs["rs_rx"].setText(str(contact.get("rs_rx", "")))
+            # RS (RX): solo números de 2 dígitos 11..59
+            self.inputs["rs_rx"].setValidator(QIntValidator(11, 59, self))
             layout.addWidget(QLabel(translation_service.tr("rs_rx")))
             layout.addWidget(self.inputs["rs_rx"])
             self.inputs["exchange_received"] = QLineEdit(self)
             self.inputs["exchange_received"].setText(
                 contact.get("exchange_received", "")
             )
+            # Intercambio recibido: solo números 1..999
+            self.inputs["exchange_received"].setValidator(QIntValidator(1, 999, self))
             layout.addWidget(QLabel(translation_service.tr("exchange_received")))
             layout.addWidget(self.inputs["exchange_received"])
             self.inputs["rs_tx"] = QLineEdit(self)
             self.inputs["rs_tx"].setText(str(contact.get("rs_tx", "")))
+            # RS (TX): solo números de 2 dígitos 11..59
+            self.inputs["rs_tx"].setValidator(QIntValidator(11, 59, self))
             layout.addWidget(QLabel(translation_service.tr("rs_tx")))
             layout.addWidget(self.inputs["rs_tx"])
             self.inputs["exchange_sent"] = QLineEdit(self)
             self.inputs["exchange_sent"].setText(contact.get("exchange_sent", ""))
+            # Intercambio enviado: solo números 1..999
+            self.inputs["exchange_sent"].setValidator(QIntValidator(1, 999, self))
             layout.addWidget(QLabel(translation_service.tr("exchange_sent")))
             layout.addWidget(self.inputs["exchange_sent"])
             # Agregar campo de observaciones para concursos
