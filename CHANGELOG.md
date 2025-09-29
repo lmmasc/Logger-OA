@@ -18,17 +18,22 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 - Botones de diálogos estandarizados a “Aceptar/Cancelar”.
 - Estilo de cabeceras de tablas: ajuste de tamaño de letra y padding horizontal.
 - Manejo del título de la ventana unificado mediante helper para preservar el sufijo de versión al cambiar de vista/idioma/tema.
+ - Títulos de vistas de logs (operativos/concursos): ahora muestran hora antes que fecha (formato `HH:MM dd/mm/YYYY`).
+ - Vistas de logs: el título ya no incluye el sufijo de versión de la app.
 
 ### Fixed
 - Carga de fechas en diálogo de edición: normalización de timestamps en texto a int/None.
 - Correcciones menores de indentación y estabilidad en formularios.
 - Ajustes en pruebas y configuración para evitar conflictos de Pylance en imports.
+ - Tabla operativos: marcar con `*` la hora UTC cuando su fecha difiere de la fecha OA.
+ - Formulario concursos: corrección del ancho del campo RS (RX).
 
 ### Docs
 - Actualización de documentación de importación (PDF PERÚ/URUGUAY, Excel ARG/CHL y CSV) y atajos de teclado.
 
 ### Build
 - Scripts de build: generación de versión desde git, limpieza del spec en Linux y mejoras de empaquetado.
+ - Refactor: eliminación de setlocale innecesario en tabla de contactos.
 
 ## [1.0.0] - 2025-09-26
 ### Added
