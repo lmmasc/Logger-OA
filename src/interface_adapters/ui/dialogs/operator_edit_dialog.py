@@ -189,8 +189,8 @@ class OperatorEditDialog(QDialog):
         country_combo.currentIndexChanged.connect(self._on_country_changed)
         # Botones y estado inicial
         btns = QHBoxLayout()
-        btn_ok = QPushButton(translation_service.tr("yes_button"))
-        btn_cancel = QPushButton(translation_service.tr("no_button"))
+        btn_ok = QPushButton(translation_service.tr("accept_button"))
+        btn_cancel = QPushButton(translation_service.tr("cancel_button"))
         btns.addWidget(btn_ok)
         btns.addWidget(btn_cancel)
         layout.addLayout(btns)

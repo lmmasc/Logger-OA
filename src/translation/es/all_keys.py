@@ -166,6 +166,7 @@ UI_TRANSLATIONS = {
     "no": "NO",
     "yes_button": "Sí",
     "no_button": "No",
+    "accept_button": "Aceptar",
     "select_log_type": "Selecciona el tipo de log",
     "log_type_ops": "Log de operación",
     "log_type_contest": "Log de concurso",

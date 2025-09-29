@@ -180,6 +180,7 @@ UI_TRANSLATIONS = {
     "no": "NO",
     "yes_button": "Yes",
     "no_button": "No",
+    "accept_button": "Accept",
     "select_log_type": "Select log type",
     "log_type_ops": "Operation log",
     "log_type_contest": "Contest log",
