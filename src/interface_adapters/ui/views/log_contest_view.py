@@ -307,7 +307,8 @@ class LogContestView(QWidget):
             try:
                 dt_utc = datetime.fromtimestamp(int(dt), tz=timezone.utc)
                 dt_peru = dt_utc - timedelta(hours=5)
-                log_date = dt_peru.strftime("%d/%m/%Y %H:%M")
+                # Mostrar hora y luego fecha
+                log_date = dt_peru.strftime("%H:%M %d/%m/%Y")
             except Exception:
                 log_date = str(dt)
         header_text = f"{callsign} - {contest_name} - {log_date}"

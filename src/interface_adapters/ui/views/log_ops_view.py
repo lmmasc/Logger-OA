@@ -304,7 +304,8 @@ class LogOpsView(QWidget):
 
             dt_utc = datetime.fromtimestamp(log.start_time, tz=timezone.utc)
             dt_peru = dt_utc - timedelta(hours=5)
-            log_date = dt_peru.strftime("%d/%m/%Y %H:%M")
+            # Mostrar hora y luego fecha
+            log_date = dt_peru.strftime("%H:%M %d/%m/%Y")
         show_freq = True
         if frequency_band.lower() == translation_service.tr("vhf").lower():
             repeater_key = meta.get("repeater_key", "")
