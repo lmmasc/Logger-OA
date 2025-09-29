@@ -76,6 +76,7 @@ class LogFormWidget(QWidget):
             # RS_RX, intercambio recibido/enviado, RS_TX, observaciones
             self.rs_rx_input = QLineEdit(self)
             self.rs_rx_input.setText("59")
+            self.rs_rx_input.setFixedWidth(50)
             self.rs_rx_input.setSizePolicy(
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
             )
