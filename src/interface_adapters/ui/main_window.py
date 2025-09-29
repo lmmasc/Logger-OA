@@ -359,11 +359,11 @@ class MainWindow(QMainWindow):
             self.manual_window.close()
         super().closeEvent(event)
 
-    def set_window_title(self, base_title: str) -> None:
-        """Setea el título de la ventana principal agregando la versión al final.
+    def set_window_title(self, base_title: str, include_version: bool = True) -> None:
+        """Setea el título de la ventana principal.
 
-        Debe usarse en lugar de setWindowTitle en el resto de la app para
-        conservar el sufijo de versión al cambiar vistas o idioma.
+        Por defecto agrega la versión al final. Para vistas de logs que no deben
+        mostrar la versión, pasar include_version=False.
         """
         version = getattr(self, "_app_version", None)
         if not version:
@@ -373,7 +373,7 @@ class MainWindow(QMainWindow):
                 version = _V
             except Exception:
                 version = ""
-        if version:
+        if include_version and version:
             self.setWindowTitle(f"{base_title} v{version}")
         else:
             self.setWindowTitle(base_title)

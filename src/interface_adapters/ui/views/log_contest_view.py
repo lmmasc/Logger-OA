@@ -317,9 +317,9 @@ class LogContestView(QWidget):
         main_window = find_main_window(self)
         if self.isVisible() and main_window:
             if hasattr(main_window, "set_window_title"):
-                main_window.set_window_title(header_text)
+                main_window.set_window_title(header_text, include_version=False)
             else:
-                main_window.set_window_title(header_text)
+                main_window.setWindowTitle(header_text)
 
     def _on_suggestion_selected(self, base_callsign):
         """
