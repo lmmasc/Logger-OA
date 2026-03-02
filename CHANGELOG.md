@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [1.2.0] - 2026-03-02
+### Added
+- Exportación ADIF actualizada: se agrega el campo <OPERATOR> en cada registro y se actualiza la versión del estándar a 3.1.6, cumpliendo la especificación oficial.
+- Mejora en la exportación de texto para WhatsApp: formato enriquecido con tipo de log, modo, repetidor/frecuencia y operador, usando claves de traducción dedicadas.
+
+### Changed
+- Exportador ADIF ahora incluye <OPERATOR> y usa la versión 3.1.6 en el encabezado.
+- WhatsApp export: el texto ahora utiliza la clave de traducción 'operator_label' para el operador.
+
+### Docs
+- Documentación actualizada sobre exportación ADIF y formato de texto para WhatsApp.
+
 ## [1.1.0] - 2025-09-29
 ### Added
 - Edición de hora solamente en ContactEditDialog (QTimeEdit) para QTR OA/UTC, preservando la fecha al guardar.
@@ -49,5 +61,8 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 - Sistema de traducciones modular.
 - Pruebas con pytest.
 
-[1.1.0]: https://github.com/lmmasc/Logger-OA/compare/v1.0.0...v1.1.0
+[NOTA]: La versión 1.2.0 aún no ha sido publicada como release oficial; los cambios están disponibles únicamente en el código fuente.
+
+[1.2.0]: https://github.com/lmmasc/Logger-OA/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/lmmasc/Logger-OA/releases/tag/v1.1.0
 [1.0.0]: https://github.com/lmmasc/Logger-OA/releases/tag/v1.0.0

@@ -360,7 +360,7 @@ def export_log_to_adi(db_path: str, export_path: str) -> str:
     # Generar ADIF
     adif_lines = []
     adif_lines.append(
-        f"<ADIF_VER:5>3.1.0 <STATION_CALLSIGN:{len(operator)}>{operator} <EOH>"
+        f"<ADIF_VER:5>3.1.6 <STATION_CALLSIGN:{len(operator)}>{operator} <EOH>"
     )
     for contact in contacts:
         # Campos mínimos
@@ -382,13 +382,14 @@ def export_log_to_adi(db_path: str, export_path: str) -> str:
             mode = mode_meta
         rst_sent = contact.get("rs_tx", "") or contact.get("exchange_sent", "")
         rst_rcvd = contact.get("rs_rx", "") or contact.get("exchange_received", "")
-        # Construir línea ADIF
+        # Construir línea ADIF con OPERATOR
         adif_entry = (
             f"<CALL:{len(callsign)}>{callsign} "
             f"<QSO_DATE:{len(qso_date)}>{qso_date} "
             f"<TIME_ON:{len(time_on)}>{time_on} "
             f"<BAND:{len(band)}>{band} "
             f"<MODE:{len(mode)}>{mode} "
+            f"<OPERATOR:{len(operator)}>{operator} "
             f"<RST_SENT:{len(rst_sent)}>{rst_sent} "
             f"<RST_RCVD:{len(rst_rcvd)}>{rst_rcvd} <EOR>"
         )
