@@ -9,7 +9,7 @@ GIT_VERSION=$(git describe --tags --always --dirty 2>/dev/null || echo "0.0.0-de
 echo "APP_NAME = \"Logger OA\"" > src/version.py
 echo "APP_VERSION = \"${GIT_VERSION}\"" >> src/version.py
 # Incluir recursos y módulos necesarios en el binario
-.venv-mac/bin/pyinstaller src/main.py \
+.venv/bin/pyinstaller src/main.py \
   --name LoggerOA \
   --windowed \
   --onefile \

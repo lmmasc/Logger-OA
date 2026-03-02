@@ -11,7 +11,7 @@ if "%GIT_VERSION%"=="" set GIT_VERSION=0.0.0-dev
   echo APP_VERSION = "%GIT_VERSION%"
 ) > src\version.py
 
-.venv-windows\Scripts\pyinstaller src\main.py ^
+.venv\Scripts\pyinstaller src\main.py ^
   --windowed ^
   --onefile ^
   --name LoggerOA ^
