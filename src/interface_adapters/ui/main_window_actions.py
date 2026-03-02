@@ -481,7 +481,22 @@ def action_log_export_simple_text(self):
             "No hay contactos en el log actual.",
         )
         return
-    # Generar texto formateado tipo tabla para WhatsApp y depuración
+    # --- NUEVO BLOQUE: encabezado con tipo, banda, modo y repetidora/frecuencia ---
+    meta = getattr(self.current_log, "metadata", {})
+    tipo = translation_service.tr(meta.get("operation_type", "")) if meta else ""
+    banda = translation_service.tr(meta.get("frequency_band", "")) if meta else ""
+    modo = translation_service.tr(meta.get("mode_key", "")) if meta else ""
+    repetidora = translation_service.tr(meta.get("repeater_key", "")) if meta and meta.get("repeater_key") else ""
+    frecuencia = meta.get("frequency", "") if meta else ""
+
+    # Construir encabezado: tipo, banda, modo, repetidora/frecuencia
+    encabezado = " ".join(
+        filter(
+            None,
+            [tipo, banda, modo, repetidora if repetidora and repetidora != translation_service.tr("rep_simplex") else frecuencia],
+        )
+    )
+
     # Calcular el ancho máximo del indicativo
     indicativos = []
     for contact in contacts:
@@ -491,11 +506,14 @@ def action_log_export_simple_text(self):
             indicativos.append(getattr(contact, "callsign", "-"))
     max_callsign_len = max(len(str(i)) for i in indicativos) if indicativos else 10
 
-    # Encabezado con columnas alineadas
+    # Encabezado con columnas alineadas y operador en la segunda línea
     header_num = "Nº"
     header_callsign = translation_service.tr("log_operative_table_header_callsign")
     header_name = translation_service.tr("log_operative_table_header_name")
-    lines = [f"{header_num:>2}  {header_callsign:<{max_callsign_len}}  {header_name}"]
+    operador = getattr(self.current_log, "operator", "-")
+    operador_label = translation_service.tr("operator_label") if hasattr(translation_service, 'tr') else "Operador"
+    operador_line = f"{operador_label}: {operador}"
+    lines = [encabezado, operador_line, f"{header_num:>2}  {header_callsign:<{max_callsign_len}}  {header_name}"]
 
     # Filas alineadas
     for idx, contact in enumerate(contacts, 1):

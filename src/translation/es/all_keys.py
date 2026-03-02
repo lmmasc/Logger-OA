@@ -289,6 +289,7 @@ UI_TRANSLATIONS = {
     "add_contact": "Agregar contacto",
     "edit_contact_dialog_title": "Editar contacto",
     "edit_operator": "Editar operador",
+    "operator_label": "Operador",
     "add_operator": "Agregar operador",
     "delete_operator": "Eliminar operador",
     "confirm_delete_operator": "¿Está seguro que desea eliminar el operador?",
