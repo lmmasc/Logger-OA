@@ -382,7 +382,7 @@ def export_log_to_adi(db_path: str, export_path: str) -> str:
             mode = mode_meta
         rst_sent = contact.get("rs_tx", "") or contact.get("exchange_sent", "")
         rst_rcvd = contact.get("rs_rx", "") or contact.get("exchange_received", "")
-        # Construir línea ADIF con OPERATOR
+        # Construir línea ADIF con OPERATOR y, si es concurso, STX_STRING/SRX_STRING
         adif_entry = (
             f"<CALL:{len(callsign)}>{callsign} "
             f"<QSO_DATE:{len(qso_date)}>{qso_date} "
@@ -391,8 +391,32 @@ def export_log_to_adi(db_path: str, export_path: str) -> str:
             f"<MODE:{len(mode)}>{mode} "
             f"<OPERATOR:{len(operator)}>{operator} "
             f"<RST_SENT:{len(rst_sent)}>{rst_sent} "
-            f"<RST_RCVD:{len(rst_rcvd)}>{rst_rcvd} <EOR>"
+            f"<RST_RCVD:{len(rst_rcvd)}>{rst_rcvd} "
         )
+        if log_type == LogType.CONTEST_LOG.value:
+            # Frecuencia según banda
+            freq = ""
+            if band == "40M":
+                freq = "7100"
+            elif band == "2M":
+                freq = "146000"
+            elif band == "70CM":
+                freq = "435000"
+            if freq:
+                adif_entry += f"<FREQ:{len(freq)}>{freq} "
+            # Intercambio enviado
+            rs_tx = str(contact.get("rs_tx", "")).zfill(2)
+            exchange_sent = str(contact.get("exchange_sent", "")).zfill(3)
+            stx_string = rs_tx + exchange_sent
+            # Intercambio recibido
+            rs_rx = str(contact.get("rs_rx", "")).zfill(2)
+            exchange_received = str(contact.get("exchange_received", "")).zfill(3)
+            srx_string = rs_rx + exchange_received
+            adif_entry += (
+                f"<STX_STRING:{len(stx_string)}>{stx_string} "
+                f"<SRX_STRING:{len(srx_string)}>{srx_string} "
+            )
+        adif_entry += "<EOR>"
         adif_lines.append(adif_entry)
     with open(export_path, "w", encoding="utf-8") as adif_file:
         adif_file.write("\n".join(adif_lines))
