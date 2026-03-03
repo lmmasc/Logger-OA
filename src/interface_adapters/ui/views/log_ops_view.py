@@ -253,6 +253,9 @@ class LogOpsView(QWidget):
             log: Objeto log con los datos a mostrar.
         """
         self._current_log = log
+        # Actualizar valores por defecto del formulario según la banda
+        if hasattr(self, "form_widget") and hasattr(self.form_widget, "_set_defaults_by_band"):
+            self.form_widget._set_defaults_by_band()
         self.retranslate_ui()
 
     def retranslate_ui(self):

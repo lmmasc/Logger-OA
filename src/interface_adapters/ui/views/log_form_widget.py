@@ -199,7 +199,7 @@ class LogFormWidget(QWidget):
                     translation_service.tr("station_portable"),
                 ]
             )
-            self.station_input.setCurrentIndex(0)
+            self.station_input.setCurrentIndex(3)  # Portátil
             self.station_input.setFixedWidth(120)
             self.station_input.setSizePolicy(
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
@@ -224,7 +224,7 @@ class LogFormWidget(QWidget):
                     translation_service.tr("energy_commercial"),
                 ]
             )
-            self.energy_input.setCurrentIndex(0)
+            self.energy_input.setCurrentIndex(2)  # Batería
             self.energy_input.setFixedWidth(120)
             self.energy_input.setSizePolicy(
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
@@ -241,7 +241,7 @@ class LogFormWidget(QWidget):
             form_row.addWidget(self.energy_input)
             self.energy_label = energy_label
             self.power_input = QLineEdit(self)
-            self.power_input.setText("1")
+            self.power_input.setText("5")
             self.power_input.setFixedWidth(60)
             self.power_input.setSizePolicy(
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
@@ -385,6 +385,27 @@ class LogFormWidget(QWidget):
             QWidget.setTabOrder(self.rs_rx_input, self.rs_tx_input)
             QWidget.setTabOrder(self.rs_tx_input, self.observations_input)
 
+    
+    def _set_defaults_by_band(self):
+        """
+        Asigna los valores por defecto de estación, energía y potencia según la banda seleccionada en el log operativo.
+        """
+        band_key = None
+        from interface_adapters.ui.utils import find_main_window
+        main_window = find_main_window(self)
+        if main_window and hasattr(main_window, "current_log") and main_window.current_log:
+            meta = getattr(main_window.current_log, "metadata", {})
+            band_key = meta.get("frequency_band", None)
+        # Indices: estación_base=1, estación_portátil=3, energía_batería=2, energía_comercial=3
+        if band_key == "band_hf":
+            self.station_input.setCurrentIndex(1)  # Base
+            self.energy_input.setCurrentIndex(3)   # Comercial
+            self.power_input.setText("100")
+        else:
+            self.station_input.setCurrentIndex(3)  # Portátil
+            self.energy_input.setCurrentIndex(2)   # Batería
+            self.power_input.setText("5")
+
     def get_data(self, callsign=None):
         """
         Obtiene los datos ingresados en el formulario y los retorna como diccionario.
@@ -408,9 +429,7 @@ class LogFormWidget(QWidget):
         if self.log_type == LogType.CONTEST_LOG:
             # --- Bloque de extracción de datos para concurso ---
             contact_id = str(uuid.uuid4())
-            timestamp = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
-            # Resolver operador usando lógica de prefijo/base/sufijo con SQLite
-            operator = find_operator_for_input(callsign_val)
+            self._set_defaults_by_band()
             name = operator.name if operator else "-"
             region = operator.region if operator else "-"
             data.update(
@@ -477,12 +496,7 @@ class LogFormWidget(QWidget):
     def reset_form_fields(self):
         """Reinicia los campos de estación, energía, potencia, RS y observaciones en modo operativo."""
         if self.log_type == LogType.OPERATION_LOG:
-            if hasattr(self, "station_input"):
-                self.station_input.setCurrentIndex(0)
-            if hasattr(self, "energy_input"):
-                self.energy_input.setCurrentIndex(0)
-            if hasattr(self, "power_input"):
-                self.power_input.setText("1")
+            #self._set_defaults_by_band()
             if hasattr(self, "rs_rx_input"):
                 self.rs_rx_input.setText("59")
             if hasattr(self, "rs_tx_input"):
