@@ -4,9 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
-
-## [Unreleased]
+## [1.2.0] - 2026-03-02
 ### Added
+- Exportación ADIF actualizada: se agrega el campo <OPERATOR> en cada registro y se actualiza la versión del estándar a 3.1.6, cumpliendo la especificación oficial.
+- Mejora en la exportación de texto para WhatsApp: formato enriquecido con tipo de log, modo, repetidor/frecuencia y operador, usando claves de traducción dedicadas.
+- En exportación ADIF de concursos, se agregan los campos <STX_STRING> y <SRX_STRING> con el intercambio completo (RS + correlativo, sin separador), cumpliendo el estándar.
+- En exportación ADIF de concursos, se agrega el campo <FREQ> con valor fijo según banda: 7100 (40m), 146000 (VHF/2m), 435000 (UHF/70cm) para compatibilidad con el calificador.
+- Los valores por defecto para los operativos ahora se asignan correctamente según la banda al abrir el log: HF (estación "base", energía "comercial", potencia 100), VHF/UHF (estación "portátil", energía "batería", potencia 5).
 - Base de compatibilidad para una rama legacy de Windows 7 x86: bootstrap Qt que permite mapear PySide2 como respaldo de PySide6 y recrea enums de Qt6 usados por la UI.
 - Archivos separados de dependencias para variante moderna y legacy.
 - Script y spec iniciales para build de la variante `win7-x86`.
@@ -14,8 +18,14 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 - Validaciones explícitas de Python 3.8 x86 en los scripts de setup y build legacy.
 
 ### Changed
+- Exportador ADIF ahora incluye <OPERATOR> y usa la versión 3.1.6 en el encabezado.
+- WhatsApp export: el texto ahora utiliza la clave de traducción 'operator_label' para el operador.
 - Toolchain legacy fijado para compatibilidad real de empaquetado: `pyinstaller==4.10` con `pyinstaller-hooks-contrib==2022.0`.
 - Dependencias legacy ajustadas para empaquetado estable con PyInstaller 4.10, fijando `charset-normalizer<3`.
+- `ThemeManager` ahora concatena explícitamente `base.qss` con el tema activo y fuerza `Fusion` para reducir variaciones visuales entre Windows modernos, Windows 7 legacy y otros escritorios.
+- Los diálogos de abrir/guardar archivo pasan a usar `QFileDialog` no nativo configurado por la aplicación para mantener consistencia visual con el sistema de temas.
+- El build moderno de Windows ahora valida `.venv`, informa la versión/arquitectura del intérprete, limpia artefactos previos y usa `LoggerOA.spec` como fuente de verdad en lugar de reconstruir el empaquetado inline.
+- `requirements.txt` queda como alias de `requirements-modern.txt`, consolidando la variante moderna en un único archivo base de dependencias.
 - La variante legacy vuelve a `PySide2/shiboken2 5.14.2.3` y el spec vuelve a `onefile`, eliminando la dependencia temporal en `PyQt5` para evitar la dualidad GPL/comercial en distribuciones legacy.
 - Bootstrap Qt legacy ampliado para mapear `exec_()` de Qt5 a `exec()` en `QApplication` y diálogos usados por la UI actual.
 - Build legacy ajustado para excluir `multiprocessing` y `concurrent.futures.process`, evitando el runtime hook `pyi_rth_multiprocessing` que fallaba en Windows 7 antes de arrancar la app.
@@ -28,24 +38,16 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 - Win7 x86 legacy experimental PyQt5: `qt_compat_bootstrap` ahora prepara tambien rutas de `PyQt5`, registra alias `sip -> PyQt5.sip` y deja de silenciar errores del backend legacy; si PyQt5 o PySide2 fallan al importar en Win7, el mensaje resultante ahora expone la causa real en vez de terminar solo con `ModuleNotFoundError: No module named 'PySide6'`.
 - Fixed legacy Win7 x86 PDF startup by pinning `cryptography==42.0.7` in the legacy requirements. `pdfminer.six` had been pulling `cryptography 46.x`, which fails on native Windows 7 during `_rust` import, while `42.0.7` is the last wheel line that explicitly restored Windows 7 compatibility.
 
-### Docs
-- Documentados los prerrequisitos de runtime para ejecutar la variante legacy en Windows 7 x86: SP1, KB2999226 y VC++ 2015 x86.
+### Fixed
+- Resaltado de selección en la tabla de operadores: los items seleccionados ahora aplican colores explícitos en ambos temas, evitando diferencias entre Windows 7 y Windows 11.
+- Campo de indicativo: se restablece de forma explícita `Roboto Mono` a `32pt` y en negrita en ambos temas, evitando que el estilo global reduzca el tamaño o pierda el peso tipográfico.
 
-
-## [1.2.0] - 2026-03-02
-### Added
-- Exportación ADIF actualizada: se agrega el campo <OPERATOR> en cada registro y se actualiza la versión del estándar a 3.1.6, cumpliendo la especificación oficial.
-- Mejora en la exportación de texto para WhatsApp: formato enriquecido con tipo de log, modo, repetidor/frecuencia y operador, usando claves de traducción dedicadas.
-- En exportación ADIF de concursos, se agregan los campos <STX_STRING> y <SRX_STRING> con el intercambio completo (RS + correlativo, sin separador), cumpliendo el estándar.
-- En exportación ADIF de concursos, se agrega el campo <FREQ> con valor fijo según banda: 7100 (40m), 146000 (VHF/2m), 435000 (UHF/70cm) para compatibilidad con el calificador.
-- Los valores por defecto para los operativos ahora se asignan correctamente según la banda al abrir el log: HF (estación "base", energía "comercial", potencia 100), VHF/UHF (estación "portátil", energía "batería", potencia 5).
-
-### Changed
-- Exportador ADIF ahora incluye <OPERATOR> y usa la versión 3.1.6 en el encabezado.
-- WhatsApp export: el texto ahora utiliza la clave de traducción 'operator_label' para el operador.
+### Build
+- Eliminado el archivo `requirements-dev.txt` obsoleto; la instalación moderna queda canalizada por `requirements-dev-modern.txt` y `requirements-modern.txt`.
 
 ### Docs
 - Documentación actualizada sobre exportación ADIF y formato de texto para WhatsApp.
+- Documentados los prerrequisitos de runtime para ejecutar la variante legacy en Windows 7 x86: SP1, KB2999226 y VC++ 2015 x86.
 
 ## [1.1.0] - 2025-09-29
 ### Added

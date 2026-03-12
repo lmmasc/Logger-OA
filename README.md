@@ -85,7 +85,7 @@ Si al abrir el ejecutable aparece el error `api-ms-win-crt-runtime-l1-1-0.dll`, 
 1. Clona el repositorio y accede a la carpeta del proyecto:
    ```bash
    git clone <URL_DEL_REPOSITORIO>
-   cd "Logger OA v2"
+  cd "Logger-OA"
    ```
 2. Crea y activa el entorno virtual correspondiente. Si solo trabajas con la variante moderna, usa el entorno moderno. Si además mantendrás Win7 x86, crea un segundo entorno dedicado para legacy.
 
@@ -103,8 +103,8 @@ Si al abrir el ejecutable aparece el error `api-ms-win-crt-runtime-l1-1-0.dll`, 
 
   **Windows (cmd):**
   ```cmd
-  python -m venv .venv-windows
-  .venv-windows\Scripts\activate
+  python -m venv .venv
+  .venv\Scripts\activate
   ```
 
   **Windows (PowerShell):**
@@ -239,9 +239,9 @@ Para Windows hay dos rutas distintas:
 - `build-windows.bat`: build moderno con el entorno `.venv`.
 - `build-windows-legacy.bat`: build legacy Win7 x86 con el entorno `.venv-win7-x86`.
 
-En la variante legacy Win7 x86 el resultado se genera como carpeta autocontenida `dist\LoggerOA-win7-x86\` con su ejecutable principal `LoggerOA-win7-x86.exe`. Esta variante usa `onedir` en lugar de `onefile` para evitar fallos de carga de DLLs de PySide2/shiboken2 en Windows 7.
+En la variante legacy Win7 x86 el resultado se genera como ejecutable `onefile` en `dist\LoggerOA-win7-x86.exe`, construido con `LoggerOA.win7-x86.spec` y el entorno `.venv-win7-x86`.
 
-No copies solo `LoggerOA-win7-x86.exe`: para ejecutar la variante legacy debes conservar toda la carpeta `LoggerOA-win7-x86` o distribuirla comprimida completa.
+En la variante moderna, `build-windows.bat` usa `LoggerOA.spec` como fuente de verdad del empaquetado y genera `dist\LoggerOA.exe`.
 
 
 ---
