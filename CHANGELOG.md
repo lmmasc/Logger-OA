@@ -10,7 +10,7 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 - Exportación ADIF actualizada: se agrega el campo <OPERATOR> en cada registro y se actualiza la versión del estándar a 3.1.6, cumpliendo la especificación oficial.
 - Mejora en la exportación de texto para WhatsApp: formato enriquecido con tipo de log, modo, repetidor/frecuencia y operador, usando claves de traducción dedicadas.
 - En exportación ADIF de concursos, se agregan los campos <STX_STRING> y <SRX_STRING> con el intercambio completo (RS + correlativo, sin separador), cumpliendo el estándar.
-- En exportación ADIF de concursos, se agrega el campo <FREQ> con valor fijo según banda: 7100 (40m), 146000 (VHF/2m), 435000 (UHF/70cm).
+- En exportación ADIF de concursos, se agrega el campo <FREQ> con valor fijo según banda: 7100 (40m), 146000 (VHF/2m), 435000 (UHF/70cm) para compatibilidad con el calificador.
 - Los valores por defecto para los operativos ahora se asignan correctamente según la banda al abrir el log: HF (estación "base", energía "comercial", potencia 100), VHF/UHF (estación "portátil", energía "batería", potencia 5).
 
 ### Changed
