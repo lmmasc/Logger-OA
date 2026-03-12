@@ -275,9 +275,17 @@ QTableWidget {
     border: 2px solid #bdbdbd;
     border-radius: 6px;
     gridline-color: #bdbdbd;
+    selection-background-color: palette(highlight);
+    selection-color: palette(highlighted-text);
 }
 QTableWidget:focus {
     border: 2px solid palette(highlight);
+}
+QTableWidget::item:selected,
+QTableWidget::item:selected:active,
+QTableWidget::item:selected:!active {
+    background-color: palette(highlight);
+    color: palette(highlighted-text);
 }
 QHeaderView::section {
     background-color: #e0e0e0;

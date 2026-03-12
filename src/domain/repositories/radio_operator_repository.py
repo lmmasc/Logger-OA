@@ -17,7 +17,7 @@ class RadioOperatorRepository(ABC):
         pass
 
     @abstractmethod
-    def disable_absent(self, present_callsigns: list[str]) -> None:
+    def disable_absent(self, present_callsigns: List[str]) -> None:
         pass
 
     @abstractmethod

@@ -13,6 +13,11 @@ Flujo principal:
 import sys
 import traceback
 
+# Compatibilidad Qt: en la variante legacy puede mapear PySide2 -> PySide6.
+import qt_compat_bootstrap
+
+qt_compat_bootstrap.bootstrap()
+
 # Terceros
 from PySide6.QtWidgets import QApplication, QMessageBox
 

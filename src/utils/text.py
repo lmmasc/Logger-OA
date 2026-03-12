@@ -5,6 +5,7 @@ Basado en la versión anterior, adaptado para la nueva estructura.
 
 import re
 import unicodedata
+from typing import Optional
 
 
 def normalize_ascii(text: str) -> str:
@@ -37,7 +38,7 @@ def normalize_callsign(raw: str) -> str:
     return prefix + suffix_clean
 
 
-def extract_cutoff_date(text: str) -> str | None:
+def extract_cutoff_date(text: str) -> Optional[str]:
     m = re.search(
         r"AL\s+(\d{1,2})\s+([A-Z\u00c1\u00c9\u00CD\u00d3\u00DA\u00d1]+)\s+(\d{4})",
         text,

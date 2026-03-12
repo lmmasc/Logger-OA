@@ -1,6 +1,7 @@
 import os
 import re
 import importlib.util
+from typing import Set
 
 
 def import_module_from_path(module_name: str, file_path: str):
@@ -12,7 +13,7 @@ def import_module_from_path(module_name: str, file_path: str):
     return module
 
 
-def parse_ts_itu_prefixes(ts_path: str) -> set[str]:
+def parse_ts_itu_prefixes(ts_path: str) -> Set[str]:
     with open(ts_path, "r", encoding="utf-8") as f:
         content = f.read()
     m = re.search(r"ITU_PREFIXES:\s*{(.+?)}", content, re.DOTALL)

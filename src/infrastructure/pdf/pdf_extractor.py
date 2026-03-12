@@ -6,6 +6,7 @@ Incluye soporte flexible para distintos formatos en español (p.ej., Uruguay CX)
 import pdfplumber
 import re
 import os
+from typing import Optional
 from datetime import datetime, timezone, timedelta
 from utils.text import normalize_ascii, normalize_callsign, extract_cutoff_date
 from utils.resources import get_resource_path
@@ -291,7 +292,9 @@ def _map_uruguay_columns(header_row_norm):
     }
 
 
-def _parse_spanish_date_to_utc(date_str: str, country_code: str | None) -> int | None:
+def _parse_spanish_date_to_utc(
+    date_str: str, country_code: Optional[str]
+) -> Optional[int]:
     """
     Convierte fechas en español a timestamp UTC.
     Soporta formatos:
@@ -389,7 +392,7 @@ def _parse_spanish_date_to_utc(date_str: str, country_code: str | None) -> int |
     return None
 
 
-def _tz_for_country(country_code: str | None):
+def _tz_for_country(country_code: Optional[str]):
     # Offset aproximado; para mayor precisión se podría usar zoneinfo si fuese necesario
     if country_code == "URY":
         return timezone(timedelta(hours=-3))
@@ -399,7 +402,7 @@ def _tz_for_country(country_code: str | None):
     return timezone.utc
 
 
-def _extract_cutoff_from_filename(filename: str) -> str | None:
+def _extract_cutoff_from_filename(filename: str) -> Optional[str]:
     """
     Intenta extraer fecha (dd/mm/YYYY) a partir de nombres como
     "Vigentes julio 2025" o "al 13 ago 2025" dentro del nombre de archivo.
@@ -423,7 +426,7 @@ def _extract_cutoff_from_filename(filename: str) -> str | None:
     return None
 
 
-def _month_to_mm(token: str) -> str | None:
+def _month_to_mm(token: str) -> Optional[str]:
     t = normalize_ascii(token).upper()[:3]
     mp = {
         "ENE": "01",

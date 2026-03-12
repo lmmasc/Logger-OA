@@ -1,0 +1,8 @@
+reportlab<4
+pdfplumber<0.11
+cryptography==42.0.7
+charset-normalizer<3
+PySide2==5.14.2.3
+shiboken2==5.14.2.3
+markdown<4
+openpyxl<3.2

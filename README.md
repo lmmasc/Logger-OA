@@ -52,6 +52,23 @@ Aplicación de escritorio multiplataforma para la gestión de concursos y operac
 - **Linux, Windows o macOS**
 - Recomendado: entorno virtual (`venv`)
 
+### Nota sobre compatibilidad dual
+Si vas a mantener una variante legacy para Windows 7 x86, usa un entorno virtual separado para cada stack.
+
+- Variante moderna: Python 3.10+ con PySide6.
+- Variante legacy Win7 x86: Python 3.8 x86 con PySide2.
+
+No conviene mezclar ambos stacks en el mismo `venv`, porque las dependencias Qt y el tooling de empaquetado son incompatibles entre sí.
+
+### Requisitos adicionales para Windows 7 x86
+La variante legacy requiere que el sistema operativo tenga instalados componentes de runtime que no vienen presentes en muchas instalaciones limpias de Windows 7.
+
+- Windows 7 SP1 x86.
+- Universal CRT para Windows 7: actualización KB2999226.
+- Microsoft Visual C++ Redistributable x86 para Visual Studio 2015 (VC++ 14.0).
+
+Si al abrir el ejecutable aparece el error `api-ms-win-crt-runtime-l1-1-0.dll`, el problema no está en Logger OA sino en el sistema operativo: falta el Universal CRT. Instala primero KB2999226 y luego el redistribuible VC++ x86.
+
 ### Dependencias principales
 - `PySide6>=6.9.2`
 - `pdfplumber`
@@ -70,7 +87,7 @@ Aplicación de escritorio multiplataforma para la gestión de concursos y operac
    git clone <URL_DEL_REPOSITORIO>
    cd "Logger OA v2"
    ```
-2. Crea y activa el entorno virtual correspondiente (según tu sistema operativo). Los scripts de build requieren estos nombres específicos:
+2. Crea y activa el entorno virtual correspondiente. Si solo trabajas con la variante moderna, usa el entorno moderno. Si además mantendrás Win7 x86, crea un segundo entorno dedicado para legacy.
 
   **Linux:**
   ```bash
@@ -92,19 +109,39 @@ Aplicación de escritorio multiplataforma para la gestión de concursos y operac
 
   **Windows (PowerShell):**
   ```powershell
-  python -m venv .venv-windows
-  .venv-windows\Scripts\Activate.ps1
+    python -m venv .venv
+    .venv\Scripts\Activate.ps1
   ```
-3. Instala las dependencias:
+  3. Instala las dependencias de la variante que vayas a usar:
    ```bash
-   pip install -r requirements.txt
-   # Para desarrollo:
-   pip install -r requirements-dev.txt
+    # Variante moderna
+    pip install -r requirements-modern.txt
+    # Para desarrollo moderno:
+    pip install -r requirements-dev-modern.txt
    ```
+    Para la variante legacy de Windows 7 x86:
+    ```cmd
+    C:\Python38-32\python.exe -m venv .venv-win7-x86
+    .venv-win7-x86\Scripts\python.exe -m pip install -r requirements-dev-legacy.txt
+    ```
 4. Ejecuta la aplicación:
    ```bash
    python src/main.py
    ```
+
+  ### Setup rápido en Windows
+
+  Variante moderna:
+  ```cmd
+  scripts\setup-windows-modern.bat
+  ```
+
+  Variante legacy Win7 x86:
+  ```cmd
+  scripts\setup-windows-legacy.bat C:\Python38-32\python.exe
+  ```
+
+  El segundo script requiere una instalación separada de Python 3.8 de 32 bits. El script valida ambos requisitos antes de crear `.venv-win7-x86`.
 
 ---
 
@@ -193,13 +230,21 @@ En la carpeta `scripts/` hay scripts para generar ejecutables en Linux, macOS y 
 - `build-linux.sh`
 - `build-mac.sh`
 - `build-windows.bat`
+- `build-windows-legacy.bat`
 
 Ejecuta el script correspondiente para generar el ejecutable standalone.
 
+Para Windows hay dos rutas distintas:
+
+- `build-windows.bat`: build moderno con el entorno `.venv`.
+- `build-windows-legacy.bat`: build legacy Win7 x86 con el entorno `.venv-win7-x86`.
+
+En la variante legacy Win7 x86 el resultado se genera como carpeta autocontenida `dist\LoggerOA-win7-x86\` con su ejecutable principal `LoggerOA-win7-x86.exe`. Esta variante usa `onedir` en lugar de `onefile` para evitar fallos de carga de DLLs de PySide2/shiboken2 en Windows 7.
+
+No copies solo `LoggerOA-win7-x86.exe`: para ejecutar la variante legacy debes conservar toda la carpeta `LoggerOA-win7-x86` o distribuirla comprimida completa.
+
+
 ---
-
-
-## Testing
 
 Las pruebas unitarias y de integración se encuentran en la carpeta `tests/` y utilizan `pytest`.
 

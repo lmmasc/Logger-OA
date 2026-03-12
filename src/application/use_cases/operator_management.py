@@ -2,6 +2,8 @@
 Casos de uso para gestión de operadores (consulta y creación).
 """
 
+from typing import Optional
+
 from infrastructure.repositories.sqlite_radio_operator_repository import (
     SqliteRadioOperatorRepository,
 )
@@ -25,7 +27,7 @@ def create_operator(op_data: dict):
     return new_operator
 
 
-def find_operator_for_input(callsign: str) -> RadioOperator | None:
+def find_operator_for_input(callsign: str) -> Optional[RadioOperator]:
     """
     Resuelve el operador a partir del texto ingresado por el usuario, manteniendo la lógica anterior
     de separación de prefijo/base/sufijo pero utilizando consultas SQLite (rápidas):

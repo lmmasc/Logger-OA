@@ -3,6 +3,8 @@ Controlador para la gestión de operadores de radio.
 Actúa como intermediario entre la UI y los servicios/casos de uso.
 """
 
+from typing import Optional
+
 from application.use_cases.radio_operator_management import RadioOperatorManagement
 from infrastructure.repositories.sqlite_radio_operator_repository import (
     SqliteRadioOperatorRepository,
@@ -23,8 +25,8 @@ class RadioOperatorController:
         page_size: int,
         order_by: str = "callsign",
         asc: bool = True,
-        filter_col: str | None = None,
-        filter_text: str | None = None,
+        filter_col: Optional[str] = None,
+        filter_text: Optional[str] = None,
     ):
         return self.service.list_operators_paged(
             page=page,

@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
 
+## [Unreleased]
+### Added
+- Base de compatibilidad para una rama legacy de Windows 7 x86: bootstrap Qt que permite mapear PySide2 como respaldo de PySide6 y recrea enums de Qt6 usados por la UI.
+- Archivos separados de dependencias para variante moderna y legacy.
+- Script y spec iniciales para build de la variante `win7-x86`.
+- Scripts de setup para entornos virtuales modernos y legacy en Windows, con documentación del flujo dual.
+- Validaciones explícitas de Python 3.8 x86 en los scripts de setup y build legacy.
+
+### Changed
+- Toolchain legacy fijado para compatibilidad real de empaquetado: `pyinstaller==4.10` con `pyinstaller-hooks-contrib==2022.0`.
+- Dependencias legacy ajustadas para empaquetado estable con PyInstaller 4.10, fijando `charset-normalizer<3`.
+- La variante legacy vuelve a `PySide2/shiboken2 5.14.2.3` y el spec vuelve a `onefile`, eliminando la dependencia temporal en `PyQt5` para evitar la dualidad GPL/comercial en distribuciones legacy.
+- Bootstrap Qt legacy ampliado para mapear `exec_()` de Qt5 a `exec()` en `QApplication` y diálogos usados por la UI actual.
+- Build legacy ajustado para excluir `multiprocessing` y `concurrent.futures.process`, evitando el runtime hook `pyi_rth_multiprocessing` que fallaba en Windows 7 antes de arrancar la app.
+- Build legacy ajustado para excluir `pkg_resources` y `setuptools`, eliminando el runtime hook `pyi_rth_pkgres` que fallaba en Windows 7 al cargar `pyexpat`.
+- Bootstrap Qt legacy endurecido para Windows 7: cuando `os.add_dll_directory()` falla con WinError 127, degrada a una ruta segura vía `PATH` en lugar de abortar la inicialización de PySide2.
+- Bootstrap Qt legacy reforzado en Windows: adelanta al `PATH` las carpetas de `PySide2` y `shiboken2` antes del primer import, para mejorar la resolución de DLLs en builds `onefile` sobre Windows 7.
+- Stack Qt legacy rebajado a `PySide2/shiboken2 5.14.2.3` para probar una línea de wheels potencialmente más compatible con Windows 7 x86.
+- Win7 x86 legacy: `qt_compat_bootstrap` ahora agrega tambien la raiz del bundle (`sys._MEIPASS` / directorio del ejecutable) al `PATH` antes de importar PySide2, para que `shiboken2.abi3.dll`, `pyside2.abi3.dll` y los `Qt5*.dll` ubicados en la raiz del onedir sean resolubles durante el arranque.
+- Win7 x86 legacy experimental fallback: la variante legacy pasa a priorizar `PyQt5==5.15.4` como backend Qt5 para evitar el bloqueo de carga nativa en `shiboken2` observado con PySide2 en Windows 7, manteniendo la misma superficie de imports `PySide6` mediante `qt_compat_bootstrap`.
+- Win7 x86 legacy experimental PyQt5: `qt_compat_bootstrap` ahora prepara tambien rutas de `PyQt5`, registra alias `sip -> PyQt5.sip` y deja de silenciar errores del backend legacy; si PyQt5 o PySide2 fallan al importar en Win7, el mensaje resultante ahora expone la causa real en vez de terminar solo con `ModuleNotFoundError: No module named 'PySide6'`.
+- Fixed legacy Win7 x86 PDF startup by pinning `cryptography==42.0.7` in the legacy requirements. `pdfminer.six` had been pulling `cryptography 46.x`, which fails on native Windows 7 during `_rust` import, while `42.0.7` is the last wheel line that explicitly restored Windows 7 compatibility.
+
+### Docs
+- Documentados los prerrequisitos de runtime para ejecutar la variante legacy en Windows 7 x86: SP1, KB2999226 y VC++ 2015 x86.
+
+
 ## [1.2.0] - 2026-03-02
 ### Added
 - Exportación ADIF actualizada: se agrega el campo <OPERATOR> en cada registro y se actualiza la versión del estándar a 3.1.6, cumpliendo la especificación oficial.

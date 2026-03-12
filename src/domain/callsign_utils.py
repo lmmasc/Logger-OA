@@ -1,17 +1,19 @@
 # callsign_utils.py
 # Utilidades para prefijos ITU y país de indicativo
 
+from typing import Optional
+
 from domain.itu_prefixes import ITU_PREFIXES
 from domain.itu_country_names import ITU_COUNTRY_NAMES
 
 
-def callsign_to_country(callsign: str) -> str | None:
+def callsign_to_country(callsign: str) -> Optional[str]:
     """
     Devuelve el país ITU para un indicativo dado.
     Args:
         callsign (str): Indicativo completo (puede incluir /).
     Returns:
-        str | None: Código de país ITU o None si no se encuentra.
+        Optional[str]: Código de país ITU o None si no se encuentra.
     """
     parts = callsign.split("/")
     sorted_parts = sorted(parts, key=len)
@@ -27,14 +29,14 @@ def callsign_to_country(callsign: str) -> str | None:
     return None
 
 
-def get_country_full_name(itu_code: str, lang: str = "es") -> str | None:
+def get_country_full_name(itu_code: str, lang: str = "es") -> Optional[str]:
     """
     Devuelve el nombre completo del país según el código ITU y el idioma.
     Args:
         itu_code (str): Código ITU del país (ej: 'USA', 'ESP').
         lang (str): 'es' para español, 'en' para inglés. Por defecto 'es'.
     Returns:
-        str | None: Nombre completo del país o None si no existe.
+        Optional[str]: Nombre completo del país o None si no existe.
     """
     country = ITU_COUNTRY_NAMES.get(itu_code)
     if country:

@@ -4,8 +4,13 @@ settings_service.py
 Servicio centralizado para la gestión de configuraciones de la aplicación usando QSettings.
 """
 
-from PySide6.QtCore import QSettings, QObject, Signal
 from enum import Enum
+import qt_compat_bootstrap
+
+
+qt_compat_bootstrap.bootstrap()
+
+from PySide6.QtCore import QSettings, QObject, Signal
 
 
 class SettingsSignals(QObject):

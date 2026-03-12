@@ -1,6 +1,7 @@
 import os
 import re
 import importlib.util
+from typing import Set
 
 
 def import_module_from_path(module_name: str, file_path: str):
@@ -38,7 +39,7 @@ def test_prefix_values_have_country_names():
     )
 
 
-def parse_ts_itu_prefixes(ts_path: str) -> set[str]:
+def parse_ts_itu_prefixes(ts_path: str) -> Set[str]:
     # Extraer objeto ITU_PREFIXES del archivo TS (formato simple clave: 'VAL',)
     with open(ts_path, "r", encoding="utf-8") as f:
         content = f.read()
@@ -59,7 +60,7 @@ def parse_ts_itu_prefixes(ts_path: str) -> set[str]:
     return prefixes
 
 
-def parse_py_itu_prefixes(py_path: str) -> set[str]:
+def parse_py_itu_prefixes(py_path: str) -> Set[str]:
     mod = import_module_from_path("itu_prefixes_py", py_path)
     return set(getattr(mod, "ITU_PREFIXES").keys())
 

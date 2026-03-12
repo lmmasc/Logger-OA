@@ -21,8 +21,8 @@ class RadioOperatorManagement:
         page_size: int,
         order_by: str = "callsign",
         asc: bool = True,
-        filter_col: str | None = None,
-        filter_text: str | None = None,
+        filter_col: Optional[str] = None,
+        filter_text: Optional[str] = None,
     ) -> Tuple[List[RadioOperator], int]:
         return self.repository.list_paged(
             page=page,
@@ -39,7 +39,7 @@ class RadioOperatorManagement:
     def update_operator(self, operator: RadioOperator) -> None:
         self.repository.update(operator)
 
-    def disable_absent_operators(self, present_callsigns: list[str]) -> None:
+    def disable_absent_operators(self, present_callsigns: List[str]) -> None:
         self.repository.disable_absent(present_callsigns)
 
     def delete_operator_by_callsign(self, callsign: str) -> None:
