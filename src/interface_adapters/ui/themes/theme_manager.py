@@ -11,6 +11,24 @@ from config.settings_service import settings_service, SettingsKey, ThemeValue
 from utils.resources import get_resource_path
 
 
+def _read_qss_file(file_path: str) -> str:
+    with open(file_path, "r", encoding="utf-8") as qss_file:
+        return qss_file.read()
+
+
+def _load_theme_stylesheet(theme_name: str) -> str:
+    base_qss_path = get_resource_path("src/interface_adapters/ui/themes/base.qss")
+    theme_qss_path = get_resource_path(
+        f"src/interface_adapters/ui/themes/{theme_name}.qss"
+    )
+    base_qss = _read_qss_file(base_qss_path)
+    theme_qss = _read_qss_file(theme_qss_path)
+    theme_lines = [
+        line for line in theme_qss.splitlines() if not line.strip().startswith("@import")
+    ]
+    return "\n\n".join([base_qss, "\n".join(theme_lines)])
+
+
 class ThemeManager:
     """
     Clase para gestionar y aplicar temas de la aplicación.
@@ -40,14 +58,12 @@ class ThemeManager:
             theme_to_apply = detected_theme
         else:
             theme_to_apply = theme
-        qss_rel_path = f"src/interface_adapters/ui/themes/{theme_to_apply.value}.qss"
-        qss_path = get_resource_path(qss_rel_path)
         try:
-            with open(qss_path, "r") as f:
-                qss = f.read()
-                app_instance = QApplication.instance()
-                if isinstance(app_instance, QApplication):
-                    app_instance.setStyleSheet(qss)
+            qss = _load_theme_stylesheet(theme_to_apply.value)
+            app_instance = QApplication.instance()
+            if isinstance(app_instance, QApplication):
+                app_instance.setStyle("Fusion")
+                app_instance.setStyleSheet(qss)
             if self.current_theme != theme:
                 self.settings.set_value(SettingsKey.THEME.value, theme.value)
             self.current_theme = theme

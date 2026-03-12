@@ -1,8 +1,1 @@
-reportlab
-pdfplumber
-PySide6
-markdown
-PySide6_Addons
-PySide6_Essentials
-shiboken6
-openpyxl
+-r requirements-modern.txt

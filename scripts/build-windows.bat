@@ -2,7 +2,15 @@
 REM Script para generar el ejecutable en Windows
 
 cd /d %~dp0\..
-del /F LoggerOA.spec
+
+if not exist .venv\Scripts\python.exe (
+  echo No existe .venv. Ejecuta antes scripts\setup-windows-modern.bat
+  exit /b 1
+)
+
+.venv\Scripts\python.exe -c "import platform, struct, sys; print('Build moderno con:', platform.python_version(), struct.calcsize('P') * 8)"
+if errorlevel 1 exit /b %errorlevel%
+
 REM Generar src\version.py desde git (fallback a 0.0.0-dev)
 for /f "delims=" %%a in ('git describe --tags --always --dirty 2^>NUL') do set GIT_VERSION=%%a
 if "%GIT_VERSION%"=="" set GIT_VERSION=0.0.0-dev
@@ -11,24 +19,10 @@ if "%GIT_VERSION%"=="" set GIT_VERSION=0.0.0-dev
   echo APP_VERSION = "%GIT_VERSION%"
 ) > src\version.py
 
-.venv\Scripts\pyinstaller src\main.py ^
-  --windowed ^
-  --onefile ^
-  --name LoggerOA ^
-  --icon=assets\app_icon.ico ^
-  --paths src ^
-  --add-data "assets;assets" ^
-  --add-data "src/config;src/config" ^
-  --add-data "src/domain;src/domain" ^
-  --add-data "src/infrastructure;src/infrastructure" ^
-  --add-data "src/interface_adapters;src/interface_adapters" ^
-  --add-data "src/interface_adapters/ui/themes;src/interface_adapters/ui/themes" ^
-  --add-data "src/interface_adapters/ui/views;src/interface_adapters/ui/views" ^
-  --add-data "src/application;src/application" ^
-  --add-data "src/utils;src/utils" ^
-  --add-data "src/translation;src/translation" ^
-  --add-data "src/main.py;src/main.py" ^
-  --hidden-import PySide6 ^
-  --hidden-import shiboken6 ^
-  --hidden-import translation.es.all_keys ^
-  --hidden-import translation.en.all_keys ^
+if exist dist\LoggerOA.exe del /f /q dist\LoggerOA.exe
+if exist build\LoggerOA rmdir /s /q build\LoggerOA
+
+.venv\Scripts\pyinstaller --noconfirm LoggerOA.spec
+if errorlevel 1 exit /b %errorlevel%
+
+echo Build moderno generado en dist\LoggerOA.exe

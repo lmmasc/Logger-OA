@@ -51,6 +51,26 @@ QMenu::item:disabled {
 /* =============================
    Botones principales
    ============================= */
+QPushButton {
+    background-color: #f2f2f2;
+    color: #222;
+    border: 1px solid #c5c5c5;
+    border-radius: 6px;
+    padding: 6px 14px;
+}
+QPushButton:hover {
+    background-color: #e6e6e6;
+    border-color: #aeb4ba;
+}
+QPushButton:pressed {
+    background-color: #d9d9d9;
+}
+QPushButton:disabled {
+    background-color: #f2f2f2;
+    color: #9a9a9a;
+    border-color: #d4d4d4;
+}
+
 /* Botón para agregar operador */
 QPushButton#AddOperatorButton {
     background-color: #388e3c;
@@ -237,6 +257,9 @@ QListWidget#callsignSuggestionList:focus {
    Campos de texto y combos
    ============================= */
 QLineEdit#callsignInput {
+    font-family: "Roboto Mono";
+    font-size: 32pt;
+    font-weight: bold;
     border: 2px solid #bdbdbd;
     border-radius: 6px;
     padding: 4px 8px;
@@ -244,13 +267,27 @@ QLineEdit#callsignInput {
 QLineEdit#callsignInput:focus {
     border: 2px solid palette(highlight);
 }
-QLineEdit, QComboBox, QTimeEdit, QDateTimeEdit {
+QLineEdit, QTextEdit, QPlainTextEdit, QComboBox, QTimeEdit, QDateTimeEdit, QDateEdit {
+    background-color: #ffffff;
+    color: #222;
     border: 2px solid #bdbdbd;
     border-radius: 6px;
     padding: 4px 8px;
 }
-QLineEdit:focus, QComboBox:focus, QTimeEdit:focus, QDateTimeEdit:focus {
+QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus, QComboBox:focus, QTimeEdit:focus, QDateTimeEdit:focus, QDateEdit:focus {
     border: 2px solid palette(highlight);
+}
+QComboBox::drop-down, QDateEdit::drop-down {
+    border: none;
+    width: 24px;
+    background: transparent;
+}
+QComboBox QAbstractItemView {
+    background-color: #ffffff;
+    color: #222;
+    border: 1px solid #bdbdbd;
+    selection-background-color: #1976d2;
+    selection-color: #ffffff;
 }
 /* Estado inválido para campos de entrada */
 QLineEdit[invalid="true"], QComboBox[invalid="true"], QTimeEdit[invalid="true"], QDateTimeEdit[invalid="true"], QDateEdit[invalid="true"] {

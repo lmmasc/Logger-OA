@@ -47,6 +47,70 @@ from .main_window_db_window import show_db_window, on_db_table_window_closed
 # --- Acciones de Log ---
 
 
+def _create_file_dialog(
+    parent,
+    title,
+    directory,
+    selected_file,
+    file_mode,
+    name_filter,
+    accept_mode,
+):
+    dialog = QFileDialog(parent)
+    dialog.setOption(QFileDialog.Option.DontUseNativeDialog, True)
+    dialog.setWindowTitle(title)
+    if directory:
+        dialog.setDirectory(directory)
+    if selected_file:
+        dialog.selectFile(selected_file)
+    dialog.setFileMode(file_mode)
+    dialog.setAcceptMode(accept_mode)
+    if name_filter:
+        dialog.setNameFilter(name_filter)
+    return dialog
+
+
+def _get_open_file_name(parent, title, directory, name_filter):
+    dialog = _create_file_dialog(
+        parent,
+        title,
+        directory,
+        "",
+        QFileDialog.FileMode.ExistingFile,
+        name_filter,
+        QFileDialog.AcceptMode.AcceptOpen,
+    )
+    if not dialog.exec():
+        return "", ""
+    selected_files = dialog.selectedFiles()
+    selected_filter = dialog.selectedNameFilter()
+    return (selected_files[0], selected_filter) if selected_files else ("", selected_filter)
+
+
+def _get_save_file_name(parent, title, directory, name_filter):
+    initial_directory = directory
+    selected_file = ""
+    if directory:
+        normalized_path = os.path.normpath(directory)
+        if os.path.basename(normalized_path):
+            initial_directory = os.path.dirname(normalized_path) or os.getcwd()
+            selected_file = os.path.basename(normalized_path)
+    dialog = _create_file_dialog(
+        parent,
+        title,
+        initial_directory,
+        selected_file,
+        QFileDialog.FileMode.AnyFile,
+        name_filter,
+        QFileDialog.AcceptMode.AcceptSave,
+    )
+    if not dialog.exec():
+        return "", ""
+    selected_files = dialog.selectedFiles()
+    selected_filter = dialog.selectedNameFilter()
+    return (selected_files[0], selected_filter) if selected_files else ("", selected_filter)
+
+
 def action_log_new_operativo(self):
     """
     Crea un nuevo log operativo directamente, sin diálogo de selección de tipo.
@@ -139,7 +203,7 @@ def action_log_open_operativo(self):
 
     log_folder = os.path.join(get_log_dir(), OPERATIONS_DIR)
     os.makedirs(log_folder, exist_ok=True)
-    file_path, _ = QFileDialog.getOpenFileName(
+    file_path, _ = _get_open_file_name(
         self,
         translation_service.tr("open_log"),
         log_folder,
@@ -191,7 +255,7 @@ def action_log_open_concurso(self):
 
     log_folder = os.path.join(get_log_dir(), CONTESTS_DIR)
     os.makedirs(log_folder, exist_ok=True)
-    file_path, _ = QFileDialog.getOpenFileName(
+    file_path, _ = _get_open_file_name(
         self,
         translation_service.tr("open_log"),
         log_folder,
@@ -294,7 +358,7 @@ def action_log_export_txt(self):
     base_name = os.path.splitext(os.path.basename(db_path))[0]
     default_filename = f"{base_name}.txt"
     export_dir = get_export_dir()
-    export_path, _ = QFileDialog.getSaveFileName(
+    export_path, _ = _get_save_file_name(
         self,
         translation_service.tr("export_log"),
         os.path.join(export_dir, default_filename),
@@ -335,7 +399,7 @@ def action_log_export_csv(self):
     base_name = os.path.splitext(os.path.basename(db_path))[0]
     default_filename = f"{base_name}.csv"
     export_dir = get_export_dir()
-    export_path, _ = QFileDialog.getSaveFileName(
+    export_path, _ = _get_save_file_name(
         self,
         translation_service.tr("export_log"),
         os.path.join(export_dir, default_filename),
@@ -376,7 +440,7 @@ def action_log_export_adi(self):
     base_name = os.path.splitext(os.path.basename(db_path))[0]
     default_filename = f"{base_name}.adi"
     export_dir = get_export_dir()
-    export_path, _ = QFileDialog.getSaveFileName(
+    export_path, _ = _get_save_file_name(
         self,
         translation_service.tr("export_log"),
         os.path.join(export_dir, default_filename),
@@ -429,7 +493,7 @@ def action_log_export_pdf(self):
     base_name = os.path.splitext(os.path.basename(db_path))[0]
     default_filename = f"{base_name}.pdf"
     export_dir = get_export_dir()
-    export_path, _ = QFileDialog.getSaveFileName(
+    export_path, _ = _get_save_file_name(
         self,
         translation_service.tr("export_log"),
         os.path.join(export_dir, default_filename),
@@ -550,7 +614,7 @@ def action_db_import_pdf(self):
     """
     Importa operadores OA desde un PDF oficial, mostrando resumen visual.
     """
-    file_path, _ = QFileDialog.getOpenFileName(
+    file_path, _ = _get_open_file_name(
         self,
         translation_service.tr("import_from_pdf"),
         "",
@@ -627,7 +691,7 @@ def action_db_import_excel(self):
     """
     Importa operadores OA desde un archivo Excel, mostrando resumen visual.
     """
-    file_path, _ = QFileDialog.getOpenFileName(
+    file_path, _ = _get_open_file_name(
         self,
         translation_service.tr("import_from_excel"),
         "",
@@ -711,15 +775,13 @@ def action_db_import_csv(self):
     """
     Importa operadores desde un archivo CSV (exportado por la propia aplicación), mostrando resumen visual.
     """
-    file_dialog = QFileDialog(self)
-    file_dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
-    file_dialog.setNameFilter("Archivos CSV (*.csv)")
-    if file_dialog.exec():
-        selected_files = file_dialog.selectedFiles()
-        if not selected_files:
-            return
-        file_path = selected_files[0]
-    else:
+    file_path, _ = _get_open_file_name(
+        self,
+        translation_service.tr("import_from_csv"),
+        "",
+        "Archivos CSV (*.csv)",
+    )
+    if not file_path:
         return
 
     def do_import():
@@ -802,7 +864,7 @@ def action_db_export(self):
     """
     now_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     default_filename = f"operadores_export_{now_str}.csv"
-    export_path, _ = QFileDialog.getSaveFileName(
+    export_path, _ = _get_save_file_name(
         self,
         translation_service.tr("export_db"),
         get_export_dir(default_filename),
@@ -870,42 +932,41 @@ def action_db_restore(self):
     Restaura la base de datos desde un archivo de respaldo seleccionado por el usuario.
     """
     backup_dir = os.path.join(BASE_PATH, "backups")
-    file_dialog = QFileDialog(self)
-    file_dialog.setWindowTitle("Seleccionar backup para restaurar")
-    file_dialog.setDirectory(backup_dir)
-    file_dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
-    file_dialog.setNameFilter("Backups (*.db)")
-    if file_dialog.exec():
-        selected_files = file_dialog.selectedFiles()
-        if selected_files:
-            backup_file = os.path.basename(selected_files[0])
-            try:
-                DatabaseController.restore_database(backup_file)
-                QMessageBox.information(
-                    self, "Restaurar", f"Base restaurada desde: {backup_file}"
-                )
-            except Exception as e:
-                QMessageBox.critical(self, "Error", f"No se pudo restaurar: {e}")
+    selected_path, _ = _get_open_file_name(
+        self,
+        "Seleccionar backup para restaurar",
+        backup_dir,
+        "Backups (*.db)",
+    )
+    if selected_path:
+        backup_file = os.path.basename(selected_path)
+        try:
+            DatabaseController.restore_database(backup_file)
+            QMessageBox.information(
+                self, "Restaurar", f"Base restaurada desde: {backup_file}"
+            )
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"No se pudo restaurar: {e}")
 
 
 def action_db_import_db(self):
     """
     Importa operadores desde una base de datos externa seleccionada por el usuario.
     """
-    file_dialog = QFileDialog(self)
-    file_dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
-    file_dialog.setNameFilter("Bases de datos (*.db)")
-    if file_dialog.exec():
-        selected_files = file_dialog.selectedFiles()
-        if selected_files:
-            external_db_path = selected_files[0]
-            try:
-                imported = DatabaseController.import_database(external_db_path)
-                QMessageBox.information(
-                    self, "Importar", f"Operadores importados: {imported}"
-                )
-            except Exception as e:
-                QMessageBox.critical(self, "Error", f"No se pudo importar: {e}")
+    external_db_path, _ = _get_open_file_name(
+        self,
+        "Importar base de datos",
+        "",
+        "Bases de datos (*.db)",
+    )
+    if external_db_path:
+        try:
+            imported = DatabaseController.import_database(external_db_path)
+            QMessageBox.information(
+                self, "Importar", f"Operadores importados: {imported}"
+            )
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"No se pudo importar: {e}")
 
 
 # --- Acciones de UI y ventanas secundarias ---
