@@ -20,20 +20,33 @@ permissions:
 jobs:
   build-linux:
     runs-on: ubuntu-22.04
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', github.event.inputs.release_tag) || github.ref }}
+          fetch-depth: 0
 
       - name: Resolve release tag
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "RELEASE_TAG=${{ github.event.inputs.release_tag }}" >> "$GITHUB_ENV"
+            RAW_TAG="${{ github.event.inputs.release_tag }}"
+            case "$RAW_TAG" in
+              v*) RELEASE_TAG="$RAW_TAG" ;;
+              *) RELEASE_TAG="v$RAW_TAG" ;;
+            esac
+            echo "RELEASE_TAG=$RELEASE_TAG" >> "$GITHUB_ENV"
           else
             echo "RELEASE_TAG=${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
           fi
+
+      - name: Checkout requested tag
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git fetch --tags origin
+          git checkout "refs/tags/${RELEASE_TAG}"
 
       - name: Set up Python
         uses: actions/setup-python@v5
