@@ -2,9 +2,17 @@ name: Build Linux Release
 
 on:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Tag de release a compilar y adjuntar
+        required: true
+        type: string
   push:
     tags:
       - "v*"
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 permissions:
   contents: write
@@ -16,6 +24,16 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', github.event.inputs.release_tag) || github.ref }}
+
+      - name: Resolve release tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "RELEASE_TAG=${{ github.event.inputs.release_tag }}" >> "$GITHUB_ENV"
+          else
+            echo "RELEASE_TAG=${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
+          fi
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -49,15 +67,16 @@ jobs:
       - name: Package Linux executable
         run: |
           cd dist
-          tar -czf LoggerOA-${GITHUB_REF_NAME}-linux-x64.tar.gz LoggerOA
+          tar -czf LoggerOA-${RELEASE_TAG}-linux-x64.tar.gz LoggerOA
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: LoggerOA-${{ github.ref_name }}-linux-x64
-          path: dist/LoggerOA-${{ github.ref_name }}-linux-x64.tar.gz
+          name: LoggerOA-${{ env.RELEASE_TAG }}-linux-x64
+          path: dist/LoggerOA-${{ env.RELEASE_TAG }}-linux-x64.tar.gz
 
       - name: Attach asset to GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/LoggerOA-${{ github.ref_name }}-linux-x64.tar.gz
+          tag_name: ${{ env.RELEASE_TAG }}
+          files: dist/LoggerOA-${{ env.RELEASE_TAG }}-linux-x64.tar.gz
