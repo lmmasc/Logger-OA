@@ -922,9 +922,17 @@ def action_db_backup(self):
     """
     try:
         backup_path = DatabaseController.backup_database()
-        QMessageBox.information(self, "Backup", f"Backup creado en: {backup_path}")
+        QMessageBox.information(
+            self,
+            translation_service.tr("menu_create_backup"),
+            translation_service.tr("db_backup_success").format(path=backup_path),
+        )
     except Exception as e:
-        QMessageBox.critical(self, "Error", f"No se pudo crear el backup: {e}")
+        QMessageBox.critical(
+            self,
+            translation_service.tr("dialog_error_title"),
+            translation_service.tr("db_backup_failed").format(error=e),
+        )
 
 
 def action_db_restore(self):
@@ -934,7 +942,7 @@ def action_db_restore(self):
     backup_dir = os.path.join(BASE_PATH, "backups")
     selected_path, _ = _get_open_file_name(
         self,
-        "Seleccionar backup para restaurar",
+        translation_service.tr("db_restore_select_backup"),
         backup_dir,
         "Backups (*.db)",
     )
@@ -943,10 +951,18 @@ def action_db_restore(self):
         try:
             DatabaseController.restore_database(backup_file)
             QMessageBox.information(
-                self, "Restaurar", f"Base restaurada desde: {backup_file}"
+                self,
+                translation_service.tr("menu_restore_backup"),
+                translation_service.tr("db_restore_success").format(
+                    filename=backup_file
+                ),
             )
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"No se pudo restaurar: {e}")
+            QMessageBox.critical(
+                self,
+                translation_service.tr("dialog_error_title"),
+                translation_service.tr("db_restore_failed").format(error=e),
+            )
 
 
 def action_db_import_db(self):
@@ -955,7 +971,7 @@ def action_db_import_db(self):
     """
     external_db_path, _ = _get_open_file_name(
         self,
-        "Importar base de datos",
+        translation_service.tr("db_import_select_file"),
         "",
         "Bases de datos (*.db)",
     )
@@ -963,10 +979,16 @@ def action_db_import_db(self):
         try:
             imported = DatabaseController.import_database(external_db_path)
             QMessageBox.information(
-                self, "Importar", f"Operadores importados: {imported}"
+                self,
+                translation_service.tr("menu_database_section_import"),
+                translation_service.tr("db_import_success").format(count=imported),
             )
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"No se pudo importar: {e}")
+            QMessageBox.critical(
+                self,
+                translation_service.tr("dialog_error_title"),
+                translation_service.tr("db_import_failed").format(error=e),
+            )
 
 
 # --- Acciones de UI y ventanas secundarias ---

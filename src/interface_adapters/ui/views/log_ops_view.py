@@ -104,7 +104,7 @@ class LogOpsView(QWidget):
         # Botón QRZ
         self.qrz_btn = QPushButton("QRZ", self)
         self.qrz_btn.setObjectName("QRZButton")
-        self.qrz_btn.setToolTip("Abrir QRZ.com para el indicativo")
+        self.qrz_btn.setToolTip(translation_service.tr("qrz_button_tooltip"))
         self.qrz_btn.clicked.connect(self._on_open_qrz)
         # Layout horizontal: relojes a la izquierda, columna derecha con alertas y botones
         from .alerts_widget import AlertsWidget
@@ -280,6 +280,8 @@ class LogOpsView(QWidget):
             self.add_contact_btn.setText(translation_service.tr("add_contact"))
         if hasattr(self, "delete_contact_btn"):
             self.delete_contact_btn.setText(translation_service.tr("delete_contact"))
+        if hasattr(self, "qrz_btn"):
+            self.qrz_btn.setToolTip(translation_service.tr("qrz_button_tooltip"))
 
     def update_header(self):
         """
@@ -418,6 +420,8 @@ class LogOpsView(QWidget):
         msg_box.setDefaultButton(QMessageBox.StandardButton.No)
         yes_button = msg_box.button(QMessageBox.StandardButton.Yes)
         no_button = msg_box.button(QMessageBox.StandardButton.No)
+        yes_button.setText(translation_service.tr("yes_button"))
+        no_button.setText(translation_service.tr("no_button"))
         reply = msg_box.exec()
         if reply != QMessageBox.StandardButton.Yes:
             return

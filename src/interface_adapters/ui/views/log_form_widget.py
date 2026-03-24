@@ -390,6 +390,12 @@ class LogFormWidget(QWidget):
         """
         Asigna los valores por defecto de estación, energía y potencia según la banda seleccionada en el log operativo.
         """
+        if not all(
+            hasattr(self, attr)
+            for attr in ("station_input", "energy_input", "power_input")
+        ):
+            return
+
         band_key = None
         from interface_adapters.ui.utils import find_main_window
         main_window = find_main_window(self)
@@ -420,6 +426,8 @@ class LogFormWidget(QWidget):
         from utils.callsign_parser import parse_callsign
 
         base_callsign, _, _ = parse_callsign(callsign_val)
+        operator = find_operator_for_input(callsign_val)
+        timestamp = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
         data = {
             "callsign": callsign_val,
             "rs_rx": self.rs_rx_input.text(),
@@ -429,7 +437,6 @@ class LogFormWidget(QWidget):
         if self.log_type == LogType.CONTEST_LOG:
             # --- Bloque de extracción de datos para concurso ---
             contact_id = str(uuid.uuid4())
-            self._set_defaults_by_band()
             name = operator.name if operator else "-"
             region = operator.region if operator else "-"
             data.update(
@@ -449,12 +456,12 @@ class LogFormWidget(QWidget):
             )
         elif self.log_type == LogType.OPERATION_LOG:
             # --- Bloque de extracción de datos para operativo ---
+            self._set_defaults_by_band()
             # Resolver operador usando lógica de prefijo/base/sufijo con SQLite
             operator = find_operator_for_input(callsign_val)
             name = operator.name if operator else ""
             country = operator.country if operator else ""
             region = operator.region if operator else "-"
-            timestamp = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
             station_keys = [
                 "no_data",
                 "station_base",
@@ -608,17 +615,26 @@ class LogFormWidget(QWidget):
                 data["callsign"], data["timestamp"], contacts
             )
             if duplicate:
-                msg = (
-                    f"El indicativo {duplicate['callsign']} ({duplicate['name']}) ya fue registrado en este bloque horario OA a las {duplicate['hora_oa']}. "
-                    "¿Desea registrar de todas formas este contacto?"
+                msg = translation_service.tr("contest_duplicate_block_msg").format(
+                    callsign=duplicate["callsign"],
+                    name=duplicate["name"],
+                    hora_oa=duplicate["hora_oa"],
                 )
-                reply = QMessageBox.question(
-                    self,
-                    translation_service.tr("main_window_title"),
-                    msg,
-                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                    QMessageBox.StandardButton.No,
+                msg_box = QMessageBox(self)
+                msg_box.setIcon(QMessageBox.Icon.Question)
+                msg_box.setWindowTitle(translation_service.tr("main_window_title"))
+                msg_box.setText(msg)
+                msg_box.setStandardButtons(
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
                 )
+                msg_box.setDefaultButton(QMessageBox.StandardButton.No)
+                msg_box.button(QMessageBox.StandardButton.Yes).setText(
+                    translation_service.tr("yes_button")
+                )
+                msg_box.button(QMessageBox.StandardButton.No).setText(
+                    translation_service.tr("no_button")
+                )
+                reply = msg_box.exec()
                 if reply != QMessageBox.StandardButton.Yes:
                     # Borrar campo de ingreso indicativo y dar foco
                     parent = self.parent()

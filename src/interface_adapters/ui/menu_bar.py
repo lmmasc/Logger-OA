@@ -95,7 +95,9 @@ class MainMenuBar(QMenuBar):
         self.export_pdf_action = QAction(
             translation_service.tr("menu_export_pdf"), self
         )
-        self.export_whatsapp_action = QAction("Whatsapp", self)
+        self.export_whatsapp_action = QAction(
+            translation_service.tr("menu_export_whatsapp"), self
+        )
         self.export_menu.addAction(self.export_txt_action)
         self.export_menu.addAction(self.export_csv_action)
         self.export_menu.addAction(self.export_adi_action)
@@ -322,6 +324,9 @@ class MainMenuBar(QMenuBar):
         self.export_csv_action.setText(translation_service.tr("menu_export_csv"))
         self.export_adi_action.setText(translation_service.tr("menu_export_adi"))
         self.export_pdf_action.setText(translation_service.tr("menu_export_pdf"))
+        self.export_whatsapp_action.setText(
+            translation_service.tr("menu_export_whatsapp")
+        )
 
         self.database_menu.setTitle(translation_service.tr("menu_database_menu"))
         self.import_menu.setTitle(

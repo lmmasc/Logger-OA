@@ -106,7 +106,7 @@ class LogContestView(QWidget):
         # Botón QRZ
         self.qrz_btn = QPushButton("QRZ", self)
         self.qrz_btn.setObjectName("QRZButton")
-        self.qrz_btn.setToolTip("Abrir QRZ.com para el indicativo")
+        self.qrz_btn.setToolTip(translation_service.tr("qrz_button_tooltip"))
         self.qrz_btn.clicked.connect(self._on_open_qrz)
         self.qrz_btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         # Layout horizontal: relojes a la izquierda, columna derecha con alertas y botones
@@ -275,6 +275,9 @@ class LogContestView(QWidget):
         self.queue_widget.retranslate_ui()
 
         self.callsign_info.update_info(self.callsign_input.get_callsign())
+
+        if hasattr(self, "qrz_btn"):
+            self.qrz_btn.setToolTip(translation_service.tr("qrz_button_tooltip"))
 
         # Establecer intercambio enviado al abrir el log de concurso
         if hasattr(self.form_widget, "exchange_sent_input") and hasattr(

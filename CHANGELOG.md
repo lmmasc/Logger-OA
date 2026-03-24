@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [Unreleased]
+
+## [1.2.1] - 2026-03-24
+### Fixed
+- Los diálogos de confirmación en concursos ahora traducen correctamente los botones `Sí/No` en lugar de depender de los textos estándar de Qt.
+- El mensaje de contacto duplicado dentro del bloque horario OA en concursos pasa a usar claves de traducción y deja de quedar fijo en español.
+- Se corrige una regresión en el formulario de concursos: `get_data()` ya no intenta aplicar defaults de estación/energía propios de logs operativos, evitando el `AttributeError` sobre `station_input`.
+- Se localizan textos visibles aún hardcodeados en la UI: tooltip del botón `QRZ`, acción de exportación para WhatsApp y mensajes de respaldo, restauración e importación de base de datos.
+
 ## [1.2.0] - 2026-03-02
 ### Added
 - Exportación ADIF actualizada: se agrega el campo <OPERATOR> en cada registro y se actualiza la versión del estándar a 3.1.6, cumpliendo la especificación oficial.
@@ -94,8 +103,9 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 - Sistema de traducciones modular.
 - Pruebas con pytest.
 
-[NOTA]: La versión 1.2.0 aún no ha sido publicada como release oficial; los cambios están disponibles únicamente en el código fuente.
+[Unreleased]: https://github.com/lmmasc/Logger-OA/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/lmmasc/Logger-OA/compare/v1.2.0...v1.2.1
+[1.2.0]: https://github.com/lmmasc/Logger-OA/releases/tag/v1.2.0
 
-[1.2.0]: https://github.com/lmmasc/Logger-OA/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/lmmasc/Logger-OA/releases/tag/v1.1.0
 [1.0.0]: https://github.com/lmmasc/Logger-OA/releases/tag/v1.0.0
