@@ -56,6 +56,43 @@ class ContactLogRepository:
             )
             conn.commit()
 
+    def get_file_format_version(self) -> int:
+        with sqlite3.connect(self.db_path) as conn:
+            c = conn.cursor()
+            c.execute("PRAGMA user_version")
+            row = c.fetchone()
+            return int(row[0]) if row and row[0] is not None else 0
+
+    def set_file_format_version(self, version: int):
+        with sqlite3.connect(self.db_path) as conn:
+            c = conn.cursor()
+            c.execute(f"PRAGMA user_version = {int(version)}")
+            conn.commit()
+
+    def update_log_metadata(self, log_id: str, metadata: dict):
+        import json
+
+        with sqlite3.connect(self.db_path) as conn:
+            c = conn.cursor()
+            c.execute(
+                """
+                UPDATE logs SET metadata = ? WHERE id = ?
+                """,
+                (json.dumps(metadata or {}), log_id),
+            )
+            conn.commit()
+
+    def update_log_timestamps(self, log_id: str, start_time: int, end_time: int):
+        with sqlite3.connect(self.db_path) as conn:
+            c = conn.cursor()
+            c.execute(
+                """
+                UPDATE logs SET start_time = ?, end_time = ? WHERE id = ?
+                """,
+                (start_time, end_time, log_id),
+            )
+            conn.commit()
+
     def get_log(self, log_id: str) -> Optional[ContactLog]:
         # Implementar: cargar y deserializar log según tipo
         pass
@@ -88,12 +125,14 @@ class ContactLogRepository:
         contacts = []
         with sqlite3.connect(self.db_path) as conn:
             c = conn.cursor()
-            c.execute("SELECT data FROM contacts WHERE log_id = ?", (log_id,))
+            c.execute("SELECT id, data FROM contacts WHERE log_id = ?", (log_id,))
             rows = c.fetchall()
             for row in rows:
-                data = row[0]
+                contact_id, data = row
                 try:
                     contact_dict = json.loads(data)
+                    if isinstance(contact_dict, dict) and not contact_dict.get("id"):
+                        contact_dict["id"] = contact_id
                     contacts.append(contact_dict)
                 except Exception:
                     continue
@@ -115,5 +154,18 @@ class ContactLogRepository:
                 UPDATE contacts SET data = ? WHERE id = ?
                 """,
                 (json.dumps(contact.__dict__), contact_id),
+            )
+            conn.commit()
+
+    def update_contact_data(self, contact_id: str, contact_data: dict):
+        import json
+
+        with sqlite3.connect(self.db_path) as conn:
+            c = conn.cursor()
+            c.execute(
+                """
+                UPDATE contacts SET data = ? WHERE id = ?
+                """,
+                (json.dumps(contact_data), contact_id),
             )
             conn.commit()

@@ -1,4 +1,8 @@
 from datetime import datetime
+from application.use_cases.log_file_format import (
+    CURRENT_LOG_FILE_FORMAT_VERSION,
+    normalize_log_metadata,
+)
 from domain.entities.operation import OperationLog
 from domain.entities.contest import ContestLog
 from domain.repositories.contact_log_repository import ContactLogRepository
@@ -36,7 +40,10 @@ def create_log(log_type: LogType, operator_callsign: str, **kwargs):
             mode=kwargs.get("mode_key", ""),
             frequency=kwargs.get("frequency", ""),
             repeater=kwargs.get("repeater_key", ""),
-            metadata=kwargs.get("metadata", {}),
+            metadata=normalize_log_metadata(
+                log_type.value,
+                kwargs.get("metadata", {}),
+            ),
         )
     elif log_type == LogType.CONTEST_LOG:
         contest_key = kwargs.pop("contest_key", "contest")
@@ -47,7 +54,10 @@ def create_log(log_type: LogType, operator_callsign: str, **kwargs):
             operator=operator_callsign,
             start_time=timestamp,
             name=kwargs.get("name", contest_key),
-            metadata=kwargs.get("metadata", {}),
+            metadata=normalize_log_metadata(
+                log_type.value,
+                kwargs.get("metadata", {}),
+            ),
         )
     else:
         raise ValueError(f"Tipo de log no soportado: {log_type}")
@@ -55,4 +65,5 @@ def create_log(log_type: LogType, operator_callsign: str, **kwargs):
     log.db_path = db_path
     repo = ContactLogRepository(db_path)
     repo.save_log(log, log_type.value)
+    repo.set_file_format_version(CURRENT_LOG_FILE_FORMAT_VERSION)
     return db_path, log

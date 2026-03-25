@@ -30,6 +30,7 @@ from infrastructure.repositories.sqlite_radio_operator_repository import (
     SqliteRadioOperatorRepository,
 )
 from datetime import datetime, timezone, timedelta
+from utils.datetime import parse_utc_timestamp
 from utils.callsign_parser import parse_callsign
 
 
@@ -307,7 +308,9 @@ class LogOpsView(QWidget):
         log_date = ""
         if log and hasattr(log, "start_time") and log.start_time:
 
-            dt_utc = datetime.fromtimestamp(log.start_time, tz=timezone.utc)
+            dt_utc = datetime.fromtimestamp(
+                parse_utc_timestamp(log.start_time), tz=timezone.utc
+            )
             dt_peru = dt_utc - timedelta(hours=5)
             # Mostrar hora y luego fecha
             log_date = dt_peru.strftime("%H:%M %d/%m/%Y")

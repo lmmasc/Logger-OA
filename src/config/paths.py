@@ -3,8 +3,9 @@ def format_timestamp_local(timestamp: int) -> str:
     Formatea un timestamp UTC entero a string local de Perú (YYYY-MM-DD_HH-MM-SS).
     """
     from datetime import datetime, timezone, timedelta
+    from utils.datetime import parse_utc_timestamp
 
-    dt_utc = datetime.fromtimestamp(timestamp, tz=timezone.utc)
+    dt_utc = datetime.fromtimestamp(parse_utc_timestamp(timestamp), tz=timezone.utc)
     dt_peru = dt_utc - timedelta(hours=5)
     return dt_peru.strftime("%Y-%m-%d_%H-%M-%S")
 

@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from utils.fonts import build_roboto_mono_font
+from utils.datetime import parse_utc_timestamp
 
 # --- Imports de la aplicación ---
 from translation.translation_service import translation_service
@@ -154,7 +155,7 @@ class ContactTableWidget(QWidget):
                     value = ""
                     if ts:
                         dt_utc = datetime.datetime.fromtimestamp(
-                            int(ts), tz=datetime.timezone.utc
+                            parse_utc_timestamp(ts), tz=datetime.timezone.utc
                         )
                         dt_oa = dt_utc - datetime.timedelta(hours=5)
                         value = dt_oa.strftime(time_fmt)
@@ -163,7 +164,7 @@ class ContactTableWidget(QWidget):
                     value = ""
                     if ts:
                         dt_utc = datetime.datetime.fromtimestamp(
-                            int(ts), tz=datetime.timezone.utc
+                            parse_utc_timestamp(ts), tz=datetime.timezone.utc
                         )
                         # Convertir a hora OA (UTC-5) para comparar fechas
                         dt_oa = dt_utc - datetime.timedelta(hours=5)

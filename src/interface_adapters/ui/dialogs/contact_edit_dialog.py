@@ -22,6 +22,7 @@ from PySide6.QtGui import QIntValidator
 from translation.translation_service import translation_service
 from config.settings_service import LanguageValue
 from interface_adapters.ui.view_manager import LogType
+from utils.datetime import parse_utc_timestamp
 import datetime
 
 
@@ -196,7 +197,7 @@ class ContactEditDialog(QDialog):
             # Mostrar hora OA (UTC-5)
             if ts:
                 dt_utc = datetime.datetime.fromtimestamp(
-                    int(ts), tz=datetime.timezone.utc
+                    parse_utc_timestamp(ts), tz=datetime.timezone.utc
                 )
                 dt_oa = dt_utc - datetime.timedelta(hours=5)
                 # Guardar fecha OA base para conservarla al aceptar
@@ -222,7 +223,7 @@ class ContactEditDialog(QDialog):
             # Operativos: mantener UTC
             if ts:
                 py_dt_utc = datetime.datetime.fromtimestamp(
-                    int(ts), tz=datetime.timezone.utc
+                    parse_utc_timestamp(ts), tz=datetime.timezone.utc
                 )
             else:
                 py_dt_utc = datetime.datetime.now(datetime.timezone.utc)

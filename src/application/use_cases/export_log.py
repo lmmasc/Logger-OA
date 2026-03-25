@@ -20,6 +20,7 @@ from utils.resources import get_resource_path
 from interface_adapters.ui.view_manager import LogType
 from config.settings_service import LanguageValue
 from domain.callsign_utils import get_country_full_name
+from utils.datetime import parse_utc_timestamp
 from utils.text import normalize_ascii
 from infrastructure.db.queries import get_radio_operator_by_callsign
 from translation.translation_service import translation_service as ts
@@ -120,7 +121,7 @@ def export_log_to_txt(db_path: str, export_path: str, translation_service=None) 
                     value = ""
                     if ts:
                         dt_utc = datetime.datetime.fromtimestamp(
-                            int(ts), tz=datetime.timezone.utc
+                            parse_utc_timestamp(ts), tz=datetime.timezone.utc
                         )
                         dt_oa = dt_utc - datetime.timedelta(hours=5)
                         if log_type == LogType.CONTEST_LOG.value:
@@ -133,7 +134,7 @@ def export_log_to_txt(db_path: str, export_path: str, translation_service=None) 
                     value = ""
                     if ts:
                         value = datetime.datetime.fromtimestamp(
-                            int(ts), tz=datetime.timezone.utc
+                            parse_utc_timestamp(ts), tz=datetime.timezone.utc
                         ).strftime(f"%H:%M {date_fmt}")
                     row.append(value)
                 elif key in ("station", "energy"):
@@ -264,7 +265,7 @@ def export_log_to_csv(
                     value = ""
                     if ts:
                         dt_utc = datetime.datetime.fromtimestamp(
-                            int(ts), tz=datetime.timezone.utc
+                            parse_utc_timestamp(ts), tz=datetime.timezone.utc
                         )
                         dt_oa = dt_utc - datetime.timedelta(hours=5)
                         if log_type == LogType.CONTEST_LOG.value:
@@ -277,7 +278,7 @@ def export_log_to_csv(
                     value = ""
                     if ts:
                         value = datetime.datetime.fromtimestamp(
-                            int(ts), tz=datetime.timezone.utc
+                            parse_utc_timestamp(ts), tz=datetime.timezone.utc
                         ).strftime(f"%H:%M {date_fmt}")
                     row.append(value)
                 elif key in ("station", "energy"):
@@ -367,7 +368,9 @@ def export_log_to_adi(db_path: str, export_path: str) -> str:
         callsign = contact.get("callsign", "")
         ts = contact.get("timestamp", None)
         if ts:
-            dt_utc = datetime.datetime.fromtimestamp(int(ts), tz=datetime.timezone.utc)
+            dt_utc = datetime.datetime.fromtimestamp(
+                parse_utc_timestamp(ts), tz=datetime.timezone.utc
+            )
             qso_date = dt_utc.strftime("%Y%m%d")
             time_on = dt_utc.strftime("%H%M%S")
         else:
@@ -507,7 +510,7 @@ def export_log_to_pdf(db_path: str, export_path: str) -> str:
         qtr = ""
         if ts_contact:
             dt_utc = datetime.datetime.fromtimestamp(
-                int(ts_contact), tz=datetime.timezone.utc
+                parse_utc_timestamp(ts_contact), tz=datetime.timezone.utc
             )
             dt_oa = dt_utc - datetime.timedelta(hours=5)
             qtr = dt_oa.strftime("%H:%M")

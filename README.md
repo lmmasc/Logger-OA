@@ -18,6 +18,7 @@ Aplicación de escritorio multiplataforma para la gestión de concursos y operac
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Scripts de Build Multiplataforma](#scripts-de-build-multiplataforma)
 - [Automatización de Releases](#automatización-de-releases)
+- [Formato de Logs](#formato-de-logs)
 - [Testing](#testing)
 - [Licencia y condiciones de uso](#licencia-y-condiciones-de-uso)
 - [Créditos / Autoría](#créditos--autoría)
@@ -278,6 +279,23 @@ Importante:
 - Los builds de macOS no incluyen firma ni notarización de Apple.
 - La variante legacy sigue requiriendo Python 3.8 x86 y dependencias separadas.
 
+Compatibilidad de logs:
+
+- Los logs SQLite creados por versiones antiguas siguen siendo abribles por las versiones actuales.
+- Si un log legacy contiene timestamps guardados como texto en formato `YYYY-MM-DD_HH-MM-SS`, la app los normaliza automáticamente al abrirlo y actualiza el archivo al formato versionado actual.
+
+
+---
+
+## Formato de Logs
+
+La especificación formal del formato actual de logs se encuentra en [BaseDocs/log_file_format_v2.md](BaseDocs/log_file_format_v2.md).
+
+Resumen:
+
+- Cada log se guarda como un archivo SQLite independiente.
+- El formato actual usa `PRAGMA user_version = 2`.
+- La migración desde variantes legacy ocurre automáticamente al abrir el archivo.
 
 ---
 

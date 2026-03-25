@@ -13,6 +13,7 @@ from translation.translation_service import translation_service
 from config.settings_service import LanguageValue
 from interface_adapters.ui.utils import find_main_window
 from interface_adapters.ui.view_manager import LogType
+from utils.datetime import parse_utc_timestamp
 
 # --- Imports de módulos locales (widgets) ---
 from application.use_cases.contact_management import delete_contact_from_log
@@ -308,7 +309,9 @@ class LogContestView(QWidget):
             from datetime import datetime, timezone, timedelta
 
             try:
-                dt_utc = datetime.fromtimestamp(int(dt), tz=timezone.utc)
+                dt_utc = datetime.fromtimestamp(
+                    parse_utc_timestamp(dt), tz=timezone.utc
+                )
                 dt_peru = dt_utc - timedelta(hours=5)
                 # Mostrar hora y luego fecha
                 log_date = dt_peru.strftime("%H:%M %d/%m/%Y")

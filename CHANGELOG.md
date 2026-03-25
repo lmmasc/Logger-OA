@@ -19,6 +19,10 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 - Los campos numéricos de logs (`RS`, intercambios y potencia) vuelven a mostrarse realmente con `Roboto Mono` bajo el tema activo, sin ser sobrescritos por el estilo global.
 - La tabla de registros del log y la tabla de base de datos usan `Roboto Mono Regular`, mejorando legibilidad y alineación de datos técnicos.
 - Las etiquetas `Intercambio recibido` e `Intercambio enviado` en español ganan ancho suficiente para evitar recortes visuales.
+- Se corrige la apertura de logs legacy cuyos timestamps estaban guardados como texto (`YYYY-MM-DD_HH-MM-SS`) en lugar de epoch UTC, evitando el error `invalid literal for int() with base 10`.
+
+### Compatibility
+- Al abrir logs legacy, la aplicación normaliza en disco los timestamps del encabezado y de contactos, y migra metadata/contactos a un formato versionado actual usando `PRAGMA user_version = 2`.
 
 ### Build
 - Los builds modernos y legacy quedan preparados para incluir tanto `RobotoMono-Regular.ttf` como `RobotoMono-Bold.ttf` desde la carpeta `assets`, asegurando negrita real en los ejecutables.
@@ -26,6 +30,7 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ### Docs
 - README actualizado para reflejar el flujo actual de entornos modernos y legacy, los scripts de build vigentes y la automatización de releases con GitHub Actions.
+- Se agrega una especificación formal del formato de logs en `BaseDocs/log_file_format_v2.md` y se enlaza desde el README.
 
 ## [1.2.1] - 2026-03-24
 ### Fixed
