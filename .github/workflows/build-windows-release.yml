@@ -67,19 +67,23 @@ jobs:
         shell: cmd
         run: scripts\build-windows.bat
 
-      - name: Rename Windows artifact
+      - name: Package Windows artifact
         shell: pwsh
         run: |
-          Copy-Item dist\LoggerOA.exe dist\LoggerOA-${env:RELEASE_TAG}-windows-x64.exe -Force
+          $packageDir = Join-Path $env:RUNNER_TEMP 'LoggerOA-windows-x64'
+          Remove-Item $packageDir -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Path $packageDir | Out-Null
+          Copy-Item dist\LoggerOA.exe (Join-Path $packageDir 'LoggerOA.exe') -Force
+          Compress-Archive -Path (Join-Path $packageDir 'LoggerOA.exe') -DestinationPath dist\LoggerOA-${env:RELEASE_TAG}-windows-x64.zip -Force
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
           name: LoggerOA-${{ steps.resolve_tag.outputs.release_tag }}-windows-x64
-          path: dist/LoggerOA-${{ steps.resolve_tag.outputs.release_tag }}-windows-x64.exe
+          path: dist/LoggerOA-${{ steps.resolve_tag.outputs.release_tag }}-windows-x64.zip
 
       - name: Attach asset to GitHub release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.resolve_tag.outputs.release_tag }}
-          files: dist/LoggerOA-${{ steps.resolve_tag.outputs.release_tag }}-windows-x64.exe
+          files: dist/LoggerOA-${{ steps.resolve_tag.outputs.release_tag }}-windows-x64.zip

@@ -23,7 +23,7 @@ exe = EXE(
     a.datas,
     [],
     exclude_binaries=False,
-    name='LoggerOA-win7-x86',
+    name='LoggerOA-win7',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

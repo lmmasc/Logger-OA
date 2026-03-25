@@ -89,12 +89,10 @@ jobs:
         run: |
           cd dist
           if [ -d LoggerOA.app ]; then
-            mv LoggerOA.app LoggerOA-${RELEASE_TAG}-${{ matrix.artifact_suffix }}.app
-            ditto -c -k --sequesterRsrc --keepParent LoggerOA-${RELEASE_TAG}-${{ matrix.artifact_suffix }}.app LoggerOA-${RELEASE_TAG}-${{ matrix.artifact_suffix }}.zip
+            ditto -c -k --sequesterRsrc --keepParent LoggerOA.app LoggerOA-${RELEASE_TAG}-${{ matrix.artifact_suffix }}.zip
           elif [ -f LoggerOA ]; then
-            mv LoggerOA LoggerOA-${RELEASE_TAG}-${{ matrix.artifact_suffix }}
-            chmod +x LoggerOA-${RELEASE_TAG}-${{ matrix.artifact_suffix }}
-            ditto -c -k --sequesterRsrc --keepParent LoggerOA-${RELEASE_TAG}-${{ matrix.artifact_suffix }} LoggerOA-${RELEASE_TAG}-${{ matrix.artifact_suffix }}.zip
+            chmod +x LoggerOA
+            ditto -c -k --sequesterRsrc --keepParent LoggerOA LoggerOA-${RELEASE_TAG}-${{ matrix.artifact_suffix }}.zip
           else
             echo "No se encontro artefacto esperado en dist/"
             ls -la

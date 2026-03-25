@@ -19,10 +19,11 @@ if "%GIT_VERSION%"=="" set GIT_VERSION=0.0.0-dev
   echo APP_VERSION = "%GIT_VERSION%"
 ) > src\version.py
 
+if exist dist\LoggerOA-win7.exe del /f /q dist\LoggerOA-win7.exe
 if exist dist\LoggerOA-win7-x86.exe del /f /q dist\LoggerOA-win7-x86.exe
 if exist dist\LoggerOA-win7-x86 rmdir /s /q dist\LoggerOA-win7-x86
 
 .venv-win7-x86\Scripts\python.exe -m PyInstaller --noconfirm LoggerOA.win7-x86.spec
 if errorlevel 1 exit /b %errorlevel%
 
-echo Build legacy generado en dist\LoggerOA-win7-x86.exe
+echo Build legacy generado en dist\LoggerOA-win7.exe
