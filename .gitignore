@@ -34,6 +34,8 @@ ENV/
 # PyInstaller
 *.manifest
 *.spec
+!LoggerOA.spec
+!LoggerOA.win7-x86.spec
 
 # Installer logs
 debug.log
