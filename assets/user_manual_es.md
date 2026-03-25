@@ -42,8 +42,9 @@ Al abrir Logger OA, verás la ventana principal con los siguientes menús:
 	- **Exportar como CSV**: Exporta el log actual en formato CSV (hoja de cálculo). Al finalizar, se abre la carpeta y se selecciona el archivo exportado.
 	- **Exportar como ADI**: Exporta el log actual en formato ADIF para otros programas de radioafición. Al finalizar, se abre la carpeta y se selecciona el archivo exportado.
 	- **Exportar como PDF**: Exporta el log de concurso en formato planilla PDF (solo disponible para logs de concurso). Al finalizar, se abre la carpeta y se selecciona el archivo exportado.
+	- **Exportar para WhatsApp**: Abre una ventana con texto simple listo para copiar y compartir rápidamente por WhatsApp u otros medios. No genera un archivo en disco.
 - **Cerrar log**: Cierra el log actual y vuelve a la pantalla de bienvenida.
-- **Abrir carpeta**: Accede rápidamente a la carpeta de trabajo.
+- **Abrir carpeta local**: Abre la carpeta local donde la aplicación guarda su base de datos y archivos de trabajo.
 - **Salir**: Cierra la aplicación.
 
 ### Menú Base de datos
@@ -71,7 +72,7 @@ Al abrir Logger OA, verás la ventana principal con los siguientes menús:
 - **Idioma** (submenú):
 	- **Español**: Cambia la interfaz al idioma español.
 	- **Inglés**: Cambia la interfaz al idioma inglés.
-	- **Automático**: Selecciona el idioma según la configuración del sistema operativo.
+	- **Automático**: Selecciona el idioma según el idioma del sistema operativo.
 
 ### Menú Ayuda
 - **Manual de uso**: Muestra este manual en pantalla.
@@ -90,14 +91,14 @@ Al abrir Logger OA, verás la ventana principal con los siguientes menús:
 
 2. **Opciones al crear un log operativo:**
 	- Define el indicativo principal de operación.
-	- Selecciona el tipo de operación (CPS, RENER, BOLETIN).
+	- Selecciona el tipo de operación (CPS, RENER, BOLETIN o genérico).
 	- Elige la banda de frecuencia y el modo (HF, VHF, LSB, USB, FM, etc.).
 	- Ingresa la frecuencia y, si corresponde, el repetidor.
 	- La aplicación genera automáticamente el archivo de log y lo asocia a la sesión.
 
 3. **Opciones al crear un log de concurso:**
 	- Define el indicativo principal de operación.
-	- Selecciona el concurso en el que participas (de una lista predefinida).
+	- Selecciona el concurso en el que participas (de una lista predefinida, por ejemplo Día Mundial de la Radio, Independencia del Perú o Día del Radioaficionado Peruano).
 	- El log se asocia al nombre del concurso y se genera el archivo correspondiente.
 
 4. Una vez creado el log, la ventana principal mostrará el encabezado con los datos seleccionados y podrás comenzar a registrar contactos.
@@ -130,9 +131,11 @@ Al abrir Logger OA, verás la ventana principal con los siguientes menús:
 ### Abrir un log existente
 1. Ve a **Archivo > Abrir** y selecciona **Abrir operativo** o **Abrir concurso**.
 2. Elige el archivo de log que deseas abrir.
+3. Si el log fue creado por una versión antigua y contiene datos legacy, la aplicación lo normaliza automáticamente al formato actual al abrirlo.
 
 ### Exportar logs y base de datos
-- Para exportar un log: **Archivo > Exportar log**.
+- Para exportar un log a archivo: **Archivo > Exportar** y luego elige **TXT**, **CSV**, **ADI** o **PDF** según corresponda.
+- Para compartir un resumen rápido por mensajería: **Archivo > Exportar > Exportar para WhatsApp**.
 - Para exportar la base de datos: **Base de datos > Exportar a CSV**.
 
 ### Importar operadores desde archivos externos
@@ -167,8 +170,8 @@ Al abrir Logger OA, verás la ventana principal con los siguientes menús:
 - Ve a **Preferencias > Indicativo** para definir, visualizar o cambiar el modo de uso del indicativo.
 
 ### Crear y restaurar respaldos
-- **Base de datos > Crear respaldo** para guardar una copia de seguridad.
-- **Base de datos > Restaurar respaldo** para recuperar datos desde un backup.
+- **Base de datos > Respaldo > Crear respaldo** para guardar una copia de seguridad.
+- **Base de datos > Respaldo > Restaurar respaldo** para recuperar datos desde un backup.
 
 ---
 

@@ -40,8 +40,9 @@ When you open Logger OA, you will see the main window with the following menus:
 	- **Export as CSV**: Export the current log in CSV (spreadsheet) format. When finished, the folder opens and the exported file is selected.
 	- **Export as ADI**: Export the current log in ADIF format for other ham radio programs. When finished, the folder opens and the exported file is selected.
 	- **Export as PDF**: Export the contest log in PDF sheet format (only available for contest logs). When finished, the folder opens and the exported file is selected.
+	- **Export for WhatsApp**: Opens a simple text window ready to copy and share quickly through WhatsApp or any other messaging tool. It does not create a file on disk.
 - **Close Log**: Close the current log and return to the welcome screen.
-- **Open Folder**: Quickly access the working folder.
+- **Open local folder**: Open the local folder where the application stores its database and working files.
 - **Exit**: Close the application.
 
 ### Database Menu
@@ -69,7 +70,7 @@ When you open Logger OA, you will see the main window with the following menus:
 - **Language** (submenu):
 	- **Spanish**: Switch the interface to Spanish.
 	- **English**: Switch the interface to English.
-	- **Automatic**: Select the language according to the operating system settings.
+	- **Automatic**: Select the language according to the operating system language.
 
 ### Help Menu
 - **User Manual**: Show this manual on screen.
@@ -87,14 +88,14 @@ When you open Logger OA, you will see the main window with the following menus:
 
 2. **Options when creating an operation log:**
 	- Define the main callsign for operation.
-	- Select the type of operation (CPS, RENER, BULLETIN).
+	- Select the type of operation (CPS, RENER, BULLETIN, or generic).
 	- Choose the frequency band and mode (HF, VHF, LSB, USB, FM, etc.).
 	- Enter the frequency and, if applicable, the repeater.
 	- The application automatically generates the log file and associates it with the session.
 
 3. **Options when creating a contest log:**
 	- Define the main callsign for operation.
-	- Select the contest you are participating in (from a predefined list).
+	- Select the contest you are participating in (from a predefined list, for example World Radio Day Contest, Independence of Peru Contest, or Peruvian Ham Day Contest).
 	- The log is associated with the contest name and the corresponding file is generated.
 
 4. Once the log is created, the main window will display the header with the selected data and you can start registering contacts.
@@ -127,9 +128,11 @@ When you open Logger OA, you will see the main window with the following menus:
 ### Open an Existing Log
 1. Go to **File > Open** and select **Open Operation Log** or **Open Contest Log**.
 2. Choose the log file you want to open.
+3. If the log was created by an older version and contains legacy data, the application automatically normalizes it to the current format when opening it.
 
 ### Export Logs and Database
-- To export a log: **File > Export > [Format]** (TXT, CSV, ADI, PDF). After exporting, the folder will open and the exported file will be selected automatically, regardless of your operating system (Windows, macOS, Linux). If your system does not support file selection, the folder will simply open as a fallback.
+- To export a log to a file: **File > Export > [Format]** (TXT, CSV, ADI, PDF). After exporting, the folder will open and the exported file will be selected automatically, regardless of your operating system (Windows, macOS, Linux). If your system does not support file selection, the folder will simply open as a fallback.
+- To share a quick text summary: **File > Export > Export for WhatsApp**.
 - To export the database: **Database > Export to CSV**.
 
 ### Import Operators from External Files
@@ -164,8 +167,8 @@ When you open Logger OA, you will see the main window with the following menus:
 - Go to **Preferences > Callsign** to define, view, or change the callsign usage mode.
 
 ### Create and Restore Backups
-- **Database > Create Backup** to save a backup copy.
-- **Database > Restore Backup** to recover data from a backup.
+- **Database > Backup > Create Backup** to save a backup copy.
+- **Database > Backup > Restore Backup** to recover data from a backup.
 
 ---
 
