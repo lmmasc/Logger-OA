@@ -1,4 +1,4 @@
-name: Build Linux Release
+name: Build Windows Release
 
 on:
   workflow_dispatch:
@@ -18,8 +18,8 @@ permissions:
   contents: write
 
 jobs:
-  build-linux:
-    runs-on: ubuntu-22.04
+  build-windows:
+    runs-on: windows-2022
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
@@ -31,6 +31,7 @@ jobs:
 
       - name: Resolve release tag
         id: resolve_tag
+        shell: bash
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             RAW_TAG="${{ github.event.inputs.release_tag }}"
@@ -47,6 +48,7 @@ jobs:
 
       - name: Checkout requested tag
         if: github.event_name == 'workflow_dispatch'
+        shell: bash
         run: |
           git fetch --tags origin
           git checkout "refs/tags/${RELEASE_TAG}"
@@ -55,46 +57,29 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          architecture: "x64"
 
-      - name: Install Linux runtime dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libgl1 \
-            libegl1 \
-            libdbus-1-3 \
-            libxkbcommon0 \
-            libfontconfig1 \
-            libxcb1 \
-            libx11-xcb1
+      - name: Create modern virtual environment
+        shell: cmd
+        run: scripts\setup-windows-modern.bat python
 
-      - name: Create virtual environment
-        run: |
-          python -m venv .venv
-          . .venv/bin/activate
-          pip install --upgrade pip
-          pip install -r requirements-dev-modern.txt
+      - name: Build Windows executable
+        shell: cmd
+        run: scripts\build-windows.bat
 
-      - name: Build Linux executable
+      - name: Rename Windows artifact
+        shell: pwsh
         run: |
-          chmod +x scripts/build-linux.sh
-          ./scripts/build-linux.sh
-
-      - name: Package Linux executable
-        run: |
-          cd dist
-          mv LoggerOA LoggerOA-${RELEASE_TAG}-linux-x64
-          chmod +x LoggerOA-${RELEASE_TAG}-linux-x64
-          tar -czf LoggerOA-${RELEASE_TAG}-linux-x64.tar.gz LoggerOA-${RELEASE_TAG}-linux-x64
+          Copy-Item dist\LoggerOA.exe dist\LoggerOA-${env:RELEASE_TAG}-windows-x64.exe -Force
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: LoggerOA-${{ steps.resolve_tag.outputs.release_tag }}-linux-x64
-          path: dist/LoggerOA-${{ steps.resolve_tag.outputs.release_tag }}-linux-x64.tar.gz
+          name: LoggerOA-${{ steps.resolve_tag.outputs.release_tag }}-windows-x64
+          path: dist/LoggerOA-${{ steps.resolve_tag.outputs.release_tag }}-windows-x64.exe
 
       - name: Attach asset to GitHub release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.resolve_tag.outputs.release_tag }}
-          files: dist/LoggerOA-${{ steps.resolve_tag.outputs.release_tag }}-linux-x64.tar.gz
+          files: dist/LoggerOA-${{ steps.resolve_tag.outputs.release_tag }}-windows-x64.exe

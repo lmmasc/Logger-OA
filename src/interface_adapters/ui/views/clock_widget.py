@@ -15,12 +15,11 @@ import datetime
 from PySide6.QtWidgets import QFrame, QLabel, QHBoxLayout, QSizePolicy, QVBoxLayout
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QFont
-from utils.resources import get_resource_path
-from PySide6.QtGui import QFontDatabase
 
 # --- Imports de la aplicación ---
 from translation.translation_service import translation_service
 from config.settings_service import LanguageValue, settings_service, ThemeValue
+from utils.fonts import build_roboto_mono_font
 
 
 class ClockWidget(QFrame):
@@ -49,18 +48,7 @@ class ClockWidget(QFrame):
         self.time = QLabel()
         self.time.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.time.setObjectName("ClockTimeOA" if not self.utc else "ClockTimeUTC")
-        font_path = get_resource_path("assets/RobotoMono-Regular.ttf")
-        font_id = QFontDatabase.addApplicationFont(font_path)
-        font_families = QFontDatabase.applicationFontFamilies(font_id)
-        font_time = QFont()
-        if font_families:
-            font_time.setFamily(font_families[0])
-        else:
-            font_time.setFamily(
-                "Consolas, Menlo, Courier New, Liberation Mono, Monospace"
-            )
-        font_time.setBold(True)
-        font_time.setPointSize(30)
+        font_time = build_roboto_mono_font(30, bold=True)
         self.time.setFont(font_time)
         main_layout.addWidget(self.time)
         # Fila inferior: label OA/UTC + fecha
@@ -71,21 +59,13 @@ class ClockWidget(QFrame):
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.label.setObjectName("ClockLabelOA" if not self.utc else "ClockLabelUTC")
         font_label = QFont()
-        # font_label.setFamily("Consolas, Menlo, Courier New, Liberation Mono, Monospace")
         font_label.setBold(True)
         font_label.setPointSize(14)
         self.label.setFont(font_label)
         self.date = QLabel()
         self.date.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.date.setObjectName("ClockDateOA" if not self.utc else "ClockDateUTC")
-        font_date = QFont()
-        if font_families:
-            font_date.setFamily(font_families[0])
-        else:
-            font_date.setFamily(
-                "Consolas, Menlo, Courier New, Liberation Mono, Monospace"
-            )
-        font_date.setPointSize(16)
+        font_date = build_roboto_mono_font(16, bold=False)
         self.date.setFont(font_date)
         bottom_layout.addWidget(self.label)
         bottom_layout.addWidget(self.date)

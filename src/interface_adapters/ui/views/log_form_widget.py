@@ -5,7 +5,7 @@ from domain.contact_type import ContactType
 
 # Third-party imports
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QIntValidator
+from PySide6.QtGui import QFont, QIntValidator
 from PySide6.QtWidgets import (
     QWidget,
     QLineEdit,
@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
     QSizePolicy,
     QDialog,
 )
+from utils.fonts import build_roboto_mono_font
 
 # Local application imports
 from translation.translation_service import translation_service
@@ -60,6 +61,10 @@ class LogFormWidget(QWidget):
         self._setup_ui()
         self._setup_tab_order()
 
+    def _build_technical_font(self, point_size: int, bold: bool = False) -> QFont:
+        """Construye la fuente monoespaciada usada en campos técnicos visibles."""
+        return build_roboto_mono_font(point_size, bold=bold)
+
     def _setup_ui(self):
         """
         Configura y construye la interfaz gráfica del formulario de log/contacto.
@@ -84,9 +89,8 @@ class LogFormWidget(QWidget):
             self.rs_rx_input.textChanged.connect(
                 lambda _: self._validate_widget(self.rs_rx_input)
             )
-            font_rs = self.rs_rx_input.font()
-            font_rs.setPointSize(18)
-            font_rs.setBold(True)
+            self.rs_rx_input.setProperty("monoFontSize", "18")
+            font_rs = self._build_technical_font(18, bold=False)
             self.rs_rx_input.setFont(font_rs)
             rs_rx_label = QLabel(translation_service.tr("rs_rx"))
             rs_rx_label.setAlignment(
@@ -108,9 +112,8 @@ class LogFormWidget(QWidget):
             self.exchange_received_input.textChanged.connect(
                 lambda _: self._validate_widget(self.exchange_received_input)
             )
-            font_ex = self.exchange_received_input.font()
-            font_ex.setPointSize(18)
-            font_ex.setBold(True)
+            self.exchange_received_input.setProperty("monoFontSize", "18")
+            font_ex = self._build_technical_font(18, bold=False)
             self.exchange_received_input.setFont(font_ex)
             exchange_received_label = QLabel(
                 translation_service.tr("exchange_received")
@@ -118,7 +121,7 @@ class LogFormWidget(QWidget):
             exchange_received_label.setAlignment(
                 Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
             )
-            exchange_received_label.setFixedWidth(140)
+            exchange_received_label.setFixedWidth(165)
             exchange_received_label.setSizePolicy(
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
             )
@@ -135,9 +138,8 @@ class LogFormWidget(QWidget):
             self.rs_tx_input.textChanged.connect(
                 lambda _: self._validate_widget(self.rs_tx_input)
             )
-            font_rs_tx = self.rs_tx_input.font()
-            font_rs_tx.setPointSize(18)
-            font_rs_tx.setBold(True)
+            self.rs_tx_input.setProperty("monoFontSize", "18")
+            font_rs_tx = self._build_technical_font(18, bold=False)
             self.rs_tx_input.setFont(font_rs_tx)
             rs_tx_label = QLabel(translation_service.tr("rs_tx"))
             rs_tx_label.setAlignment(
@@ -159,15 +161,14 @@ class LogFormWidget(QWidget):
             self.exchange_sent_input.textChanged.connect(
                 lambda _: self._validate_widget(self.exchange_sent_input)
             )
-            font_ex_sent = self.exchange_sent_input.font()
-            font_ex_sent.setPointSize(18)
-            font_ex_sent.setBold(True)
+            self.exchange_sent_input.setProperty("monoFontSize", "18")
+            font_ex_sent = self._build_technical_font(18, bold=False)
             self.exchange_sent_input.setFont(font_ex_sent)
             exchange_sent_label = QLabel(translation_service.tr("exchange_sent"))
             exchange_sent_label.setAlignment(
                 Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
             )
-            exchange_sent_label.setFixedWidth(140)
+            exchange_sent_label.setFixedWidth(165)
             exchange_sent_label.setSizePolicy(
                 QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
             )
@@ -251,6 +252,8 @@ class LogFormWidget(QWidget):
             self.power_input.textChanged.connect(
                 lambda _: self._validate_widget(self.power_input)
             )
+            self.power_input.setProperty("monoFontSize", "16")
+            self.power_input.setFont(self._build_technical_font(16, bold=False))
             power_label = QLabel(f"{translation_service.tr('power')} (W)")
             power_label.setAlignment(
                 Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
@@ -272,6 +275,8 @@ class LogFormWidget(QWidget):
             self.rs_rx_input.textChanged.connect(
                 lambda _: self._validate_widget(self.rs_rx_input)
             )
+            self.rs_rx_input.setProperty("monoFontSize", "18")
+            self.rs_rx_input.setFont(self._build_technical_font(18, bold=False))
             rs_rx_label = QLabel(translation_service.tr("rs_rx"))
             rs_rx_label.setAlignment(
                 Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
@@ -293,6 +298,8 @@ class LogFormWidget(QWidget):
             self.rs_tx_input.textChanged.connect(
                 lambda _: self._validate_widget(self.rs_tx_input)
             )
+            self.rs_tx_input.setProperty("monoFontSize", "18")
+            self.rs_tx_input.setFont(self._build_technical_font(18, bold=False))
             rs_tx_label = QLabel(translation_service.tr("rs_tx"))
             rs_tx_label.setAlignment(
                 Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter

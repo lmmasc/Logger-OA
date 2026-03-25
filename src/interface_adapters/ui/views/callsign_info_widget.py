@@ -5,9 +5,8 @@ CallsignInfoWidget: Widget para mostrar información y sugerencias de indicativo
 """
 
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QListWidget, QListWidgetItem
-from PySide6.QtGui import QFont, QFontDatabase
+from PySide6.QtGui import QFont
 from utils.callsign_parser import parse_callsign
-from utils.resources import get_resource_path
 from PySide6.QtCore import Signal, Qt, QTimer
 from translation.translation_service import translation_service
 from utils.text import get_filtered_operators
@@ -16,6 +15,7 @@ from infrastructure.repositories.sqlite_radio_operator_repository import (
 )
 from utils.datetime import format_iso_date
 from domain.callsign_utils import get_country_full_name
+from utils.fonts import build_roboto_mono_font
 
 
 class CallsignInfoWidget(QWidget):
@@ -131,18 +131,9 @@ class CallsignInfoWidget(QWidget):
             except Exception:
                 # Fallback a filtrado en memoria si algo falla
                 operadores = get_filtered_operators(filtro)
-        font_path = get_resource_path("assets/RobotoMono-Regular.ttf")
-        font_id = QFontDatabase.addApplicationFont(font_path)
-        font_families = QFontDatabase.applicationFontFamilies(font_id)
         for op in operadores:
             item = QListWidgetItem(op.callsign)
-            font = QFont()
-            if font_families:
-                font.setFamily(font_families[0])
-            else:
-                font.setFamily("Monospace")
-            font.setPointSize(20)
-            font.setBold(True)
+            font = build_roboto_mono_font(20, bold=True)
             item.setFont(font)
             if op.name:
                 item.setToolTip(op.name)

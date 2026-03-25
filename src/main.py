@@ -27,6 +27,7 @@ from infrastructure.db.connection import get_connection
 from infrastructure.db.schema import init_radioamateur_table
 from interface_adapters.ui.main_window import MainWindow
 from infrastructure.db import queries
+from utils.fonts import ensure_roboto_mono_registered
 
 
 def main():
@@ -43,6 +44,7 @@ def main():
 
         # Crear la aplicación Qt y mostrar la ventana principal
         app = QApplication(sys.argv)
+        ensure_roboto_mono_registered()
 
         # Chequeo automático de vencimientos al arranque
         try:

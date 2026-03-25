@@ -1,14 +1,26 @@
 #!/bin/bash
 # Script para generar el ejecutable en Linux
 
+set -euo pipefail
+
 cd "$(dirname "$0")/.."
-rm -f LoggerOA.spec
+
+if [ ! -x .venv/bin/python ]; then
+  echo "No existe .venv. Crea antes el entorno moderno e instala requirements-dev-modern.txt"
+  exit 1
+fi
+
+.venv/bin/python -c "import platform, struct; print('Build Linux con:', platform.python_version(), struct.calcsize('P') * 8)"
 
 # Generar version.py desde git (fallback a 0.0.0-dev)
 GIT_VERSION=$(git describe --tags --always --dirty 2>/dev/null || echo "0.0.0-dev")
 echo "APP_NAME = \"Logger OA\"" > src/version.py
 echo "APP_VERSION = \"${GIT_VERSION}\"" >> src/version.py
-# Incluir recursos y módulos necesarios en el binario
+
+rm -f dist/LoggerOA
+rm -rf build/LoggerOA
+
+# Incluir recursos y módulos necesarios en el binario Linux.
 .venv/bin/pyinstaller src/main.py \
   --onefile \
   --name LoggerOA \
@@ -28,4 +40,6 @@ echo "APP_VERSION = \"${GIT_VERSION}\"" >> src/version.py
   --hidden-import PySide6 \
   --hidden-import shiboken6 \
   --hidden-import translation.es.all_keys \
-  --hidden-import translation.en.all_keys \
+  --hidden-import translation.en.all_keys
+
+echo "Build Linux generado en dist/LoggerOA"

@@ -1,14 +1,4 @@
 
-## Licencia y condiciones de uso
-
-Este software se distribuye bajo la licencia MIT. Puedes copiarlo, modificarlo y crear tus propias versiones, siempre y cuando **menciones a los desarrolladores originales** en los créditos:
-
-- Miguel OA4BAU
-- Raquel OA4EHN
-
-No se aceptan sugerencias ni mejoras en este repositorio oficial. Eres libre de crear y distribuir tus propias versiones, respetando la mención a los autores.
-
-**Disclaimer:** Este software se proporciona "tal cual", sin garantías de ningún tipo, expresas o implícitas. Los autores no se hacen responsables por daños, pérdidas o cualquier consecuencia derivada del uso del software. Úsalo bajo tu propio riesgo.
 # Logger OA
 
 ![PySide6](https://img.shields.io/badge/UI-PySide6-blue)
@@ -26,9 +16,10 @@ Aplicación de escritorio multiplataforma para la gestión de concursos y operac
 - [Instalación](#instalación)
 - [Uso](#uso)
 - [Estructura del proyecto](#estructura-del-proyecto)
-- [Contribución](#contribución)
+- [Scripts de Build Multiplataforma](#scripts-de-build-multiplataforma)
+- [Automatización de Releases](#automatización-de-releases)
 - [Testing](#testing)
-- [Licencia](#licencia)
+- [Licencia y condiciones de uso](#licencia-y-condiciones-de-uso)
 - [Créditos / Autoría](#créditos--autoría)
 
 ---
@@ -41,6 +32,7 @@ Aplicación de escritorio multiplataforma para la gestión de concursos y operac
 - Interfaz gráfica moderna con PySide6 (Qt), temas claro/oscuro y cambio de idioma.
 - Arquitectura desacoplada basada en Clean Architecture.
 - Scripts de build para Linux, Windows y macOS.
+- Workflows de GitHub Actions para releases automáticos en Linux, Windows x64, Windows 7 x86 legacy, macOS Intel y macOS Apple Silicon.
 - Internacionalización modular y extensible.
 - Pruebas unitarias y de integración con pytest.
 
@@ -87,18 +79,18 @@ Si al abrir el ejecutable aparece el error `api-ms-win-crt-runtime-l1-1-0.dll`, 
    git clone <URL_DEL_REPOSITORIO>
   cd "Logger-OA"
    ```
-2. Crea y activa el entorno virtual correspondiente. Si solo trabajas con la variante moderna, usa el entorno moderno. Si además mantendrás Win7 x86, crea un segundo entorno dedicado para legacy.
+2. Crea y activa el entorno virtual correspondiente. Si solo trabajas con la variante moderna, usa `.venv` en cualquier plataforma. Si además mantendrás Win7 x86, crea un segundo entorno dedicado para legacy.
 
   **Linux:**
   ```bash
-  python3 -m venv .venv-linux
-  source .venv-linux/bin/activate
+  python3 -m venv .venv
+  source .venv/bin/activate
   ```
 
   **macOS:**
   ```bash
-  python3 -m venv .venv-mac
-  source .venv-mac/bin/activate
+  python3 -m venv .venv
+  source .venv/bin/activate
   ```
 
   **Windows (cmd):**
@@ -114,9 +106,7 @@ Si al abrir el ejecutable aparece el error `api-ms-win-crt-runtime-l1-1-0.dll`, 
   ```
   3. Instala las dependencias de la variante que vayas a usar:
    ```bash
-    # Variante moderna
-    pip install -r requirements-modern.txt
-    # Para desarrollo moderno:
+    # Variante moderna para desarrollo y builds
     pip install -r requirements-dev-modern.txt
    ```
     Para la variante legacy de Windows 7 x86:
@@ -234,6 +224,22 @@ En la carpeta `scripts/` hay scripts para generar ejecutables en Linux, macOS y 
 
 Ejecuta el script correspondiente para generar el ejecutable standalone.
 
+Para Linux y macOS, el flujo moderno usa el entorno `.venv` y `requirements-dev-modern.txt`.
+
+Ejemplos:
+
+```bash
+./scripts/build-linux.sh
+./scripts/build-mac.sh
+```
+
+En Windows:
+
+```cmd
+scripts\build-windows.bat
+scripts\build-windows-legacy.bat
+```
+
 Para Windows hay dos rutas distintas:
 
 - `build-windows.bat`: build moderno con el entorno `.venv`.
@@ -243,8 +249,39 @@ En la variante legacy Win7 x86 el resultado se genera como ejecutable `onefile` 
 
 En la variante moderna, `build-windows.bat` usa `LoggerOA.spec` como fuente de verdad del empaquetado y genera `dist\LoggerOA.exe`.
 
+En Linux y macOS, los scripts generan `src/version.py` desde el tag o commit actual y empaquetan también la carpeta `assets`, incluyendo las fuentes `RobotoMono-Regular.ttf` y `RobotoMono-Bold.ttf`.
 
 ---
+
+## Automatización de Releases
+
+El repositorio incluye workflows de GitHub Actions para generar builds de release automáticamente cuando se publica un tag con formato `v*` o cuando se lanzan manualmente vía `workflow_dispatch`.
+
+Workflows disponibles:
+
+- Linux x64: `.github/workflows/build-linux-release.yml`
+- Windows moderno x64: `.github/workflows/build-windows-release.yml`
+- Windows legacy Win7 x86: `.github/workflows/build-windows-legacy-release.yml`
+- macOS Intel x64 y Apple Silicon ARM64: `.github/workflows/build-macos-release.yml`
+
+Assets generados por tag:
+
+- `LoggerOA-vX.Y.Z-linux-x64.tar.gz`
+- `LoggerOA-vX.Y.Z-windows-x64.exe`
+- `LoggerOA-vX.Y.Z-windows-win7-x86.exe`
+- `LoggerOA-vX.Y.Z-macos-intel-x64.zip`
+- `LoggerOA-vX.Y.Z-macos-arm64.zip`
+
+Importante:
+
+- Los workflows deben existir ya en el commit al que apunta el tag.
+- Los builds de macOS no incluyen firma ni notarización de Apple.
+- La variante legacy sigue requiriendo Python 3.8 x86 y dependencias separadas.
+
+
+---
+
+## Testing
 
 Las pruebas unitarias y de integración se encuentran en la carpeta `tests/` y utilizan `pytest`.
 
@@ -252,6 +289,19 @@ Para ejecutar todas las pruebas:
 ```bash
 pytest
 ```
+
+---
+
+## Licencia y condiciones de uso
+
+Este software se distribuye bajo la licencia MIT. Puedes copiarlo, modificarlo y crear tus propias versiones, siempre y cuando **menciones a los desarrolladores originales** en los créditos:
+
+- Miguel OA4BAU
+- Raquel OA4EHN
+
+No se aceptan sugerencias ni mejoras en este repositorio oficial. Eres libre de crear y distribuir tus propias versiones, respetando la mención a los autores.
+
+**Disclaimer:** Este software se proporciona "tal cual", sin garantías de ningún tipo, expresas o implícitas. Los autores no se hacen responsables por daños, pérdidas o cualquier consecuencia derivada del uso del software. Úsalo bajo tu propio riesgo.
 
 ---
 

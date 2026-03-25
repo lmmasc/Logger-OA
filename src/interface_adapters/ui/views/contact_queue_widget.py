@@ -20,7 +20,6 @@ from PySide6.QtWidgets import (
     QStyle,
 )
 from PySide6.QtGui import QFont, QFontDatabase
-from utils.resources import get_resource_path
 from PySide6.QtCore import Signal, Qt
 from PySide6.QtWidgets import (
     QWidget,
@@ -33,11 +32,11 @@ from PySide6.QtWidgets import (
     QStyledItemDelegate,
     QStyle,
 )
-from PySide6.QtGui import QFont, QFontDatabase
-from utils.resources import get_resource_path
+from PySide6.QtGui import QFont
 
 # --- Imports de la aplicación ---
 from translation.translation_service import translation_service
+from utils.fonts import build_roboto_mono_font
 
 
 class NoFocusDelegate(QStyledItemDelegate):
@@ -80,15 +79,7 @@ class ContactQueueWidget(QWidget):
         self.queue_list.setWrapping(False)
         self.label.setFixedHeight(42)
         self.queue_list.setFixedHeight(68)
-        font_path = get_resource_path("assets/RobotoMono-Regular.ttf")
-        font_id = QFontDatabase.addApplicationFont(font_path)
-        font_families = QFontDatabase.applicationFontFamilies(font_id)
-        font = self.queue_list.font()
-        if font_families:
-            font.setFamily(font_families[0])
-        else:
-            font.setFamily("Monospace")
-        font.setPointSize(20)
+        font = build_roboto_mono_font(20, bold=False)
         self.queue_list.setFont(font)
         self.queue_list.setObjectName("ContactQueueList")
         self.queue_list.setItemDelegate(NoFocusDelegate())

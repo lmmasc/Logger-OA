@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
     QAbstractItemView,
 )
 from PySide6.QtCore import Qt
+from utils.fonts import build_roboto_mono_font
 
 # --- Imports de la aplicación ---
 from translation.translation_service import translation_service
@@ -35,6 +36,7 @@ class ContactTableWidget(QWidget):
         self.log_type = log_type
         main_layout = QVBoxLayout(self)
         self.table = QTableWidget(self)
+        self.table.setFont(build_roboto_mono_font(11, bold=False))
         main_layout.addWidget(self.table)
         self.setLayout(main_layout)
         self.set_columns()
@@ -139,9 +141,11 @@ class ContactTableWidget(QWidget):
 
         # Numeración invertida: la fila superior tiene el número más alto
         total = len(display_contacts)
+        row_font = build_roboto_mono_font(11, bold=False)
         for row, contact in enumerate(display_contacts):
             # Establecer el número de orden invertido en la primera columna
             item_num = QTableWidgetItem(str(total - row))
+            item_num.setFont(row_font)
             self.table.setVerticalHeaderItem(row, item_num)
             for col, key in enumerate(keys):
                 value = None
@@ -187,12 +191,15 @@ class ContactTableWidget(QWidget):
                 # --- Alineación derecha para RS_RX y RS_TX en concursos ---
                 if self.log_type == LogType.CONTEST_LOG and key in ("rs_rx", "rs_tx"):
                     item = QTableWidgetItem(str(value))
+                    item.setFont(row_font)
                     item.setTextAlignment(
                         Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
                     )
                     self.table.setItem(row, col, item)
                 else:
-                    self.table.setItem(row, col, QTableWidgetItem(str(value)))
+                    item = QTableWidgetItem(str(value))
+                    item.setFont(row_font)
+                    self.table.setItem(row, col, item)
         self.table.viewport().update()
         self.table.repaint()
         self.table.hide()

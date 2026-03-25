@@ -6,3 +6,34 @@ QWidget {
     font-size: 12pt;
 }
 
+QLabel#ClockTimeOA,
+QLabel#ClockTimeUTC {
+    font-family: 'Roboto Mono';
+    font-size: 30pt;
+    font-weight: bold;
+}
+
+QLabel#ClockLabelOA,
+QLabel#ClockLabelUTC {
+    font-size: 14pt;
+    font-weight: bold;
+}
+
+QLabel#ClockDateOA,
+QLabel#ClockDateUTC {
+    font-family: 'Roboto Mono';
+    font-size: 16pt;
+}
+
+QLineEdit[monoFontSize="18"] {
+    font-family: 'Roboto Mono';
+    font-size: 18pt;
+    font-weight: 400;
+}
+
+QLineEdit[monoFontSize="16"] {
+    font-family: 'Roboto Mono';
+    font-size: 16pt;
+    font-weight: 400;
+}
+

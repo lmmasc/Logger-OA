@@ -19,8 +19,7 @@ from PySide6.QtWidgets import (
     QGridLayout,  # Para grid de checkboxes
 )
 from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QFont, QFontDatabase
-from utils.resources import get_resource_path
+from PySide6.QtGui import QFont
 
 # --- Imports de la aplicación ---
 from interface_adapters.controllers.radio_operator_controller import (
@@ -29,6 +28,7 @@ from interface_adapters.controllers.radio_operator_controller import (
 from translation.translation_service import translation_service
 from config.settings_service import settings_service
 from utils.text import filter_text_match
+from utils.fonts import build_roboto_mono_font
 
 
 class DBTableWindow(QWidget):
@@ -80,16 +80,7 @@ class DBTableWindow(QWidget):
         # Filtro y métricas
         filter_layout = QHBoxLayout()
         self.filter_edit = QLineEdit()
-        font_path = get_resource_path("assets/RobotoMono-Regular.ttf")
-        font_id = QFontDatabase.addApplicationFont(font_path)
-        font_families = QFontDatabase.applicationFontFamilies(font_id)
-        font = self.filter_edit.font()
-        if font_families:
-            font.setFamily(font_families[0])
-        else:
-            font.setFamily("Monospace")
-        font.setPointSize(16)
-        font.setBold(True)
+        font = build_roboto_mono_font(16, bold=True)
         self.filter_edit.setFont(font)
         self.filter_edit.setPlaceholderText(
             translation_service.tr("filter_placeholder")
@@ -111,6 +102,7 @@ class DBTableWindow(QWidget):
 
         # Tabla
         self.table = QTableWidget()
+        self.table.setFont(build_roboto_mono_font(11, bold=False))
         main_layout.addWidget(self.table)
 
         # Controlador
@@ -416,6 +408,7 @@ class DBTableWindow(QWidget):
                     )
                     value = getattr(op, attr, "")
                     item = QTableWidgetItem(str(value))
+                item.setFont(build_roboto_mono_font(11, bold=False))
                 self.table.setItem(row_idx, col_idx, item)
         self.apply_column_visibility()
         # Actualizar contador y paginación

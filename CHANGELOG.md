@@ -6,6 +6,27 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 
+## [1.2.2] - 2026-03-25
+### Changed
+- Se centraliza la carga de `Roboto Mono` en un helper compartido, evitando registros dispersos de la fuente en widgets individuales.
+- Los widgets técnicos y de datos pasan a usar una estrategia tipográfica consistente: `Roboto Mono Bold` para elementos principales como indicativo y hora, y `Roboto Mono Regular` para campos numéricos y tablas.
+
+### Fixed
+- Se corrige una regresión en el formulario de concursos: `get_data()` ya no intenta aplicar defaults de estación/energía propios de logs operativos, evitando el `AttributeError` sobre `station_input`.
+- Los diálogos de confirmación visibles en logs y concursos aplican correctamente traducciones para botones y mensajes, incluyendo el aviso de contacto duplicado dentro del bloque horario OA.
+- Se localizan textos visibles que aún estaban hardcodeados en la UI, incluyendo tooltip de `QRZ`, exportación para WhatsApp y mensajes de respaldo, restauración e importación de base de datos.
+- Se restaura el tamaño tipográfico correcto de los relojes bajo el sistema de temas actual, evitando que el stylesheet global reduzca la hora y la fecha.
+- Los campos numéricos de logs (`RS`, intercambios y potencia) vuelven a mostrarse realmente con `Roboto Mono` bajo el tema activo, sin ser sobrescritos por el estilo global.
+- La tabla de registros del log y la tabla de base de datos usan `Roboto Mono Regular`, mejorando legibilidad y alineación de datos técnicos.
+- Las etiquetas `Intercambio recibido` e `Intercambio enviado` en español ganan ancho suficiente para evitar recortes visuales.
+
+### Build
+- Los builds modernos y legacy quedan preparados para incluir tanto `RobotoMono-Regular.ttf` como `RobotoMono-Bold.ttf` desde la carpeta `assets`, asegurando negrita real en los ejecutables.
+- Se agregan workflows de GitHub Actions para compilar releases automáticos en Linux, Windows moderno, Windows legacy Win7 x86 y macOS (Intel y Apple Silicon) al publicar tags `v*`.
+
+### Docs
+- README actualizado para reflejar el flujo actual de entornos modernos y legacy, los scripts de build vigentes y la automatización de releases con GitHub Actions.
+
 ## [1.2.1] - 2026-03-24
 ### Fixed
 - Los diálogos de confirmación en concursos ahora traducen correctamente los botones `Sí/No` en lugar de depender de los textos estándar de Qt.
@@ -103,7 +124,8 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 - Sistema de traducciones modular.
 - Pruebas con pytest.
 
-[Unreleased]: https://github.com/lmmasc/Logger-OA/compare/v1.2.1...HEAD
+[Unreleased]: https://github.com/lmmasc/Logger-OA/compare/v1.2.2...HEAD
+[1.2.2]: https://github.com/lmmasc/Logger-OA/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/lmmasc/Logger-OA/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/lmmasc/Logger-OA/releases/tag/v1.2.0
 
