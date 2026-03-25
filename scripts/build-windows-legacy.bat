@@ -22,7 +22,7 @@ if "%GIT_VERSION%"=="" set GIT_VERSION=0.0.0-dev
 if exist dist\LoggerOA-win7-x86.exe del /f /q dist\LoggerOA-win7-x86.exe
 if exist dist\LoggerOA-win7-x86 rmdir /s /q dist\LoggerOA-win7-x86
 
-.venv-win7-x86\Scripts\pyinstaller --noconfirm LoggerOA.win7-x86.spec
+.venv-win7-x86\Scripts\python.exe -m PyInstaller --noconfirm LoggerOA.win7-x86.spec
 if errorlevel 1 exit /b %errorlevel%
 
 echo Build legacy generado en dist\LoggerOA-win7-x86.exe
